@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_getting_started">Per iniziare</string>
+    <string name="title_topic_preferences">Persolanilizza il tuo feed</string>
+    <string name="subtitle_topic_preferences">Seleziona almeno 3 categorie</string>
+    <string name="logo">Logo applicazione</string>
+</resources>

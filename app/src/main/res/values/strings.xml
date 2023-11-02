@@ -2,6 +2,6 @@
     <string name="app_name" translatable="false">Readify</string>
     <string name="button_getting_started">Proceed</string>
     <string name="title_topic_preferences">Personalize your feed</string>
-    <string name="subtitle_topic_preferences">Select at least 3 topics loremlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsum ipsum</string>
+    <string name="subtitle_topic_preferences">Select at least 3 topics loremlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem</string>
     <string name="logo">App logo</string>
 </resources>

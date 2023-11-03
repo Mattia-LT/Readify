@@ -2,9 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary_color">#D60000</color>
-    <color name="secondary_color">#f29303</color>
-    <color name="tertiary_color">#FFE1F4</color>
-
+    <color name="background_color">#0047AB</color>
+    <color name="primary_color">#000080</color>
+    <color name="secondary_color">#ADD8E6</color>
+    <color name="tertiary_color">#008080</color>
+    <color name="golden_yellow">#FFC000</color>
+    <color name="orange">#FFA500</color>
 
 </resources>

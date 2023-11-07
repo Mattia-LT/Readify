@@ -1,9 +1,19 @@
 <resources>
     <string name="app_name" translatable="false">Readify</string>
     <string name="button_getting_started">Get started</string>
-
     <string name="logo">App logo</string>
     <string name="textview_slogan">Reading.\nThe Clever Way.</string>
+
+
+    <string name="login" translatable="false">Login</string>
+    <string name="email" translatable="false">E-mail</string>
+    <string name="password" translatable="false">Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="new_account">No account yet?</string>
+    <string name="register">Register</string>
+    <string name="google_login">Login with Google</string>
+
+
     <string name="navigation_bar_item_home" translatable="false">Home</string>
     <string name="navigation_bar_item_search">Search</string>
     <string name="navigation_bar_item_profile">Profile</string>

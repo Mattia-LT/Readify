@@ -3,4 +3,7 @@
     <string name="button_getting_started">Inizia</string>
     <string name="logo">Logo applicazione</string>
     <string name="textview_slogan">Leggi.\nIn modo intelligente</string>
+    <string name="navigation_bar_item_search">Cerca</string>
+    <string name="navigation_bar_item_profile">Profilo</string>
+    <string name="navigation_bar_item_saved">Salvati</string>
 </resources>

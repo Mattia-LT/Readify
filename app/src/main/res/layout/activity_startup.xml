@@ -51,7 +51,7 @@
         android:text="@string/textview_slogan"
         android:textSize="48sp"
         android:textStyle="italic"
-        android:background="@drawable/blur_bottom_to_top"
+        android:background="@drawable/blur_effect"
         />
 
 

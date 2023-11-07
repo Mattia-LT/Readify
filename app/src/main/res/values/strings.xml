@@ -4,4 +4,8 @@
 
     <string name="logo">App logo</string>
     <string name="textview_slogan">Reading.\nThe Clever Way.</string>
+    <string name="navigation_bar_item_home" translatable="false">Home</string>
+    <string name="navigation_bar_item_search">Search</string>
+    <string name="navigation_bar_item_profile">Profile</string>
+    <string name="navigation_bar_item_saved">Saved</string>
 </resources>

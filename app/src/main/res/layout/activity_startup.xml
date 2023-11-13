@@ -39,6 +39,7 @@
         />
 
     <TextView
+        android:id="@+id/textview_slogan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -66,6 +67,7 @@
         android:paddingHorizontal="50sp"
         android:paddingVertical="15sp"
         android:backgroundTint="@color/golden_yellow"
+        app:layout_constraintTop_toBottomOf="@+id/textview_slogan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

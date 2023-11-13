@@ -1,11 +1,13 @@
-package it.unimib.readify;
+package it.unimib.readify.ui.startup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import it.unimib.readify.R;
+import it.unimib.readify.ui.main.HomepageActivity;
 
 public class StartupActivity extends AppCompatActivity {
 

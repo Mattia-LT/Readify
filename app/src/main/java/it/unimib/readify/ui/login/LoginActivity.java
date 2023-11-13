@@ -1,4 +1,4 @@
-package it.unimib.readify;
+package it.unimib.readify.ui.login;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;

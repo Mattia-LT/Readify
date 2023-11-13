@@ -1,9 +1,11 @@
-package it.unimib.readify;
+package it.unimib.readify.ui.main;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import it.unimib.readify.R;
 
 public class HomepageActivity extends AppCompatActivity {
 

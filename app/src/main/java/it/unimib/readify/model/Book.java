@@ -6,6 +6,11 @@ public class Book {
     private String id;
     private String[] topics;
 
+    public Book(String name, String id, String[] topics) {
+        this.name = name;
+        this.id = id;
+        this.topics = topics;
+    }
 
     public String getName() {
         return name;

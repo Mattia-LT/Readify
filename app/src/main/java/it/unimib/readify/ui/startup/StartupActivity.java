@@ -7,7 +7,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import it.unimib.readify.R;
-import it.unimib.readify.ui.main.HomepageActivity;
+import it.unimib.readify.ui.main.HomeActivity;
 
 public class StartupActivity extends AppCompatActivity {
 
@@ -19,7 +19,7 @@ public class StartupActivity extends AppCompatActivity {
         Button btn_getting_started = findViewById(R.id.button_startup);
 
         btn_getting_started.setOnClickListener(view -> {
-            Intent intent = new Intent(this, HomepageActivity.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             // intent.putExtra(key, value);
 
 

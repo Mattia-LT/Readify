@@ -10,4 +10,6 @@
     <string name="navigation_bar_item_search">Cerca</string>
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

@@ -10,5 +10,6 @@
     <color name="orange">#FFA500</color>
     <color name="google_login_button">#eceff1</color>
     <color name="google_login_text">#616161</color>
+    <color name="light_purple">#8263bf</color>
 
 </resources>

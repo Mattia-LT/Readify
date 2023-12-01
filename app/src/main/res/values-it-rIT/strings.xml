@@ -12,4 +12,10 @@
     <string name="navigation_bar_item_saved">Salvati</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="pa_title">La Mia Area Personale</string>
+    <string name="pa_collections">Raccolte</string>
+    <string name="pa_stats">Statistiche</string>
+    <string name="pa_notes">Note</string>
+    <string name="pa_settings">Impostazioni</string>
+
 </resources>

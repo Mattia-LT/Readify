@@ -20,4 +20,13 @@
     <string name="navigation_bar_item_saved">Saved</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- pa sta per personal area UwU-->
+    <string name="pa_title">My Personal Area</string>
+    <string name="pa_collections">Collections</string>
+    <string name="pa_stats">Statistics</string>
+    <string name="pa_notes">Notes</string>
+    <string name="pa_settings">Settings</string>
+    <string name="pa_description_photo" translatable="false">personal area photo</string>
+    <string name="pa_description_arrow" translatable="false">arrow right</string>
 </resources>

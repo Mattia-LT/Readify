@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
+import it.unimib.readify.ui.startup.LoginFragment;
+
 //TODO --> POSSIBILMENTE DA RIVEDERE NEL CASO DOVESSIMO UTILIZZARLO. HO COPIATO IL FILE DEL PROF
 
 /**
@@ -25,7 +27,7 @@ public class DataEncryptionUtil {
 
     private final Context context;
 
-    public DataEncryptionUtil(Context context) {
+    public DataEncryptionUtil(LoginFragment context) {
         this.context = context;
     }
 

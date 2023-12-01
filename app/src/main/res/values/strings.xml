@@ -13,11 +13,14 @@
     <string name="register">Register</string>
     <string name="google_login">Login with Google</string>
 
+    <string name= "error_email">The email is invalid</string>
+    <string name= "error_password">The password is invalid</string>
 
     <string name="navigation_bar_item_home" translatable="false">Home</string>
     <string name="navigation_bar_item_search">Search</string>
     <string name="navigation_bar_item_profile">Profile</string>
     <string name="navigation_bar_item_saved">Saved</string>
+    <string name="check_login_data_message">Check the data you inserted</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

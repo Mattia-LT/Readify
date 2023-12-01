@@ -10,6 +10,9 @@
     <string name="navigation_bar_item_search">Cerca</string>
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>
+    <string name= "error_email">La mail non è valida</string>
+    <string name= "error_password">La password non è valida</string>
+    <string name="check_login_data_message">Controllare i dati inseriti</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="pa_title">La Mia Area Personale</string>

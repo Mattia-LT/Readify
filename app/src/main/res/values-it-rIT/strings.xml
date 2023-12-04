@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="button_add_comment">Aggiungi il commento</string>
     <string name="button_getting_started">Inizia</string>
-    <string name="logo">Logo applicazione</string>
-    <string name="textview_slogan">Leggi.\nIn modo intelligente</string>
+    <string name="check_login_data_message">Controllare i dati inseriti</string>
+    <string name="error_email">La mail non è valida</string>
+    <string name="error_password">La password non è valida</string>
     <string name="forgot_password">Password dimenticata?</string>
-    <string name="new_account">Non hai ancora un account?</string>
-    <string name="register">Registrati</string>
     <string name="google_login">Login con Google</string>
-    <string name="navigation_bar_item_search">Cerca</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_comment">Scrivi qui il tuo commento</string>
+    <string name="logo">Logo applicazione</string>
+
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>
-    <string name= "error_email">La mail non è valida</string>
-    <string name= "error_password">La password non è valida</string>
-    <string name="check_login_data_message">Controllare i dati inseriti</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_bar_item_search">Cerca</string>
+    <string name="new_account">Non hai ancora un account?</string>
 
-    <string name="pa_title">La Mia Area Personale</string>
     <string name="pa_collections">Raccolte</string>
-    <string name="pa_stats">Statistiche</string>
     <string name="pa_notes">Note</string>
     <string name="pa_settings">Impostazioni</string>
+    <string name="pa_stats">Statistiche</string>
+    <string name="pa_title">La Mia Area Personale</string>
+
+    <string name="placeholder_book_author">Autore del libro</string>
+    <string name="placeholder_book_description">Descrizione del libro</string>
+    <string name="placeholder_book_title">Titolo del libro</string>
+    <string name="placeholder_comment">Corpo del commento</string>
+    <string name="placeholder_comment_name">Nome</string>
+
+    <string name="register">Registrati</string>
+
+    <string name="textview_comments_title">Commenti</string>
+    <string name="textview_description_title">Descrizione</string>
+    <string name="textview_icon_already_read">Già letto?</string>
+    <string name="textview_icon_readlist">ReadList</string>
+    <string name="textview_slogan">Leggi.\nIn modo intelligente</string>
+    <string name="hint_search_book">Inserisci il titolo del libro</string>
+    <string name="button_search">Cerca</string>
+    <string name="hint_search_author">Inserisci il nome dell\'autore</string>
+    <string name="textview_search_filters_title">Filtri di ricerca e Ordinamento</string>
+    <string name="textview_sort_by_label">Ordina per</string>
+    <string name="textview_alphabetical_order_label">Alfabetico</string>
+    <string name="textview_rating_order_label">Valutazione</string>
+    <string name="textview_genre_filter_label">Genere</string>
+    <string name="chip_genre_action">Azione</string>
+    <string name="chip_genre_science_fiction">Fantascientifico</string>
+    <string name="chip_genre_biography">Biografia</string>
+    <string name="button_apply">Applica</string>
+    <string name="content_description_book_cover">Copertina del libro</string>
+    <string name="content_description_add_to_bookshelf">Bottone \"aggiungi alla libreria\"</string>
+    <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
+    <string name="button_retry">Riprova</string>
+    <string name="content_description_filter_button">Bottone per i filtri della ricerca</string>
 
 </resources>

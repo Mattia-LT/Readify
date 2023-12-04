@@ -1,35 +1,68 @@
 <resources>
+
     <string name="app_name" translatable="false">Readify</string>
+    <string name="button_add_comment">Add comment</string>
     <string name="button_getting_started">Get started</string>
-    <string name="logo">App logo</string>
-    <string name="textview_slogan">Reading.\nThe Clever Way.</string>
-
-
-    <string name="login" translatable="false">Login</string>
+    <string name="check_login_data_message">Check the data you inserted</string>
     <string name="email" translatable="false">E-mail</string>
-    <string name="password" translatable="false">Password</string>
+    <string name="error_email">The email is invalid</string>
+    <string name="error_password">The password is invalid</string>
     <string name="forgot_password">Forgot password?</string>
-    <string name="new_account">No account yet?</string>
-    <string name="register">Register</string>
     <string name="google_login">Login with Google</string>
-
-    <string name= "error_email">The email is invalid</string>
-    <string name= "error_password">The password is invalid</string>
-
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_comment">Write your comment here</string>
+    <string name="login" translatable="false">Login</string>
+    <string name="logo">App logo</string>
     <string name="navigation_bar_item_home" translatable="false">Home</string>
-    <string name="navigation_bar_item_search">Search</string>
     <string name="navigation_bar_item_profile">Profile</string>
     <string name="navigation_bar_item_saved">Saved</string>
-    <string name="check_login_data_message">Check the data you inserted</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_bar_item_search">Search</string>
+    <string name="new_account">No account yet?</string>
 
     <!-- pa sta per personal area UwU-->
-    <string name="pa_title">My Personal Area</string>
     <string name="pa_collections">Collections</string>
-    <string name="pa_stats">Statistics</string>
+    <string name="pa_description_arrow" translatable="false">arrow right</string>
+    <string name="pa_description_photo" translatable="false">personal area photo</string>
     <string name="pa_notes">Notes</string>
     <string name="pa_settings">Settings</string>
-    <string name="pa_description_photo" translatable="false">personal area photo</string>
-    <string name="pa_description_arrow" translatable="false">arrow right</string>
+    <string name="pa_stats">Statistics</string>
+    <string name="pa_title">My Personal Area</string>
+
+    <string name="password" translatable="false">Password</string>
+
+    <string name="placeholder_book_author">Book author</string>
+    <string name="placeholder_book_description">Book description</string>
+    <string name="placeholder_book_rating" translatable="false">5.0</string>
+    <string name="placeholder_book_title">Book title</string>
+    <string name="placeholder_comment">Body of the comment</string>
+    <string name="placeholder_comment_name">Name</string>
+    <string name="placeholder_date" translatable="false">01/01/2023</string>
+
+    <string name="register">Register</string>
+
+    <string name="textview_comments_title">Comments</string>
+    <string name="textview_description_title">Description</string>
+    <string name="textview_icon_already_read">Already read?</string>
+    <string name="textview_icon_readlist">ReadList</string>
+    <string name="textview_slogan">Reading.\nThe Clever Way.</string>
+    <string name="hint_search_book">Enter book title</string>
+    <string name="button_search">Search</string>
+    <string name="hint_search_author">Enter author name</string>
+    <string name="textview_search_filters_title">Sort and Search Filters</string>
+    <string name="textview_sort_by_label">Sort by</string>
+    <string name="textview_alphabetical_order_label">Alphabetical</string>
+    <string name="textview_rating_order_label">Rating</string>
+    <string name="textview_genre_filter_label">Genre</string>
+    <string name="chip_genre_fantasy" translatable="false">Fantasy</string>
+    <string name="chip_genre_action">Action</string>
+    <string name="chip_genre_thriller" translatable="false">Thriller</string>
+    <string name="chip_genre_science_fiction">Science Fiction</string>
+    <string name="chip_genre_biography">Biography</string>
+    <string name="button_apply">Apply</string>
+    <string name="button_reset" translatable="false">Reset</string>
+    <string name="content_description_book_cover">Cover of the book</string>
+    <string name="content_description_add_to_bookshelf">Button \"add to bookshelf\"</string>
+    <string name="placeholder_error_message">An error occurred. Please, retry.</string>
+    <string name="button_retry">Retry</string>
+    <string name="content_description_filter_button">Filter Search Button</string>
 </resources>

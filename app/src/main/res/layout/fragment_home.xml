@@ -12,4 +12,14 @@
         android:gravity="center"
         android:text="HOME" />
 
+    <!-- TODO da rimuovere -->
+    <Button
+        android:id="@+id/button_da_rimuovere"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PROVA"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        />
+
 </FrameLayout>

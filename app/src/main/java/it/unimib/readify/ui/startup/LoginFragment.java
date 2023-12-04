@@ -5,8 +5,6 @@ import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.PASSWORD;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -30,6 +28,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
+import it.unimib.readify.ui.main.HomeActivity;
 import it.unimib.readify.util.DataEncryptionUtil;
 
 public class LoginFragment extends Fragment {
@@ -46,15 +45,15 @@ public class LoginFragment extends Fragment {
         return new LoginFragment();
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_login, container, false);
+        textInputLayoutEmail = rootView.findViewById(R.id.text_input_layout_email);
+        textInputLayoutPassword = rootView.findViewById(R.id.text_input_layout_password);
+        final Button buttonLogin = rootView.findViewById(R.id.button_login);
 
-        textInputLayoutEmail = findViewById(R.id.text_input_layout_email);
-        textInputLayoutPassword = findViewById(R.id.text_input_layout_password);
-        final Button buttonLogin = findViewById(R.id.button_login);
-
-        dataEncryptionUtil = new DataEncryptionUtil(this);
+        dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
 
         try {
             Log.d(TAG, "Email address from encrypted SharedPref: " + dataEncryptionUtil.
@@ -79,10 +78,20 @@ public class LoginFragment extends Fragment {
                 Log.d(TAG, "Email and password are ok");
                 saveLoginData(email, password);
             } else {
-                Snackbar.make(findViewById(android.R.id.content),
+                Snackbar.make(rootView.findViewById(android.R.id.content),
                         R.string.check_login_data_message, Snackbar.LENGTH_SHORT).show();
             }
         });
+
+
+
+
+        //TODO da rimuovere il listener, messo da tia per vedere se andava l'app
+        buttonLogin.setOnClickListener(v -> {
+            navigateToHomeActivity();
+        });
+
+        return rootView;
     }
 
     private boolean isEmailOk(String email) {
@@ -161,7 +170,15 @@ public class LoginFragment extends Fragment {
 
 
 
-
+    private void navigateToHomeActivity() {
+        if (USE_NAVIGATION_COMPONENT) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);
+        } else {
+            Intent intent = new Intent(requireContext(), HomeActivity.class);
+            startActivity(intent);
+            requireActivity().finish();
+        }
+    }
 
 
 

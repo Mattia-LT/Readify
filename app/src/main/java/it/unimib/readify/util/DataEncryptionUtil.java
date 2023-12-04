@@ -1,5 +1,6 @@
 package it.unimib.readify.util;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -27,8 +28,8 @@ public class DataEncryptionUtil {
 
     private final Context context;
 
-    public DataEncryptionUtil(LoginFragment context) {
-        this.context = context;
+    public DataEncryptionUtil(Application application) {
+        this.context = application.getApplicationContext();
     }
 
     /**

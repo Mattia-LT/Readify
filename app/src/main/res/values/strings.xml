@@ -29,6 +29,7 @@
     <string name="pa_title">My Personal Area</string>
 
     <string name="password" translatable="false">Password</string>
+    <string name="password_confirm">Confirm Password</string>
 
     <string name="placeholder_book_author">Book author</string>
     <string name="placeholder_book_description">Book description</string>
@@ -39,6 +40,16 @@
     <string name="placeholder_date" translatable="false">01/01/2023</string>
 
     <string name="register">Register</string>
+    <string name="name">Name</string>
+    <string name="surname">Surame</string>
+    <string name="username" translatable="false">Username</string>
+
+    <string-array name="gender">
+        <item>Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
 
     <string name="textview_comments_title">Comments</string>
     <string name="textview_description_title">Description</string>

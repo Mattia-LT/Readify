@@ -29,6 +29,7 @@ import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
 import it.unimib.readify.ui.main.HomeActivity;
+import it.unimib.readify.ui.main.RegisterFragment;
 import it.unimib.readify.util.DataEncryptionUtil;
 
 public class LoginFragment extends Fragment {
@@ -40,18 +41,22 @@ public class LoginFragment extends Fragment {
 
     private DataEncryptionUtil dataEncryptionUtil;
 
-
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
 
-    @Nullable
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
         textInputLayoutEmail = rootView.findViewById(R.id.text_input_layout_email);
         textInputLayoutPassword = rootView.findViewById(R.id.text_input_layout_password);
         final Button buttonLogin = rootView.findViewById(R.id.button_login);
+        final Button buttonReg = rootView.findViewById(R.id.button_register);
 
         dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
 
@@ -84,7 +89,12 @@ public class LoginFragment extends Fragment {
         });
 
 
-
+        buttonReg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openRegistrazione();
+            }
+        });
 
         //TODO da rimuovere il listener, messo da tia per vedere se andava l'app
         buttonLogin.setOnClickListener(v -> {
@@ -92,6 +102,10 @@ public class LoginFragment extends Fragment {
         });
 
         return rootView;
+    }
+    public void openRegistrazione(){
+        Intent i = new Intent(this.getActivity(), RegisterFragment.class);
+        startActivity(i);
     }
 
     private boolean isEmailOk(String email) {

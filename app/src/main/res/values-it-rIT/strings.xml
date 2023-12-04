@@ -7,10 +7,21 @@
     <string name="error_email">La mail non è valida</string>
     <string name="error_password">La password non è valida</string>
     <string name="forgot_password">Password dimenticata?</string>
+    <string name="password_confirm">Confirma Password</string>
     <string name="google_login">Login con Google</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_comment">Scrivi qui il tuo commento</string>
     <string name="logo">Logo applicazione</string>
+    <string name="name">Nome</string>
+    <string name="surname">Cognome</string>
+
+    <string-array name="gender">
+        <item>Genere</item>
+        <item>Maschio</item>
+        <item>Femmina</item>
+        <item>Altro</item>
+    </string-array>
+
 
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>

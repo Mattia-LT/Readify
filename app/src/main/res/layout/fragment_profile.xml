@@ -1,216 +1,416 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".ui.main.ProfileFragment">
 
     <!-- TODO: Update profile fragment -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="20sp" >
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20sp"
+        android:gravity="top|left">
 
-        <TextView
-            android:id="@+id/personal_area_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pa_title"
-            android:textSize="35sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="24dp"
-            android:background="@color/google_login_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/personal_area_title" />
-
-        <ImageView
-            android:id="@+id/profile_image"
-            android:layout_width="150sp"
-            android:layout_height="150sp"
-            android:layout_marginTop="8sp"
-            android:src="@drawable/ic_profile_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/personal_area_title"
-            android:contentDescription="@string/pa_description_photo"/>
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8sp"
-            android:text="Napoleone Bonaparte"
-            android:textSize="30sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_image" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="80sp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_image">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/collections"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/light_purple"
-                    android:gravity="start"
-                    android:text="@string/pa_collections"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:layout_width="30sp"
-                    android:layout_height="30sp"
-                    android:layout_marginEnd="32dp"
-                    android:src="@drawable/arrow_right_icon"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/collections"
-                    app:layout_constraintTop_toTopOf="@+id/collections"
-                    app:tint="@color/white"
-                    android:contentDescription="@string/pa_description_arrow"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/statistics"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/light_purple"
-                    android:gravity="start"
-                    
-                    android:text="@string/pa_stats"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:layout_width="30sp"
-                    android:layout_height="30sp"
-                    android:layout_marginEnd="32dp"
-                    android:src="@drawable/arrow_right_icon"
-                    app:layout_constraintBottom_toBottomOf="@+id/statistics"
-                    app:layout_constraintEnd_toEndOf="@+id/statistics"
-                    app:layout_constraintTop_toTopOf="@+id/statistics"
-                    app:tint="@color/white"
-                    android:contentDescription="@string/pa_description_arrow"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/notes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/light_purple"
-                    android:gravity="start"
-                    
-                    android:text="@string/pa_notes"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:layout_width="30sp"
-                    android:layout_height="30sp"
-                    android:layout_marginEnd="32dp"
-                    android:src="@drawable/arrow_right_icon"
-                    app:layout_constraintBottom_toBottomOf="@+id/notes"
-                    app:layout_constraintEnd_toEndOf="@+id/notes"
-                    app:layout_constraintTop_toTopOf="@+id/notes"
-                    app:tint="@color/white"
-                    android:contentDescription="@string/pa_description_arrow"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/separator2"
-            android:layout_width="match_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="16dp"
-            android:background="@color/google_login_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
+        <!-- top menu -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/separator2">
+            android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/settings"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/light_purple"
-                android:gravity="start"
-                android:text="@string/pa_settings"
-                android:textSize="30sp"
+                android:text="Napoleone_Bonaparte"
+                android:textSize="23sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0"
-                tools:layout_editor_absoluteX="0dp" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:layout_marginEnd="32dp"
-                android:src="@drawable/arrow_right_icon"
-                app:layout_constraintBottom_toBottomOf="@+id/settings"
-                app:layout_constraintEnd_toEndOf="@+id/settings"
-                app:layout_constraintTop_toTopOf="@+id/settings"
-                app:tint="@color/white"
-                android:contentDescription="@string/pa_description_arrow"/>
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="25dp"
+                android:src="@drawable/ic_heart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageView2"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_baseline_menu"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- social VERSIONE 1-->
+        
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_view_home"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="130sp"
+                android:layout_height="130sp"
+                android:contentDescription="@string/pa_description_photo"
+                android:src="@drawable/ic_baseline_profile_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="25dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="19"
+                    android:textSize="23dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="follower"
+                    android:textSize="20dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7"
+                    android:textSize="23dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="followed"
+                    android:textSize="20dp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- social VERSIONE 2-->
+        <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="130sp"
+                    android:layout_height="130sp"
+                    android:contentDescription="@string/pa_description_photo"
+                    android:src="@drawable/ic_baseline_profile_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="25dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="19"
+                            android:textSize="23dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="follower"
+                            android:textSize="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="25dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="7"
+                            android:textSize="23dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="followed"
+                            android:textSize="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3"
+                            android:textSize="23dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="comments"
+                            android:textSize="20dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+        </LinearLayout>
+        -->
+
+        <!-- condivisione social VERSIONE 1-->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ema_bon__"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ema01"
+            android:textSize="20dp"/>
+
+
+        <!-- condivisione social VERSIONE 2 -->
+        <!--
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ema_bon__"
+            android:textSize="20dp"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ema01"
+            android:textSize="20dp"/>
+        -->
+
+        <!-- collections -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Collections"
+            android:textSize="30dp"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Create new collection"
+            android:textSize="20dp"
+            android:layout_marginTop="10dp"/>
+
+        <ListView
+            android:id="@+id/listview_collections"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+
+
+
+    <!-- questa sarebbe l'intestazione
+            <TextView
+                android:id="@+id/personal_area_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pa_title"
+                android:textSize="35sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2sp"
+                android:layout_marginTop="24dp"
+                android:background="@color/google_login_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/personal_area_title" />
+            -->
+
+
+    <!--
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp">
+
+                    <Button
+                        android:id="@+id/collections"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/light_purple"
+                        android:gravity="start"
+                        android:text="@string/pa_collections"
+                        android:textSize="30sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:layout_width="30sp"
+                        android:layout_height="30sp"
+                        android:layout_marginEnd="32dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/collections"
+                        app:layout_constraintTop_toTopOf="@+id/collections"
+                        app:tint="@color/white"
+                        android:contentDescription="@string/pa_description_arrow"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/statistics"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/light_purple"
+                        android:gravity="start"
+
+                        android:text="@string/pa_stats"
+                        android:textSize="30sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:layout_width="30sp"
+                        android:layout_height="30sp"
+                        android:layout_marginEnd="32dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:layout_constraintBottom_toBottomOf="@+id/statistics"
+                        app:layout_constraintEnd_toEndOf="@+id/statistics"
+                        app:layout_constraintTop_toTopOf="@+id/statistics"
+                        app:tint="@color/white"
+                        android:contentDescription="@string/pa_description_arrow"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/light_purple"
+                        android:gravity="start"
+
+                        android:text="@string/pa_notes"
+                        android:textSize="30sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:layout_width="30sp"
+                        android:layout_height="30sp"
+                        android:layout_marginEnd="32dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:layout_constraintBottom_toBottomOf="@+id/notes"
+                        app:layout_constraintEnd_toEndOf="@+id/notes"
+                        app:layout_constraintTop_toTopOf="@+id/notes"
+                        app:tint="@color/white"
+                        android:contentDescription="@string/pa_description_arrow"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="300dp"
+                android:layout_height="2sp"
+                android:layout_marginTop="16dp"
+                android:background="@color/google_login_text" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/light_purple"
+                    android:gravity="start"
+                    android:text="@string/pa_settings"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:layout_marginEnd="32dp"
+                    android:src="@drawable/ic_arrow_right"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings"
+                    app:layout_constraintEnd_toEndOf="@+id/settings"
+                    app:layout_constraintTop_toTopOf="@+id/settings"
+                    app:tint="@color/white"
+                    android:contentDescription="@string/pa_description_arrow"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            -->

@@ -95,7 +95,7 @@
 
 
             <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/separator_1"
+                android:id="@+id/divider_book_details_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -206,7 +206,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/separator_2"
+                android:id="@+id/divider_book_details_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -241,7 +241,7 @@
 
             <!-- separatore -->
             <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/separator_3"
+                android:id="@+id/divider_book_details_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
@@ -259,7 +259,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/separator_3"
+                app:layout_constraintTop_toBottomOf="@id/divider_book_details_3"
                 android:text="@string/textview_comments_title"
                 />
 

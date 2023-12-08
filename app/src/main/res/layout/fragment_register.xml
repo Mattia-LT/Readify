@@ -42,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_name"
+        android:id="@+id/text_input_layout_username"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -72,8 +72,8 @@
         android:padding="13dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/text_input_layout_name"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_name" />
+        app:layout_constraintStart_toStartOf="@+id/text_input_layout_username"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_username" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout_email"

@@ -29,7 +29,6 @@ import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
 import it.unimib.readify.ui.main.HomeActivity;
-import it.unimib.readify.ui.main.RegisterFragment;
 import it.unimib.readify.util.DataEncryptionUtil;
 
 public class LoginFragment extends Fragment {
@@ -78,35 +77,43 @@ public class LoginFragment extends Fragment {
             String email = textInputLayoutEmail.getEditText().getText().toString();
             String password = textInputLayoutPassword.getEditText().getText().toString();
 
-            // Start login if email and password are ok
+
             if (isEmailOk(email) & isPasswordOk(password)) {
-                Log.d(TAG, "Email and password are ok");
-                saveLoginData(email, password);
+                //saveLoginData(email, password);
+                navigateToHomeActivity();
             } else {
-                Snackbar.make(rootView.findViewById(android.R.id.content),
+                Snackbar.make(requireActivity().findViewById(android.R.id.content),
                         R.string.check_login_data_message, Snackbar.LENGTH_SHORT).show();
             }
         });
-
-
         buttonReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openRegistrazione();
+                navigateToRegisterFragment();
             }
         });
-
-        //TODO da rimuovere il listener, messo da tia per vedere se andava l'app
-        buttonLogin.setOnClickListener(v -> {
-            navigateToHomeActivity();
-        });
-
         return rootView;
     }
-    public void openRegistrazione(){
-        Intent i = new Intent(this.getActivity(), RegisterFragment.class);
-        startActivity(i);
-    }
+
+
+    private void navigateToHomeActivity() {
+        if (USE_NAVIGATION_COMPONENT) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);
+        } else {
+            Intent intent = new Intent(requireContext(), HomeActivity.class);
+            startActivity(intent);
+            requireActivity().finish();
+        }}
+
+
+    private void navigateToRegisterFragment() {
+        if (USE_NAVIGATION_COMPONENT) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_registerFragment);
+        } else {
+            Intent intent = new Intent(requireContext(), HomeActivity.class);
+            startActivity(intent);
+            requireActivity().finish();
+        }}
 
     private boolean isEmailOk(String email) {
         if (!EmailValidator.getInstance().isValid((email))) {
@@ -128,19 +135,6 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private void saveLoginData(String email, String password) {
-        try {
-            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
-                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS, email);
-            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
-                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD, password);
-
-            dataEncryptionUtil.writeSecreteDataOnFile(ENCRYPTED_DATA_FILE_NAME,
-                    email.concat(":").concat(password));
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 
@@ -180,19 +174,11 @@ public class LoginFragment extends Fragment {
             startActivity(intent);
         }
         requireActivity().finish();
-    }*/
-
-
-
-    private void navigateToHomeActivity() {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);
-        } else {
-            Intent intent = new Intent(requireContext(), HomeActivity.class);
-            startActivity(intent);
-            requireActivity().finish();
-        }
     }
+
+
+
+    }*/
 
 
 

@@ -64,7 +64,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textinputlayout_search"
         tools:itemCount="12"
-        tools:listitem="@layout/book_item" />
+        tools:listitem="@layout/book_search_item" />
 
     <LinearLayout
         android:id="@+id/error_screen"

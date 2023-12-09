@@ -65,5 +65,8 @@
     <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
     <string name="button_retry">Riprova</string>
     <string name="content_description_filter_button">Bottone per i filtri della ricerca</string>
+    <string name="placeholder_home_welcome">Ciao. username!</string>
+    <string name="textview_home_continue_label">Continuiamo da dove eravamo rimasti</string>
+    <string name="textview_trending_books">Libri in tendenza</string>
 
 </resources>

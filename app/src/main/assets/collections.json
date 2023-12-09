@@ -1,0 +1,146 @@
+{
+  "status": "ok",
+  "totalResults": "4",
+  "collections": [
+    {
+      "name": "horror",
+      "visibility": true,
+      "creationDate": null,
+      "booksList": [
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fantasy",
+      "visibility": true,
+      "creationDate": null,
+      "booksList": [
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "preferiti",
+      "visibility": true,
+      "creationDate": null,
+      "booksList": [
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "da consigliare",
+      "visibility": true,
+      "creationDate": null,
+      "booksList": [
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        },
+        {
+          "id": 1,
+          "name": "aaa",
+          "topics": [
+            null
+          ]
+        }
+      ]
+    }
+  ]
+}

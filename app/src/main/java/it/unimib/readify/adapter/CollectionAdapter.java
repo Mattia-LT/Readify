@@ -1,44 +1,104 @@
 package it.unimib.readify.adapter;
 
-import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import it.unimib.readify.R;
 import it.unimib.readify.model.Collection;
 
-public class CollectionAdapter extends ArrayAdapter<Collection> {
+public class CollectionAdapter extends
+        RecyclerView.Adapter<CollectionAdapter.CollectionViewHolder> {
 
-        private final int layout;
-        private final Collection[] collectionsArray;
-
-    public CollectionAdapter(@NonNull Context context, int layout,
-                             @NonNull Collection[] collectionsArray) {
-        super(context, layout, collectionsArray);
-        this.layout = layout;
-        this.collectionsArray = collectionsArray;
+    /*
+    si è optato per una interfaccia perchè 1) ci potranno essere più eventi diversi da gestire
+    e 2) così l'adapter rimane generico
+     */
+    public interface OnItemClickListener {
+        void onCollectionItemClick(Collection collection);
     }
 
+    private final ArrayList<Collection> collectionsArray;
+    private final OnItemClickListener onItemClickListener;
+
+    public CollectionAdapter(ArrayList<Collection> collectionsArray, OnItemClickListener onItemClickListener) {
+        this.collectionsArray = collectionsArray;
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    //passaggio del layout
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        //quando può essere null e quando no?
-        if(convertView == null) {
-            convertView = LayoutInflater.from(getContext()).
-                    inflate(layout, parent, false);
-        }
-        ImageView thumbnail = convertView.findViewById(R.id.listview_collections);
-        TextView name = convertView.findViewById(R.id.listview_collections);
-        ImageView visibilityIcon = convertView.findViewById(R.id.listview_collections);
+    public CollectionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.collection_item, parent, false);
+        return new CollectionViewHolder(view);
+    }
 
-        return super.getView(position, convertView, parent);
+    //associazione tra i dati effettivi ed il layout
+    @Override
+    public void onBindViewHolder(@NonNull CollectionViewHolder holder, int position) {
+        holder.bind(collectionsArray.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        if(collectionsArray == null)
+            return 0;
+        return collectionsArray.size();
+    }
+
+    public class CollectionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private ImageView thumbnail;
+        private TextView name;
+        private ImageView visibilityIcon;
+
+        public CollectionViewHolder(@NonNull View itemView) {
+            super(itemView);
+            thumbnail = itemView.findViewById(R.id.collection_thumbnail_imageview);
+            name = itemView.findViewById(R.id.collection_name_textview);
+            visibilityIcon = itemView.findViewById(R.id.collection_visibility_icon);
+            itemView.setOnClickListener(this);
+        }
+
+        public void bind(Collection collection) {
+            //set dinamico di prova
+            thumbnail.setBackgroundColor(itemView.getResources().getColor(R.color.orange));
+            name.setText("fantasy");
+            visibilityIcon.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_visibility_24));
+
+            //gestire i margini attraverso il position (se position è pari, margin a destra, altrimenti a sinistra etc.)
+
+            //set dinamico dei dati, da utilizzare con il database
+            /*
+            if(collection.getBooks().size() == 0)
+                thumbnail.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_add_24));
+            else {
+                Drawable firstBookThumbnail = collection.getBooks().get(0).getThumbnail();
+                thumbnail.setImageDrawable(firstBookThumbnail);
+            }
+            name.setText(collection.getName());
+            if(collection.isVisible())
+                visibilityIcon.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_visibility_24));
+            else
+                visibilityIcon.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_lock_outline_24));
+             */
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("prova", name.getText().toString());
+            onItemClickListener.onCollectionItemClick(collectionsArray.get(getAdapterPosition()));
+        }
     }
 }

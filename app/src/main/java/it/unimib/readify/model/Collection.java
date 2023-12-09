@@ -9,16 +9,34 @@ public class Collection {
 
     private String name;
     private boolean visibility;
-    private Image thumbnail;
+    //private Image thumbnail;
     private final Date creationDate;
     private ArrayList <Book> books;
 
-    public Collection(String name, boolean visibility, Image thumbnail,
+    public Collection(String name, boolean visibility,
                       Date creationDate, ArrayList<Book> books) {
         this.name = name;
         this.visibility = visibility;
-        this.thumbnail = thumbnail;
+        //this.thumbnail = thumbnail;
         this.creationDate = creationDate;
         this.books = books;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isVisible() {
+        return visibility;
+    }
+
+    /*
+    public Image getThumbnail() {
+        return thumbnail;
+    }
+    */
+
+    public ArrayList<Book> getBooks() {
+        return books;
     }
 }

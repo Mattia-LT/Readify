@@ -1,14 +1,20 @@
 package it.unimib.readify.adapter;
 
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -47,7 +53,7 @@ public class CollectionAdapter extends
     //associazione tra i dati effettivi ed il layout
     @Override
     public void onBindViewHolder(@NonNull CollectionViewHolder holder, int position) {
-        holder.bind(collectionsArray.get(position));
+        holder.bind(collectionsArray.get(position), position);
     }
 
     @Override
@@ -62,24 +68,34 @@ public class CollectionAdapter extends
         private ImageView thumbnail;
         private TextView name;
         private ImageView visibilityIcon;
+        private ConstraintLayout container;
 
         public CollectionViewHolder(@NonNull View itemView) {
             super(itemView);
             thumbnail = itemView.findViewById(R.id.collection_thumbnail_imageview);
             name = itemView.findViewById(R.id.collection_name_textview);
             visibilityIcon = itemView.findViewById(R.id.collection_visibility_icon);
+            container = itemView.findViewById(R.id.collection_container);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Collection collection) {
+        public void bind(Collection collection, int position) {
             //set dinamico di prova
             thumbnail.setBackgroundColor(itemView.getResources().getColor(R.color.orange));
             name.setText("fantasy");
             visibilityIcon.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_visibility_24));
 
-            //gestire i margini attraverso il position (se position è pari, margin a destra, altrimenti a sinistra etc.)
+            //gestisce il margine del layout
+            GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) container.getLayoutParams();
+                //converte 5dp in px a seconda del dispositivo dell'utente
+            float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, Resources.getSystem().getDisplayMetrics());
+            if(position % 2 == 0)
+                layoutParams.rightMargin = (int) margin;
+            else
+                layoutParams.leftMargin = (int) margin;
 
-            //set dinamico dei dati, da utilizzare con il database
+
+            //set dinamico dei dati
             /*
             if(collection.getBooks().size() == 0)
                 thumbnail.setImageDrawable(itemView.getResources().getDrawable(R.drawable.baseline_add_24));
@@ -97,7 +113,6 @@ public class CollectionAdapter extends
 
         @Override
         public void onClick(View v) {
-            Log.d("prova", name.getText().toString());
             onItemClickListener.onCollectionItemClick(collectionsArray.get(getAdapterPosition()));
         }
     }

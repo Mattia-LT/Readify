@@ -22,30 +22,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Readify"
         tools:targetApi="31">
+
         <activity
             android:name=".ui.startup.StartupActivity"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".ui.startup.WelcomeActivity"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".ui.main.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.startup.WelcomeActivity"
-            android:exported="true"
-            >
-        </activity>
-
-        <activity
-            android:name=".ui.main.HomeActivity"
-            android:exported="true"
-            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name="it.unimib.readify.ui.main.RegisterFragment" />
-
 
         <meta-data
             android:name="preloaded_fonts"

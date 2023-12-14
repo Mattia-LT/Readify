@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /*
-usata per rappresentare la risposta dell'api alla richiesta delle collections dell'utente
+usata per registrare la risposta dell'api alla nostra richiesta
  */
 public class ApiResponse {
 

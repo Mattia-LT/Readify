@@ -5,13 +5,13 @@ import android.os.Parcelable;
 
 import java.util.List;
 
-public class BookResponse implements Parcelable {
+public class OLResponse implements Parcelable {
 
     private List<Book> bookList;
 
-    public BookResponse() {}
+    public OLResponse() {}
 
-    public BookResponse(List<Book> bookList){
+    public OLResponse(List<Book> bookList){
         this.bookList = bookList;
     }
 
@@ -39,19 +39,19 @@ public class BookResponse implements Parcelable {
         this.bookList = source.createTypedArrayList(Book.CREATOR);
     }
 
-    protected BookResponse(Parcel in) {
+    protected OLResponse(Parcel in) {
         this.bookList = in.createTypedArrayList(Book.CREATOR);
     }
 
-    public static final Creator<BookResponse> CREATOR = new Creator<BookResponse>() {
+    public static final Creator<OLResponse> CREATOR = new Creator<OLResponse>() {
         @Override
-        public BookResponse createFromParcel(Parcel source) {
-            return new BookResponse(source);
+        public OLResponse createFromParcel(Parcel source) {
+            return new OLResponse(source);
         }
 
         @Override
-        public BookResponse[] newArray(int size) {
-            return new BookResponse[size];
+        public OLResponse[] newArray(int size) {
+            return new OLResponse[size];
         }
     };
 }

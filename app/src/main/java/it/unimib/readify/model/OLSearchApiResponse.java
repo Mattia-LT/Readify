@@ -2,15 +2,17 @@ package it.unimib.readify.model;
 
 import java.util.List;
 
+import it.unimib.readify.util.OLApiUtil;
+
 /*
 usata per registrare la risposta dell'api alla nostra richiesta
  */
-public class OLSearchApiResponse extends BookResponse{
+public class OLSearchApiResponse extends OLResponse {
 
     private int numFound;
     private int start;
     private boolean numFoundExact;
-    private List<String> docsKeys;
+    private List<OLDocs> docs;
     private String q;
     private int offset;
 
@@ -18,26 +20,12 @@ public class OLSearchApiResponse extends BookResponse{
         super();
     }
 
-    public OLSearchApiResponse(int numFound, int start, boolean numFoundExact, List<String> docsKeys, String q, int offset) {
-        super(articles);
-        this.status = status;
-        this.totalResults = totalResults;
+    public OLSearchApiResponse(List<OLDocs> docs, int numFound, int start, boolean numFoundExact, String q, int offset) {
+        super(new OLWorkApiResponse().getBooksApi(docs));
+        this.numFound = numFound;
+        this.start = start;
+        this.numFoundExact = numFoundExact;
+        this.q = q;
+        this.offset = offset;
     }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getTotalResults() {
-        return totalResults;
-    }
-
-    public void setTotalResults(int totalResults) {
-        this.totalResults = totalResults;
-    }
-
 }

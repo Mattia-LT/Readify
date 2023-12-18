@@ -13,12 +13,12 @@ public abstract class Result {
      * with a Web Service or a local database.
      */
     public static final class Success extends Result {
-        private final BookResponse bookResponse;
-        public Success(BookResponse bookResponse) {
-            this.bookResponse = bookResponse;
+        private final OLResponse OLResponse;
+        public Success(OLResponse OLResponse) {
+            this.OLResponse = OLResponse;
         }
-        public BookResponse getData() {
-            return bookResponse;
+        public OLResponse getData() {
+            return OLResponse;
         }
     }
 

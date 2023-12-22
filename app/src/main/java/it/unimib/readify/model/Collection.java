@@ -5,6 +5,8 @@ import android.media.Image;
 import java.util.ArrayList;
 import java.util.Date;
 
+import it.unimib.readify.service.OLWorkApiService;
+
 // TODO: 09/12/2023 implement parcelable
 // TODO: 09/12/2023 gestione della thumbnail
 // TODO: 11/12/2023 gestione attributo data
@@ -14,9 +16,9 @@ public class Collection {
     private boolean visibility;
     //private Image thumbnail;
     //private final Date creationDate;
-    private ArrayList <Book> books;
+    private ArrayList <OLWorkApiResponse> books;
 
-    public Collection(String name, boolean visibility, ArrayList<Book> books) {
+    public Collection(String name, boolean visibility, ArrayList<OLWorkApiResponse> books) {
         this.name = name;
         this.visibility = visibility;
         //this.thumbnail = thumbnail;
@@ -38,7 +40,7 @@ public class Collection {
     }
     */
 
-    public ArrayList<Book> getBooks() {
+    public ArrayList<OLWorkApiResponse> getBooks() {
         return books;
     }
 }

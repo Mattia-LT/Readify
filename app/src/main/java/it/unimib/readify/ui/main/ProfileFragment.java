@@ -8,11 +8,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
-import it.unimib.readify.model.Book;
 import it.unimib.readify.model.Collection;
 
 public class ProfileFragment extends Fragment {

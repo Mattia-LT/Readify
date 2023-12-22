@@ -15,21 +15,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import it.unimib.readify.R;
-import it.unimib.readify.model.Book;
+import it.unimib.readify.model.OLWorkApiResponse;
 
 public class BookRecyclerViewCarouselAdapter extends RecyclerView.Adapter<BookRecyclerViewCarouselAdapter.BookViewHolder> {
 
     public interface OnItemClickListener {
-        void onBookItemClick(Book book);
+        void onBookItemClick(OLWorkApiResponse book);
         void onSaveButtonPressed(int position);
     }
 
 
-    private final List<Book> bookList;
+    private final List<OLWorkApiResponse> bookList;
     private final Application application;
     private final OnItemClickListener onBookItemClickListener;
 
-    public BookRecyclerViewCarouselAdapter(List<Book> bookList, Application application, OnItemClickListener onBookItemClickListener) {
+    public BookRecyclerViewCarouselAdapter(List<OLWorkApiResponse> bookList, Application application, OnItemClickListener onBookItemClickListener) {
         this.bookList = bookList;
         this.application = application;
         this.onBookItemClickListener = onBookItemClickListener;
@@ -72,8 +72,11 @@ public class BookRecyclerViewCarouselAdapter extends RecyclerView.Adapter<BookRe
             //TODO aggiungi qua bottone per aggiungere il libro e il relativo listener
         }
 
-        public void bind(Book book) {
+
+        //TODO SISTEMA
+        public void bind(OLWorkApiResponse book) {
             bookTitleTextView.setText(book.getTitle());
+
         }
 
         @Override

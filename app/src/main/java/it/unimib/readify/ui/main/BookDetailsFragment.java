@@ -15,8 +15,9 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CommentAdapter;
-import it.unimib.readify.model.Book;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.OLWorkApiResponse;
+
 public class BookDetailsFragment extends Fragment {
 
     private RecyclerView recyclerViewComments;
@@ -55,11 +56,11 @@ public class BookDetailsFragment extends Fragment {
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            Book receivedBook = arguments.getParcelable("book");
+            OLWorkApiResponse receivedBook = arguments.getParcelable("book");
             if(receivedBook != null){
                 textViewBookTitle.setText(receivedBook.getTitle());
-                textViewBookAuthor.setText(receivedBook.getAuthor());
-                textViewBookDescription.setText(receivedBook.getId() + receivedBook.getTopics() + receivedBook.getImagePath());
+                //textViewBookAuthor.setText(receivedBook.getAuthor());
+                //textViewBookDescription.setText(receivedBook.getId() + receivedBook.getTopics() + receivedBook.getImagePath());
             }
 
         }

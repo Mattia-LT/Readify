@@ -80,4 +80,5 @@
     <string name="placeholder_home_welcome">Hi, username!</string>
     <string name="textview_home_continue_label">Let\'s continue where we left off</string>
     <string name="textview_trending_books">Trending books</string>
+    <string name="book_search_error">An error occurred during the search, please retry.</string>
 </resources>

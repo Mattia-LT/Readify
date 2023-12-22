@@ -10,10 +10,8 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,9 +20,12 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookRecyclerViewCarouselAdapter;
-import it.unimib.readify.model.Book;
+import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.repository.BookRepository;
+import it.unimib.readify.repository.IBookRepository;
+import it.unimib.readify.util.ResponseCallback;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ResponseCallback {
 
     private static final boolean USE_NAVIGATION_COMPONENT = true;
 
@@ -32,7 +33,10 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerViewTrendingBooks;
     private LinearLayoutManager layoutManager;
-    private List<Book> bookList;
+    private List<OLWorkApiResponse> bookList;
+    private IBookRepository iBookRepository;
+
+    private BookRecyclerViewCarouselAdapter trendingBooksAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -44,18 +48,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        iBookRepository = new BookRepository(requireActivity().getApplication(), this);
+
         bookList = new ArrayList<>();
 
-        bookList.add(new Book("To Kill a Mockingbird", "ISBN-001", getTopics("Fiction", "Legal Drama"), "Harper Lee", "/images/to-kill-a-mockingbird.jpg"));
-        bookList.add(new Book("1984", "ISBN-002", getTopics("Dystopian", "Political Fiction"), "George Orwell", "/images/1984.jpg"));
-        bookList.add(new Book("The Great Gatsby", "ISBN-003", getTopics("Classic", "Romance"), "F. Scott Fitzgerald", "/images/the-great-gatsby.jpg"));
-        bookList.add(new Book("The Catcher in the Rye", "ISBN-004", getTopics("Coming-of-Age", "Drama"), "J.D. Salinger", "/images/the-catcher-in-the-rye.jpg"));
-        bookList.add(new Book("Pride and Prejudice", "ISBN-005", getTopics("Classic", "Romance"), "Jane Austen", "/images/pride-and-prejudice.jpg"));
-        bookList.add(new Book("The Hobbit", "ISBN-006", getTopics("Fantasy", "Adventure"), "J.R.R. Tolkien", "/images/the-hobbit.jpg"));
-        bookList.add(new Book("The Da Vinci Code", "ISBN-007", getTopics("Mystery", "Thriller"), "Dan Brown", "/images/the-da-vinci-code.jpg"));
-        bookList.add(new Book("The Harry Potter series", "ISBN-008", getTopics("Fantasy", "Adventure"), "J.K. Rowling", "/images/harry-potter.jpg"));
-        bookList.add(new Book("The Lord of the Rings", "ISBN-009", getTopics("Fantasy", "Adventure"), "J.R.R. Tolkien", "/images/the-lord-of-the-rings.jpg"));
-        bookList.add(new Book("The Hunger Games", "ISBN-010", getTopics("Dystopian", "Adventure"), "Suzanne Collins", "/images/the-hunger-games.jpg"));
+        iBookRepository.searchBooks("harry+potter","new",10,0);
+
 
     }
 
@@ -88,13 +88,10 @@ public class HomeFragment extends Fragment {
 
 
 
-
-
-
         // Create an adapter
-        BookRecyclerViewCarouselAdapter trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(bookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
+        trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(bookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
             @Override
-            public void onBookItemClick(Book book) {
+            public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("book", book);
                 navigateToBookDetailsFragment(bundle);
@@ -151,4 +148,22 @@ public class HomeFragment extends Fragment {
     }
 
 
+    @Override
+    public void onSuccess(List<OLWorkApiResponse> bookList) {
+    }
+
+    @Override
+    public void onWorkSuccess(OLWorkApiResponse work) {
+        this.bookList.add(work);
+        Log.e("lista",bookList.toString());
+
+        // Notify the adapter about the data change
+        trendingBooksAdapter.notifyItemInserted(bookList.size());
+
+    }
+
+    @Override
+    public void onFailure(String errorMessage) {
+        Log.e("ERRORE", errorMessage);
+    }
 }

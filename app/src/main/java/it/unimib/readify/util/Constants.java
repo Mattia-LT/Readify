@@ -13,4 +13,33 @@ public class Constants {
     // Constants for encrypted files
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.worldnews.encrypted_file.txt";
 
+
+
+
+
+    // Constants for API
+
+    public static final String OL_API_BASE_URL = "https://openlibrary.org";
+    public static final String OL_SEARCH_ENDPOINT = "/search.json";
+    public static final String OL_WORKS_ENDPOINT = "/works/";
+    public static final String OL_ISBN_ENDPOINT = "/isbn/";
+    public static final String OL_AUTHORS_ENDPOINT = "/search/authors.json";
+    public static final String OL_COVERS_API_URL = "https://covers.openlibrary.org/";
+
+
+    // Constants for Search Api
+
+    public static final String OL_SEARCH_Q_PARAMETER = "q";
+    public static final String OL_SEARCH_PAGE_PARAMETER = "page";
+    public static final String OL_SEARCH_SORT_PARAMETER = "sort";
+    public static final String OL_SEARCH_TITLE_PARAMETER = "title";
+    public static final String OL_SEARCH_AUTHOR_PARAMETER = "author";
+    public static final String OL_SEARCH_LIMIT_PARAMETER = "limit";
+    public static final String OL_SEARCH_OFFSET_PARAMETER = "offset";
+
+
+
+
+
+
 }

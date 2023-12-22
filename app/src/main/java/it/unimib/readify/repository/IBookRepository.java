@@ -1,17 +1,9 @@
 package it.unimib.readify.repository;
 
-import androidx.lifecycle.MutableLiveData;
-
-import it.unimib.readify.model.Book;
-import it.unimib.readify.model.Result;
-
 public interface IBookRepository {
 
-    MutableLiveData<Result> fetchBooks(String title, int page, int limit);
+    void searchBooks(String query, String sort, int limit, int offset);
 
-    MutableLiveData<Result> getFavoriteBooks();
+    void fetchBook(String id);
 
-    void updateBooks(Book book);
-
-    void deleteFavoriteBook();
 }

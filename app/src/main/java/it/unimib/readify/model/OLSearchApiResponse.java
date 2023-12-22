@@ -1,13 +1,16 @@
 package it.unimib.readify.model;
 
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import it.unimib.readify.util.OLApiUtil;
+import androidx.annotation.NonNull;
+
+import java.util.List;
 
 /*
 usata per registrare la risposta dell'api alla nostra richiesta
  */
-public class OLSearchApiResponse extends OLResponse {
+public class OLSearchApiResponse implements Parcelable {
 
     private int numFound;
     private int start;
@@ -17,15 +20,123 @@ public class OLSearchApiResponse extends OLResponse {
     private int offset;
 
     public OLSearchApiResponse() {
-        super();
+
     }
 
-    public OLSearchApiResponse(List<OLDocs> docs, int numFound, int start, boolean numFoundExact, String q, int offset) {
-        super(new OLWorkApiResponse().getBooksApi(docs));
+    public OLSearchApiResponse(int numFound, int start, boolean numFoundExact, List<OLDocs> docs, String q, int offset) {
         this.numFound = numFound;
         this.start = start;
         this.numFoundExact = numFoundExact;
+        this.docs = docs;
         this.q = q;
         this.offset = offset;
     }
+
+    public int getNumFound() {
+        return numFound;
+    }
+
+    public void setNumFound(int numFound) {
+        this.numFound = numFound;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public boolean isNumFoundExact() {
+        return numFoundExact;
+    }
+
+    public void setNumFoundExact(boolean numFoundExact) {
+        this.numFoundExact = numFoundExact;
+    }
+
+    public List<OLDocs> getDocs() {
+        return docs;
+    }
+
+    public void setDocs(List<OLDocs> docs) {
+        this.docs = docs;
+    }
+
+    public String getQ() {
+        return q;
+    }
+
+    public void setQ(String q) {
+        this.q = q;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "OLSearchApiResponse{" +
+                "numFound=" + numFound +
+                ", start=" + start +
+                ", numFoundExact=" + numFoundExact +
+                ", docs=" + docs +
+                ", q='" + q + '\'' +
+                ", offset=" + offset +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.numFound);
+        dest.writeInt(this.start);
+        dest.writeByte(this.numFoundExact ? (byte) 1 : (byte) 0);
+        dest.writeTypedList(this.docs);
+        dest.writeString(this.q);
+        dest.writeInt(this.offset);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.numFound = source.readInt();
+        this.start = source.readInt();
+        this.numFoundExact = source.readByte() != 0;
+        this.docs = source.createTypedArrayList(OLDocs.CREATOR);
+        this.q = source.readString();
+        this.offset = source.readInt();
+    }
+
+
+
+    protected OLSearchApiResponse(Parcel in) {
+        this.numFound = in.readInt();
+        this.start = in.readInt();
+        this.numFoundExact = in.readByte() != 0;
+        this.docs = in.createTypedArrayList(OLDocs.CREATOR);
+        this.q = in.readString();
+        this.offset = in.readInt();
+    }
+
+    public static final Parcelable.Creator<OLSearchApiResponse> CREATOR = new Parcelable.Creator<OLSearchApiResponse>() {
+        @Override
+        public OLSearchApiResponse createFromParcel(Parcel source) {
+            return new OLSearchApiResponse(source);
+        }
+
+        @Override
+        public OLSearchApiResponse[] newArray(int size) {
+            return new OLSearchApiResponse[size];
+        }
+    };
 }

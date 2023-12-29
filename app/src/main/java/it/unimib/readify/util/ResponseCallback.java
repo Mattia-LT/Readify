@@ -9,9 +9,10 @@ import it.unimib.readify.model.OLWorkApiResponse;
  * Interface to send data from Repositories to Activity/Fragment.
  */
 public interface ResponseCallback {
-    void onSuccessFromRemote(OLSearchApiResponse olSearchApiResponse);
-    void onSuccessFromRemote(OLWorkApiResponse olWorkApiResponse);
-
+    /*
+    Object come parametro, così da gestire diverse output d'uscita
+    (abbiamo più tipi di chiamate)
+     */
+    void onSuccessFromRemote(Object response);
     void onFailureFromRemote(Exception exception);
-
 }

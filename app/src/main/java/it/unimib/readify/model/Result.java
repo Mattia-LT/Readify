@@ -14,8 +14,8 @@ public abstract class Result {
      */
     public static final class Success extends Result {
         private final OLSearchApiResponse olSearchApiResponse;
-        public Success(OLSearchApiResponse olSearchApiResponse) {
-            this.olSearchApiResponse = olSearchApiResponse;
+        public Success(Object object) {
+            this.olSearchApiResponse = (OLSearchApiResponse) object;
         }
         public OLSearchApiResponse getData() {
             return olSearchApiResponse;

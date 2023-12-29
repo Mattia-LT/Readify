@@ -48,27 +48,27 @@ public class BookRepository implements IBookRepository, ResponseCallback{
     @Override
     public MutableLiveData<Result> searchBooks(String query, String sort, int limit, int offset) {
         bookRemoteDataSource.searchBooks(query, sort, limit, offset);
+        return searchApiResponseLiveData;
     }
-
-
 
     @Override
     public MutableLiveData<Result> fetchBook(String id) {
-
+        bookRemoteDataSource.fetchBook(id);
+        return searchApiResponseLiveData;
     }
 
     @Override
-    public void onSuccessFromRemote(OLSearchApiResponse olSearchApiResponse) {
-        //todo
-    }
-
-    @Override
-    public void onSuccessFromRemote(OLWorkApiResponse olWorkApiResponse) {
-
+    public void onSuccessFromRemote(Object response) {
+        Result.Success result;
+        if (response instanceof OLWorkApiResponse) {
+            result = new Result.Success(response);
+            searchApiResponseLiveData.postValue(result);
+        }
     }
 
     @Override
     public void onFailureFromRemote(Exception exception) {
-
+        Result.Error result = new Result.Error(exception.getMessage());
+        searchApiResponseLiveData.postValue(result);
     }
 }

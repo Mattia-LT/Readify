@@ -1,5 +1,6 @@
 package it.unimib.readify.source;
 
+import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,17 +23,18 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
 
     private final OLSearchApiService olSearchApiService;
     private final OLWorkApiService olWorkApiService;
+    private final List<OLWorkApiResponse> list;
 
     public BookRemoteDataSource(){
         this.olSearchApiService = ServiceLocator.getInstance().getOLSearchApiService();
         this.olWorkApiService = ServiceLocator.getInstance().getOLWorkApiService();
+        list = new ArrayList<>();
     }
 
     @Override
     public void searchBooks(String query, String sort, int limit, int offset) {
 
         //todo forse sort potrebbe essere un enum
-        //chiamata alla search
         Call<OLSearchApiResponse> bookListResponseCall = olSearchApiService.searchBooks(query, sort, limit, offset);
         bookListResponseCall.enqueue(new Callback<OLSearchApiResponse>() {
             @Override
@@ -43,23 +45,19 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 //&& !response.body().isNumFoundExact()
                 if (response.body() != null && response.isSuccessful() ) {
                     List<OLDocs> docsList = response.body().getDocs();
-                    List<OLWorkApiResponse> outputList = new ArrayList<>();
 
                     for(OLDocs docs : docsList){
-                        //per ogni key di docs facciamo la chiamata al relativo work
                         String key = docs.getKey();
                         fetchBook(key);
                     }
-                    //todo mostrali o salvali o convertili in qualcosa
-                    responseCallback.onSuccessFromRemote(response.body());
                 } else {
-                    responseCallback.onFailureFromRemote(application.getString(R.string.book_search_error));
+                    responseCallback.onFailureFromRemote(new Exception(Resources.getSystem().getString(R.string.book_search_error)));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<OLSearchApiResponse> call, @NonNull Throwable t) {
-                responseCallback.onFailureFromRemote(t.getMessage());
+                responseCallback.onFailureFromRemote(new Exception(Resources.getSystem().getString(R.string.book_search_error)));
             }
         });
     }
@@ -70,19 +68,16 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
         bookResponseCall.enqueue(new Callback<OLWorkApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<OLWorkApiResponse> call, @NonNull Response<OLWorkApiResponse> response) {
-                Log.e("URL-Work", response.toString());
-
                 if (response.body() != null && response.isSuccessful()){
-                    //todo
                     responseCallback.onSuccessFromRemote(response.body());
                 } else {
-                    responseCallback.onFailureFromRemote(application.getString(R.string.book_search_error));
+                    responseCallback.onFailureFromRemote(new Exception(Resources.getSystem().getString(R.string.book_search_error)));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
-                Log.e("errore failure", "errore singolo work");
+                responseCallback.onFailureFromRemote(new Exception(Resources.getSystem().getString(R.string.book_search_error)));
             }
         });
     }

@@ -3,8 +3,12 @@ package it.unimib.readify.util;
 import android.app.Application;
 
 import it.unimib.readify.database.BookRoomDatabase;
+import it.unimib.readify.repository.BookRepository;
+import it.unimib.readify.repository.IBookRepository;
 import it.unimib.readify.service.OLSearchApiService;
 import it.unimib.readify.service.OLWorkApiService;
+import it.unimib.readify.source.BaseBookRemoteDataSource;
+import it.unimib.readify.source.BookRemoteDataSource;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -41,13 +45,12 @@ public class ServiceLocator {
         return retrofit.create(OLWorkApiService.class);
     }
 
-
-
+    public IBookRepository getBookRepository() {
+        BaseBookRemoteDataSource bookRemoteDataSource = new BookRemoteDataSource();
+        return new BookRepository(bookRemoteDataSource);
+    }
 
     public BookRoomDatabase getBookDao(Application application) {
         return BookRoomDatabase.getDatabase(application);
     }
-
-
-
 }

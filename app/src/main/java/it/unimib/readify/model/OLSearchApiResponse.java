@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -18,10 +19,9 @@ public class OLSearchApiResponse implements Parcelable {
     private List<OLDocs> docs;
     private String q;
     private int offset;
+    private List<OLWorkApiResponse> workList;
 
-    public OLSearchApiResponse() {
-
-    }
+    public OLSearchApiResponse() {}
 
     public OLSearchApiResponse(int numFound, int start, boolean numFoundExact, List<OLDocs> docs, String q, int offset) {
         this.numFound = numFound;
@@ -30,6 +30,7 @@ public class OLSearchApiResponse implements Parcelable {
         this.docs = docs;
         this.q = q;
         this.offset = offset;
+        this.workList = new ArrayList<OLWorkApiResponse>();
     }
 
     public int getNumFound() {

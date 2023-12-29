@@ -11,52 +11,61 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookRecyclerViewCarouselAdapter;
+import it.unimib.readify.model.OLDocs;
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
 import it.unimib.readify.repository.BookRepository;
 import it.unimib.readify.repository.IBookRepository;
 import it.unimib.readify.util.ResponseCallback;
+import it.unimib.readify.util.ServiceLocator;
 
-public class HomeFragment extends Fragment implements ResponseCallback {
+public class HomeFragment extends Fragment {
 
     private static final boolean USE_NAVIGATION_COMPONENT = true;
 
     private Button buttonDaRimuovere;
-
     private RecyclerView recyclerViewTrendingBooks;
     private LinearLayoutManager layoutManager;
     private List<OLWorkApiResponse> bookList;
-    private IBookRepository iBookRepository;
-
     private BookRecyclerViewCarouselAdapter trendingBooksAdapter;
+
+
+    private BooksViewModel booksViewModel;
+
 
     public HomeFragment() {
         // Required empty public constructor
     }
+
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        iBookRepository = new BookRepository(requireActivity().getApplication(), this);
-
         bookList = new ArrayList<>();
 
-        iBookRepository.searchBooks("harry+potter","new",10,0);
+        IBookRepository booksRepository =
+                    ServiceLocator.getInstance().getBookRepository();
 
-
+        booksViewModel = new ViewModelProvider(
+                requireActivity(),
+                new BooksViewModelFactory(booksRepository)).get(BooksViewModel.class);
     }
 
     @Override
@@ -81,12 +90,9 @@ public class HomeFragment extends Fragment implements ResponseCallback {
             navigateToBookDetailsFragment();
         });
 
-
         // RecyclerView for trending carousel
         recyclerViewTrendingBooks = view.findViewById(R.id.trending_container);
         layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-
-
 
         // Create an adapter
         trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(bookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
@@ -110,9 +116,22 @@ public class HomeFragment extends Fragment implements ResponseCallback {
         recyclerViewTrendingBooks.setLayoutManager(layoutManager);
 
 
+        // view model
+        booksViewModel.searchBooks("country", null).observe(getViewLifecycleOwner(),
+                result -> {
+                    if (result.isSuccess()) {
+                        int initialSize = this.bookList.size();
+                        this.bookList.clear();
+                        List<OLDocs> docsList = ((Result.Success) result).getData().getDocs();
+                        for (OLDocs oldoc: docsList) {
+                            booksViewModel.fetchBook(oldoc.getKey());
+                        }
+                        trendingBooksAdapter.notifyItemRangeInserted(initialSize, this.bookList.size());
 
-
-
+                    } else {
+                        Snackbar.make(view, 0, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void navigateToBookDetailsFragment() {
@@ -129,41 +148,10 @@ public class HomeFragment extends Fragment implements ResponseCallback {
     private void navigateToBookDetailsFragment(Bundle bundle) {
         if (USE_NAVIGATION_COMPONENT) {
             Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
-
         } else {
             Intent intent = new Intent(requireContext(), HomeActivity.class);
             startActivity(intent);
             //requireActivity().finish();
         }
-    }
-
-
-
-    //TODO da rimuovere, temporanea
-    private static ArrayList<String> getTopics(String topic1, String topic2) {
-        ArrayList<String> topics = new ArrayList<>();
-        topics.add(topic1);
-        topics.add(topic2);
-        return topics;
-    }
-
-
-    @Override
-    public void onSuccess(List<OLWorkApiResponse> bookList) {
-    }
-
-    @Override
-    public void onWorkSuccess(OLWorkApiResponse work) {
-        this.bookList.add(work);
-        Log.e("lista",bookList.toString());
-
-        // Notify the adapter about the data change
-        trendingBooksAdapter.notifyItemInserted(bookList.size());
-
-    }
-
-    @Override
-    public void onFailure(String errorMessage) {
-        Log.e("ERRORE", errorMessage);
     }
 }

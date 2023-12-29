@@ -1,9 +1,13 @@
 package it.unimib.readify.repository;
 
+import androidx.lifecycle.MutableLiveData;
+
+import it.unimib.readify.model.Result;
+
 public interface IBookRepository {
 
-    void searchBooks(String query, String sort, int limit, int offset);
+    MutableLiveData<Result> searchBooks(String query, String sort, int limit, int offset);
 
-    void fetchBook(String id);
+    MutableLiveData<Result> fetchBook(String id);
 
 }

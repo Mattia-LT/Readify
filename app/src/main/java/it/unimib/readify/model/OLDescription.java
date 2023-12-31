@@ -3,6 +3,10 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
+import java.util.Objects;
+
 public class OLDescription implements Parcelable {
 
     private String type;
@@ -29,6 +33,27 @@ public class OLDescription implements Parcelable {
         this.value = value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OLDescription that = (OLDescription) o;
+        return Objects.equals(type, that.type) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, value);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "OLDescription{" +
+                "type='" + type + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
     @Override
     public int describeContents() {
         return 0;

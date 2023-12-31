@@ -6,17 +6,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import it.unimib.readify.repository.IBookRepository;
 
-public class BooksViewModelFactory implements ViewModelProvider.Factory {
+public class BookViewModelFactory implements ViewModelProvider.Factory {
 
     private final IBookRepository iBookRepository;
 
-    public BooksViewModelFactory(IBookRepository iBookRepository) {
+    public BookViewModelFactory(IBookRepository iBookRepository) {
         this.iBookRepository = iBookRepository;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new BooksViewModel(iBookRepository);
+        return (T) new BookViewModel(iBookRepository);
     }
 }

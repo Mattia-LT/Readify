@@ -3,39 +3,45 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class OLWorkApiResponse implements Parcelable {
 
-    private OLDescription olDescription;
+    private OLDescription description;
     private String title;
+
     private List<Integer> covers;
-    private String first_publish_date;
+
+    @SerializedName("first_publish_date")
+    private String firstPublishDate;
     private String key;
-    private List<OLAuthor> olAuthors;
+    private List<OLAuthorKeys> authors;
     private List<String> subjects;
 
-    public OLWorkApiResponse() {
+    private List<OLAuthorApiResponse> authorList;
 
-    }
+    public OLWorkApiResponse() {}
 
-    public OLWorkApiResponse(OLDescription olDescription, String title, List<Integer> covers, String first_publish_date, String key, List<OLAuthor> olAuthors, List<String> subjects) {
-        this.olDescription = olDescription;
+    public OLWorkApiResponse(OLDescription description, String title, List<Integer> covers, String firstPublishDate, String key, List<OLAuthorKeys> authors, List<String> subjects) {
+        this.description = description;
         this.title = title;
         this.covers = covers;
-        this.first_publish_date = first_publish_date;
+        this.firstPublishDate = firstPublishDate;
         this.key = key;
-        this.olAuthors = olAuthors;
+        this.authors = authors;
         this.subjects = subjects;
     }
 
-    public OLDescription getOlDescription() {
-        return olDescription;
+    public OLDescription getDescription() {
+        return description;
     }
 
-    public void setOlDescription(OLDescription olDescription) {
-        this.olDescription = olDescription;
+    public void setDescription(OLDescription description) {
+        this.description = description;
     }
 
     public String getTitle() {
@@ -54,12 +60,12 @@ public class OLWorkApiResponse implements Parcelable {
         this.covers = covers;
     }
 
-    public String getFirst_publish_date() {
-        return first_publish_date;
+    public String getFirstPublishDate() {
+        return firstPublishDate;
     }
 
-    public void setFirst_publish_date(String first_publish_date) {
-        this.first_publish_date = first_publish_date;
+    public void setFirstPublishDate(String firstPublishDate) {
+        this.firstPublishDate = firstPublishDate;
     }
 
     public String getKey() {
@@ -70,12 +76,12 @@ public class OLWorkApiResponse implements Parcelable {
         this.key = key;
     }
 
-    public List<OLAuthor> getOlAuthors() {
-        return olAuthors;
+    public List<OLAuthorKeys> getAuthors() {
+        return authors;
     }
 
-    public void setOlAuthors(List<OLAuthor> olAuthors) {
-        this.olAuthors = olAuthors;
+    public void setAuthors(List<OLAuthorKeys> authors) {
+        this.authors = authors;
     }
 
     public List<String> getSubjects() {
@@ -86,18 +92,41 @@ public class OLWorkApiResponse implements Parcelable {
         this.subjects = subjects;
     }
 
+    public List<OLAuthorApiResponse> getAuthorList() {
+        return authorList;
+    }
+
+    public void setAuthorList(List<OLAuthorApiResponse> authorList) {
+        this.authorList = authorList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OLWorkApiResponse that = (OLWorkApiResponse) o;
+        return Objects.equals(description, that.description) && Objects.equals(title, that.title) && Objects.equals(covers, that.covers) && Objects.equals(firstPublishDate, that.firstPublishDate) && Objects.equals(key, that.key) && Objects.equals(authors, that.authors) && Objects.equals(subjects, that.subjects) && Objects.equals(authorList, that.authorList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, title, covers, firstPublishDate, key, authors, subjects, authorList);
+    }
+
     @Override
     public String toString() {
         return "OLWorkApiResponse{" +
-                "olDescription=" + olDescription +
+                "description=" + description +
                 ", title='" + title + '\'' +
                 ", covers=" + covers +
-                ", first_publish_date='" + first_publish_date + '\'' +
+                ", first_publish_date='" + firstPublishDate + '\'' +
                 ", key='" + key + '\'' +
-                ", olAuthors=" + olAuthors +
+                ", authors=" + authors +
                 ", subjects=" + subjects +
+                ", authorList=" + authorList +
                 '}';
     }
+
 
     @Override
     public int describeContents() {
@@ -106,38 +135,41 @@ public class OLWorkApiResponse implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.olDescription, flags);
+        dest.writeParcelable(this.description, flags);
         dest.writeString(this.title);
         dest.writeList(this.covers);
-        dest.writeString(this.first_publish_date);
+        dest.writeString(this.firstPublishDate);
         dest.writeString(this.key);
-        dest.writeTypedList(this.olAuthors);
+        dest.writeTypedList(this.authors);
         dest.writeStringList(this.subjects);
+        dest.writeTypedList(this.authorList);
     }
 
     public void readFromParcel(Parcel source) {
-        this.olDescription = source.readParcelable(OLDescription.class.getClassLoader());
+        this.description = source.readParcelable(OLDescription.class.getClassLoader());
         this.title = source.readString();
         this.covers = new ArrayList<Integer>();
         source.readList(this.covers, Integer.class.getClassLoader());
-        this.first_publish_date = source.readString();
+        this.firstPublishDate = source.readString();
         this.key = source.readString();
-        this.olAuthors = source.createTypedArrayList(OLAuthor.CREATOR);
+        this.authors = source.createTypedArrayList(OLAuthorKeys.CREATOR);
         this.subjects = source.createStringArrayList();
+        this.authorList = source.createTypedArrayList(OLAuthorApiResponse.CREATOR);
     }
 
     protected OLWorkApiResponse(Parcel in) {
-        this.olDescription = in.readParcelable(OLDescription.class.getClassLoader());
+        this.description = in.readParcelable(OLDescription.class.getClassLoader());
         this.title = in.readString();
         this.covers = new ArrayList<Integer>();
         in.readList(this.covers, Integer.class.getClassLoader());
-        this.first_publish_date = in.readString();
+        this.firstPublishDate = in.readString();
         this.key = in.readString();
-        this.olAuthors = in.createTypedArrayList(OLAuthor.CREATOR);
+        this.authors = in.createTypedArrayList(OLAuthorKeys.CREATOR);
         this.subjects = in.createStringArrayList();
+        this.authorList = in.createTypedArrayList(OLAuthorApiResponse.CREATOR);
     }
 
-    public static final Parcelable.Creator<OLWorkApiResponse> CREATOR = new Parcelable.Creator<OLWorkApiResponse>() {
+    public static final Creator<OLWorkApiResponse> CREATOR = new Creator<OLWorkApiResponse>() {
         @Override
         public OLWorkApiResponse createFromParcel(Parcel source) {
             return new OLWorkApiResponse(source);

@@ -5,7 +5,6 @@ import android.media.Image;
 import java.util.ArrayList;
 import java.util.Date;
 
-import it.unimib.readify.service.OLWorkApiService;
 
 // TODO: 09/12/2023 implement parcelable
 // TODO: 09/12/2023 gestione della thumbnail

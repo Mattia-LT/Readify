@@ -20,15 +20,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookRecyclerViewCarouselAdapter;
-import it.unimib.readify.model.OLDocs;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.repository.BookRepository;
 import it.unimib.readify.repository.IBookRepository;
-import it.unimib.readify.util.ResponseCallback;
 import it.unimib.readify.util.ServiceLocator;
 
 public class HomeFragment extends Fragment {
@@ -36,14 +34,15 @@ public class HomeFragment extends Fragment {
     private static final boolean USE_NAVIGATION_COMPONENT = true;
 
     private Button buttonDaRimuovere;
-    private RecyclerView recyclerViewTrendingBooks;
-    private LinearLayoutManager layoutManager;
-    private List<OLWorkApiResponse> bookList;
+    private List<OLWorkApiResponse> trendingBookList;
+
+    private List<OLWorkApiResponse> suggestedBookList;
     private BookRecyclerViewCarouselAdapter trendingBooksAdapter;
+    private BookRecyclerViewCarouselAdapter suggestedBooksAdapter;
 
 
-    private BooksViewModel booksViewModel;
-
+    private BookViewModel trendingBooksViewModel;
+    private BookViewModel suggestedBooksViewModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -53,19 +52,25 @@ public class HomeFragment extends Fragment {
         return new HomeFragment();
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bookList = new ArrayList<>();
 
-        IBookRepository booksRepository =
-                    ServiceLocator.getInstance().getBookRepository();
+        IBookRepository bookRepository = ServiceLocator.getInstance().getBookRepository(requireActivity().getApplication());
 
-        booksViewModel = new ViewModelProvider(
+        trendingBooksViewModel = new ViewModelProvider(
                 requireActivity(),
-                new BooksViewModelFactory(booksRepository)).get(BooksViewModel.class);
+                new BookViewModelFactory(bookRepository)
+                ).get(BookViewModel.class);
+
+        suggestedBooksViewModel = new ViewModelProvider(
+                requireActivity(), new BookViewModelFactory(bookRepository)
+                ).get(BookViewModel.class);
+
+
+        trendingBookList = new ArrayList<>();
+        suggestedBookList = new ArrayList<>();
+
     }
 
     @Override
@@ -84,18 +89,11 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //TODO da rimuovere
-        buttonDaRimuovere = view.findViewById(R.id.button_da_rimuovere);
-        buttonDaRimuovere.setOnClickListener(v -> {
-            navigateToBookDetailsFragment();
-        });
-
         // RecyclerView for trending carousel
-        recyclerViewTrendingBooks = view.findViewById(R.id.trending_container);
-        layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-
+        RecyclerView recyclerViewTrendingBooks = view.findViewById(R.id.trending_container);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
-        trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(bookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
+        trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(trendingBookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
@@ -117,21 +115,70 @@ public class HomeFragment extends Fragment {
 
 
         // view model
-        booksViewModel.searchBooks("country", null).observe(getViewLifecycleOwner(),
-                result -> {
-                    if (result.isSuccess()) {
-                        int initialSize = this.bookList.size();
-                        this.bookList.clear();
-                        List<OLDocs> docsList = ((Result.Success) result).getData().getDocs();
-                        for (OLDocs oldoc: docsList) {
-                            booksViewModel.fetchBook(oldoc.getKey());
-                        }
-                        trendingBooksAdapter.notifyItemRangeInserted(initialSize, this.bookList.size());
+        trendingBooksViewModel.searchBooks("harry+potter", null).observe(getViewLifecycleOwner(), result -> {
+            if(result.isSuccess()) {
+                //Log.e("controllo", ((Result.SearchSuccess) result).getData().toString());
+                int intialSize = this.trendingBookList.size();
+                this.trendingBookList.clear();
+                this.trendingBookList.addAll(((Result.SearchSuccess) result).getData().getWorkList());
+                trendingBooksAdapter.notifyItemRangeInserted(intialSize, this.trendingBookList.size());
+            } else {
+                Log.e("Result.isSuccess() = false in home fragment", result.toString());
+                Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
+            }
+        });
 
-                    } else {
-                        Snackbar.make(view, 0, Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+
+
+
+
+        //recyclerview for suggested books
+        List<String> mockData = new ArrayList<>();
+        mockData.add("/works/OL14933414W");
+        mockData.add("/works/OL27479W");
+        mockData.add("/works/OL27516W");
+        mockData.add("/works/OL262758W");
+        mockData.add("/works/OL27658078W");
+        mockData.add("/works/OL18146933W");
+
+        // RecyclerView for suggested carousel
+        RecyclerView recyclerViewSuggestedBooks = view.findViewById(R.id.suggested_container);
+        RecyclerView.LayoutManager suggestedBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        // Create an adapter
+        suggestedBooksAdapter = new BookRecyclerViewCarouselAdapter(suggestedBookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener() {
+            @Override
+            public void onBookItemClick(OLWorkApiResponse book) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("book", book);
+                navigateToBookDetailsFragment(bundle);
+            }
+
+            @Override
+            public void onSaveButtonPressed(int position) {
+                //TODO da implementare
+            }
+        });
+
+        // Set the adapter on the RecyclerView
+        recyclerViewSuggestedBooks.setAdapter(suggestedBooksAdapter);
+        recyclerViewSuggestedBooks.setLayoutManager(suggestedBooksLayoutManager);
+
+        // view model
+
+        suggestedBooksViewModel.fetchBooks(mockData).observe(getViewLifecycleOwner(), resultList -> {
+            AtomicInteger counter = new AtomicInteger(0);
+            for(Result result : resultList){
+                if(result.isSuccess()) {
+                    OLWorkApiResponse suggestedBook = ((Result.WorkSuccess) result).getData();
+                    Log.d("suggested "+ suggestedBook.getTitle() + "(" + counter + ")", suggestedBook.toString());
+                    this.suggestedBookList.add(suggestedBook);
+                    suggestedBooksAdapter.notifyItemInserted(counter.incrementAndGet());
+                } else {
+                    Log.e("Result.isSuccess() = false in home fragment", result.toString());
+                    Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void navigateToBookDetailsFragment() {

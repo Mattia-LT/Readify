@@ -69,5 +69,8 @@
     <string name="textview_home_continue_label">Continuiamo da dove eravamo rimasti</string>
     <string name="textview_trending_books">Libri in tendenza</string>
     <string name="book_search_error">Si è verificato un errore durante la ricerca, riprova.</string>
+    <string name="description_not_available">Questo libro non fornisce una descrizione. Sentiti libero di esplorarne il contenuto attraverso recensioni o commenti per ulteriori informazioni.</string>
+    <string name="empty_search_snackbar">La barra di ricerca é vuota</string>
+    <string name="textview_home_suggested">Suggeriti per te</string>
 
 </resources>

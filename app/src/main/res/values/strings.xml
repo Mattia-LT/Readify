@@ -81,4 +81,8 @@
     <string name="textview_home_continue_label">Let\'s continue where we left off</string>
     <string name="textview_trending_books">Trending books</string>
     <string name="book_search_error">An error occurred during the search, please retry.</string>
+    <string name="description_not_available">This book does not provide a description. Feel free to explore its content through reviews or comments for more information</string>
+    <string name="empty_search_snackbar">The searchbar is empty</string>
+    <string name="textview_home_suggested">Suggested for you</string>
+
 </resources>

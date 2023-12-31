@@ -5,20 +5,42 @@ public abstract class Result {
     private Result() {}
 
     public boolean isSuccess(){
-        return this instanceof Success;
+        return false;
     }
 
     /**
      * Class that represents a successful action during the interaction
      * with a Web Service or a local database.
      */
-    public static final class Success extends Result {
+
+    public static final class SearchSuccess extends Result {
         private final OLSearchApiResponse olSearchApiResponse;
-        public Success(Object object) {
-            this.olSearchApiResponse = (OLSearchApiResponse) object;
+        public boolean isSuccess(){
+            return true;
         }
+
+        public SearchSuccess(OLSearchApiResponse olSearchApiResponse) {
+            this.olSearchApiResponse = olSearchApiResponse;
+        }
+
         public OLSearchApiResponse getData() {
             return olSearchApiResponse;
+        }
+    }
+
+
+    public static final class WorkSuccess extends Result {
+        private final OLWorkApiResponse olWorkApiResponse;
+
+        public boolean isSuccess(){
+            return true;
+        }
+
+        public WorkSuccess(OLWorkApiResponse olWorkApiResponse) {
+            this.olWorkApiResponse = olWorkApiResponse;
+        }
+        public OLWorkApiResponse getData() {
+            return olWorkApiResponse;
         }
     }
 
@@ -28,6 +50,7 @@ public abstract class Result {
      */
     public static final class Error extends Result {
         private final String message;
+
         public Error(String message) {
             this.message = message;
         }

@@ -30,7 +30,7 @@ public class OLSearchApiResponse implements Parcelable {
         this.docs = docs;
         this.q = q;
         this.offset = offset;
-        this.workList = new ArrayList<OLWorkApiResponse>();
+        this.workList = new ArrayList<>();
     }
 
     public int getNumFound() {
@@ -81,7 +81,14 @@ public class OLSearchApiResponse implements Parcelable {
         this.offset = offset;
     }
 
-    @NonNull
+    public List<OLWorkApiResponse> getWorkList() {
+        return workList;
+    }
+
+    public void setWorkList(List<OLWorkApiResponse> workList) {
+        this.workList = workList;
+    }
+
     @Override
     public String toString() {
         return "OLSearchApiResponse{" +
@@ -91,6 +98,7 @@ public class OLSearchApiResponse implements Parcelable {
                 ", docs=" + docs +
                 ", q='" + q + '\'' +
                 ", offset=" + offset +
+                ", workList=" + workList +
                 '}';
     }
 
@@ -107,6 +115,7 @@ public class OLSearchApiResponse implements Parcelable {
         dest.writeTypedList(this.docs);
         dest.writeString(this.q);
         dest.writeInt(this.offset);
+        dest.writeTypedList(this.workList);
     }
 
     public void readFromParcel(Parcel source) {
@@ -116,9 +125,8 @@ public class OLSearchApiResponse implements Parcelable {
         this.docs = source.createTypedArrayList(OLDocs.CREATOR);
         this.q = source.readString();
         this.offset = source.readInt();
+        this.workList = source.createTypedArrayList(OLWorkApiResponse.CREATOR);
     }
-
-
 
     protected OLSearchApiResponse(Parcel in) {
         this.numFound = in.readInt();
@@ -127,9 +135,10 @@ public class OLSearchApiResponse implements Parcelable {
         this.docs = in.createTypedArrayList(OLDocs.CREATOR);
         this.q = in.readString();
         this.offset = in.readInt();
+        this.workList = in.createTypedArrayList(OLWorkApiResponse.CREATOR);
     }
 
-    public static final Parcelable.Creator<OLSearchApiResponse> CREATOR = new Parcelable.Creator<OLSearchApiResponse>() {
+    public static final Creator<OLSearchApiResponse> CREATOR = new Creator<OLSearchApiResponse>() {
         @Override
         public OLSearchApiResponse createFromParcel(Parcel source) {
             return new OLSearchApiResponse(source);

@@ -84,5 +84,6 @@
     <string name="description_not_available">This book does not provide a description. Feel free to explore its content through reviews or comments for more information</string>
     <string name="empty_search_snackbar">The searchbar is empty</string>
     <string name="textview_home_suggested">Suggested for you</string>
+    <string name="textview_new_books">New Books</string>
 
 </resources>

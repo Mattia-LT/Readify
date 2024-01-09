@@ -68,7 +68,7 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<BookSearchResu
             coverImageView = itemView.findViewById(R.id.imageview_book_cover);
             titleTextView = itemView.findViewById(R.id.textview_book_title);
             descriptionTextView = itemView.findViewById(R.id.textview_book_description);
-            addButton = itemView.findViewById(R.id.imagebutton_clickable_icon);
+            addButton = itemView.findViewById(R.id.imagebutton_add_icon);
         }
     }
 

@@ -13,6 +13,10 @@ public interface ResponseCallback {
     Object come parametro, così da gestire diverse output d'uscita
     (abbiamo più tipi di chiamate)
      */
-    void onSuccessFromRemote(Object response);
+    void onSuccessSearchFromRemote(List<OLWorkApiResponse> searchApiResponse);
+
+    void onSuccessFetchBookFromRemote(OLWorkApiResponse workApiResponse);
+    void onSuccessFetchBooksFromRemote(List<OLWorkApiResponse> workApiResponseList, String reference);
+
     void onFailureFromRemote(Exception exception);
 }

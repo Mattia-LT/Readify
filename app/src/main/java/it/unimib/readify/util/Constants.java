@@ -41,5 +41,10 @@ public class Constants {
 
 
 
+    // Constants for recycler views
+    public static final String TRENDING = "trending";
+    public static final String SUGGESTED = "suggested";
+    public static final String RECENT = "recent";
+    public static final String SEARCH = "search";
 
 }

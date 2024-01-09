@@ -11,4 +11,5 @@ public abstract class BaseBookRemoteDataSource {
     }
     public abstract void searchBooks(String query, String sort, int limit, int offset);
     public abstract void fetchBook(String id);
+    public abstract void getBooks(List<String> idList, String reference);
 }

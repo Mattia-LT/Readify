@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "178486194736",
+    "project_id": "readify-9b50c",
+    "storage_bucket": "readify-9b50c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178486194736:android:26642e02da7c93cd7ef3f5",
+        "android_client_info": {
+          "package_name": "it.unimib.readify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "178486194736-ngep0282v77v42r4e06m2jkp4pkselt2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.unimib.readify",
+            "certificate_hash": "749dec5179c53ffdf1c82b9c498a84033144c722"
+          }
+        },
+        {
+          "client_id": "178486194736-bo3brdvsb7usibtejca6t1slqh9q0464.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ8n4KpGL_uGq-klFCZoW3iuelH5gP0mI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "178486194736-bo3brdvsb7usibtejca6t1slqh9q0464.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

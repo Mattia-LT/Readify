@@ -69,9 +69,12 @@ dependencies {
     // https://firebase.google.com/docs/android/setup#available-libraries
 
     // AUTENTICAZIONE
-    implementation("com.firebaseui:firebase-ui-auth")
+    implementation("com.google.firebase:firebase-auth")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
+
+    //ce l'aveva il prof (?)
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 

@@ -34,8 +34,6 @@ import it.unimib.readify.repository.IBookRepository;
 import it.unimib.readify.util.ServiceLocator;
 
 public class HomeFragment extends Fragment {
-
-    private static final boolean USE_NAVIGATION_COMPONENT = true;
     private List<OLWorkApiResponse> trendingBookList;
     private List<OLWorkApiResponse> suggestedBookList;
     private List<OLWorkApiResponse> recentBookList;
@@ -256,23 +254,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void navigateToBookDetailsFragment() {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment);
-
-        } else {
-            Intent intent = new Intent(requireContext(), HomeActivity.class);
-            startActivity(intent);
-            //requireActivity().finish();
-        }
+        Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment);
     }
 
     private void navigateToBookDetailsFragment(Bundle bundle) {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
-        } else {
-            Intent intent = new Intent(requireContext(), HomeActivity.class);
-            startActivity(intent);
-            //requireActivity().finish();
-        }
+        Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
     }
 }

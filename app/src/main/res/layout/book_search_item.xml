@@ -33,16 +33,16 @@
                 android:id="@+id/textview_book_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
                 android:layout_marginStart="30dp"
-                android:layout_marginEnd="60dp"
+                android:layout_marginTop="25dp"
                 android:text="@string/placeholder_book_title"
+                android:maxWidth="200dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/textview_book_description"
                 app:layout_constraintStart_toEndOf="@+id/imageview_book_cover"
-                android:ellipsize="end"
-                android:lines="1"
                 style="@style/TextAppearance.Material3.TitleMedium"
+                android:lines="1"
+                android:ellipsize="end"
                 />
 
             <TextView

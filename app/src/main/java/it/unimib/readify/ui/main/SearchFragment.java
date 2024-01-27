@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,7 +57,7 @@ public class SearchFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentSearchBinding = FragmentSearchBinding.inflate(inflater,container,false);
@@ -73,7 +74,19 @@ public class SearchFragment extends Fragment {
 
 
         RecyclerView recyclerViewSearchResults = fragmentSearchBinding.recyclerviewSearch;
-        searchResultsAdapter = new BookSearchResultAdapter(requireContext(), searchResultList);
+        searchResultsAdapter = new BookSearchResultAdapter(searchResultList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onBookItemClick(OLWorkApiResponse book) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("book", book);
+                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
+            }
+
+            @Override
+            public void onAddToCollectionButtonPressed(int position) {
+
+            }
+        });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         recyclerViewSearchResults.setAdapter(searchResultsAdapter);
         recyclerViewSearchResults.setLayoutManager(layoutManager);
@@ -114,7 +127,6 @@ public class SearchFragment extends Fragment {
             bookViewModel.searchBooks(query, null).observe(getViewLifecycleOwner(), resultList -> {
                 int counter = 0;
                 this.searchResultList.clear();
-                Log.i("SF-BVM-SB-O", "ok");
                 for(Result result : resultList){
                     if(result.isSuccess()) {
                         OLWorkApiResponse searchedBook = ((Result.WorkSuccess) result).getData();
@@ -124,7 +136,7 @@ public class SearchFragment extends Fragment {
                         Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
                     }
                 }
-                searchResultsAdapter.notifyDataSetChanged();
+                searchResultsAdapter.notifyItemRangeChanged(0,searchResultList.size());
                 fragmentSearchBinding.progressindicatorSearch.setVisibility(View.GONE);
             });
         }

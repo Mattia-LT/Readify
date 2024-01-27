@@ -25,7 +25,11 @@ public class Constants {
     public static final String OL_ISBN_ENDPOINT = "/isbn/";
     public static final String OL_AUTHORS_ENDPOINT = "/search/authors.json";
     public static final String OL_COVERS_API_URL = "https://covers.openlibrary.org/";
+    public static final String OL_COVERS_API_ID_PARAMETER = "w/id/";
 
+    public static final String OL_COVERS_API_IMAGE_SIZE_S = "-S.jpg";
+    public static final String OL_COVERS_API_IMAGE_SIZE_M = "-M.jpg";
+    public static final String OL_COVERS_API_IMAGE_SIZE_L = "-L.jpg";
 
     // Constants for Search Api
 

@@ -63,6 +63,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textinputlayout_search"
+        android:layout_marginBottom="100dp"
         tools:itemCount="12"
         tools:listitem="@layout/book_search_item" />
 

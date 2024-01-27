@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/mobile_gradient_backgrounds_2"
     tools:context=".ui.startup.WelcomeActivity">
 
     <androidx.constraintlayout.widget.Guideline
@@ -12,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="21dp" />
+        app:layout_constraintGuide_begin="16dp" />
 
 
 
@@ -35,7 +36,7 @@
         android:layout_marginStart="140dp"
         android:layout_marginTop="12dp"
         android:text="@string/register"
-        android:textColor="?android:textColorPrimary"
+        android:textColor="@color/white"
         android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,11 +48,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
-
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/left_guideline"
         app:layout_constraintTop_toBottomOf="@+id/textview_login"
-        app:startIconDrawable="@android:drawable/ic_menu_report_image"
         app:endIconMode="clear_text"
         app:errorEnabled="true">
 
@@ -59,6 +59,10 @@
             android:id="@+id/text_input_edit_text_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_textbox"
+            android:drawableStart="@drawable/ic_baseline_profile_24"
+            android:drawablePadding="20dp"
+            android:drawableTint="@color/white"
             android:hint="@string/username" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,6 +74,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="240dp"
         android:padding="13dp"
+        android:background="@drawable/custom_textbox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/text_input_layout_username"
@@ -81,11 +86,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="24dp"
-
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/spinner_gender"
         app:layout_constraintTop_toBottomOf="@+id/spinner_gender"
-        app:startIconDrawable="@drawable/ic_baseline_email_24"
         app:endIconMode="clear_text"
         app:errorEnabled="true">
 
@@ -93,7 +97,12 @@
             android:id="@+id/text_input_edit_text_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_textbox"
+            android:drawableStart="@drawable/ic_baseline_email_24"
+            android:drawableTint="@color/white"
+            android:drawablePadding="20dp"
             android:hint="@string/email"
+            android:textColorHint="@color/white"
             android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -107,13 +116,17 @@
         app:layout_constraintStart_toStartOf="@+id/left_guideline"
         app:layout_constraintTop_toBottomOf="@+id/text_input_layout_email"
         app:passwordToggleEnabled="true"
-        app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
+        android:textColorHint="@color/white"
         app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_textbox"
+            android:drawableStart="@drawable/ic_baseline_vpn_key_24"
+            android:drawablePadding="20dp"
+            android:drawableTint="@color/white"
             android:hint="@string/password"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -124,17 +137,21 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/left_guideline"
         app:layout_constraintTop_toBottomOf="@+id/text_input_layout_password"
         app:passwordToggleEnabled="true"
-        app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
         app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_password_confirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_textbox"
+            android:drawableStart="@drawable/ic_baseline_vpn_key_24"
+            android:drawablePadding="20dp"
+            android:drawableTint="@color/white"
             android:hint="@string/password_confirm"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -146,7 +163,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
-        android:backgroundTint="@color/golden_yellow"
+        android:backgroundTint="@color/login_blue"
         android:text="@string/register"
         android:textColor="@color/white"
         android:textSize="14sp"

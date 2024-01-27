@@ -20,7 +20,7 @@
             android:id="@+id/top_appbar_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="@color/login_blue"
             android:minHeight="?attr/actionBarSize"
             app:menu="@menu/top_app_bar"
             app:layout_constraintEnd_toEndOf="parent"

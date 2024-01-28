@@ -26,7 +26,7 @@ import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.repository.IBookRepository;
+import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.util.ServiceLocator;
 
 public class HomeFragment extends Fragment {

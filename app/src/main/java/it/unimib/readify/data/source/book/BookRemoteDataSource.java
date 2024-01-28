@@ -1,11 +1,8 @@
-package it.unimib.readify.source;
+package it.unimib.readify.data.source.book;
 
 import static it.unimib.readify.util.Constants.SEARCH;
 
 import android.app.Application;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +14,7 @@ import it.unimib.readify.model.OLDescription;
 import it.unimib.readify.model.OLDocs;
 import it.unimib.readify.model.OLSearchApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.service.OLApiService;
+import it.unimib.readify.data.service.OLApiService;
 import it.unimib.readify.util.ServiceLocator;
 import retrofit2.Call;
 import retrofit2.Callback;

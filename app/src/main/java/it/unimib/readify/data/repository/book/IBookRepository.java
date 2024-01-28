@@ -1,4 +1,4 @@
-package it.unimib.readify.repository;
+package it.unimib.readify.data.repository.book;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

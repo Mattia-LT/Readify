@@ -5,7 +5,11 @@ public abstract class Result {
     private Result() {}
 
     public boolean isSuccess(){
-        return false;
+        if (this instanceof WorkSuccess || this instanceof UserSuccess) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -13,28 +17,8 @@ public abstract class Result {
      * with a Web Service or a local database.
      */
 
-    public static final class SearchSuccess extends Result {
-        private final OLSearchApiResponse olSearchApiResponse;
-        public boolean isSuccess(){
-            return true;
-        }
-
-        public SearchSuccess(OLSearchApiResponse olSearchApiResponse) {
-            this.olSearchApiResponse = olSearchApiResponse;
-        }
-
-        public OLSearchApiResponse getData() {
-            return olSearchApiResponse;
-        }
-    }
-
-
     public static final class WorkSuccess extends Result {
         private final OLWorkApiResponse olWorkApiResponse;
-
-        public boolean isSuccess(){
-            return true;
-        }
 
         public WorkSuccess(OLWorkApiResponse olWorkApiResponse) {
             this.olWorkApiResponse = olWorkApiResponse;
@@ -43,6 +27,20 @@ public abstract class Result {
             return olWorkApiResponse;
         }
     }
+
+    public static final class UserSuccess extends Result{
+        private final User user;
+        public UserSuccess(User user) {
+            this.user = user;
+        }
+        public User getData() {
+            return user;
+        }
+    }
+
+
+
+
 
     /**
      * Class that represents an error occurred during the interaction

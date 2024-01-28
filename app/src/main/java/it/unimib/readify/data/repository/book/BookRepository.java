@@ -1,11 +1,9 @@
-package it.unimib.readify.repository;
+package it.unimib.readify.data.repository.book;
 
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SEARCH;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
-
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -14,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.model.OLSearchApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.source.BaseBookRemoteDataSource;
+import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
 import it.unimib.readify.util.ResponseCallback;
 
 public class BookRepository implements IBookRepository, ResponseCallback{

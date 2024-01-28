@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import it.unimib.readify.repository.IBookRepository;
+import it.unimib.readify.data.repository.book.IBookRepository;
 
 public class BookViewModelFactory implements ViewModelProvider.Factory {
 

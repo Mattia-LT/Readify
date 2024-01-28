@@ -1,4 +1,4 @@
-package it.unimib.readify.service;
+package it.unimib.readify.data.service;
 
 import static it.unimib.readify.util.Constants.OL_SEARCH_ENDPOINT;
 import static it.unimib.readify.util.Constants.OL_SEARCH_LIMIT_PARAMETER;

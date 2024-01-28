@@ -4,19 +4,14 @@ import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.repository.IBookRepository;
+import it.unimib.readify.data.repository.book.IBookRepository;
 
 public class BookViewModel extends ViewModel {
 

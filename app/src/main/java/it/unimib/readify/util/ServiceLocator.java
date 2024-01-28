@@ -5,13 +5,13 @@ import android.app.Application;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import it.unimib.readify.database.BookRoomDatabase;
+import it.unimib.readify.data.database.BookRoomDatabase;
 import it.unimib.readify.model.OLDescription;
-import it.unimib.readify.repository.BookRepository;
-import it.unimib.readify.repository.IBookRepository;
-import it.unimib.readify.service.OLApiService;
-import it.unimib.readify.source.BaseBookRemoteDataSource;
-import it.unimib.readify.source.BookRemoteDataSource;
+import it.unimib.readify.data.repository.book.BookRepository;
+import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.data.service.OLApiService;
+import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
+import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

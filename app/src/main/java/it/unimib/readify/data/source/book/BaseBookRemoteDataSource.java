@@ -1,4 +1,4 @@
-package it.unimib.readify.source;
+package it.unimib.readify.data.source.book;
 
 import java.util.List;
 

@@ -72,7 +72,6 @@ public class SearchFragment extends Fragment {
 
         //todo gestire menu
 
-
         RecyclerView recyclerViewSearchResults = fragmentSearchBinding.recyclerviewSearch;
         searchResultsAdapter = new BookSearchResultAdapter(searchResultList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
             @Override

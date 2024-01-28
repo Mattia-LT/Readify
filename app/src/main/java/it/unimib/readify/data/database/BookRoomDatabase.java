@@ -1,4 +1,4 @@
-package it.unimib.readify.database;
+package it.unimib.readify.data.database;
 
 import android.content.Context;
 

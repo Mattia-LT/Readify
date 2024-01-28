@@ -73,5 +73,6 @@
     <string name="empty_search_snackbar">La barra di ricerca é vuota</string>
     <string name="textview_home_suggested">Suggeriti per te</string>
     <string name="textview_new_books">Nuovi libri</string>
+    <string name="textview_loading">Caricamento...</string>
 
 </resources>

@@ -4,13 +4,10 @@ import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,10 +21,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import it.unimib.readify.R;
-import it.unimib.readify.adapter.BookRecyclerViewCarouselAdapter;
+import it.unimib.readify.adapter.BookCarouselAdapter;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.repository.IBookRepository;
@@ -37,9 +33,9 @@ public class HomeFragment extends Fragment {
     private List<OLWorkApiResponse> trendingBookList;
     private List<OLWorkApiResponse> suggestedBookList;
     private List<OLWorkApiResponse> recentBookList;
-    private BookRecyclerViewCarouselAdapter trendingBooksAdapter;
-    private BookRecyclerViewCarouselAdapter suggestedBooksAdapter;
-    private BookRecyclerViewCarouselAdapter recentBooksAdapter;
+    private BookCarouselAdapter trendingBooksAdapter;
+    private BookCarouselAdapter suggestedBooksAdapter;
+    private BookCarouselAdapter recentBooksAdapter;
 
     private BookViewModel bookViewModel;
 
@@ -114,7 +110,7 @@ public class HomeFragment extends Fragment {
         RecyclerView recyclerViewTrendingBooks = view.findViewById(R.id.trending_container);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
-        trendingBooksAdapter = new BookRecyclerViewCarouselAdapter(trendingBookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener(){
+        trendingBooksAdapter = new BookCarouselAdapter(trendingBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener(){
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
@@ -123,7 +119,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onSaveButtonPressed(int position) {
+            public void onAddToCollectionButtonPressed(int position) {
                 //TODO sistemare
                 //bookList.get(position).setFavorite(!newsList.get(position).isFavorite());
                 //iNewsRepository.updateNews(newsList.get(position));
@@ -169,7 +165,7 @@ public class HomeFragment extends Fragment {
         RecyclerView recyclerViewSuggestedBooks = view.findViewById(R.id.suggested_container);
         RecyclerView.LayoutManager suggestedBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
-        suggestedBooksAdapter = new BookRecyclerViewCarouselAdapter(suggestedBookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener() {
+        suggestedBooksAdapter = new BookCarouselAdapter(suggestedBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
@@ -178,7 +174,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onSaveButtonPressed(int position) {
+            public void onAddToCollectionButtonPressed(int position) {
                 //TODO da implementare
             }
         });
@@ -210,7 +206,7 @@ public class HomeFragment extends Fragment {
         RecyclerView recyclerViewRecentBooks = view.findViewById(R.id.recent_container);
         RecyclerView.LayoutManager recentBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
-        recentBooksAdapter = new BookRecyclerViewCarouselAdapter(recentBookList, requireActivity().getApplication(), new BookRecyclerViewCarouselAdapter.OnItemClickListener() {
+        recentBooksAdapter = new BookCarouselAdapter(recentBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
@@ -219,7 +215,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onSaveButtonPressed(int position) {
+            public void onAddToCollectionButtonPressed(int position) {
                 //TODO da implementare
             }
         });

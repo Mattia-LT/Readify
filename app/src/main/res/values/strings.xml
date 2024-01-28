@@ -85,5 +85,6 @@
     <string name="empty_search_snackbar">The searchbar is empty</string>
     <string name="textview_home_suggested">Suggested for you</string>
     <string name="textview_new_books">New Books</string>
+    <string name="textview_loading">Loading...</string>
 
 </resources>

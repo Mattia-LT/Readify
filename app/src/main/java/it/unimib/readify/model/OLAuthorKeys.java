@@ -3,15 +3,19 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 import java.util.Objects;
 
 public class OLAuthorKeys implements Parcelable {
 
     private OLDocs author;
+    private String key;
 
-    public OLAuthorKeys(OLDocs author) {
+    public OLAuthorKeys(OLDocs author, String key) {
         this.author = author;
+        this.key = key;
     }
 
     public OLDocs getAuthor() {
@@ -22,24 +26,34 @@ public class OLAuthorKeys implements Parcelable {
         this.author = author;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "OLAuthorKeys{" +
+                "author=" + author +
+                ", key='" + key + '\'' +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OLAuthorKeys that = (OLAuthorKeys) o;
-        return Objects.equals(author, that.author);
+        return Objects.equals(author, that.author) && Objects.equals(key, that.key);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author);
-    }
-
-    @Override
-    public String toString() {
-        return "OLAuthorKeys{" +
-                "author=" + author +
-                '}';
+        return Objects.hash(author, key);
     }
 
 
@@ -51,14 +65,17 @@ public class OLAuthorKeys implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.author, flags);
+        dest.writeString(this.key);
     }
 
     public void readFromParcel(Parcel source) {
         this.author = source.readParcelable(OLDocs.class.getClassLoader());
+        this.key = source.readString();
     }
 
     protected OLAuthorKeys(Parcel in) {
         this.author = in.readParcelable(OLDocs.class.getClassLoader());
+        this.key = in.readString();
     }
 
     public static final Creator<OLAuthorKeys> CREATOR = new Creator<OLAuthorKeys>() {

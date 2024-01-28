@@ -121,6 +121,10 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                             .apply(requestOptions)
                             .into(binding.imageviewBookCover);
                 }
+            } else {
+                Glide.with(application)
+                        .load(R.drawable.image_not_available)
+                        .into(binding.imageviewBookCover);
             }
         }
 

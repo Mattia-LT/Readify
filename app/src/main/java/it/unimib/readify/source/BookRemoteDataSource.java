@@ -105,7 +105,13 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
         List<OLAuthorKeys> authorsKeys = book.getAuthors();
         if(authorsKeys != null && !authorsKeys.isEmpty()){
             for(OLAuthorKeys authorKey : authorsKeys) {
-                String key = authorKey.getAuthor().getKey();
+                String key = null;
+                if(authorKey.getAuthor() != null){
+                    key = authorKey.getAuthor().getKey();
+                } else if (authorKey.getKey() != null){
+                    key = authorKey.getKey();
+                    authorKey.setAuthor(new OLDocs(key));
+                }
                 olApiService.fetchAuthor(key).enqueue(new Callback<OLAuthorApiResponse>() {
                     @Override
                     public void onResponse(Call<OLAuthorApiResponse> call, Response<OLAuthorApiResponse> response) {
@@ -145,5 +151,4 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
             book.setDescription(new OLDescription(type, value));
         }
     }
-
 }

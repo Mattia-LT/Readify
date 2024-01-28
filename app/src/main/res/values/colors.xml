@@ -6,10 +6,11 @@
     <color name="primary_color">#000080</color>
     <color name="secondary_color">#ADD8E6</color>
     <color name="tertiary_color">#008080</color>
-    <color name="golden_yellow">#FFC000</color>
+    <color name="login_blue">#4b62f0</color>
     <color name="orange">#FFA500</color>
     <color name="google_login_button">#eceff1</color>
     <color name="google_login_text">#616161</color>
     <color name="light_purple">#8263bf</color>
+    <color name= "login_background">#FFE1E1</color>
 
 </resources>

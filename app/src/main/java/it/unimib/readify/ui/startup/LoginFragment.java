@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
+import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.ui.main.HomeActivity;
 import it.unimib.readify.util.DataEncryptionUtil;
 
@@ -39,6 +40,7 @@ public class LoginFragment extends Fragment {
     private static final String TAG = LoginFragment.class.getSimpleName();
 
     private DataEncryptionUtil dataEncryptionUtil;
+    private FragmentLoginBinding fragmentLoginBinding;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();

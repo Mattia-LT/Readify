@@ -26,6 +26,10 @@ public class OLWorkApiResponse implements Parcelable {
 
     public OLWorkApiResponse() {}
 
+    public OLWorkApiResponse(List<Integer> covers) {
+        this.covers = covers;
+    }
+
     public OLWorkApiResponse(OLDescription description, String title, List<Integer> covers, String firstPublishDate, String key, List<OLAuthorKeys> authors, List<String> subjects) {
         this.description = description;
         this.title = title;
@@ -54,6 +58,16 @@ public class OLWorkApiResponse implements Parcelable {
 
     public List<Integer> getCovers() {
         return covers;
+    }
+
+    public int getCover(int position) {
+        return covers.get(position);
+    }
+
+    public int getNumberOfCovers() {
+        if(covers == null)
+            return 0;
+        return covers.size();
     }
 
     public void setCovers(List<Integer> covers) {

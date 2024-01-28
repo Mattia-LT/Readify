@@ -102,6 +102,7 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
         //TODO SISTEMA
+        //secondo me la variabile pos non cambia mai il suo valore ed il while va in loop
         public void bind(OLWorkApiResponse book) {
             binding.bookTitle.setText(book.getTitle());
             if(book.getCovers() != null){

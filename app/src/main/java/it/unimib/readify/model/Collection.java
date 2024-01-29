@@ -12,7 +12,6 @@ import java.util.Date;
 
 // TODO: 09/12/2023 implement parcelable
 // TODO: 09/12/2023 gestione della thumbnail
-// TODO: 11/12/2023 gestione attributo data
 public class Collection implements Parcelable {
 
     private final String name;
@@ -58,12 +57,6 @@ public class Collection implements Parcelable {
 
     public OLWorkApiResponse getBook(int position) {
         return books.get(position);
-    }
-
-    public int getNumberOfBooks() {
-        if(books != null)
-            return books.size();
-        return 0;
     }
 
     @Override

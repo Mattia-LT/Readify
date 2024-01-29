@@ -74,5 +74,6 @@
     <string name="textview_home_suggested">Suggeriti per te</string>
     <string name="textview_new_books">Nuovi libri</string>
     <string name="textview_loading">Caricamento...</string>
+    <string name="rating_not_available">Valutazione non disponibile</string>
 
 </resources>

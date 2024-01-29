@@ -112,8 +112,16 @@ public class BookDetailsFragment extends Fragment {
                    fragmentBookDetailsBinding.bookBackgroundImage.setImageResource(R.drawable.sfondo_13);
                 }
 
+                //rating
+                if(receivedBook.getRating() != null && receivedBook.getRating().getSummary().getAverage() != 0){
+                    float rating = (float) receivedBook.getRating().getSummary().getAverage();
+                    fragmentBookDetailsBinding.ratingbarBook.setRating(rating);
+                    fragmentBookDetailsBinding.textviewRating.setText(String.format("%s", rating).substring(0,3));
+                } else {
+                    fragmentBookDetailsBinding.ratingbarBook.setRating(0);
+                    fragmentBookDetailsBinding.textviewRating.setText(R.string.rating_not_available);
+                }
 
-                //ratings https://openlibrary.org/works/OL45804W/ratings.json
 
 
 

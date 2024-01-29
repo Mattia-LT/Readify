@@ -4,6 +4,8 @@ import static it.unimib.readify.util.Constants.SEARCH;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLAuthorKeys;
 import it.unimib.readify.model.OLDescription;
 import it.unimib.readify.model.OLDocs;
+import it.unimib.readify.model.OLRatingResponse;
 import it.unimib.readify.model.OLSearchApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.data.service.OLApiService;
@@ -77,6 +80,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                         if(book != null){
                             checkBookData(book);
                             fetchAuthorsForWork(book);
+                            fetchRatingForWork(book);
                             books.add(book);
                             if(books.size() == idList.size()){
                                 responseCallback.onSuccessFetchBooksFromRemote(books, reference);
@@ -95,6 +99,32 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 }
             });
         }
+    }
+
+    public void fetchRatingForWork(OLWorkApiResponse workApiResponse) {
+        String id = workApiResponse.getKey();
+        olApiService.fetchRating(id).enqueue(new Callback<OLRatingResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<OLRatingResponse> call, @NonNull Response<OLRatingResponse> response) {
+                if(response.isSuccessful()){
+                    OLRatingResponse rating = response.body();
+                    if(rating != null){
+                        workApiResponse.setRating(rating);
+                    } else {
+                        //todo errore
+                    }
+                } else {
+                    //todo errore
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OLRatingResponse> call, Throwable t) {
+                //todo errore
+            }
+        });
+
+
     }
 
     private void fetchAuthorsForWork(OLWorkApiResponse book){

@@ -7,6 +7,7 @@ import static it.unimib.readify.util.Constants.OL_SEARCH_Q_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_SEARCH_SORT_PARAMETER;
 
 import it.unimib.readify.model.OLAuthorApiResponse;
+import it.unimib.readify.model.OLRatingResponse;
 import it.unimib.readify.model.OLSearchApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import retrofit2.Call;
@@ -29,6 +30,9 @@ public interface OLApiService {
 
     @GET("{id}.json")
     Call<OLAuthorApiResponse> fetchAuthor(@Path("id") String id );
+
+    @GET("{id}/ratings.json")
+    Call<OLRatingResponse> fetchRating(@Path("id") String id);
 
 
 }

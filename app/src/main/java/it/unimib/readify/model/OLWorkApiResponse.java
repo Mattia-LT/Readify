@@ -13,9 +13,7 @@ public class OLWorkApiResponse implements Parcelable {
 
     private OLDescription description;
     private String title;
-
     private List<Integer> covers;
-
     @SerializedName("first_publish_date")
     private String firstPublishDate;
     private String key;
@@ -61,16 +59,6 @@ public class OLWorkApiResponse implements Parcelable {
 
     public List<Integer> getCovers() {
         return covers;
-    }
-
-    public int getCover(int position) {
-        return covers.get(position);
-    }
-
-    public int getNumberOfCovers() {
-        if(covers == null)
-            return 0;
-        return covers.size();
     }
 
     public void setCovers(List<Integer> covers) {

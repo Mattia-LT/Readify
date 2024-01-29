@@ -107,6 +107,7 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int pos = 0;
                 while (cover == -1 && pos < book.getCovers().size()) {
                     cover = book.getCovers().get(pos);
+                    pos++;
                 }
                 if (cover == -1) {
                     binding.imageviewBookCover.setImageResource(R.drawable.image_not_available);

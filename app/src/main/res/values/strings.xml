@@ -86,5 +86,6 @@
     <string name="textview_home_suggested">Suggested for you</string>
     <string name="textview_new_books">New Books</string>
     <string name="textview_loading">Loading...</string>
+    <string name="rating_not_available">Rating not available</string>
 
 </resources>

@@ -24,6 +24,7 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
+import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
@@ -36,6 +37,7 @@ public class HomeFragment extends Fragment {
     private BookCarouselAdapter trendingBooksAdapter;
     private BookCarouselAdapter suggestedBooksAdapter;
     private BookCarouselAdapter recentBooksAdapter;
+    private FragmentHomeBinding fragmentHomeBinding;
 
     private BookViewModel bookViewModel;
 
@@ -68,11 +70,8 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-
-        //todo controllo
-
-        return rootView;
+        fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
+        return fragmentHomeBinding.getRoot();
     }
 
 
@@ -107,7 +106,7 @@ public class HomeFragment extends Fragment {
 
 
         // RecyclerView for trending carousel
-        RecyclerView recyclerViewTrendingBooks = view.findViewById(R.id.trending_container);
+        RecyclerView recyclerViewTrendingBooks = fragmentHomeBinding.trendingContainer;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
         trendingBooksAdapter = new BookCarouselAdapter(trendingBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener(){
@@ -120,7 +119,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onAddToCollectionButtonPressed(int position) {
-                //TODO sistemare
+                //TODO sistemare, magari se tieni premuto appare un dialog per aggiungerlo
                 //bookList.get(position).setFavorite(!newsList.get(position).isFavorite());
                 //iNewsRepository.updateNews(newsList.get(position));
             }
@@ -162,7 +161,7 @@ public class HomeFragment extends Fragment {
         */
 
         // RecyclerView for suggested carousel
-        RecyclerView recyclerViewSuggestedBooks = view.findViewById(R.id.suggested_container);
+        RecyclerView recyclerViewSuggestedBooks =fragmentHomeBinding.suggestedContainer;
         RecyclerView.LayoutManager suggestedBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
         suggestedBooksAdapter = new BookCarouselAdapter(suggestedBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {
@@ -203,7 +202,7 @@ public class HomeFragment extends Fragment {
 
         // recycler view for recent books
 
-        RecyclerView recyclerViewRecentBooks = view.findViewById(R.id.recent_container);
+        RecyclerView recyclerViewRecentBooks = fragmentHomeBinding.recentContainer;
         RecyclerView.LayoutManager recentBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         // Create an adapter
         recentBooksAdapter = new BookCarouselAdapter(recentBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {

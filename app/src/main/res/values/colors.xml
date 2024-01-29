@@ -12,5 +12,7 @@
     <color name="google_login_text">#616161</color>
     <color name="light_purple">#8263bf</color>
     <color name= "login_background">#FFE1E1</color>
+    <color name="light_gray_background">#f1f2f3</color>
+    <color name="light_gray_divider">#c6c6c6</color>
 
 </resources>

@@ -110,6 +110,7 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 int cover = -1;
                 while (cover == -1 && pos < book.getCovers().size()) {
                     cover = book.getCovers().get(pos);
+                    pos++;
                 }
                 if (cover == -1) {
                     binding.bookCover.setImageResource(R.drawable.image_not_available);

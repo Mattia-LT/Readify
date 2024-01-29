@@ -111,7 +111,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        fragmentRegisterBinding.spinnerGender.setSelection(4);
+
     }
 
 

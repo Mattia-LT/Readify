@@ -60,7 +60,6 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
             if(collectionName.getEditableText().toString().equals(""))
                 Snackbar.make(view, "Nome non inserito", Snackbar.LENGTH_SHORT).show();
             else {
-                Log.d("name", collectionName.getEditableText().toString());
                 Collection newCollection = new Collection(collectionName.getEditableText().toString(),
                         collectionVisibility.isChecked(), null);
                 inputListener.sendInput(newCollection);

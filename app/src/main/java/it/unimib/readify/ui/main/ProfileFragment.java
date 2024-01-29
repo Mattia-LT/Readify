@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentProfileBinding;
@@ -25,9 +28,10 @@ import it.unimib.readify.model.OLWorkApiResponse;
 
 public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {
 
-    private ArrayList<it.unimib.readify.model.Collection> collectionsArray;
-    private Collection newCollection;
+    private ArrayList<it.unimib.readify.model.Collection> collectionsList;
     private FragmentProfileBinding fragmentProfileBinding;
+    private CollectionViewModel collectionViewModel;
+    private CollectionAdapter collectionAdapter;
 
     public ProfileFragment() { /*Required empty public constructor*/ }
 
@@ -41,7 +45,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentProfileBinding = FragmentProfileBinding.inflate(inflater,container,false);
         return fragmentProfileBinding.getRoot();
@@ -55,40 +59,46 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         runCollectionCreationProcess(view);
     }
 
-    //CollectionCreationBottomSheet.OnInputListener method
-    @Override
-    public void sendInput(Collection newCollection) {
-        this.newCollection = newCollection;
-    }
-
     //managing collections existence
     public void runCollectionsView(View view) {
         //test data
-        collectionsArray = new ArrayList<>();
-        collectionsArray.add(0, new Collection("horror", true,
+        collectionsList = new ArrayList<>();
+        collectionsList.add(0, new Collection("horror", true,
                 new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
                         new ArrayList<>(Arrays.asList(-1, 6498519, 8904777))
                 )))));
-        collectionsArray.add(1, new Collection("fantasy", true,
+        collectionsList.add(1, new Collection("fantasy", true,
                 new ArrayList<>(Collections.singletonList(null))));
-        collectionsArray.add(2, new Collection("favourites", false, null));
-        collectionsArray.add(3, new Collection("to recommend", true,
+        collectionsList.add(2, new Collection("favourites", false, null));
+        collectionsList.add(3, new Collection("to recommend", true,
                 new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
                         new ArrayList<>(Arrays.asList(-1, 108274, 233884))
                 )))));
-        collectionsArray.add(4, new Collection("horror", true, null));
+        collectionsList.add(4, new Collection("horror", true, null));
 
-        //managing recycler view
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
-        CollectionAdapter collectionAdapter = new CollectionAdapter(collectionsArray,
+        //initializing viewModel and collectionAdapter
+        collectionViewModel = new ViewModelProvider(this).get(CollectionViewModel.class);
+        collectionAdapter = new CollectionAdapter(
                 new CollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onCollectionItemClick(Collection collection) {
                         Snackbar.make(view, collection.getName(), Snackbar.LENGTH_SHORT).show();
                     }
                 }, requireActivity().getApplication());
+
+        //managing recycler view
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
         fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
+
+        //managing viewModel
+        collectionViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(), new Observer<List<Collection>>() {
+            @Override
+            public void onChanged(List<Collection> collections) {
+                collectionAdapter.setCollectionsList(collections);
+            }
+        });
+        collectionViewModel.updateCollectionListLiveData(collectionsList);
     }
 
     public void runCollectionCreationProcess(View view) {
@@ -98,5 +108,12 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         fragmentProfileBinding.createCollection.setOnClickListener( v -> {
             collectionCreationBottomSheet.show(getChildFragmentManager(), collectionCreationBottomSheet.getTag());
         });
+    }
+
+    //CollectionCreationBottomSheet.OnInputListener method
+    @Override
+    public void sendInput(Collection newCollection) {
+        collectionsList.add(newCollection);
+        collectionViewModel.updateCollectionListLiveData(collectionsList);
     }
 }

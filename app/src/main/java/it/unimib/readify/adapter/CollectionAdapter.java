@@ -19,12 +19,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.model.Collection;
 
 public class CollectionAdapter extends
-        RecyclerView.Adapter<CollectionAdapter.CollectionViewHolder> {
+        RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
 
     /*
     using an interface because
@@ -35,46 +36,51 @@ public class CollectionAdapter extends
         void onCollectionItemClick(Collection collection);
     }
 
-    private final ArrayList<Collection> collectionsArray;
+    private List<Collection> collectionsList;
     private final OnItemClickListener onItemClickListener;
     private final Application application;
 
-    public CollectionAdapter(ArrayList<Collection> collectionsArray, OnItemClickListener onItemClickListener, Application application) {
-        this.collectionsArray = collectionsArray;
+    public CollectionAdapter(OnItemClickListener onItemClickListener, Application application) {
         this.onItemClickListener = onItemClickListener;
         this.application = application;
+        collectionsList = new ArrayList<>();
+    }
+
+    public void setCollectionsList(List<Collection> collectionsList) {
+        this.collectionsList = collectionsList;
+        notifyItemRangeChanged(0, this.collectionsList.size());
     }
 
     //managing layout
     @NonNull
     @Override
-    public CollectionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.collection_item, parent, false);
-        return new CollectionViewHolder(view);
+        return new ViewHolder(view);
     }
 
     //association between the actual data and the layout
     @Override
-    public void onBindViewHolder(@NonNull CollectionViewHolder holder, int position) {
-        holder.bind(collectionsArray.get(position), position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.bind(collectionsList.get(position), position);
     }
 
     @Override
     public int getItemCount() {
-        if(collectionsArray == null)
+        if(collectionsList == null)
             return 0;
-        return collectionsArray.size();
+        return collectionsList.size();
     }
 
-    public class CollectionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView thumbnail;
         private TextView name;
         private ImageView visibilityIcon;
         private ConstraintLayout container;
 
-        public CollectionViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
             thumbnail = itemView.findViewById(R.id.collection_thumbnail_imageview);
             name = itemView.findViewById(R.id.collection_name_textview);
@@ -114,6 +120,7 @@ public class CollectionAdapter extends
                 if(!isThumbnailAvailable)
                     thumbnail.setImageResource(R.drawable.image_not_available);
             }
+
             //set collection name and visibility
             name.setText(collection.getName());
             if(collection.isVisible())
@@ -133,7 +140,7 @@ public class CollectionAdapter extends
 
         @Override
         public void onClick(View v) {
-            onItemClickListener.onCollectionItemClick(collectionsArray.get(getAdapterPosition()));
+            onItemClickListener.onCollectionItemClick(collectionsList.get(getAdapterPosition()));
         }
     }
 }

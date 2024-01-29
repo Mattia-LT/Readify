@@ -86,29 +86,30 @@ public class CollectionAdapter extends
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
-            if(collection.getNumberOfBooks() == 0)
+            if(collection.getBooks() == null || collection.getBooks().size() == 0)
                 thumbnail.setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;
-                for (int i = 0; i < collection.getNumberOfBooks(); i++) {
-                        for (int j = 0; j < collection.getBook(i).getNumberOfCovers(); j++) {
-                            if(collection.getBook(i).getCover(j) != -1) {
-                                isThumbnailAvailable = true;
-                                Log.d("url", "https://covers.openlibrary.org/b/id/"
-                                        + collection.getBook(i).getCover(j)
-                                        + "-L.jpg");
-                                RequestOptions requestOptions = new RequestOptions()
-                                        .placeholder(R.drawable.loading_image_gif)
-                                        .error(R.drawable.image_not_available);
-                                Glide.with(application)
-                                        .load("https://covers.openlibrary.org/b/id/"
-                                                + collection.getBook(i).getCover(j)
-                                                + "-L.jpg")
-                                        .apply(requestOptions)
-                                        .into(thumbnail);
-                                break;
+                for (int i = 0; i < collection.getBooks().size(); i++) {
+                        if(collection.getBook(i) != null && collection.getBook(i).getCovers() != null)
+                            for (int j = 0; j < collection.getBook(i).getCovers().size(); j++) {
+                                if(collection.getBook(i).getCovers().get(j) != -1) {
+                                    isThumbnailAvailable = true;
+                                    Log.d("url", "https://covers.openlibrary.org/b/id/"
+                                            + collection.getBook(i).getCovers().get(j)
+                                            + "-L.jpg");
+                                    RequestOptions requestOptions = new RequestOptions()
+                                            .placeholder(R.drawable.loading_image_gif)
+                                            .error(R.drawable.image_not_available);
+                                    Glide.with(application)
+                                            .load("https://covers.openlibrary.org/b/id/"
+                                                    + collection.getBook(i).getCovers().get(j)
+                                                    + "-L.jpg")
+                                            .apply(requestOptions)
+                                            .into(thumbnail);
+                                    break;
+                                }
                             }
-                        }
                 }
                 if(!isThumbnailAvailable)
                     thumbnail.setImageResource(R.drawable.image_not_available);

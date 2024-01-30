@@ -8,7 +8,8 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".ui.main.ProfileFragment"
-    android:layout_marginBottom="100dp">
+    android:layout_marginBottom="100dp"
+    app:navGraph="@navigation/home_navigation_graph">
 
     <!-- TODO: Update profile fragment -->
     <LinearLayout

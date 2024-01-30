@@ -75,5 +75,8 @@
     <string name="textview_new_books">Nuovi libri</string>
     <string name="textview_loading">Caricamento...</string>
     <string name="rating_not_available">Valutazione non disponibile</string>
+    <string name="books">libri</string>
+    <string name="book">libro</string>
+    <string name="empty_collection">nessun libro in questa raccolta</string>
 
 </resources>

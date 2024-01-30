@@ -31,6 +31,7 @@
 
     </fragment>
 
+    <!-- dialog è necessario? -->
     <dialog
         android:id="@+id/filter_bottomsheet"
         android:name="it.unimib.readify.ui.main.FilterBottomSheet"
@@ -55,7 +56,23 @@
         android:id="@+id/profileFragment"
         android:name="it.unimib.readify.ui.main.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_collectionFragment"
+            app:destination=
+                "@+id/collectionFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectionFragment"
+        android:name="it.unimib.readify.ui.main.CollectionFragment"
+        android:label="fragment_collection"
+        tools:layout="@layout/fragment_collection" >
+        <action
+            android:id="@+id/action_collectionFragment_to_profileFragment"
+            app:destination=
+                "@+id/profileFragment"/>
+    </fragment>
 
 
     <fragment

@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment {
 
         bookViewModel = new ViewModelProvider(
                 requireActivity(),
-                new BookViewModelFactory(bookRepository)
+                new DataViewModelFactory(bookRepository)
                 ).get(BookViewModel.class);
 
         trendingBookList = new ArrayList<>();

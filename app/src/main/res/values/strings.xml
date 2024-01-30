@@ -20,7 +20,7 @@
     <string name="navigation_bar_item_search">Search</string>
     <string name="new_account">No account yet?</string>
 
-    <!-- pa sta per personal area UwU-->
+    <!-- pa sta per personal area -->
     <string name="pa_collections">Collections</string>
     <string name="pa_description_arrow" translatable="false">arrow right</string>
     <string name="pa_description_photo" translatable="false">personal area photo</string>
@@ -87,5 +87,8 @@
     <string name="textview_new_books">New Books</string>
     <string name="textview_loading">Loading...</string>
     <string name="rating_not_available">Rating not available</string>
+    <string name="books">books</string>
+    <string name="book">book</string>
+    <string name="empty_collection">no books in this collection</string>
 
 </resources>

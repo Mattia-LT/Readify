@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
@@ -63,7 +65,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void runCollectionsView(View view) {
         //test data
         collectionsList = new ArrayList<>();
-        collectionsList.add(0, new Collection("horror", true,
+        collectionsList.add(0, new Collection("horror", false,
                 new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
                         new ArrayList<>(Arrays.asList(-1, 6498519, 8904777))
                 )))));
@@ -74,15 +76,18 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
                         new ArrayList<>(Arrays.asList(-1, 108274, 233884))
                 )))));
-        collectionsList.add(4, new Collection("horror", true, null));
+        collectionsList.add(4, new Collection("romance", true, null));
 
         //initializing viewModel and collectionAdapter
-        collectionViewModel = new ViewModelProvider(this).get(CollectionViewModel.class);
+        collectionViewModel = new ViewModelProvider(requireActivity(), new DataViewModelFactory())
+                .get(CollectionViewModel.class);
         collectionAdapter = new CollectionAdapter(
                 new CollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onCollectionItemClick(Collection collection) {
-                        Snackbar.make(view, collection.getName(), Snackbar.LENGTH_SHORT).show();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("collectionData", collection);
+                        Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_collectionFragment, bundle);
                     }
                 }, requireActivity().getApplication());
 

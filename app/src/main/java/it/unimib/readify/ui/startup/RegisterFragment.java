@@ -6,7 +6,6 @@ import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE
 import static it.unimib.readify.util.Constants.PASSWORD;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -17,11 +16,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -65,7 +62,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
 
-            ArrayAdapter adapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.gender, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.gender, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             fragmentRegisterBinding.spinnerGender.setAdapter(adapter);
             fragmentRegisterBinding.spinnerGender.setOnItemSelectedListener(this);
@@ -86,13 +83,16 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
                 e.printStackTrace();
             }
 
-                fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
-                    String username = fragmentRegisterBinding.textInputLayoutUsername.getEditText().getText().toString();
-                    String email = fragmentRegisterBinding.textInputLayoutEmail.getEditText().getText().toString();
-                    String password = fragmentRegisterBinding.textInputLayoutPassword.getEditText().getText().toString();
-                    String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
 
-                if (isUsernameOk(username) &isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm) & (fragmentRegisterBinding.spinnerGender.getSelectedItemId() != 0 )) {
+            fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
+
+                String username = fragmentRegisterBinding.textInputLayoutUsername.getEditText().getText().toString();
+                String email = fragmentRegisterBinding.textInputLayoutEmail.getEditText().getText().toString();
+                String password = fragmentRegisterBinding.textInputLayoutPassword.getEditText().getText().toString();
+                String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
+
+
+                if (isUsernameOk(username) &isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm)) {
                     //saveLoginData(email, password);
                     Intent k = new Intent(this.getActivity(), HomeActivity.class);
                     startActivity(k);
@@ -106,7 +106,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        ((TextView) view).setTextColor(Color.WHITE);
     }
 
     @Override

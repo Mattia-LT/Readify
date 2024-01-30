@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.core.widget.NestedScrollView
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:context=".ui.main.ProfileFragment"
-    android:layout_marginBottom="100dp">
+    android:id="@+id/draw_layout"
+    tools:openDrawer="right">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:context=".ui.main.ProfileFragment"
+        android:layout_marginBottom="100dp">
+
 
     <!-- TODO: Update profile fragment -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +27,7 @@
 
         <!-- top menu -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TextView
@@ -34,25 +41,30 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/heart"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginStart="36dp"
                 android:src="@drawable/ic_heart"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView2"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/textView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
 
             <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="30dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="10dp"
+                android:id="@+id/hamburger"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="36dp"
                 android:src="@drawable/ic_baseline_menu"
+                android:background= "@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/heart"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <!-- social VERSIONE 1-->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -126,11 +138,9 @@
             android:text="ema_bon__"
             android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ema01"
-            android:textSize="20sp"/>
+
+
+
 
         <!-- collections -->
         <TextView
@@ -175,6 +185,14 @@
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
+        <com.google.android.material.navigation.NavigationView
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:id="@+id/nav_view"
+            android:layout_gravity="end"
+            app:menu="@menu/navigation_drawer_menu" />
+    </androidx.drawerlayout.widget.DrawerLayout>
+
 
 
 

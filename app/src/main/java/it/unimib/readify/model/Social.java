@@ -11,6 +11,8 @@ public class Social implements Parcelable {
     private String twitter;
     private String tiktok;
 
+    public Social() {}
+
     public Social(String facebook, String instagram, String twitter, String tiktok) {
         this.facebook = facebook;
         this.instagram = instagram;

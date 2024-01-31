@@ -1,23 +1,30 @@
 package it.unimib.readify.model;
 
 import java.util.List;
+import java.util.HashMap;
 
 public class User {
 
     private String biography;
-
-    //private consigliati
     private List<Collection> collections;
+    private HashMap<String, Integer> recommended;
     private String email;
     private String genre;
-    private Social socialLinks;
+    //hashmap?
+    private HashMap<String, String> socialLinks;
     private String username;
     private String visibility;
+    //id token necessario?
     private String idToken;
+    private Followers followers;
+    private Followers following;
 
-    public User(String biography, List<Collection> collections, String email, String genre, Social socialLinks, String username, String visibility, String idToken) {
+    public User() {}
+
+    public User(String biography, List<Collection> collections, HashMap<String, Integer> recommended, String email, String genre, HashMap<String, String> socialLinks, String username, String visibility, String idToken) {
         this.biography = biography;
         this.collections = collections;
+        this.recommended = recommended;
         this.email = email;
         this.genre = genre;
         this.socialLinks = socialLinks;
@@ -64,13 +71,7 @@ public class User {
         this.genre = genre;
     }
 
-    public Social getSocialLinks() {
-        return socialLinks;
-    }
 
-    public void setSocialLinks(Social socialLinks) {
-        this.socialLinks = socialLinks;
-    }
 
     public String getUsername() {
         return username;
@@ -94,5 +95,52 @@ public class User {
 
     public void setIdToken(String idToken) {
         this.idToken = idToken;
+    }
+
+    public HashMap<String, Integer> getRecommended() {
+        return recommended;
+    }
+
+    public void setRecommended(HashMap<String, Integer> recommended) {
+        this.recommended = recommended;
+    }
+
+    public HashMap<String, String> getSocialLinks() {
+        return socialLinks;
+    }
+
+    public void setSocialLinks(HashMap<String, String> socialLinks) {
+        this.socialLinks = socialLinks;
+    }
+
+    public Followers getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Followers followers) {
+        this.followers = followers;
+    }
+
+    public Followers getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Followers following) {
+        this.following = following;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "biography='" + biography + '\'' +
+                ", collections=" + collections +
+                ", recommended=" + recommended +
+                ", email='" + email + '\'' +
+                ", genre='" + genre + '\'' +
+                ", socialLinks=" + socialLinks +
+                ", username='" + username + '\'' +
+                ", visibility='" + visibility + '\'' +
+                ", idToken='" + idToken + '\'' +
+                '}';
     }
 }

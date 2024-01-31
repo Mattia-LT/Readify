@@ -4,6 +4,23 @@ import java.util.List;
 
 public class Followers {
     int counter;
-    List<Follower> followers;
+    List<Integer> followers;
 
+    public Followers() {}
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+
+    public List<Integer> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Integer> followers) {
+        this.followers = followers;
+    }
 }

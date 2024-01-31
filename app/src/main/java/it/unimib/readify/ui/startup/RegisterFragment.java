@@ -9,6 +9,7 @@ import static it.unimib.readify.util.Constants.USER_COLLISION_ERROR;
 import static it.unimib.readify.util.Constants.WEAK_PASSWORD_ERROR;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,7 +37,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
-import it.unimib.readify.databinding.FragmentLoginBinding;
+
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
@@ -111,7 +113,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
                 Log.d("password", password);
                 Log.d("confirmpassword", passwordConfirm);
 
-                if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm)) {
+                if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm) & (fragmentRegisterBinding.spinnerGender.getSelectedItemPosition() != 0)) {
                     //fragmentRegisterBinding.progressBar.setVisibility(View.VISIBLE);
                     if (!userViewModel.isAuthenticationError()) {
                         userViewModel.getUserMutableLiveData(email, password, false).observe(
@@ -146,6 +148,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ((TextView) view).setTextColor(Color.WHITE);
     }
 
     @Override

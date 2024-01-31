@@ -87,8 +87,14 @@ public class UserViewModel extends ViewModel {
         userMutableLiveData = userRepository.getUser(email, password, isUserRegistered);
     }
 
-    private void getUserData(String token) {
+    public void getUserData(String token) {
         userMutableLiveData = userRepository.getGoogleUser(token);
+    }
+
+    //todo da rivedere
+    public MutableLiveData<Result> getUserDataFromToken(String token) {
+        userMutableLiveData = userRepository.getUserData(token);
+        return userMutableLiveData;
     }
 
     private void getWork(String idToken){

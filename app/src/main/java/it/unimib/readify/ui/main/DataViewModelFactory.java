@@ -10,14 +10,9 @@ import it.unimib.readify.data.repository.user.IUserRepository;
 public class DataViewModelFactory implements ViewModelProvider.Factory {
 
     private IBookRepository iBookRepository;
-    private IUserRepository iUserRepository;
 
     public DataViewModelFactory(IBookRepository iBookRepository) {
         this.iBookRepository = iBookRepository;
-    }
-
-    public DataViewModelFactory(IUserRepository iUserRepository) {
-        this.iUserRepository = iUserRepository;
     }
 
     public DataViewModelFactory() {}
@@ -33,9 +28,7 @@ public class DataViewModelFactory implements ViewModelProvider.Factory {
         if (modelClass.equals(BookViewModel.class)) {
             return (T) new BookViewModel(iBookRepository);
         }
-        if (modelClass.equals(CollectionViewModel.class)) {
-            return (T) new CollectionViewModel();
-        } else {
+        else {
             // Gestisci altri tipi di ViewModel o lancia un'eccezione se necessario
             throw new IllegalArgumentException("Unsupported model class: " + modelClass);
         }

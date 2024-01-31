@@ -42,6 +42,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         return userMutableLiveData;
     }
 
+    public MutableLiveData<Result> getUserData(String idToken) {
+        userDataRemoteDataSource.getUserData(idToken);
+        return userMutableLiveData;
+    }
+
     @Override
     public MutableLiveData<Result> getGoogleUser(String idToken) {
         signInWithGoogle(idToken);

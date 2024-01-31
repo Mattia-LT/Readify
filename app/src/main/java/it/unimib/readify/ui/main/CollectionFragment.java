@@ -1,6 +1,7 @@
 package it.unimib.readify.ui.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,20 +9,30 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.ui.startup.UserViewModel;
+import it.unimib.readify.ui.startup.UserViewModelFactory;
+import it.unimib.readify.util.ServiceLocator;
 
 public class CollectionFragment extends Fragment {
 
     private FragmentCollectionBinding collectionProfileBinding;
     private BookItemCollectionAdapter bookItemCollectionAdapter;
+    private UserViewModel userViewModel;
     private Collection collection;
 
     @Override
@@ -40,13 +51,40 @@ public class CollectionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //initializing adapter
-        bookItemCollectionAdapter = new BookItemCollectionAdapter();
+
+
+        //repository
+        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+
+        //initializing viewModel and adapter
+        userViewModel = new ViewModelProvider(requireActivity(), new UserViewModelFactory(userRepository))
+                .get(UserViewModel.class);
+        bookItemCollectionAdapter = new BookItemCollectionAdapter(
+                new BookItemCollectionAdapter.OnItemClickListener() {
+                    @Override
+                    public void onBookItemClick(OLWorkApiResponse book) {
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("book", book);
+                        Navigation.findNavController(view).navigate(R.id.action_collectionFragment_to_bookDetailsFragment, bundle);
+                    }
+                }, requireActivity().getApplication());
 
         //managing recycler view
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
+
+        //managing viewModel
+        userViewModel.getUserMutableLiveData("prova@gmail.com", "password", true)
+                .observe(getViewLifecycleOwner(), result -> {
+                    collection = ((Result.UserSuccess) result).getData().getCollections().get(0);
+                    Log.d("collection name", collection.getName());
+                });
+        //servirà in caso di modifiche (?)
+        //userViewModel.updateCollectionListLiveData(collectionsList);
+
+
+
 
         //managing data from Profile Fragment
         Bundle bundle = getArguments();

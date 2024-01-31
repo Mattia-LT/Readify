@@ -7,6 +7,7 @@ import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
@@ -67,6 +69,18 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 userResponseCallback.onFailureFromRemoteDatabase(error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void getUserData(String idToken) {
+        databaseReference.child("users").child(idToken).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));
+            }
+            else {
+                userResponseCallback.onFailureFromRemoteDatabase(task.getException().getLocalizedMessage());
             }
         });
     }

@@ -1,5 +1,7 @@
 package it.unimib.readify.data.source.user;
 
+import androidx.lifecycle.MutableLiveData;
+
 import java.util.Set;
 
 import it.unimib.readify.data.repository.user.UserResponseCallback;
@@ -14,6 +16,7 @@ public abstract class BaseUserDataRemoteDataSource {
 
     public abstract void saveUserData(User user);
     public abstract void getWork(String idToken);
+    public abstract void getUserData(String idToken);
     public abstract void getUserPreferences(String idToken);
     public abstract void saveUserPreferences(String message, String idToken);
 }

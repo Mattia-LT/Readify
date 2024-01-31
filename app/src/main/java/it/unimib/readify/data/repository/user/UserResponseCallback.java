@@ -9,7 +9,7 @@ public interface UserResponseCallback {
     void onSuccessFromAuthentication(User user);
     void onFailureFromAuthentication(String message);
     void onSuccessFromRemoteDatabase(User user);
-    void onSuccessFromRemoteDatabase(List<OLWorkApiResponse> bookList);
+    void onSuccessFromRemoteDatabase(OLWorkApiResponse work);
     void onFailureFromRemoteDatabase(String message);
     void onSuccessLogout();
 }

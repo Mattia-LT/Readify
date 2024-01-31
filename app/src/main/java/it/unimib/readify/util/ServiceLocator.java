@@ -6,6 +6,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import it.unimib.readify.data.database.BookRoomDatabase;
+import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.UserRepository;
+import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource;
+import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
+import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
+import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.OLDescription;
 import it.unimib.readify.data.repository.book.BookRepository;
 import it.unimib.readify.data.repository.book.IBookRepository;
@@ -57,4 +63,19 @@ public class ServiceLocator {
     public BookRoomDatabase getBookDao(Application application) {
         return BookRoomDatabase.getDatabase(application);
     }
+
+    public IUserRepository getUserRepository(Application application) {
+        SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(application);
+        DataEncryptionUtil dataEncryptionUtil = new DataEncryptionUtil(application);
+
+        BaseUserAuthenticationRemoteDataSource userRemoteAuthenticationDataSource =
+                new UserAuthenticationRemoteDataSource();
+
+        BaseUserDataRemoteDataSource userDataRemoteDataSource =
+                new UserDataRemoteDataSource(sharedPreferencesUtil);
+
+        return new UserRepository(userRemoteAuthenticationDataSource, userDataRemoteDataSource);
+    }
+
+
 }

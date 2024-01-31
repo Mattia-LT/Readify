@@ -24,10 +24,13 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.ui.startup.UserViewModel;
+import it.unimib.readify.ui.startup.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
 
 public class HomeFragment extends Fragment {
@@ -40,6 +43,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding fragmentHomeBinding;
 
     private BookViewModel bookViewModel;
+    private UserViewModel userViewModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -52,6 +56,13 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
+
+
 
         IBookRepository bookRepository = ServiceLocator.getInstance().getBookRepository(requireActivity().getApplication());
 
@@ -79,6 +90,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Snackbar.make(view, "USER LOGGATO" + userViewModel.getLoggedUser().getEmail(), Snackbar.LENGTH_SHORT).show();
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();
         mockDataSuggested.add("/works/OL14933414W");

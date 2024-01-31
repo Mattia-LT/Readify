@@ -1,6 +1,7 @@
 package it.unimib.readify.ui.main;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,9 +12,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import it.unimib.readify.R;
 import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.model.User;
 import it.unimib.readify.util.ServiceLocator;
 
 public class HomeActivity extends AppCompatActivity {

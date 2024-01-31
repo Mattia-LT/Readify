@@ -48,24 +48,25 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() == null) {
                     firebaseAuth.removeAuthStateListener(this);
+                    Log.d("USERAUTHREMOTE", "User logged out");
                     userResponseCallback.onSuccessLogout();
                 }
             }
         };
         firebaseAuth.addAuthStateListener(authStateListener);
         firebaseAuth.signOut();
-
     }
 
     @Override
-    public void registration(String email, String password) {
+    public void signUp(String email, String password) {
         //todo gestire gli errori
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
+                    Log.d("USERAUTHREMOTE", "User signed up");
                     userResponseCallback.onSuccessFromAuthentication(
-                            new User( email, firebaseUser.getDisplayName(), firebaseUser.getUid())
+                            new User(email, firebaseUser.getDisplayName(), firebaseUser.getUid())
                     );
                 } else {
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
@@ -77,12 +78,13 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     }
 
     @Override
-    public void login(String email, String password) {
+    public void signIn(String email, String password) {
         //todo gestire gli errori
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
+                    Log.d("USERAUTHREMOTE", "User signed in");
                     userResponseCallback.onSuccessFromAuthentication(
                             new User(email, firebaseUser.getDisplayName(), firebaseUser.getUid())
                     );
@@ -106,6 +108,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                     // Sign in success, update UI with the signed-in user's information
                     FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                     if (firebaseUser != null) {
+                        Log.d("USERAUTHREMOTE", "User signed in/up with google");
                         userResponseCallback.onSuccessFromAuthentication(
                                 new User(firebaseUser.getEmail(),
                                         firebaseUser.getDisplayName(),
@@ -117,6 +120,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                     }
                 } else {
                     // If sign in fails, display a message to the user.
+                    Log.w("USERAUTHREMOTE", "signInWithCredential:failure", task.getException());
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
                 }
             });

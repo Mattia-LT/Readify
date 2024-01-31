@@ -87,6 +87,10 @@
     <string name="textview_new_books">New Books</string>
     <string name="textview_loading">Loading...</string>
     <string name="rating_not_available">Rating not available</string>
+    <string name="unexpected_error">An unexpected error occurred, please retry.</string>
+    <string name="error_login_user_message">An error occurred during login, please retry</string>
+    <string name="error_login_password_message">An error occurred during login, check your password again</string>
+    <string name="error_no_google_account_found_message">Error: no google account associated to this email</string>
     <string name="books">books</string>
     <string name="book">book</string>
     <string name="empty_collection">no books in this collection</string>

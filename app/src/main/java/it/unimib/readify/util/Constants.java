@@ -4,11 +4,19 @@ public class Constants {
 
     //TODO Eventuali costanti da usare nella progettazione andranno qui. esempio:
 
-    public static final String FANTASY = "Fantasy";
+    // Constants for SharedPreferences
+    public static final String SHARED_PREFERENCES_FILE_NAME = "it.unimib.worldnews.preferences";
+    public static final String SHARED_PREFERENCES_COUNTRY_OF_INTEREST = "country_of_interest";
+    public static final String SHARED_PREFERENCES_TOPICS_OF_INTEREST = "topics_of_interest";
+    public static final String SHARED_PREFERENCES_FIRST_LOADING = "first_loading";
+
+    // Constants for EncryptedSharedPreferences
 
     public static final String ENCRYPTED_SHARED_PREFERENCES_FILE_NAME = "it.unimib.worldnews.encrypted_preferences";
     public static final String EMAIL_ADDRESS = "email_address";
     public static final String PASSWORD = "password";
+    public static final String ID_TOKEN = "google_token";
+
 
     // Constants for encrypted files
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.worldnews.encrypted_file.txt";
@@ -63,6 +71,13 @@ public class Constants {
     public static final String INVALID_CREDENTIALS_ERROR = "invalidCredentials";
     public static final String USER_COLLISION_ERROR = "userCollisionError";
     public static final String WEAK_PASSWORD_ERROR = "passwordIsWeak";
+
+
+    // Constants for Firebase
+
+    public static final String FIREBASE_USERS_COLLECTION = "users";
+    public static final String FIREBASE_REALTIME_DATABASE = "https://readify-9b50c-default-rtdb.europe-west1.firebasedatabase.app/";
+    public static final String FIREBASE_WORKS_COLLECTION = "books";
 
 
 

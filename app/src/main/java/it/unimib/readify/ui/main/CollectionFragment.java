@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import it.unimib.readify.R;
@@ -43,7 +44,7 @@ public class CollectionFragment extends Fragment {
         bookItemCollectionAdapter = new BookItemCollectionAdapter();
 
         //managing recycler view
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
 

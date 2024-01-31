@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -12,6 +13,8 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import it.unimib.readify.R;
+import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.util.ServiceLocator;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -46,6 +49,16 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
 
+
+        //initializing userRepository and userViewModel
+        /*
+        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository();
+        UserViewModel userViewModel = new ViewModelProvider(this, new DataViewModelFactory(userRepository))
+                .get(UserViewModel.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("userRepository", userRepository);
+        bundle.putParcelable("userViewModel", userViewModel);
+         */
 
 
     }

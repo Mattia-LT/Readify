@@ -5,13 +5,19 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.data.repository.user.IUserRepository;
 
 public class DataViewModelFactory implements ViewModelProvider.Factory {
 
     private IBookRepository iBookRepository;
+    private IUserRepository iUserRepository;
 
     public DataViewModelFactory(IBookRepository iBookRepository) {
         this.iBookRepository = iBookRepository;
+    }
+
+    public DataViewModelFactory(IUserRepository iUserRepository) {
+        this.iUserRepository = iUserRepository;
     }
 
     public DataViewModelFactory() {}

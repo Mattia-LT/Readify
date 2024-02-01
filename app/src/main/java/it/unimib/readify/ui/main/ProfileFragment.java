@@ -8,15 +8,19 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 
@@ -83,7 +87,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
 
         //runCollectionsView(view);
         //runCollectionCreationProcess(view);
-        runDrawer();
+        runDrawer(view);
     }
 
 
@@ -122,9 +126,11 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         //userViewModel.updateCollectionListLiveData(collectionsList);
     }
 
-    public void runDrawer() {
+    public void runDrawer(View view) {
         DrawerLayout drawerLayout = fragmentProfileBinding.drawLayout;
         ImageView imageView = fragmentProfileBinding.hamburger;
+        NavigationView navigationView = fragmentProfileBinding.navView;
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +141,21 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 }
             }
         });
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                int itemId = menuItem.getItemId();
+                if (itemId == R.id.nav_settings) {
+                    Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
+                }
+                drawerLayout.closeDrawer(GravityCompat.END);
+                return true;
+            }
+
+        });
     }
+
+
 
 }

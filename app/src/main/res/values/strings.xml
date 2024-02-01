@@ -94,6 +94,8 @@
     <string name="books">books</string>
     <string name="book">book</string>
     <string name="empty_collection">no books in this collection</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="undo_changes">Undo Changes</string>
     <string name="users_section">Users</string>
     <string name="books_section">Books</string>
     <string name="hint_search_users">Search another user</string>

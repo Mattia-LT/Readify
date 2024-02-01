@@ -61,23 +61,6 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //test data
-        /*
-        collectionsList = new ArrayList<>();
-        collectionsList.add(0, new Collection("horror", false,
-                new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
-                        new ArrayList<>(Arrays.asList(-1, 6498519, 8904777))
-                )))));
-        collectionsList.add(1, new Collection("fantasy", true,
-                new ArrayList<>(Collections.singletonList(null))));
-        collectionsList.add(2, new Collection("favourites", false, null));
-        collectionsList.add(3, new Collection("to recommend", true,
-                new ArrayList<>(Collections.singletonList(new OLWorkApiResponse(
-                        new ArrayList<>(Arrays.asList(-1, 108274, 233884))
-                )))));
-        collectionsList.add(4, new Collection("romance", true, null));
-         */
-
         //initializing repository
         IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
 
@@ -86,7 +69,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 .get(UserViewModel.class);
 
         //viewModel actions
-
+        /*
         userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
             if(result.isSuccess()) {
                 User userData = ((Result.UserSuccess) result).getData();
@@ -95,6 +78,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 Log.d("getUserDatafrom token", "errore");
             }
         });
+         */
 
         /*
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);

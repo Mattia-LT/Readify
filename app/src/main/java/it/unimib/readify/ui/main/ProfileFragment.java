@@ -87,7 +87,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         });
 
         //UI drawer view
-        runDrawer();
+        runDrawer(view);
     }
 
 

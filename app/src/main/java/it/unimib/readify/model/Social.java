@@ -6,73 +6,30 @@ import android.os.Parcelable;
 import java.util.Objects;
 
 public class Social implements Parcelable {
-    private String facebook;
-    private String instagram;
-    private String twitter;
-    private String tiktok;
+    private String socialPlatform;
+    private String link;
 
     public Social() {}
 
-    public Social(String facebook, String instagram, String twitter, String tiktok) {
-        this.facebook = facebook;
-        this.instagram = instagram;
-        this.twitter = twitter;
-        this.tiktok = tiktok;
+    public Social(String socialPlatform, String link) {
+        this.socialPlatform = socialPlatform;
+        this.link = link;
     }
 
-    public String getFacebook() {
-        return facebook;
+    public String getSocialPlatform() {
+        return socialPlatform;
     }
 
-    public void setFacebook(String facebook) {
-        this.facebook = facebook;
+    public void setSocialPlatform(String socialPlatform) {
+        this.socialPlatform = socialPlatform;
     }
 
-    public String getInstagram() {
-        return instagram;
+    public String getLink() {
+        return link;
     }
 
-    public void setInstagram(String instagram) {
-        this.instagram = instagram;
-    }
-
-    public String getTwitter() {
-        return twitter;
-    }
-
-    public void setTwitter(String twitter) {
-        this.twitter = twitter;
-    }
-
-    public String getTiktok() {
-        return tiktok;
-    }
-
-    public void setTiktok(String tiktok) {
-        this.tiktok = tiktok;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Social social = (Social) o;
-        return Objects.equals(facebook, social.facebook) && Objects.equals(instagram, social.instagram) && Objects.equals(twitter, social.twitter) && Objects.equals(tiktok, social.tiktok);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(facebook, instagram, twitter, tiktok);
-    }
-
-    @Override
-    public String toString() {
-        return "Social{" +
-                "facebook='" + facebook + '\'' +
-                ", instagram='" + instagram + '\'' +
-                ", twitter='" + twitter + '\'' +
-                ", tiktok='" + tiktok + '\'' +
-                '}';
+    public void setLink(String link) {
+        this.link = link;
     }
 
 
@@ -83,27 +40,21 @@ public class Social implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.facebook);
-        dest.writeString(this.instagram);
-        dest.writeString(this.twitter);
-        dest.writeString(this.tiktok);
+        dest.writeString(this.socialPlatform);
+        dest.writeString(this.link);
     }
 
     public void readFromParcel(Parcel source) {
-        this.facebook = source.readString();
-        this.instagram = source.readString();
-        this.twitter = source.readString();
-        this.tiktok = source.readString();
+        this.socialPlatform = source.readString();
+        this.link = source.readString();
     }
 
     protected Social(Parcel in) {
-        this.facebook = in.readString();
-        this.instagram = in.readString();
-        this.twitter = in.readString();
-        this.tiktok = in.readString();
+        this.socialPlatform = in.readString();
+        this.link = in.readString();
     }
 
-    public static final Parcelable.Creator<Social> CREATOR = new Parcelable.Creator<Social>() {
+    public static final Creator<Social> CREATOR = new Creator<Social>() {
         @Override
         public Social createFromParcel(Parcel source) {
             return new Social(source);
@@ -115,5 +66,11 @@ public class Social implements Parcelable {
         }
     };
 
-
+    @Override
+    public String toString() {
+        return "Social{" +
+                "socialPlatform='" + socialPlatform + '\'' +
+                ", link='" + link + '\'' +
+                '}';
+    }
 }

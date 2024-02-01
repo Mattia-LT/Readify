@@ -4,7 +4,7 @@ package it.unimib.readify.model;
 public class Factor {
 
     private String genreName;
-    private int rating;
+    private int value;
 
     public Factor() {}
 }

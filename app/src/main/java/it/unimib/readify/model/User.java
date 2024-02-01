@@ -3,6 +3,7 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
@@ -10,21 +11,27 @@ public class User implements Parcelable {
 
     private String biography;
     private List<Collection> collections;
-    private HashMap<String, Integer> recommended;
+    private List<Factor> recommended;
     private String email;
     private String genre;
-    //hashmap?
-    private HashMap<String, String> socialLinks;
+    private List<Social> socialLinks;
     private String username;
     private String visibility;
-    //id token necessario?
+    private ExternalGroup followers;
+    private ExternalGroup following;
     private String idToken;
-    private Followers followers;
-    private Followers following;
 
     public User() {}
 
-    public User(String biography, List<Collection> collections, HashMap<String, Integer> recommended, String email, String genre, HashMap<String, String> socialLinks, String username, String visibility, String idToken) {
+    public User(String email, String idToken) {
+        this.email = email;
+        this.idToken = idToken;
+    }
+
+    public User(String biography, List<Collection> collections, List<Factor> recommended,
+                String email, String genre, List<Social> socialLinks, String username,
+                String visibility, ExternalGroup followers, ExternalGroup following,
+                String idToken) {
         this.biography = biography;
         this.collections = collections;
         this.recommended = recommended;
@@ -33,12 +40,8 @@ public class User implements Parcelable {
         this.socialLinks = socialLinks;
         this.username = username;
         this.visibility = visibility;
-        this.idToken = idToken;
-    }
-
-    public User(String email, String username, String idToken) {
-        this.email = email;
-        this.username = username;
+        this.followers = followers;
+        this.following = following;
         this.idToken = idToken;
     }
 
@@ -58,6 +61,14 @@ public class User implements Parcelable {
         this.collections = collections;
     }
 
+    public List<Factor> getRecommended() {
+        return recommended;
+    }
+
+    public void setRecommended(List<Factor> recommended) {
+        this.recommended = recommended;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -74,7 +85,13 @@ public class User implements Parcelable {
         this.genre = genre;
     }
 
+    public List<Social> getSocialLinks() {
+        return socialLinks;
+    }
 
+    public void setSocialLinks(List<Social> socialLinks) {
+        this.socialLinks = socialLinks;
+    }
 
     public String getUsername() {
         return username;
@@ -92,59 +109,28 @@ public class User implements Parcelable {
         this.visibility = visibility;
     }
 
+    public ExternalGroup getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(ExternalGroup followers) {
+        this.followers = followers;
+    }
+
+    public ExternalGroup getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(ExternalGroup following) {
+        this.following = following;
+    }
+
     public String getIdToken() {
         return idToken;
     }
 
     public void setIdToken(String idToken) {
         this.idToken = idToken;
-    }
-
-    public HashMap<String, Integer> getRecommended() {
-        return recommended;
-    }
-
-    public void setRecommended(HashMap<String, Integer> recommended) {
-        this.recommended = recommended;
-    }
-
-    public HashMap<String, String> getSocialLinks() {
-        return socialLinks;
-    }
-
-    public void setSocialLinks(HashMap<String, String> socialLinks) {
-        this.socialLinks = socialLinks;
-    }
-
-    public Followers getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(Followers followers) {
-        this.followers = followers;
-    }
-
-    public Followers getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(Followers following) {
-        this.following = following;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "biography='" + biography + '\'' +
-                ", collections=" + collections +
-                ", recommended=" + recommended +
-                ", email='" + email + '\'' +
-                ", genre='" + genre + '\'' +
-                ", socialLinks=" + socialLinks +
-                ", username='" + username + '\'' +
-                ", visibility='" + visibility + '\'' +
-                ", idToken='" + idToken + '\'' +
-                '}';
     }
 
 
@@ -157,46 +143,48 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.biography);
         dest.writeTypedList(this.collections);
-        dest.writeSerializable(this.recommended);
+        dest.writeList(this.recommended);
         dest.writeString(this.email);
         dest.writeString(this.genre);
-        dest.writeSerializable(this.socialLinks);
+        dest.writeTypedList(this.socialLinks);
         dest.writeString(this.username);
         dest.writeString(this.visibility);
-        dest.writeString(this.idToken);
         dest.writeParcelable(this.followers, flags);
         dest.writeParcelable(this.following, flags);
+        dest.writeString(this.idToken);
     }
 
     public void readFromParcel(Parcel source) {
         this.biography = source.readString();
         this.collections = source.createTypedArrayList(Collection.CREATOR);
-        this.recommended = (HashMap<String, Integer>) source.readSerializable();
+        this.recommended = new ArrayList<Factor>();
+        source.readList(this.recommended, Factor.class.getClassLoader());
         this.email = source.readString();
         this.genre = source.readString();
-        this.socialLinks = (HashMap<String, String>) source.readSerializable();
+        this.socialLinks = source.createTypedArrayList(Social.CREATOR);
         this.username = source.readString();
         this.visibility = source.readString();
+        this.followers = source.readParcelable(ExternalGroup.class.getClassLoader());
+        this.following = source.readParcelable(ExternalGroup.class.getClassLoader());
         this.idToken = source.readString();
-        this.followers = source.readParcelable(Followers.class.getClassLoader());
-        this.following = source.readParcelable(Followers.class.getClassLoader());
     }
 
     protected User(Parcel in) {
         this.biography = in.readString();
         this.collections = in.createTypedArrayList(Collection.CREATOR);
-        this.recommended = (HashMap<String, Integer>) in.readSerializable();
+        this.recommended = new ArrayList<Factor>();
+        in.readList(this.recommended, Factor.class.getClassLoader());
         this.email = in.readString();
         this.genre = in.readString();
-        this.socialLinks = (HashMap<String, String>) in.readSerializable();
+        this.socialLinks = in.createTypedArrayList(Social.CREATOR);
         this.username = in.readString();
         this.visibility = in.readString();
+        this.followers = in.readParcelable(ExternalGroup.class.getClassLoader());
+        this.following = in.readParcelable(ExternalGroup.class.getClassLoader());
         this.idToken = in.readString();
-        this.followers = in.readParcelable(Followers.class.getClassLoader());
-        this.following = in.readParcelable(Followers.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);
@@ -207,4 +195,21 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "biography='" + biography + '\'' +
+                ", collections=" + collections +
+                ", recommended=" + recommended +
+                ", email='" + email + '\'' +
+                ", genre='" + genre + '\'' +
+                ", socialLinks=" + socialLinks +
+                ", username='" + username + '\'' +
+                ", visibility='" + visibility + '\'' +
+                ", followers=" + followers +
+                ", following=" + following +
+                ", idToken='" + idToken + '\'' +
+                '}';
+    }
 }

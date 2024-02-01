@@ -5,10 +5,10 @@ import android.os.Parcelable;
 
 import java.util.Date;
 
-public class Follower implements Parcelable {
-    boolean read;
-    Date timestamp;
-    String username;
+public class ExternalUser implements Parcelable {
+    private boolean read;
+    private Date timestamp;
+    private String username;
 
     public boolean isRead() {
         return read;
@@ -54,25 +54,25 @@ public class Follower implements Parcelable {
         this.username = source.readString();
     }
 
-    public Follower() {
+    public ExternalUser() {
     }
 
-    protected Follower(Parcel in) {
+    protected ExternalUser(Parcel in) {
         this.read = in.readByte() != 0;
         long tmpTimestamp = in.readLong();
         this.timestamp = tmpTimestamp == -1 ? null : new Date(tmpTimestamp);
         this.username = in.readString();
     }
 
-    public static final Parcelable.Creator<Follower> CREATOR = new Parcelable.Creator<Follower>() {
+    public static final Parcelable.Creator<ExternalUser> CREATOR = new Parcelable.Creator<ExternalUser>() {
         @Override
-        public Follower createFromParcel(Parcel source) {
-            return new Follower(source);
+        public ExternalUser createFromParcel(Parcel source) {
+            return new ExternalUser(source);
         }
 
         @Override
-        public Follower[] newArray(int size) {
-            return new Follower[size];
+        public ExternalUser[] newArray(int size) {
+            return new ExternalUser[size];
         }
     };
 }

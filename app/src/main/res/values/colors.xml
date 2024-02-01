@@ -8,11 +8,13 @@
     <color name="tertiary_color">#008080</color>
     <color name="login_blue">#4b62f0</color>
     <color name="orange">#FFA500</color>
+    <color name="red_undo">#CC0101</color>
     <color name="google_login_button">#eceff1</color>
     <color name="google_login_text">#616161</color>
     <color name="light_purple">#8263bf</color>
     <color name= "login_background">#FFE1E1</color>
     <color name="light_gray_background">#f1f2f3</color>
     <color name="light_gray_divider">#c6c6c6</color>
+    <color name="grey_button">#717171</color>
 
 </resources>

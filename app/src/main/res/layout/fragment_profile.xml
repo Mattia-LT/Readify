@@ -23,60 +23,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="20sp"
-        android:gravity="top|left">
+        android:padding="20dp"
+        android:gravity="top|start">
 
-        <!-- top menu -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Napoleone_Bonaparte"
-                android:textSize="23sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/heart"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="36dp"
-                android:src="@drawable/ic_heart"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0" />
-
-            <ImageView
-                android:id="@+id/hamburger"
-                android:layout_width="40dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="36dp"
-                android:src="@drawable/ic_baseline_menu"
-                android:background= "@android:color/transparent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/heart"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         <!-- social VERSIONE 1-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="10dp">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="130sp"
-                android:layout_height="130sp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
                 android:contentDescription="@string/pa_description_photo"
                 android:src="@drawable/ic_baseline_profile_24"
                 app:layout_constraintBottom_toBottomOf="parent"

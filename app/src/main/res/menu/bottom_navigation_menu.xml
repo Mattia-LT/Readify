@@ -12,11 +12,6 @@
         android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/navigation_bar_item_search"/>
     <item
-        android:id="@+id/favoritesFragment"
-        android:enabled="true"
-        android:icon="@drawable/ic_baseline_saved_24"
-        android:title="@string/navigation_bar_item_saved"/>
-    <item
         android:id="@+id/profileFragment"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_profile_24"

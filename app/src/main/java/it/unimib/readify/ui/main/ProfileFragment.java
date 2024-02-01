@@ -5,8 +5,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -15,11 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -64,7 +69,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        loadMenu(view);
         //initializing repository and viewModel
         IUserRepository userRepository = ServiceLocator.getInstance()
                 .getUserRepository(requireActivity().getApplication());
@@ -86,8 +91,6 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
             }
         });
 
-        //UI drawer view
-        runDrawer(view);
     }
 
 
@@ -125,36 +128,50 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         //userViewModel.updateCollectionListLiveData(collectionsList);
     }
 
-    public void runDrawer(View view) {
-        DrawerLayout drawerLayout = fragmentProfileBinding.drawLayout;
-        ImageView imageView = fragmentProfileBinding.hamburger;
-        NavigationView navigationView = fragmentProfileBinding.navView;
-
-        imageView.setOnClickListener(new View.OnClickListener() {
+    public void loadMenu(View view){
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        requireActivity().addMenuProvider(new MenuProvider() {
             @Override
-            public void onClick(View v) {
-                if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                    drawerLayout.closeDrawer(GravityCompat.END);
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.END);
-                }
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+                String title = requireContext().getString(R.string.app_name)
+                        .concat(" - ")
+                        .concat(requireContext().getString(R.string.book_details));
+                toolbar.setTitle(title);
+                menuInflater.inflate(R.menu.profile_appbar_menu, menu);
             }
-        });
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                int itemId = menuItem.getItemId();
-                if (itemId == R.id.nav_settings) {
-                    Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
-                }
-                drawerLayout.closeDrawer(GravityCompat.END);
-                return true;
-            }
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_notifications) {
+                    // TODO: Show notifications menu
+                } else if (menuItem.getItemId() == R.id.action_settings) {
+                    DrawerLayout drawerLayout = fragmentProfileBinding.drawLayout;
+                    NavigationView navigationView = fragmentProfileBinding.navView;
+                    if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                        drawerLayout.closeDrawer(GravityCompat.END);
+                    } else {
+                        drawerLayout.openDrawer(GravityCompat.END);
+                    }
+                    navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                            int itemId = menuItem.getItemId();
+                            if (itemId == R.id.nav_settings) {
+                                Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
+                            }
+                            drawerLayout.closeDrawer(GravityCompat.END);
+                            return true;
+                        }
 
-        });
+                    });
+                    return true;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
+
     }
-
-
 
 }

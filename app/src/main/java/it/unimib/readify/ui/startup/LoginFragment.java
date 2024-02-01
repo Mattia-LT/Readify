@@ -102,6 +102,7 @@ public class LoginFragment extends Fragment {
                                     navigateToHomeActivity();
                                 }
                                 else {
+                                    navigateToHomeActivity();
                                     Log.d("sign in error", "sign in error");
                                 }
                             });

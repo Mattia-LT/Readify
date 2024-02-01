@@ -5,7 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,10 +17,14 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -55,27 +61,22 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
-    @Nullable
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        loadMenu();
         // Inflate the layout for this fragment
         fragmentSearchBinding = FragmentSearchBinding.inflate(inflater,container,false);
         return fragmentSearchBinding.getRoot();
-
     }
 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //todo gestire menu
-
-        Bundle args = getArguments();
 
 
         tabLayout = fragmentSearchBinding.tabLayout;
@@ -113,16 +114,28 @@ public class SearchFragment extends Fragment {
 
     }
 
+    public void loadMenu(){
+        //TODO capire perche se clicco due volte search in basso si cancella la top bar
+        //TODO capire perchè per mezzo secondo si vede il nome originale e non subito il nome giusto
 
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+                String title = requireContext().getString(R.string.app_name)
+                        .concat(" - ")
+                        .concat(requireContext().getString(R.string.navigation_bar_item_search));
+                toolbar.setTitle(title);
+                menuInflater.inflate(R.menu.default_appbar_menu, menu);
+            }
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-
-
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        //bookViewModel.searchBooks(null,null).removeObservers(getViewLifecycleOwner());
     }
 
 }

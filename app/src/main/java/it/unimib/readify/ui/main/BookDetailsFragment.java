@@ -9,17 +9,23 @@ import android.graphics.Shader;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,12 +38,13 @@ import it.unimib.readify.databinding.FragmentBookDetailsBinding;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.viewmodel.BookViewModel;
 
 
 public class BookDetailsFragment extends Fragment {
 
     private FragmentBookDetailsBinding fragmentBookDetailsBinding;
-
+    private BookViewModel bookViewModel;
     private RecyclerView recyclerViewComments;
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
@@ -70,14 +77,19 @@ public class BookDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        loadMenu();
         Bundle arguments = getArguments();
         if (arguments != null) {
             OLWorkApiResponse receivedBook = arguments.getParcelable("book");
             if(receivedBook != null){
                 fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
                 StringBuilder authors = new StringBuilder();
-                for(OLAuthorApiResponse author : receivedBook.getAuthorList()){
-                    authors.append(author.getName()).append("\n");
+                if(receivedBook.getAuthorList() != null){
+                    for(OLAuthorApiResponse author : receivedBook.getAuthorList()){
+                        authors.append(author.getName()).append("\n");
+                    }
+                } else {
+                    authors.append(requireContext().getString(R.string.error_author_not_found));
                 }
                 fragmentBookDetailsBinding.bookAuthor.setText(authors.toString());
                 fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
@@ -169,5 +181,38 @@ public class BookDetailsFragment extends Fragment {
         comments.sort(Comparator.comparing(Comment::getDate).reversed());
         return comments;
     }
+
+    public void loadMenu(){
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+                String title = requireContext().getString(R.string.app_name)
+                        .concat(" - ")
+                        .concat(requireContext().getString(R.string.book_details));
+                toolbar.setTitle(title);
+                menuInflater.inflate(R.menu.default_appbar_menu, menu);
+            }
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
+        // Enable the back button
+        toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requireActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+    }
+
+
+
 
 }

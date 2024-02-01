@@ -61,8 +61,9 @@ public class UserViewModel extends ViewModel {
     }
     */
 
-    public User getLoggedUser() {
-        return userRepository.getLoggedUser();
+    public MutableLiveData<Result> getLoggedUser() {
+        //return userRepository.getLoggedUser();
+        return userMutableLiveData;
     }
 
     public MutableLiveData<Result> logout() {

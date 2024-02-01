@@ -133,7 +133,6 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -143,7 +142,7 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.biography);
         dest.writeTypedList(this.collections);
-        dest.writeList(this.recommended);
+        dest.writeTypedList(this.recommended);
         dest.writeString(this.email);
         dest.writeString(this.genre);
         dest.writeTypedList(this.socialLinks);
@@ -157,8 +156,7 @@ public class User implements Parcelable {
     public void readFromParcel(Parcel source) {
         this.biography = source.readString();
         this.collections = source.createTypedArrayList(Collection.CREATOR);
-        this.recommended = new ArrayList<Factor>();
-        source.readList(this.recommended, Factor.class.getClassLoader());
+        this.recommended = source.createTypedArrayList(Factor.CREATOR);
         this.email = source.readString();
         this.genre = source.readString();
         this.socialLinks = source.createTypedArrayList(Social.CREATOR);
@@ -172,8 +170,7 @@ public class User implements Parcelable {
     protected User(Parcel in) {
         this.biography = in.readString();
         this.collections = in.createTypedArrayList(Collection.CREATOR);
-        this.recommended = new ArrayList<Factor>();
-        in.readList(this.recommended, Factor.class.getClassLoader());
+        this.recommended = in.createTypedArrayList(Factor.CREATOR);
         this.email = in.readString();
         this.genre = in.readString();
         this.socialLinks = in.createTypedArrayList(Social.CREATOR);

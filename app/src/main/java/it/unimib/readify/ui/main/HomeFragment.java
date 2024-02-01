@@ -30,6 +30,7 @@ import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
@@ -47,6 +48,8 @@ public class HomeFragment extends Fragment {
 
     private BookViewModel bookViewModel;
     private UserViewModel userViewModel;
+
+    private User user;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -91,8 +94,15 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.d("user info", userViewModel.getLoggedUser().toString());
-
+        //todo sistemare correttamente l'inserimento del token
+        //get data from realtime database
+        userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
+            if(result.isSuccess()) {
+                user = ((Result.UserSuccess) result).getData();
+            } else {
+                Log.d("home fragment error", "getUserDataFromToken");
+            }
+        });
 
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();

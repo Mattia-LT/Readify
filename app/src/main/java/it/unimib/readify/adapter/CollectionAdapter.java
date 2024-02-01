@@ -27,6 +27,10 @@ import it.unimib.readify.model.Collection;
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
 
+    private List<Collection> collectionsList;
+    private final OnItemClickListener onItemClickListener;
+    private final Application application;
+
     /*
     using an interface because
         1) there may be more different events to manage
@@ -35,10 +39,6 @@ public class CollectionAdapter extends
     public interface OnItemClickListener {
         void onCollectionItemClick(Collection collection);
     }
-
-    private List<Collection> collectionsList;
-    private final OnItemClickListener onItemClickListener;
-    private final Application application;
 
     public CollectionAdapter(OnItemClickListener onItemClickListener, Application application) {
         this.onItemClickListener = onItemClickListener;
@@ -92,24 +92,25 @@ public class CollectionAdapter extends
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
+            /*
             if(collection.getBooks() == null || collection.getBooks().size() == 0)
                 thumbnail.setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;
                 for (int i = 0; i < collection.getBooks().size(); i++) {
-                        if(collection.getBook(i) != null && collection.getBook(i).getCovers() != null)
-                            for (int j = 0; j < collection.getBook(i).getCovers().size(); j++) {
-                                if(collection.getBook(i).getCovers().get(j) != -1) {
+                        if(collection.getBooks().get(i) != null && collection.getBooks().get(i).getCovers() != null)
+                            for (int j = 0; j < collection.getBooks().get(i).getCovers().size(); j++) {
+                                if(collection.getBooks().get(i).getCovers().get(j) != -1) {
                                     isThumbnailAvailable = true;
                                     Log.d("url", "https://covers.openlibrary.org/b/id/"
-                                            + collection.getBook(i).getCovers().get(j)
+                                            + collection.getBooks().get(i).getCovers().get(j)
                                             + "-L.jpg");
                                     RequestOptions requestOptions = new RequestOptions()
                                             .placeholder(R.drawable.loading_image_gif)
                                             .error(R.drawable.image_not_available);
                                     Glide.with(application)
                                             .load("https://covers.openlibrary.org/b/id/"
-                                                    + collection.getBook(i).getCovers().get(j)
+                                                    + collection.getBooks().get(i).getCovers().get(j)
                                                     + "-L.jpg")
                                             .apply(requestOptions)
                                             .into(thumbnail);
@@ -123,7 +124,7 @@ public class CollectionAdapter extends
 
             //set collection name and visibility
             name.setText(collection.getName());
-            if(collection.isVisible())
+            if(collection.getVisibility())
                 visibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
             else
                 visibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
@@ -136,7 +137,11 @@ public class CollectionAdapter extends
                 layoutParams.rightMargin = (int) margin;
             else
                 layoutParams.leftMargin = (int) margin;
+
+            Log.d("collection " + position, collection.toString());
+             */
         }
+
 
         @Override
         public void onClick(View v) {

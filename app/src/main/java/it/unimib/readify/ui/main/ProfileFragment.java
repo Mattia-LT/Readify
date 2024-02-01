@@ -18,8 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import java.util.ArrayList;
-
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.data.repository.user.IUserRepository;
@@ -68,44 +66,43 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 requireActivity(),
                 new UserViewModelFactory(userRepository)).get(UserViewModel.class);
 
-        if(userViewModel.getLoggedUser() != null) {
-            user = userViewModel.getLoggedUser();
-            userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
-                if(result.isSuccess()) {
-                    user = ((Result.UserSuccess) result).getData();
-                    Log.d("user data", user.toString());
-                } else {
-                    Log.d("error", "error");
-                }
-            });
-        }
+        //get user data from database
+        userViewModel.getLoggedUser().observe(getViewLifecycleOwner(), result -> {
+            if(result.isSuccess()) {
+                user = ((Result.UserSuccess) result).getData();
+                Log.d("user collections", user.getCollections().toString());
+                //UI collections view
+                runCollectionsView(view, user);
+                //UI collections creation
+                runCollectionCreationProcess();
+            } else {
+                Log.d("profile fragment error", "getLoggedUser");
+            }
+        });
 
-
-        //runCollectionsView(view);
-        //runCollectionCreationProcess(view);
+        //UI drawer view
         runDrawer();
     }
 
 
     //managing collections existence
-    public void runCollectionsView(View view) {
+    public void runCollectionsView(View view, User user) {
 
         //managing collectionAdapter and recycler view
         collectionAdapter = new CollectionAdapter(
                 new CollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onCollectionItemClick(Collection collection) {
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("collectionData", collection);
-                        Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_collectionFragment, bundle);
+                        Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_collectionFragment);
                     }
                 }, requireActivity().getApplication());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
         fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
+        collectionAdapter.setCollectionsList(user.getCollections());
     }
 
-    public void runCollectionCreationProcess(View view) {
+    public void runCollectionCreationProcess() {
         CollectionCreationBottomSheet collectionCreationBottomSheet = new CollectionCreationBottomSheet();
         collectionCreationBottomSheet.onInputListener(this);
 
@@ -115,7 +112,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     }
 
     //CollectionCreationBottomSheet.OnInputListener method
-
+    //todo da fare
     @Override
     public void sendInput(Collection newCollection) {
         //collectionsList.add(newCollection);

@@ -33,12 +33,12 @@ import it.unimib.readify.util.ServiceLocator;
 
 public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {
 
-    private ArrayList<it.unimib.readify.model.Collection> collectionsList;
     private FragmentProfileBinding fragmentProfileBinding;
     private UserViewModel userViewModel;
     private CollectionAdapter collectionAdapter;
+    private User user;
 
-    public ProfileFragment() { /*Required empty public constructor*/ }
+    public ProfileFragment() {}
 
     public static ProfileFragment newInstance() {
         return new ProfileFragment();
@@ -61,47 +61,24 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //initializing repository
-        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+        //initializing repository and viewModel
+        IUserRepository userRepository = ServiceLocator.getInstance()
+                .getUserRepository(requireActivity().getApplication());
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
 
-        //initializing viewModel
-        userViewModel = new ViewModelProvider(requireActivity(), new UserViewModelFactory(userRepository))
-                .get(UserViewModel.class);
-
-        //viewModel actions
-        /*
-        userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
-            if(result.isSuccess()) {
-                User userData = ((Result.UserSuccess) result).getData();
-                Log.d("data", userData.toString());
-            } else {
-                Log.d("getUserDatafrom token", "errore");
-            }
-        });
-         */
-
-        /*
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);
-        //Log.d("firebase", database.getApp().toString());
-        DatabaseReference myRef = firebaseDatabase.getReference("users/utente1/biografia");
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("read from database", "Value is: " + value);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Failed to read value
-                Log.d("error reading from database", "Failed to read value.", error.toException());
-            }
-        });
-         */
-
+        if(userViewModel.getLoggedUser() != null) {
+            user = userViewModel.getLoggedUser();
+            userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
+                if(result.isSuccess()) {
+                    user = ((Result.UserSuccess) result).getData();
+                    Log.d("user data", user.toString());
+                } else {
+                    Log.d("error", "error");
+                }
+            });
+        }
 
 
         //runCollectionsView(view);

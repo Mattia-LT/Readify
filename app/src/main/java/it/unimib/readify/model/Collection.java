@@ -14,10 +14,12 @@ import java.util.Date;
 // TODO: 09/12/2023 gestione della thumbnail
 public class Collection implements Parcelable {
 
-    private final String name;
-    private final boolean visibility;
+    private String name;
+    private boolean visibility;
     //private Image thumbnail;
-    private final ArrayList <OLWorkApiResponse> books;
+    private ArrayList <OLWorkApiResponse> books;
+
+    public Collection() {}
 
     public Collection(String name, boolean visibility, ArrayList<OLWorkApiResponse> books) {
         this.name = name;

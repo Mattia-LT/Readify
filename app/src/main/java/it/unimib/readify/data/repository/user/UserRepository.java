@@ -1,7 +1,5 @@
 package it.unimib.readify.data.repository.user;
 
-import android.util.Log;
-
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
@@ -46,7 +44,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     }
 
     public MutableLiveData<Result> getUserData(String idToken) {
-        userDataRemoteDataSource.getUserData(idToken);
+        userDataRemoteDataSource.getUser(idToken);
         return userMutableLiveData;
     }
 

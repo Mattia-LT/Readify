@@ -7,8 +7,16 @@ import java.util.Date;
 
 public class ExternalUser implements Parcelable {
     private boolean read;
-    private Date timestamp;
+    private String timestamp;
     private String username;
+
+    public ExternalUser() {}
+
+    public ExternalUser(boolean read, String timestamp, String username) {
+        this.read = read;
+        this.timestamp = timestamp;
+        this.username = username;
+    }
 
     public boolean isRead() {
         return read;
@@ -18,11 +26,11 @@ public class ExternalUser implements Parcelable {
         this.read = read;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -43,28 +51,23 @@ public class ExternalUser implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte(this.read ? (byte) 1 : (byte) 0);
-        dest.writeLong(this.timestamp != null ? this.timestamp.getTime() : -1);
+        dest.writeString(this.timestamp);
         dest.writeString(this.username);
     }
 
     public void readFromParcel(Parcel source) {
         this.read = source.readByte() != 0;
-        long tmpTimestamp = source.readLong();
-        this.timestamp = tmpTimestamp == -1 ? null : new Date(tmpTimestamp);
+        this.timestamp = source.readString();
         this.username = source.readString();
-    }
-
-    public ExternalUser() {
     }
 
     protected ExternalUser(Parcel in) {
         this.read = in.readByte() != 0;
-        long tmpTimestamp = in.readLong();
-        this.timestamp = tmpTimestamp == -1 ? null : new Date(tmpTimestamp);
+        this.timestamp = in.readString();
         this.username = in.readString();
     }
 
-    public static final Parcelable.Creator<ExternalUser> CREATOR = new Parcelable.Creator<ExternalUser>() {
+    public static final Creator<ExternalUser> CREATOR = new Creator<ExternalUser>() {
         @Override
         public ExternalUser createFromParcel(Parcel source) {
             return new ExternalUser(source);
@@ -75,4 +78,13 @@ public class ExternalUser implements Parcelable {
             return new ExternalUser[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "ExternalUser{" +
+                "read=" + read +
+                ", timestamp='" + timestamp + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

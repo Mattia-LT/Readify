@@ -74,7 +74,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void getUserData(String idToken) {
+    public void getUser(String idToken) {
         databaseReference.child("users").child(idToken).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
                 userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));

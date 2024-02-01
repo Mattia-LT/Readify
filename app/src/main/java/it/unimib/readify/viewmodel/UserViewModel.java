@@ -28,6 +28,10 @@ public class UserViewModel extends ViewModel {
         return userMutableLiveData;
     }
 
+    public MutableLiveData<Result> getUserMutableLiveData() {
+        return userMutableLiveData;
+    }
+
     public MutableLiveData<Result> getGoogleUserMutableLiveData(String token) {
         if (userMutableLiveData == null) {
             getUserData(token);

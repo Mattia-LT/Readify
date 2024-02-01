@@ -1,5 +1,7 @@
 package it.unimib.readify.data.repository.user;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
@@ -36,6 +38,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     public MutableLiveData<Result> getUser(String email, String password, boolean isUserRegistered) {
         if (isUserRegistered) {
             signIn(email, password);
+            //get data from realtime
         } else {
             signUp(email, password);
         }

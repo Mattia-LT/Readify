@@ -52,18 +52,5 @@ public class HomeActivity extends AppCompatActivity {
         //For the bottom navigation view
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-
-
-        //initializing userRepository and userViewModel
-        /*
-        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository();
-        UserViewModel userViewModel = new ViewModelProvider(this, new DataViewModelFactory(userRepository))
-                .get(UserViewModel.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("userRepository", userRepository);
-        bundle.putParcelable("userViewModel", userViewModel);
-         */
-
-
     }
 }

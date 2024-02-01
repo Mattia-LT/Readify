@@ -5,6 +5,7 @@ import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,15 +60,14 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+        IUserRepository userRepository = ServiceLocator.getInstance()
+                .getUserRepository(requireActivity().getApplication());
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new UserViewModelFactory(userRepository)).get(UserViewModel.class);
 
-
-
-        IBookRepository bookRepository = ServiceLocator.getInstance().getBookRepository(requireActivity().getApplication());
-
+        IBookRepository bookRepository = ServiceLocator.getInstance()
+                .getBookRepository(requireActivity().getApplication());
         bookViewModel = new ViewModelProvider(
                 requireActivity(),
                 new DataViewModelFactory(bookRepository)
@@ -76,7 +76,6 @@ public class HomeFragment extends Fragment {
         trendingBookList = new ArrayList<>();
         suggestedBookList = new ArrayList<>();
         recentBookList = new ArrayList<>();
-
     }
 
     @Override
@@ -92,7 +91,9 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Snackbar.make(view, "USER LOGGATO" + userViewModel.getLoggedUser().getEmail(), Snackbar.LENGTH_SHORT).show();
+        Log.d("user info", userViewModel.getLoggedUser().toString());
+
+
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();
         mockDataSuggested.add("/works/OL14933414W");

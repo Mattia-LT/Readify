@@ -37,7 +37,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
             return null;
         } else {
             //todo aggiungo metodo per riempire user con i dati del db
-            return new User(firebaseUser.getEmail(), firebaseUser.getDisplayName(), firebaseUser.getUid());
+            return new User(firebaseUser.getEmail(), firebaseUser.getUid());
         }
     }
 
@@ -66,7 +66,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                 if (firebaseUser != null) {
                     Log.d("USERAUTHREMOTE", "User signed up");
                     userResponseCallback.onSuccessFromAuthentication(
-                            new User(email, firebaseUser.getDisplayName(), firebaseUser.getUid())
+                            new User(email,  firebaseUser.getUid())
                     );
                 } else {
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
@@ -77,16 +77,15 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         });
     }
 
+    //fatto
     @Override
     public void signIn(String email, String password) {
-        //todo gestire gli errori
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
-                    Log.d("USERAUTHREMOTE", "User signed in");
                     userResponseCallback.onSuccessFromAuthentication(
-                            new User(email, firebaseUser.getDisplayName(), firebaseUser.getUid())
+                            new User(email, firebaseUser.getUid())
                     );
                 } else {
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
@@ -111,7 +110,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                         Log.d("USERAUTHREMOTE", "User signed in/up with google");
                         userResponseCallback.onSuccessFromAuthentication(
                                 new User(firebaseUser.getEmail(),
-                                        firebaseUser.getDisplayName(),
+
                                         firebaseUser.getUid()
                                 )
                         );

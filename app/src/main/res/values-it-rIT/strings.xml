@@ -86,5 +86,7 @@
     <string name="error_no_google_account_found_message">Errore: nessun account google associato a questa mail</string>
     <string name="hint_search_users">Cerca un utente</string>
     <string name="textview_books_read">"Libri letti: "</string>
+    <string name="edit_profile">Modifica Profilo</string>
+    <string name="undo_changes">Annulla Modifiche</string>
 
 </resources>

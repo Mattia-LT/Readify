@@ -61,6 +61,10 @@
             android:id="@+id/action_profileFragment_to_collectionFragment"
             app:destination=
                 "@+id/collectionFragment"/>
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination=
+                "@+id/settingFragment"/>
     </fragment>
 
     <fragment
@@ -84,6 +88,17 @@
         android:name="it.unimib.readify.ui.main.BookDetailsFragment"
         android:label="fragment_book_details"
         tools:layout="@layout/fragment_book_details" />
+
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="it.unimib.readify.ui.main.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_profileFragment"
+            app:destination= "@+id/profileFragment"/>
+    </fragment>
+
 
 
     <include app:graph="@navigation/login_navigation_graph" />

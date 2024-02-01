@@ -1,4 +1,4 @@
-package it.unimib.readify.ui.startup;
+package it.unimib.readify.viewmodel;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

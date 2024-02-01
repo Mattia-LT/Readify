@@ -1,4 +1,4 @@
-package it.unimib.readify.ui.main;
+package it.unimib.readify.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;

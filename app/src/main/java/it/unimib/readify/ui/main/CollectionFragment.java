@@ -9,13 +9,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
@@ -24,8 +21,8 @@ import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.ui.startup.UserViewModel;
-import it.unimib.readify.ui.startup.UserViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
 
 public class CollectionFragment extends Fragment {

@@ -1,4 +1,4 @@
-package it.unimib.readify.ui.main;
+package it.unimib.readify.viewmodel;
 
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
@@ -23,6 +23,7 @@ public class BookViewModel extends ViewModel {
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
+
     public BookViewModel(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
         this.offset = 0;

@@ -8,7 +8,6 @@ import static it.unimib.readify.util.Constants.PASSWORD;
 import static it.unimib.readify.util.Constants.USER_COLLISION_ERROR;
 import static it.unimib.readify.util.Constants.WEAK_PASSWORD_ERROR;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -18,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,7 +26,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -41,8 +37,8 @@ import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.ui.main.HomeActivity;
 import it.unimib.readify.util.DataEncryptionUtil;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{

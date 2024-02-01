@@ -1,9 +1,12 @@
 package it.unimib.readify.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 import java.util.HashMap;
 
-public class User {
+public class User implements Parcelable {
 
     private String biography;
     private List<Collection> collections;
@@ -143,4 +146,65 @@ public class User {
                 ", idToken='" + idToken + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.biography);
+        dest.writeTypedList(this.collections);
+        dest.writeSerializable(this.recommended);
+        dest.writeString(this.email);
+        dest.writeString(this.genre);
+        dest.writeSerializable(this.socialLinks);
+        dest.writeString(this.username);
+        dest.writeString(this.visibility);
+        dest.writeString(this.idToken);
+        dest.writeParcelable(this.followers, flags);
+        dest.writeParcelable(this.following, flags);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.biography = source.readString();
+        this.collections = source.createTypedArrayList(Collection.CREATOR);
+        this.recommended = (HashMap<String, Integer>) source.readSerializable();
+        this.email = source.readString();
+        this.genre = source.readString();
+        this.socialLinks = (HashMap<String, String>) source.readSerializable();
+        this.username = source.readString();
+        this.visibility = source.readString();
+        this.idToken = source.readString();
+        this.followers = source.readParcelable(Followers.class.getClassLoader());
+        this.following = source.readParcelable(Followers.class.getClassLoader());
+    }
+
+    protected User(Parcel in) {
+        this.biography = in.readString();
+        this.collections = in.createTypedArrayList(Collection.CREATOR);
+        this.recommended = (HashMap<String, Integer>) in.readSerializable();
+        this.email = in.readString();
+        this.genre = in.readString();
+        this.socialLinks = (HashMap<String, String>) in.readSerializable();
+        this.username = in.readString();
+        this.visibility = in.readString();
+        this.idToken = in.readString();
+        this.followers = in.readParcelable(Followers.class.getClassLoader());
+        this.following = in.readParcelable(Followers.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel source) {
+            return new User(source);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }

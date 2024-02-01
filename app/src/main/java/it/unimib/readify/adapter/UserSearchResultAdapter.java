@@ -1,5 +1,6 @@
 package it.unimib.readify.adapter;
 
+import static it.unimib.readify.util.Constants.ALREADY_READ;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -19,27 +20,31 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BookSearchItemBinding;
 import it.unimib.readify.databinding.BookSearchLoadingItemBinding;
+import it.unimib.readify.databinding.UserSearchItemBinding;
+import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.User;
 
-public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface OnItemClickListener {
-        void onBookItemClick(OLWorkApiResponse book);
+        void onUserItemClick(User user);
         void onAddToCollectionButtonPressed(int position);
     }
 
-    private final List<OLWorkApiResponse> bookList;
+    private final List<User> userList;
     private final Application application;
     private final OnItemClickListener onItemClickListener;
 
 
-    public BookSearchResultAdapter(List<OLWorkApiResponse> bookList, Application application, OnItemClickListener onItemClickListener) {
-        this.bookList = bookList;
+    public UserSearchResultAdapter(List<User> userList, Application application, OnItemClickListener onItemClickListener) {
+        this.userList = userList;
         this.application = application;
         this.onItemClickListener = onItemClickListener;
     }
@@ -48,73 +53,48 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        BookSearchItemBinding binding = BookSearchItemBinding.inflate(inflater, parent, false);
-        return new SearchResultViewHolder(binding);
+        UserSearchItemBinding binding = UserSearchItemBinding.inflate(inflater, parent, false);
+        return new UserSearchResultViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(position != RecyclerView.NO_POSITION){
-            if(holder instanceof SearchResultViewHolder){
-                ((SearchResultViewHolder) holder).bind(bookList.get(position));
-            }
+        if(holder instanceof UserSearchResultViewHolder){
+            ((UserSearchResultViewHolder) holder).bind(userList.get(position));
         }
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return position;
-    }
-
-    @Override
     public int getItemCount() {
-        if(bookList != null){
-            return bookList.size();
+        if(userList != null){
+            return userList.size();
         }
         return 0;
     }
 
     // custom viewholder to bind data to recyclerview items (search result items)
-    public class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final BookSearchItemBinding binding;
+    public class UserSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final UserSearchItemBinding binding;
 
-        public SearchResultViewHolder(@NonNull BookSearchItemBinding binding) {
+        public UserSearchResultViewHolder(@NonNull UserSearchItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.getRoot().setOnClickListener(this);
-            binding.imagebuttonAddIcon.setOnClickListener(this);
         }
 
-        public void bind(OLWorkApiResponse book) {
-            binding.textviewBookTitle.setText(book.getTitle());
-            binding.textviewBookDescription.setText(book.getDescription().getValue());
-            // todo gestire cambio icona quando aggiungo libro
-            // setImageViewFavoriteNews(newsList.get(getAdapterPosition()).isFavorite());
-            if(book.getCovers() != null){
-                int cover = -1;
-                int pos = 0;
-                while (cover == -1 && pos < book.getCovers().size()) {
-                    cover = book.getCovers().get(pos);
-                    pos++;
+        public void bind(User user) {
+            binding.textviewUsername.setText(user.getUsername());
+            String booksRead = application.getString(R.string.textview_books_read);
+            int numberOfBooks = 0;
+            List<Collection> collections = user.getCollections();
+            for(Collection collection : collections){
+                if(collection != null && collection.getName().equals(ALREADY_READ)){
+                    numberOfBooks = collection.getBooks().size();
                 }
-                if (cover == -1) {
-                    binding.imageviewBookCover.setImageResource(R.drawable.image_not_available);
-                } else {
-                    RequestOptions requestOptions = new RequestOptions()
-                            .placeholder(R.drawable.loading_image_gif)
-                            .error(R.drawable.image_not_available)
-                            .transform(new CenterCrop());
-
-                    Glide.with(application)
-                            .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
-                            .apply(requestOptions)
-                            .into(binding.imageviewBookCover);
-                }
-            } else {
-                Glide.with(application)
-                        .load(R.drawable.image_not_available)
-                        .into(binding.imageviewBookCover);
             }
+            booksRead = booksRead.concat(String.valueOf(numberOfBooks));
+            binding.textviewBooksRead.setText(booksRead);
+            // todo gestire foto profilo
         }
 
         @Override
@@ -126,7 +106,7 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                 //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
             } else {
                 //hai premuto qualcos'altro
-                onItemClickListener.onBookItemClick(bookList.get(getAdapterPosition()));
+                onItemClickListener.onUserItemClick(userList.get(getAdapterPosition()));
             }
         }
 

@@ -29,9 +29,11 @@ import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.ui.startup.UserViewModel;
-import it.unimib.readify.ui.startup.UserViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
+import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.DataViewModelFactory;
 
 public class HomeFragment extends Fragment {
     private List<OLWorkApiResponse> trendingBookList;

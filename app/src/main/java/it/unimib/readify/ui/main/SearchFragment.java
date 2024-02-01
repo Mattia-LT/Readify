@@ -4,11 +4,13 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,7 +21,7 @@ import android.view.inputmethod.EditorInfo;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +29,19 @@ import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookSearchResultAdapter;
+import it.unimib.readify.adapter.ViewPagerAdapter;
 import it.unimib.readify.databinding.FragmentSearchBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.viewmodel.BookViewModel;
 
 public class SearchFragment extends Fragment {
 
-    private BookSearchResultAdapter searchResultsAdapter;
-    private List<OLWorkApiResponse> searchResultList;
-    private BookViewModel bookViewModel;
-
     private FragmentSearchBinding fragmentSearchBinding;
+
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
 
 
     public SearchFragment() {
@@ -51,8 +55,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bookViewModel = new ViewModelProvider(requireActivity()).get(BookViewModel.class);
-        searchResultList = new ArrayList<>();
+
     }
 
     @Nullable
@@ -72,74 +75,46 @@ public class SearchFragment extends Fragment {
 
         //todo gestire menu
 
-        RecyclerView recyclerViewSearchResults = fragmentSearchBinding.recyclerviewSearch;
-        searchResultsAdapter = new BookSearchResultAdapter(searchResultList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
+        Bundle args = getArguments();
+
+
+        tabLayout = fragmentSearchBinding.tabLayout;
+        viewPager = fragmentSearchBinding.viewpager;
+        viewPagerAdapter = new ViewPagerAdapter(this);
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onBookItemClick(OLWorkApiResponse book) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("book", book);
-                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                viewPager.setCurrentItem(position);
             }
 
             @Override
-            public void onAddToCollectionButtonPressed(int position) {
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
-        });
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        recyclerViewSearchResults.setAdapter(searchResultsAdapter);
-        recyclerViewSearchResults.setLayoutManager(layoutManager);
 
-        MaterialButton filterButton = fragmentSearchBinding.buttonSearchFilter;
-
-        FilterBottomSheet filterBottomSheet = new FilterBottomSheet();
-        filterButton.setOnClickListener( v -> {
-            filterBottomSheet.show(getChildFragmentManager(), filterBottomSheet.getTag());
-        });
-
-        fragmentSearchBinding.progressindicatorSearch.setVisibility(View.GONE);
-        fragmentSearchBinding.errorScreen.setVisibility(View.GONE);
-        // Add an OnEditorActionListener to listen for the "Enter" key press
-        fragmentSearchBinding.edittextSearch.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (keyEvent != null && (actionId == KeyEvent.ACTION_DOWN || actionId == KeyEvent.KEYCODE_ENTER ||  actionId == EditorInfo.IME_ACTION_SEARCH || keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                fragmentSearchBinding.progressindicatorSearch.setVisibility(View.VISIBLE);
-                startSearch(view);
-                return true;
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
             }
-            return false;
         });
 
-
-
-    }
-
-
-
-
-    public void startSearch(View view){
-        // Perform the search when the "Enter" key is pressed
-        String query = Objects.requireNonNull(fragmentSearchBinding.edittextSearch.getText()).toString();
-        Snackbar.make(view, "Query: " + query, Snackbar.LENGTH_SHORT).show();
-        if(query.trim().isEmpty()){
-            Snackbar.make(view, getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
-        } else {
-            bookViewModel.searchBooks(query, null).observe(getViewLifecycleOwner(), resultList -> {
-                int counter = 0;
-                this.searchResultList.clear();
-                for(Result result : resultList){
-                    if(result.isSuccess()) {
-                        OLWorkApiResponse searchedBook = ((Result.WorkSuccess) result).getData();
-                        this.searchResultList.add(searchedBook);
-                    } else {
-                        Log.e("Result.isSuccess() = false in home fragment", result.toString());
-                        Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-                    }
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (tabLayout.getTabAt(position) != null) {
+                    tabLayout.getTabAt(position).select();
                 }
-                searchResultsAdapter.notifyItemRangeChanged(0,searchResultList.size());
-                fragmentSearchBinding.progressindicatorSearch.setVisibility(View.GONE);
-            });
-        }
+            }
+        });
+
+
     }
+
+
+
 
 
 

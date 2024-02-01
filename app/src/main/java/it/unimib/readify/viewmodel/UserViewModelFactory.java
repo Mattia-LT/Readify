@@ -1,11 +1,10 @@
-package it.unimib.readify.ui.startup;
+package it.unimib.readify.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import it.unimib.readify.data.repository.user.IUserRepository;
-import it.unimib.readify.ui.main.BookViewModel;
 
 public class UserViewModelFactory implements ViewModelProvider.Factory {
     private final IUserRepository userRepository;

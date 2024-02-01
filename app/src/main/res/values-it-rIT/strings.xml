@@ -78,9 +78,13 @@
     <string name="books">libri</string>
     <string name="book">libro</string>
     <string name="empty_collection">nessun libro in questa raccolta</string>
+    <string name="users_section">Utenti</string>
+    <string name="books_section">Libri</string>
     <string name="unexpected_error">Si è verificato un errore inaspettato, perfavore riprova.</string>
     <string name="error_login_user_message">Si è verificato un errore durante il login, perfavore riprova</string>
     <string name="error_login_password_message">SI è verificato un errore durante il login, ricontrolla la tua password.</string>
     <string name="error_no_google_account_found_message">Errore: nessun account google associato a questa mail</string>
+    <string name="hint_search_users">Cerca un utente</string>
+    <string name="textview_books_read">"Libri letti: "</string>
 
 </resources>

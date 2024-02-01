@@ -7,9 +7,6 @@ import static it.unimib.readify.util.Constants.ID_TOKEN;
 import static it.unimib.readify.util.Constants.INVALID_CREDENTIALS_ERROR;
 import static it.unimib.readify.util.Constants.INVALID_USER_ERROR;
 import static it.unimib.readify.util.Constants.PASSWORD;
-import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_COUNTRY_OF_INTEREST;
-import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
-import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_TOPICS_OF_INTEREST;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -28,7 +25,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.BeginSignInResult;
@@ -39,7 +35,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -49,13 +44,14 @@ import java.security.GeneralSecurityException;
 import it.unimib.readify.R;
 import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentLoginBinding;
-import it.unimib.readify.databinding.FragmentSearchBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.ui.main.HomeActivity;
 import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.util.ServiceLocator;
 import it.unimib.readify.util.SharedPreferencesUtil;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.UserViewModelFactory;
 
 public class LoginFragment extends Fragment {
 

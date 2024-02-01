@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
-
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,28 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.ui.startup.UserViewModel;
-import it.unimib.readify.ui.startup.UserViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
 
 public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {

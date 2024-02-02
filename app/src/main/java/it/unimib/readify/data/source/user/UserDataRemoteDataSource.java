@@ -38,31 +38,35 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Log.d("USERDATASOURCE", "User already present in Firebase Realtime Database");
+                    Log.d("save user data: signIn case", "User already present in Firebase Realtime Database");
                     userResponseCallback.onSuccessFromRemoteDatabase(user);
                 } else {
-                    Log.d("USERDATASOURCE", "User not present in Firebase Realtime Database");
+                    Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    userResponseCallback.onSuccessFromRemoteDatabase(user);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    userResponseCallback.onFailureFromRemoteDatabase(e.getLocalizedMessage());
-                                }
-                            });
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                userResponseCallback.onSuccessFromRemoteDatabase(user);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage());
+                            }
+                        });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
             }
         });
+    }
+
+    @Override
+    public void saveWorkData() {
+        //todo da implementare
     }
 
     @Override
@@ -72,25 +76,22 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));
             }
             else {
-                userResponseCallback.onFailureFromRemoteDatabase(task.getException().getLocalizedMessage());
+                userResponseCallback.onFailureFromRemoteDatabaseUser(task.getException().getLocalizedMessage());
             }
         });
     }
 
     @Override
-    public void getWork(String idToken) {
-        //todo sostituire idtoken con bookID, occhio che mancano gli /
-        databaseReference.child(FIREBASE_WORKS_COLLECTION).child(idToken).get().addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.d("USERDATAREMOTE", "Error getting data", task.getException());
-                        userResponseCallback.onFailureFromRemoteDatabase(task.getException().getLocalizedMessage());
-                    }
-                    else {
-                        Log.d("USERDATAREMOTE", "Successful read: " + task.getResult().getValue());
-                        //todo potrebbe essere sbagliato
-                        userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(OLWorkApiResponse.class));
-                    }
-                });
+    public void getWork(String idBook) {
+        //todo mancano gli /
+        databaseReference.child(FIREBASE_WORKS_COLLECTION).child(idBook).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(OLWorkApiResponse.class));
+            }
+            else {
+                userResponseCallback.onFailureFromRemoteDatabaseWork(task.getException().getLocalizedMessage());
+            }
+        });
     }
 
     @Override
@@ -103,30 +104,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         //todo da implementare
     }
 
-    //todo aggiungere qui chiamate alla tabella user
    /*
-   @Override
-   public void getUserFavoriteNews(String idToken) {
-       databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
-               child(FIREBASE_FAVORITE_NEWS_COLLECTION).get().addOnCompleteListener(task -> {
-                   if (!task.isSuccessful()) {
-                       Log.d(TAG, "Error getting data", task.getException());
-                       userResponseCallback.onFailureFromRemoteDatabase(task.getException().getLocalizedMessage());
-                   }
-                   else {
-                       Log.d(TAG, "Successful read: " + task.getResult().getValue());
-
-                       List<News> newsList = new ArrayList<>();
-                       for(DataSnapshot ds : task.getResult().getChildren()) {
-                           News news = ds.getValue(News.class);
-                           newsList.add(news);
-                       }
-
-                       userResponseCallback.onSuccessFromRemoteDatabase(newsList);
-                   }
-               });
-   }
-
     @Override
     public void getUserPreferences(String idToken) {
         databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
@@ -168,7 +146,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void saveUserPreferences(String favoriteCountry, Set<String> favoriteTopics, String idToken) {
-        // TODO Add listeners to manage error cases
         databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
                 child(SHARED_PREFERENCES_COUNTRY_OF_INTEREST).setValue(favoriteCountry);
 

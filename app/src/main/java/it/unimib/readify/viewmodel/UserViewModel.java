@@ -76,10 +76,6 @@ public class UserViewModel extends ViewModel {
         return userMutableLiveData;
     }
 
-    public void getUser(String email, String password, boolean isUserRegistered) {
-        userRepository.getUser(email, password, isUserRegistered);
-    }
-
     public boolean isAuthenticationError() {
         return authenticationError;
     }

@@ -29,44 +29,14 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
-
-    @Override
-    public User getLoggedUser() {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser == null) {
-            return null;
-        } else {
-            //todo aggiungo metodo per riempire user con i dati del db
-            return new User(firebaseUser.getEmail(), firebaseUser.getUid());
-        }
-    }
-
-    @Override
-    public void logout() {
-        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    firebaseAuth.removeAuthStateListener(this);
-                    Log.d("USERAUTHREMOTE", "User logged out");
-                    userResponseCallback.onSuccessLogout();
-                }
-            }
-        };
-        firebaseAuth.addAuthStateListener(authStateListener);
-        firebaseAuth.signOut();
-    }
-
     @Override
     public void signUp(String email, String password, String username, String gender) {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
-                    Log.d("USERAUTHREMOTE", "User signed up");
-                    userResponseCallback.onSuccessFromAuthentication(
-                            new User(email,  firebaseUser.getUid(), username, gender)
-                    );
+                    userResponseCallback.onSuccessFromAuthentication
+                            (new User(email, firebaseUser.getUid(), username, gender));
                 } else {
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
                 }
@@ -76,7 +46,6 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         });
     }
 
-    //fatto
     @Override
     public void signIn(String email, String password) {
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
@@ -97,7 +66,6 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
 
     @Override
     public void signInWithGoogle(String idToken) {
-        //todo gestire errori
         if (idToken !=  null) {
             // Got an ID token from Google. Use it to authenticate with Firebase.
             AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
@@ -125,6 +93,22 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         }
     }
 
+    @Override
+    public void logout() {
+        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+                    firebaseAuth.removeAuthStateListener(this);
+                    Log.d("USERAUTHREMOTE", "User logged out");
+                    userResponseCallback.onSuccessLogout();
+                }
+            }
+        };
+        firebaseAuth.addAuthStateListener(authStateListener);
+        firebaseAuth.signOut();
+    }
+
     private String getErrorMessage(Exception exception) {
         if (exception instanceof FirebaseAuthWeakPasswordException) {
             return WEAK_PASSWORD_ERROR;
@@ -137,6 +121,4 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         }
         return UNEXPECTED_ERROR;
     }
-
-
 }

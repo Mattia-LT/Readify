@@ -11,8 +11,12 @@ public abstract class BaseUserDataRemoteDataSource {
     }
 
     public abstract void saveUserData(User user);
-    public abstract void getWork(String idToken);
+    public abstract void saveWorkData();
     public abstract void getUser(String idToken);
+    public abstract void getWork(String idBook);
+
+
+    //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);
     public abstract void saveUserPreferences(String message, String idToken);
 }

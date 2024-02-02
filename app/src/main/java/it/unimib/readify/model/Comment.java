@@ -2,6 +2,7 @@ package it.unimib.readify.model;
 
 import java.util.Date;
 
+//todo da cambiare per il database
 public class Comment {
     private String userId;
     private String comment;

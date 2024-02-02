@@ -17,6 +17,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.util.List;
+
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -65,8 +68,33 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void saveWorkData() {
-        //todo da implementare
+    public void saveWorkData(OLWorkApiResponse work) {
+        /*
+        todo da implementare la corretta classe Comments + vedere se funziona +
+         la key corrisponde all'id del libro nel database giusto?
+        */
+        databaseReference.child(FIREBASE_WORKS_COLLECTION).child(work.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseReference.child(FIREBASE_USERS_COLLECTION).child(work.getKey()).setValue(work.getComments())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                userResponseCallback.onSuccessFromRemoteDatabase(work);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                userResponseCallback.onFailureFromRemoteDatabaseWork(e.getLocalizedMessage());
+                            }
+                        });
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -83,7 +111,10 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void getWork(String idBook) {
-        //todo mancano gli /
+        /*
+            todo mancano gli /
+             a logica non dovrebbe essere un problema
+         */
         databaseReference.child(FIREBASE_WORKS_COLLECTION).child(idBook).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(OLWorkApiResponse.class));

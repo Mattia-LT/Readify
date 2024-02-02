@@ -19,10 +19,9 @@ public class OLWorkApiResponse implements Parcelable {
     private String key;
     private List<OLAuthorKeys> authors;
     private List<String> subjects;
-
     private OLRatingResponse rating;
-
     private List<OLAuthorApiResponse> authorList;
+    private List<Comment> comments;
 
     public OLWorkApiResponse() {}
 
@@ -39,6 +38,22 @@ public class OLWorkApiResponse implements Parcelable {
         this.authors = authors;
         this.rating = rating;
         this.subjects = subjects;
+    }
+
+    public OLWorkApiResponse(OLDescription description, String title, List<Integer> covers,
+                             String firstPublishDate, String key, List<OLAuthorKeys> authors,
+                             List<String> subjects, OLRatingResponse rating,
+                             List<OLAuthorApiResponse> authorList, List<Comment> comments) {
+        this.description = description;
+        this.title = title;
+        this.covers = covers;
+        this.firstPublishDate = firstPublishDate;
+        this.key = key;
+        this.authors = authors;
+        this.subjects = subjects;
+        this.rating = rating;
+        this.authorList = authorList;
+        this.comments = comments;
     }
 
     public OLDescription getDescription() {
@@ -113,32 +128,12 @@ public class OLWorkApiResponse implements Parcelable {
         this.authorList = authorList;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OLWorkApiResponse that = (OLWorkApiResponse) o;
-        return Objects.equals(description, that.description) && Objects.equals(title, that.title) && Objects.equals(covers, that.covers) && Objects.equals(firstPublishDate, that.firstPublishDate) && Objects.equals(key, that.key) && Objects.equals(authors, that.authors) && Objects.equals(subjects, that.subjects) && Objects.equals(rating, that.rating) && Objects.equals(authorList, that.authorList);
+    public List<Comment> getComments() {
+        return comments;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(description, title, covers, firstPublishDate, key, authors, subjects, rating, authorList);
-    }
-
-    @Override
-    public String toString() {
-        return "OLWorkApiResponse{" +
-                "description=" + description +
-                ", title='" + title + '\'' +
-                ", covers=" + covers +
-                ", firstPublishDate='" + firstPublishDate + '\'' +
-                ", key='" + key + '\'' +
-                ", authors=" + authors +
-                ", subjects=" + subjects +
-                ", rating=" + rating +
-                ", authorList=" + authorList +
-                '}';
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
 
@@ -158,6 +153,7 @@ public class OLWorkApiResponse implements Parcelable {
         dest.writeStringList(this.subjects);
         dest.writeParcelable(this.rating, flags);
         dest.writeTypedList(this.authorList);
+        dest.writeList(this.comments);
     }
 
     public void readFromParcel(Parcel source) {
@@ -171,6 +167,8 @@ public class OLWorkApiResponse implements Parcelable {
         this.subjects = source.createStringArrayList();
         this.rating = source.readParcelable(OLRatingResponse.class.getClassLoader());
         this.authorList = source.createTypedArrayList(OLAuthorApiResponse.CREATOR);
+        this.comments = new ArrayList<Comment>();
+        source.readList(this.comments, Comment.class.getClassLoader());
     }
 
     protected OLWorkApiResponse(Parcel in) {
@@ -184,6 +182,8 @@ public class OLWorkApiResponse implements Parcelable {
         this.subjects = in.createStringArrayList();
         this.rating = in.readParcelable(OLRatingResponse.class.getClassLoader());
         this.authorList = in.createTypedArrayList(OLAuthorApiResponse.CREATOR);
+        this.comments = new ArrayList<Comment>();
+        in.readList(this.comments, Comment.class.getClassLoader());
     }
 
     public static final Creator<OLWorkApiResponse> CREATOR = new Creator<OLWorkApiResponse>() {
@@ -197,4 +197,20 @@ public class OLWorkApiResponse implements Parcelable {
             return new OLWorkApiResponse[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "OLWorkApiResponse{" +
+                "description=" + description +
+                ", title='" + title + '\'' +
+                ", covers=" + covers +
+                ", firstPublishDate='" + firstPublishDate + '\'' +
+                ", key='" + key + '\'' +
+                ", authors=" + authors +
+                ", subjects=" + subjects +
+                ", rating=" + rating +
+                ", authorList=" + authorList +
+                ", comments=" + comments +
+                '}';
+    }
 }

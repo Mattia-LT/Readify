@@ -66,6 +66,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
 
     @Override
     public void signInWithGoogle(String idToken) {
+        //todo da vedere
         if (idToken !=  null) {
             // Got an ID token from Google. Use it to authenticate with Firebase.
             AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
@@ -95,6 +96,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
 
     @Override
     public void logout() {
+        //todo da vedere
         FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -110,6 +112,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     }
 
     private String getErrorMessage(Exception exception) {
+        //todo decidere se tenere
         if (exception instanceof FirebaseAuthWeakPasswordException) {
             return WEAK_PASSWORD_ERROR;
         } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {

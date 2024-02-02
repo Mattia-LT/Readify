@@ -9,7 +9,7 @@ public abstract class BaseBookRemoteDataSource {
     public void setResponseCallback(ResponseCallback responseCallback) {
         this.responseCallback = responseCallback;
     }
-    public abstract void searchBooks(String query, String sort, int limit, int offset);
+    public abstract void searchBooks(String query, String sort, int limit, int offset, String subjects);
     public abstract void fetchBook(String id);
     public abstract void getBooks(List<String> idList, String reference);
 }

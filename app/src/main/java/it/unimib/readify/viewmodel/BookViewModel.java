@@ -30,8 +30,8 @@ public class BookViewModel extends ViewModel {
         this.limit = 10;
     }
 
-    public MutableLiveData<List<Result>> searchBooks(String query, String sort) {
-        searchResultsLiveData = bookRepository.searchBooks(query, sort, limit, offset);
+    public MutableLiveData<List<Result>> searchBooks(String query, String sort, String subjects) {
+        searchResultsLiveData = bookRepository.searchBooks(query, sort, limit, offset, subjects);
         return searchResultsLiveData;
     }
 

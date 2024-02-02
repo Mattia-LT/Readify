@@ -5,6 +5,7 @@ import static it.unimib.readify.util.Constants.OL_SEARCH_LIMIT_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_SEARCH_OFFSET_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_SEARCH_Q_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_SEARCH_SORT_PARAMETER;
+import static it.unimib.readify.util.Constants.OL_SEARCH_SUBJECT_PARAMETER;
 
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLRatingResponse;
@@ -22,7 +23,8 @@ public interface OLApiService {
             @Query(OL_SEARCH_Q_PARAMETER) String q,
             @Query(OL_SEARCH_SORT_PARAMETER) String sort,
             @Query(OL_SEARCH_LIMIT_PARAMETER) int limit,
-            @Query(OL_SEARCH_OFFSET_PARAMETER) int offset );
+            @Query(OL_SEARCH_OFFSET_PARAMETER) int offset,
+            @Query(OL_SEARCH_SUBJECT_PARAMETER) String subject);
 
 
     @GET("{id}.json")

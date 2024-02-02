@@ -48,6 +48,7 @@ public class Constants {
     public static final String OL_SEARCH_AUTHOR_PARAMETER = "author";
     public static final String OL_SEARCH_LIMIT_PARAMETER = "limit";
     public static final String OL_SEARCH_OFFSET_PARAMETER = "offset";
+    public static final String OL_SEARCH_SUBJECT_PARAMETER = "subject";
 
 
 

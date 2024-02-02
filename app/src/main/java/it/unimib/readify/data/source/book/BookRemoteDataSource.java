@@ -33,8 +33,8 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
     }
 
     @Override
-    public void searchBooks(String query, String sort, int limit, int offset) {
-        olApiService.searchBooks(query, sort, limit, offset).enqueue(new Callback<OLSearchApiResponse>() {
+    public void searchBooks(String query, String sort, int limit, int offset, String subjects) {
+        olApiService.searchBooks(query, sort, limit, offset, subjects).enqueue(new Callback<OLSearchApiResponse>() {
             @Override
             public void onResponse(Call<OLSearchApiResponse> call, Response<OLSearchApiResponse> response) {
                 if(response.isSuccessful()){

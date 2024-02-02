@@ -44,8 +44,8 @@ public class BookRepository implements IBookRepository, ResponseCallback{
     }
 
     @Override
-    public MutableLiveData<List<Result>> searchBooks(String query, String sort, int limit, int offset) {
-        bookRemoteDataSource.searchBooks(query, sort, limit, offset);
+    public MutableLiveData<List<Result>> searchBooks(String query, String sort, int limit, int offset, String subjects) {
+        bookRemoteDataSource.searchBooks(query, sort, limit, offset, subjects);
         return searchResultsLiveData;
     }
 

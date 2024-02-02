@@ -31,7 +31,7 @@ import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.viewmodel.BookViewModel;
 
-public class TabSearchBooksFragment extends Fragment {
+public class TabSearchBooksFragment extends Fragment implements FilterBottomSheet.FilterBottomSheetListener {
 
     private FragmentTabSearchBooksBinding fragmentTabSearchBooksBinding;
 
@@ -39,8 +39,8 @@ public class TabSearchBooksFragment extends Fragment {
     private List<OLWorkApiResponse> searchResultList;
     private BookViewModel bookViewModel;
 
-
-
+    private String sortMode;
+    private String subjects;
 
 
     @Nullable
@@ -70,9 +70,7 @@ public class TabSearchBooksFragment extends Fragment {
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("book", book);
-
                 Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
-
             }
 
             @Override
@@ -88,6 +86,7 @@ public class TabSearchBooksFragment extends Fragment {
 
         FilterBottomSheet filterBottomSheet = new FilterBottomSheet();
         filterButton.setOnClickListener( v -> {
+            filterBottomSheet.setFilterBottomSheetListener(this);
             filterBottomSheet.show(getChildFragmentManager(), filterBottomSheet.getTag());
         });
 
@@ -113,20 +112,22 @@ public class TabSearchBooksFragment extends Fragment {
         if(query.trim().isEmpty()){
             Snackbar.make(view, getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
         } else {
-            bookViewModel.searchBooks(query, null).observe(getViewLifecycleOwner(), resultList -> {
-                int counter = 0;
-                this.searchResultList.clear();
+            fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
+            bookViewModel.searchBooks(query, sortMode, subjects).observe(getViewLifecycleOwner(), resultList -> {
+                fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
+                searchResultList.clear();
+                searchResultsAdapter.notifyItemRangeChanged(0,0);
                 for(Result result : resultList){
                     if(result.isSuccess()) {
                         OLWorkApiResponse searchedBook = ((Result.WorkSuccess) result).getData();
-                        Log.d("book", searchedBook.toString());
-                        this.searchResultList.add(searchedBook);
+                        //Log.d("book", searchedBook.toString());
+                        searchResultList.add(searchedBook);
                     } else {
                         Log.e("Result.isSuccess() = false in home fragment", result.toString());
                         Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
                     }
                 }
-                searchResultsAdapter.notifyItemRangeChanged(0,searchResultList.size());
+                searchResultsAdapter.notifyItemRangeChanged(0, searchResultList.size());
                 fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
             });
         }
@@ -137,7 +138,7 @@ public class TabSearchBooksFragment extends Fragment {
     private void resumeSearch(){
         String query = Objects.requireNonNull(fragmentTabSearchBooksBinding.edittextSearch.getText()).toString();
         if(!query.trim().isEmpty()){
-            bookViewModel.searchBooks(query, null).observe(getViewLifecycleOwner(), resultList -> {
+            bookViewModel.searchBooks(query, sortMode, subjects).observe(getViewLifecycleOwner(), resultList -> {
                 this.searchResultList.clear();
                 for(Result result : resultList){
                     if(result.isSuccess()) {
@@ -155,4 +156,16 @@ public class TabSearchBooksFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDataPassed(String sortMode, List<String> subjectsSelected) {
+        this.sortMode = sortMode;
+        this.subjects = null;
+        if(subjectsSelected != null){
+            this.subjects = "";
+            for(String s: subjectsSelected){
+                this.subjects = subjects.concat(s).concat(" ");
+            }
+
+        }
+    }
 }

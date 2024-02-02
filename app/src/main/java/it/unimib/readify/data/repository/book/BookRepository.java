@@ -18,12 +18,6 @@ import it.unimib.readify.util.ResponseCallback;
 
 public class BookRepository implements IBookRepository, ResponseCallback{
 
-    /*
-    private final Application application;
-    private final OLSearchApiService olSearchApiService;
-    //private final BookDao bookDao;
-    private final ResponseCallback responseCallback;
-    */
 
     private MutableLiveData<Result> workApiResponseLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
@@ -103,7 +97,7 @@ public class BookRepository implements IBookRepository, ResponseCallback{
 
     @Override
     public void onFailureFromRemote(Exception exception) {
-        List<Result> errorList = new ArrayList<Result>();
+        List<Result> errorList = new ArrayList<>();
         errorList.add(new Result.Error(exception.getMessage()));
         searchResultsLiveData.postValue(errorList);
         workApiResponseLiveData.postValue(new Result.Error(exception.getMessage()));

@@ -5,7 +5,6 @@ import android.app.Application;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import it.unimib.readify.data.database.BookRoomDatabase;
 import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.user.UserRepository;
 import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource;
@@ -60,9 +59,6 @@ public class ServiceLocator {
         return new BookRepository(bookRemoteDataSource);
     }
 
-    public BookRoomDatabase getBookDao(Application application) {
-        return BookRoomDatabase.getDatabase(application);
-    }
 
     public IUserRepository getUserRepository(Application application) {
         SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(application);

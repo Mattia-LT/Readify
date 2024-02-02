@@ -1,34 +1,20 @@
 package it.unimib.readify.adapter;
 
 import static it.unimib.readify.util.Constants.ALREADY_READ;
-import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
-import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
-import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
 
 import android.app.Application;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.RequestOptions;
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
-import it.unimib.readify.databinding.BookSearchItemBinding;
-import it.unimib.readify.databinding.BookSearchLoadingItemBinding;
 import it.unimib.readify.databinding.UserSearchItemBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 
 public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

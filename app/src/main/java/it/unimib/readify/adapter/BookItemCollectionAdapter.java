@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 
 public class BookItemCollectionAdapter extends

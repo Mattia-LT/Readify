@@ -4,7 +4,6 @@ import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,10 +13,8 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import it.unimib.readify.R;
-import it.unimib.readify.databinding.BookHomeItemBinding;
 import it.unimib.readify.databinding.CommentItemBinding;
 import it.unimib.readify.model.Comment;
-import it.unimib.readify.model.OLWorkApiResponse;
 
 public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

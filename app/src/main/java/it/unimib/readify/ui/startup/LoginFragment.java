@@ -112,14 +112,9 @@ public class LoginFragment extends Fragment {
             }
         });
 
-
-
-
-        fragmentLoginBinding.buttonRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToRegisterFragment();
-            }
+        //registration
+        fragmentLoginBinding.buttonRegister.setOnClickListener( v -> {
+            navigateToRegisterFragment();
         });
     }
 

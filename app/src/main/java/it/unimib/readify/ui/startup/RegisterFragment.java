@@ -34,26 +34,23 @@ import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
 
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.DataEncryptionUtil;
+import it.unimib.readify.util.ServiceLocator;
 import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
     private static final boolean USE_NAVIGATION_COMPONENT = true;
-
-    private static final String TAG = LoginFragment.class.getSimpleName();
-
-    private DataEncryptionUtil dataEncryptionUtil;
     private UserViewModel userViewModel;
+    private IUserRepository userRepository;
     private FragmentRegisterBinding fragmentRegisterBinding;
 
-    public RegisterFragment() {
-        // Required empty public constructor
-    }
+    public RegisterFragment() {}
 
     public static RegisterFragment newInstance() {
         return new RegisterFragment();
@@ -62,9 +59,10 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.setAuthenticationError(false);
-        dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
+        userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new it.unimib.readify.viewmodel.UserViewModelFactory(userRepository)).get(UserViewModel.class);
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,68 +73,38 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
 
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.gender, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(),
+                    R.array.gender, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             fragmentRegisterBinding.spinnerGender.setAdapter(adapter);
             fragmentRegisterBinding.spinnerGender.setOnItemSelectedListener(this);
 
-
-            dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
-
-            try {
-                Log.d(TAG, "Email address from encrypted SharedPref: " + dataEncryptionUtil.
-                        readSecretDataWithEncryptedSharedPreferences(
-                                ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS));
-                Log.d(TAG, "Password from encrypted SharedPref: " + dataEncryptionUtil.
-                        readSecretDataWithEncryptedSharedPreferences(
-                                ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD));
-                Log.d(TAG, "Login data from encrypted file: " + dataEncryptionUtil.
-                        readSecretDataOnFile(ENCRYPTED_DATA_FILE_NAME));
-            } catch (GeneralSecurityException | IOException e) {
-                e.printStackTrace();
-            }
-
-
             fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
 
-                String username = fragmentRegisterBinding.textInputLayoutUsername.getEditText().getText().toString();
-                String email = fragmentRegisterBinding.textInputLayoutEmail.getEditText().getText().toString();
-                String password = fragmentRegisterBinding.textInputLayoutPassword.getEditText().getText().toString();
-                String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
+                //String username = fragmentRegisterBinding.textInputLayoutUsername.getEditText().getText().toString();
+                //String email = fragmentRegisterBinding.textInputLayoutEmail.getEditText().getText().toString();
+                //String password = fragmentRegisterBinding.textInputLayoutPassword.getEditText().getText().toString();
+                //String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
+                //String gender = fragmentRegisterBinding.spinnerGender.getSelectedItem().toString();
 
-                Log.d("username", username);
-                Log.d("email", email);
-                Log.d("password", password);
-                Log.d("confirmpassword", passwordConfirm);
+                String username = "aww";
+                String email = "prova@gmail.com";
+                String password = "password";
+                String passwordConfirm = "password";
+                String gender = "F";
 
-                if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm) & (fragmentRegisterBinding.spinnerGender.getSelectedItemPosition() != 0)) {
-                    //fragmentRegisterBinding.progressBar.setVisibility(View.VISIBLE);
-                    if (!userViewModel.isAuthenticationError()) {
-                        userViewModel.getUserMutableLiveData(email, password, false).observe(
-                                getViewLifecycleOwner(), result -> {
-                                    if (result.isSuccess()) {
-                                        User user = ((Result.UserSuccess) result).getData();
-                                        saveLoginData(email, password, user.getIdToken());
-                                        userViewModel.setAuthenticationError(false);
-                                        Navigation.findNavController(view).navigate(
-                                                R.id.action_registerFragment_to_homeActivity);
-                                    } else {
-                                        userViewModel.setAuthenticationError(true);
-                                        Snackbar.make(requireActivity().findViewById(android.R.id.content),
-                                                getErrorMessage(((Result.Error) result).getMessage()),
-                                                Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
-                    } else {
-                        userViewModel.getUser(email, password, false);
-                    }
-
-
-
-
+                if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) &
+                        isPasswordConfirmOk(passwordConfirm) &
+                        (fragmentRegisterBinding.spinnerGender.getSelectedItemPosition() != 0)) {
+                            userViewModel.createUser(email, password, username, gender);
+                            //se la registrazione non va a buon fine, userViewModel.getLoggedUser() sarà uguale ad un Result.Error
+                            if(userViewModel.getLoggedUser() != null) {
+                                Snackbar.make(view, "Utente già esistente", Snackbar.LENGTH_SHORT).show();
+                            } else {
+                                navigateToLoginFragment();
+                            }
                 } else {
-                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
-                            R.string.check_login_data_message, Snackbar.LENGTH_SHORT).show();
+                    Log.d("registration error", "registration error");
                 }
             });
     }
@@ -151,7 +119,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-
 
     private boolean isUsernameOk(String username) {
         if (username.isEmpty()) {
@@ -193,23 +160,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     }
 
 
-    private void saveLoginData(String email, String password, String idToken) {
-        try {
-            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
-                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS, email);
-            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
-                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD, password);
-            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
-                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ID_TOKEN, idToken);
-            dataEncryptionUtil.writeSecreteDataOnFile(ENCRYPTED_DATA_FILE_NAME,
-                    email.concat(":").concat(password));
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
     private String getErrorMessage(String message) {
         switch(message) {
             case WEAK_PASSWORD_ERROR:
@@ -220,4 +170,9 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
                 return requireActivity().getString(R.string.unexpected_error);
         }
     }
+
+    private void navigateToLoginFragment() {
+        if (USE_NAVIGATION_COMPONENT) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_loginFragment);
+        } }
 }

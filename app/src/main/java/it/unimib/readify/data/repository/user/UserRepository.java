@@ -1,5 +1,7 @@
 package it.unimib.readify.data.repository.user;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
@@ -38,7 +40,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
             signIn(email, password);
             //get data from realtime
         } else {
-            signUp(email, password);
+            //signUp(email, password);
         }
         return userMutableLiveData;
     }
@@ -73,13 +75,13 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     }
 
     @Override
-    public User getLoggedUser() {
-        return userAuthRemoteDataSource.getLoggedUser();
+    public MutableLiveData<Result> getLoggedUser() {
+        return userMutableLiveData;
     }
 
     @Override
-    public void signUp(String email, String password) {
-        userAuthRemoteDataSource.signUp(email, password);
+    public void signUp(String email, String password, String username, String gender) {
+        userAuthRemoteDataSource.signUp(email, password, username, gender);
     }
 
     @Override

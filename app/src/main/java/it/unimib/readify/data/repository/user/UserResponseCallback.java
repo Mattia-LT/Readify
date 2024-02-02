@@ -8,6 +8,7 @@ public interface UserResponseCallback {
     void onFailureFromAuthentication(String message);
     void onSuccessFromRemoteDatabase(User user);
     void onSuccessFromRemoteDatabase(OLWorkApiResponse work);
-    void onFailureFromRemoteDatabase(String message);
+    void onFailureFromRemoteDatabaseUser(String message);
+    void onFailureFromRemoteDatabaseWork(String message);
     void onSuccessLogout();
 }

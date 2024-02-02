@@ -55,8 +55,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     }
 
     @Override
-    public MutableLiveData<Result> getWork(String idToken) {
-        userDataRemoteDataSource.getWork(idToken);
+    public MutableLiveData<Result> getWork(String idBook) {
+        userDataRemoteDataSource.getWork(idBook);
         return workMutableLiveData;
     }
 
@@ -97,6 +97,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         //todo implementa o rimuovi
     }
 
+    //giusto
     @Override
     public void onSuccessFromAuthentication(User user) {
         if (user != null) {
@@ -110,22 +111,32 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         userMutableLiveData.postValue(result);
     }
 
+    //giusto
     @Override
     public void onSuccessFromRemoteDatabase(User user) {
         Result.UserSuccess result = new Result.UserSuccess(user);
         userMutableLiveData.postValue(result);
     }
 
+    //giusto
     @Override
     public void onSuccessFromRemoteDatabase(OLWorkApiResponse work) {
         Result.WorkSuccess result = new Result.WorkSuccess(work);
         workMutableLiveData.postValue(result);
     }
 
+    //giusto
     @Override
-    public void onFailureFromRemoteDatabase(String message) {
+    public void onFailureFromRemoteDatabaseUser(String message) {
         Result.Error result = new Result.Error(message);
         userMutableLiveData.postValue(result);
+    }
+
+    //giusto
+    @Override
+    public void onFailureFromRemoteDatabaseWork(String message) {
+        Result.Error result = new Result.Error(message);
+        workMutableLiveData.postValue(result);
     }
 
     @Override

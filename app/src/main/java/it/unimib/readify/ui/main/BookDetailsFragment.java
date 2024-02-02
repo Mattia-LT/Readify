@@ -110,6 +110,10 @@ public class BookDetailsFragment extends Fragment {
                                 .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                                 .apply(requestOptions)
                                 .into(fragmentBookDetailsBinding.bookImage);
+                        Glide.with(requireActivity().getApplicationContext())
+                                .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
+                                .apply(requestOptions)
+                                .into(fragmentBookDetailsBinding.bookBackgroundImage);
                     }
                 } else {
                     Glide.with(requireActivity().getApplicationContext())

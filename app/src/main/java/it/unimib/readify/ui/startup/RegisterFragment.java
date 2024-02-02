@@ -44,8 +44,6 @@ import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
-
-    private static final boolean USE_NAVIGATION_COMPONENT = true;
     private UserViewModel userViewModel;
     private IUserRepository userRepository;
     private FragmentRegisterBinding fragmentRegisterBinding;
@@ -172,7 +170,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     private void navigateToLoginFragment() {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_loginFragment);
-        } }
+        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_loginFragment);
+    }
 }

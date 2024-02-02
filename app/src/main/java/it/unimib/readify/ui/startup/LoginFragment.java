@@ -54,8 +54,6 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.UserViewModelFactory;
 
 public class LoginFragment extends Fragment {
-
-    private static final boolean USE_NAVIGATION_COMPONENT = true;
     private FragmentLoginBinding fragmentLoginBinding;
     private UserViewModel userViewModel;
     private IUserRepository userRepository;
@@ -121,22 +119,19 @@ public class LoginFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
 
 
 
     private void navigateToHomeActivity() {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);
-        } }
+        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);
+    }
 
 
     private void navigateToRegisterFragment() {
-        if (USE_NAVIGATION_COMPONENT) {
-            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_registerFragment);
-        } }
+        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_registerFragment);
+    }
 
     private boolean isEmailOk(String email) {
         if (!EmailValidator.getInstance().isValid((email))) {

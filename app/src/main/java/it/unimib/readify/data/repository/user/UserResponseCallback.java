@@ -1,7 +1,5 @@
 package it.unimib.readify.data.repository.user;
 
-import java.util.List;
-
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 

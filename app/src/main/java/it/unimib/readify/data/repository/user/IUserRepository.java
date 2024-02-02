@@ -2,10 +2,8 @@ package it.unimib.readify.data.repository.user;
 
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.Set;
 
 import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
 
 
 public interface IUserRepository {

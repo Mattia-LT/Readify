@@ -3,7 +3,6 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Date;
 
 public class ExternalUser implements Parcelable {
     private boolean read;

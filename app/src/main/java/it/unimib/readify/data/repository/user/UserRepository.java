@@ -1,7 +1,5 @@
 package it.unimib.readify.data.repository.user;
 
-import android.util.Log;
-
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;

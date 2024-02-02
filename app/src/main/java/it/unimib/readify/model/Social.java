@@ -3,7 +3,6 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Objects;
 
 public class Social implements Parcelable {
     private String socialPlatform;

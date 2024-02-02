@@ -90,7 +90,6 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 Log.d("profile fragment error", "getLoggedUser");
             }
         });
-
     }
 
 
@@ -114,7 +113,6 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void runCollectionCreationProcess() {
         CollectionCreationBottomSheet collectionCreationBottomSheet = new CollectionCreationBottomSheet();
         collectionCreationBottomSheet.onInputListener(this);
-
         fragmentProfileBinding.createCollection.setOnClickListener( v -> {
             collectionCreationBottomSheet.show(getChildFragmentManager(), collectionCreationBottomSheet.getTag());
         });
@@ -170,8 +168,5 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
-
     }
-
 }

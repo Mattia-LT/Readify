@@ -106,4 +106,10 @@ public class UserViewModel extends ViewModel {
         workMutableLiveData = userRepository.getWork(idToken);
     }
 
+    public void createUser(String email, String password, String username, String gender) {
+        //todo gestire user = null nel logout
+        userRepository.signUp(email, password, username, gender);
+        userMutableLiveData = userRepository.getLoggedUser();
+    }
+
 }

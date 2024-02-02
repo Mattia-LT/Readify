@@ -3,9 +3,7 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 
 public class User implements Parcelable {
 
@@ -13,7 +11,7 @@ public class User implements Parcelable {
     private List<Collection> collections;
     private List<Factor> recommended;
     private String email;
-    private String genre;
+    private String gender;
     private List<Social> socialLinks;
     private String username;
     private String visibility;
@@ -28,15 +26,22 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
+    public User(String email, String idToken, String username, String gender) {
+        this.email = email;
+        this.idToken = idToken;
+        this.username = username;
+        this.gender = gender;
+    }
+
     public User(String biography, List<Collection> collections, List<Factor> recommended,
-                String email, String genre, List<Social> socialLinks, String username,
+                String email, String gender, List<Social> socialLinks, String username,
                 String visibility, ExternalGroup followers, ExternalGroup following,
                 String idToken) {
         this.biography = biography;
         this.collections = collections;
         this.recommended = recommended;
         this.email = email;
-        this.genre = genre;
+        this.gender = gender;
         this.socialLinks = socialLinks;
         this.username = username;
         this.visibility = visibility;
@@ -77,12 +82,12 @@ public class User implements Parcelable {
         this.email = email;
     }
 
-    public String getGenre() {
-        return genre;
+    public String getGender() {
+        return gender;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public List<Social> getSocialLinks() {
@@ -144,7 +149,7 @@ public class User implements Parcelable {
         dest.writeTypedList(this.collections);
         dest.writeTypedList(this.recommended);
         dest.writeString(this.email);
-        dest.writeString(this.genre);
+        dest.writeString(this.gender);
         dest.writeTypedList(this.socialLinks);
         dest.writeString(this.username);
         dest.writeString(this.visibility);
@@ -158,7 +163,7 @@ public class User implements Parcelable {
         this.collections = source.createTypedArrayList(Collection.CREATOR);
         this.recommended = source.createTypedArrayList(Factor.CREATOR);
         this.email = source.readString();
-        this.genre = source.readString();
+        this.gender = source.readString();
         this.socialLinks = source.createTypedArrayList(Social.CREATOR);
         this.username = source.readString();
         this.visibility = source.readString();
@@ -172,7 +177,7 @@ public class User implements Parcelable {
         this.collections = in.createTypedArrayList(Collection.CREATOR);
         this.recommended = in.createTypedArrayList(Factor.CREATOR);
         this.email = in.readString();
-        this.genre = in.readString();
+        this.gender = in.readString();
         this.socialLinks = in.createTypedArrayList(Social.CREATOR);
         this.username = in.readString();
         this.visibility = in.readString();
@@ -200,7 +205,7 @@ public class User implements Parcelable {
                 ", collections=" + collections +
                 ", recommended=" + recommended +
                 ", email='" + email + '\'' +
-                ", genre='" + genre + '\'' +
+                ", genre='" + gender + '\'' +
                 ", socialLinks=" + socialLinks +
                 ", username='" + username + '\'' +
                 ", visibility='" + visibility + '\'' +

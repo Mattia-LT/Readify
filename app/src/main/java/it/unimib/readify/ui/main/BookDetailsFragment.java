@@ -4,8 +4,10 @@ import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
 
+import android.graphics.PorterDuff;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -206,7 +209,12 @@ public class BookDetailsFragment extends Fragment {
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         // Enable the back button
-        toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24);
+        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
+        int newColor = getResources().getColor(R.color.white, null);
+        if (coloredIcon != null) {
+            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
+        }
+        toolbar.setNavigationIcon(coloredIcon);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

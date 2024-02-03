@@ -52,13 +52,6 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
 
 
     @Override
-    public void onResume() {
-        super.onResume();
-        resumeSearch();
-        //todo potrebbero esserci soluzioni migliori
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -123,7 +116,7 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
                         //Log.d("book", searchedBook.toString());
                         searchResultList.add(searchedBook);
                     } else {
-                        Log.e("Result.isSuccess() = false in home fragment", result.toString());
+                        Log.e("Result.isSuccess() = false in SearchBooks fragment", result.toString());
                         Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
                     }
                 }
@@ -146,14 +139,13 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
                         Log.d("book", searchedBook.toString());
                         this.searchResultList.add(searchedBook);
                     } else {
-                        Log.e("Result.isSuccess() = false in home fragment", result.toString());
+                        Log.e("Result.isSuccess() = false in SearchBooks fragment", result.toString());
                     }
                 }
                 searchResultsAdapter.notifyItemRangeChanged(0,searchResultList.size());
                 fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
             });
         }
-
     }
 
     @Override
@@ -167,5 +159,12 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
             }
 
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumeSearch();
+        //todo potrebbero esserci soluzioni migliori
     }
 }

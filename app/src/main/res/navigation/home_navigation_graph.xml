@@ -25,6 +25,9 @@
             android:id="@+id/action_searchFragment_to_bookDetailsFragment"
             app:destination="@id/bookDetailsFragment" />
         <action
+            android:id="@+id/action_searchFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
             android:id="@+id/action_searchFragment_to_filter_bottomsheet"
             app:destination="@id/filter_bottomsheet" />
 
@@ -55,6 +58,9 @@
             android:id="@+id/action_profileFragment_to_settingsFragment"
             app:destination=
                 "@+id/settingFragment"/>
+        <action
+            android:id="@+id/action_profileFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
 
     <fragment

@@ -90,5 +90,7 @@
     <string name="error_author_not_found">Autore non trovato</string>
     <string name="edit_profile">Modifica Profilo</string>
     <string name="undo_changes">Annulla Modifiche</string>
+    <string name="notifications_button">Notifiche</string>
+    <string name="settings_button_profile">Menù</string>
 
 </resources>

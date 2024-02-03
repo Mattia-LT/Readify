@@ -1,8 +1,11 @@
 package it.unimib.readify.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
 import java.util.Set;
 
 import it.unimib.readify.data.repository.user.IUserRepository;
@@ -13,6 +16,7 @@ public class UserViewModel extends ViewModel {
     private final IUserRepository userRepository;
     private MutableLiveData<Result> userMutableLiveData;
     private MutableLiveData<Result> workMutableLiveData;
+    private MutableLiveData<List<Result>> userSearchResultLiveData;
     private boolean authenticationError;
 
     public UserViewModel(IUserRepository userRepository) {
@@ -106,6 +110,12 @@ public class UserViewModel extends ViewModel {
         //todo gestire user = null nel logout
         userRepository.signUp(email, password, username, gender);
         userMutableLiveData = userRepository.getLoggedUser();
+    }
+
+    public MutableLiveData<List<Result>> searchUsers(String query){
+        Log.d("UserViewModel", "Query: " + query);
+        userSearchResultLiveData = userRepository.searchUsers(query);
+        return userSearchResultLiveData;
     }
 
 }

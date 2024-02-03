@@ -3,14 +3,18 @@ package it.unimib.readify.adapter;
 import static it.unimib.readify.util.Constants.ALREADY_READ;
 
 import android.app.Application;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Random;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.UserSearchItemBinding;
@@ -73,14 +77,39 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
             String booksRead = application.getString(R.string.textview_books_read);
             int numberOfBooks = 0;
             List<Collection> collections = user.getCollections();
-            for(Collection collection : collections){
-                if(collection != null && collection.getName().equals(ALREADY_READ)){
-                    numberOfBooks = collection.getBooks().size();
+            if(collections != null){
+                for(Collection collection : collections){
+                    if(collection != null && collection.getName().equals(ALREADY_READ)){
+                        numberOfBooks = collection.getBooks().size();
+                    }
                 }
             }
             booksRead = booksRead.concat(String.valueOf(numberOfBooks));
             binding.textviewBooksRead.setText(booksRead);
-            // todo gestire foto profilo
+            //todo mettere colori diversi alle foto profilo
+            Drawable coloredIcon = ContextCompat.getDrawable(application, R.drawable.ic_baseline_profile_24);
+            Random random = new Random();
+            int randomNumber = random.nextInt(4);
+            int newColor = 0;
+
+            switch (randomNumber){
+                case 0:
+                    newColor = application.getResources().getColor(R.color.orange, null);
+                    break;
+                case 1:
+                    newColor = application.getResources().getColor(R.color.light_purple, null);
+                    break;
+                case 2:
+                    newColor = application.getResources().getColor(R.color.login_blue, null);
+                    break;
+                case 3:
+                    newColor = application.getResources().getColor(R.color.red_undo, null);
+                    break;
+            }
+            if (coloredIcon != null) {
+                coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
+            }
+            binding.imageviewUser.setImageDrawable(coloredIcon);
         }
 
         @Override
@@ -120,5 +149,6 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
             */
         }
     }
+
 }
 

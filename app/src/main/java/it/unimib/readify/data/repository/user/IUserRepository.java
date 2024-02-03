@@ -3,6 +3,8 @@ package it.unimib.readify.data.repository.user;
 import androidx.lifecycle.MutableLiveData;
 
 
+import java.util.List;
+
 import it.unimib.readify.model.Result;
 
 
@@ -12,6 +14,7 @@ public interface IUserRepository {
     MutableLiveData<Result> getWork(String idToken);
     MutableLiveData<Result> getUserData(String idToken);
     MutableLiveData<Result> getUserPreferences(String idToken);
+    MutableLiveData<List<Result>> searchUsers(String query);
     MutableLiveData<Result> logout();
     MutableLiveData<Result> getLoggedUser();
 

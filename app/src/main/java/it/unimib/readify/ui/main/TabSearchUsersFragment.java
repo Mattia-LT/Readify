@@ -1,6 +1,7 @@
 package it.unimib.readify.ui.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +25,8 @@ import java.util.Objects;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.UserSearchResultAdapter;
 import it.unimib.readify.databinding.FragmentTabSearchUsersBinding;
+import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.UserViewModel;
 
@@ -52,13 +56,12 @@ public class TabSearchUsersFragment extends Fragment {
             public void onUserItemClick(User user) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", user);
-                //todo da cambiare la navigation
-                //Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_profileFragment, bundle);
             }
 
             @Override
             public void onAddToCollectionButtonPressed(int position) {
-
+                //todo implementa pulsante segui?b
             }
         });
 
@@ -87,10 +90,52 @@ public class TabSearchUsersFragment extends Fragment {
             Snackbar.make(view, getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
         } else {
             //todo implementa qui ricerca utenti
-
+            Log.d("UserSearchFragment", "Query: " + query);
+            fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
+            userViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
+                fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
+                searchResultList.clear();
+                userSearchResultAdapter.notifyItemRangeChanged(0,0);
+                for(Result result : resultList){
+                    if(result.isSuccess()) {
+                        User user = ((Result.UserSuccess) result).getData();
+                        Log.d("UserSearchFragment", "user: " + user);
+                        searchResultList.add(user);
+                    } else {
+                        Log.e("Result.isSuccess() = false in SearchUsers fragment", result.toString());
+                        Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+                userSearchResultAdapter.notifyItemRangeChanged(0, searchResultList.size());
+                fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);
+            });
         }
     }
 
+    private void resumeSearch(){
+        String query = Objects.requireNonNull(fragmentTabSearchUsersBinding.edittextSearchUsers.getText()).toString();
+        if(!query.trim().isEmpty()){
+            userViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
+                this.searchResultList.clear();
+                for(Result result : resultList){
+                    if(result.isSuccess()) {
+                        User user = ((Result.UserSuccess) result).getData();
+                        //Log.d("user", user.toString());
+                        this.searchResultList.add(user);
+                    } else {
+                        Log.e("Result.isSuccess() = false in SearchUsers fragment", result.toString());
+                    }
+                }
+                userSearchResultAdapter.notifyItemRangeChanged(0,searchResultList.size());
+                fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);
+            });
+        }
+    }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumeSearch();
+        //todo potrebbero esserci soluzioni migliori
+    }
 }

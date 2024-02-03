@@ -14,12 +14,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
-import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -121,6 +122,46 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             }
             else {
                 userResponseCallback.onFailureFromRemoteDatabaseWork(task.getException().getLocalizedMessage());
+            }
+        });
+    }
+
+    @Override
+    public void searchUsers(String query) {
+        //todo possiamo rimuoverlo o passarlo come parametro. per ora lascio qua
+        int limit = 10;
+        List<User> userSearchResults = new ArrayList<>();
+        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        // query + "\uf8ff" is used to set the end of the range
+        Log.d("UserRemoteDataSource", customReference.toString());
+        Query searchQuery = customReference.orderByChild("username").startAt(query).endAt(query + "\uf8ff");
+        Log.d("UserRemoteDataSource", searchQuery.toString());
+        searchQuery.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Handle the results
+                int count = 0;
+                for (DataSnapshot userSnapshot : task.getResult().getChildren()) {
+                    if (count < limit) {
+                        // Assuming you have a User class to represent the user data
+                        User user = userSnapshot.getValue(User.class);
+                        if (user != null) {
+                            // Do something with the user, e.g., display it in your UI
+                            Log.d("UserSearch", "Found user: " + user);
+                            userSearchResults.add(user);
+                            count++;
+                        }
+                    } else {
+                        // Limit reached, break out of the loop
+                        break;
+                    }
+                }
+                userResponseCallback.onSuccessFromRemoteDatabase(userSearchResults);
+            } else {
+                // Handle errors
+                Exception exception = task.getException();
+                if (exception != null) {
+                    Log.e("UserSearch", "Error: " + exception.getMessage());
+                }
             }
         });
     }

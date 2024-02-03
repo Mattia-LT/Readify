@@ -23,6 +23,7 @@ public class BookViewModel extends ViewModel {
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
+    private MutableLiveData<List<Result>> collectionResultsLiveData;
 
     public BookViewModel(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -59,6 +60,10 @@ public class BookViewModel extends ViewModel {
                     recentCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
                 }
                 return recentCarouselLiveData;
+            case "normal":
+                if(collectionResultsLiveData == null)
+                    collectionResultsLiveData = bookRepository.getBooksByIdList(idList, reference);
+                return collectionResultsLiveData;
             default:
                 return null;
         }

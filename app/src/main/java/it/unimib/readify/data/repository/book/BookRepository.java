@@ -24,6 +24,7 @@ public class BookRepository implements IBookRepository, ResponseCallback{
     private MutableLiveData<List<Result>> suggestedBooksLiveData;
     private MutableLiveData<List<Result>> recentBooksLiveData;
     private MutableLiveData<List<Result>> trendingBooksLiveData;
+    private MutableLiveData<List<Result>> collectionBooksLiveData;
 
     private final BaseBookRemoteDataSource bookRemoteDataSource;
 
@@ -33,6 +34,7 @@ public class BookRepository implements IBookRepository, ResponseCallback{
         suggestedBooksLiveData = new MutableLiveData<>();
         recentBooksLiveData = new MutableLiveData<>();
         trendingBooksLiveData = new MutableLiveData<>();
+        collectionBooksLiveData = new MutableLiveData<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
         this.bookRemoteDataSource.setResponseCallback(this);
     }
@@ -59,6 +61,8 @@ public class BookRepository implements IBookRepository, ResponseCallback{
                 return recentBooksLiveData;
             case SUGGESTED:
                 return suggestedBooksLiveData;
+            case "normal":
+                return collectionBooksLiveData;
         }
         return null;
     }
@@ -91,6 +95,9 @@ public class BookRepository implements IBookRepository, ResponseCallback{
                 break;
             case SEARCH:
                 searchResultsLiveData.postValue(resultList);
+                break;
+            default:
+                collectionBooksLiveData.postValue(resultList);
                 break;
         }
     }

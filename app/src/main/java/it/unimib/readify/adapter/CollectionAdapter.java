@@ -1,6 +1,9 @@
 package it.unimib.readify.adapter;
 
 import android.app.Application;
+import android.content.res.Resources;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +12,22 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
+import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.util.ServiceLocator;
+import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.DataViewModelFactory;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
@@ -85,25 +97,24 @@ public class CollectionAdapter extends
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
-            /*
-            if(collection.getBooks() == null || collection.getBooks().size() == 0)
+            if(collection.getWorks() == null || collection.getWorks().size() == 0)
                 thumbnail.setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;
-                for (int i = 0; i < collection.getBooks().size(); i++) {
-                        if(collection.getBooks().get(i) != null && collection.getBooks().get(i).getCovers() != null)
-                            for (int j = 0; j < collection.getBooks().get(i).getCovers().size(); j++) {
-                                if(collection.getBooks().get(i).getCovers().get(j) != -1) {
+                for (int i = 0; i < collection.getWorks().size(); i++) {
+                        if(collection.getWorks().get(i) != null && collection.getWorks().get(i).getCovers() != null)
+                            for (int j = 0; j < collection.getWorks().get(i).getCovers().size(); j++) {
+                                if(collection.getWorks().get(i).getCovers().get(j) != -1) {
                                     isThumbnailAvailable = true;
                                     Log.d("url", "https://covers.openlibrary.org/b/id/"
-                                            + collection.getBooks().get(i).getCovers().get(j)
+                                            + collection.getWorks().get(i).getCovers().get(j)
                                             + "-L.jpg");
                                     RequestOptions requestOptions = new RequestOptions()
                                             .placeholder(R.drawable.loading_image_gif)
                                             .error(R.drawable.image_not_available);
                                     Glide.with(application)
                                             .load("https://covers.openlibrary.org/b/id/"
-                                                    + collection.getBooks().get(i).getCovers().get(j)
+                                                    + collection.getWorks().get(i).getCovers().get(j)
                                                     + "-L.jpg")
                                             .apply(requestOptions)
                                             .into(thumbnail);
@@ -117,7 +128,7 @@ public class CollectionAdapter extends
 
             //set collection name and visibility
             name.setText(collection.getName());
-            if(collection.getVisibility())
+            if(collection.isVisible())
                 visibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
             else
                 visibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
@@ -130,11 +141,7 @@ public class CollectionAdapter extends
                 layoutParams.rightMargin = (int) margin;
             else
                 layoutParams.leftMargin = (int) margin;
-
-            Log.d("collection " + position, collection.toString());
-             */
         }
-
 
         @Override
         public void onClick(View v) {

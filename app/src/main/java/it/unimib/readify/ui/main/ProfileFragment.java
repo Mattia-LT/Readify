@@ -31,11 +31,15 @@ import java.util.ArrayList;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
+import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
@@ -44,6 +48,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
 
     private FragmentProfileBinding fragmentProfileBinding;
     private UserViewModel userViewModel;
+    private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
     private User user;
 
@@ -70,18 +75,43 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu(view);
-        //initializing repository and viewModel
+        //initializing repository and viewModel User
         IUserRepository userRepository = ServiceLocator.getInstance()
                 .getUserRepository(requireActivity().getApplication());
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new UserViewModelFactory(userRepository)).get(UserViewModel.class);
 
+        //initializing repository and viewModel Book
+        IBookRepository bookRepository = ServiceLocator.getInstance()
+                .getBookRepository(requireActivity().getApplication());
+        bookViewModel = new ViewModelProvider(
+                requireActivity(),
+                new DataViewModelFactory(bookRepository)
+        ).get(BookViewModel.class);
+
         //get user data from database
         userViewModel.getLoggedUser().observe(getViewLifecycleOwner(), result -> {
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
                 Log.d("user collections", user.getCollections().toString());
+
+                //get books from api
+                int counter = 0;
+                for (int i = 0; i < user.getCollections().size(); i++) {
+                    int finalCounter = counter;
+                    bookViewModel.fetchBooks(user.getCollections().get(i).getBooks(), "normal")
+                            .observe(getViewLifecycleOwner(), resultsList -> {
+                                for(int j = 0; j < resultsList.size(); j++) {
+                                    if(resultsList.get(j).isSuccess()) {
+                                        OLWorkApiResponse book = ((Result.WorkSuccess) resultsList.get(j)).getData();
+                                        user.getCollections().get(finalCounter).getWorks().add(j, book);
+                                    }
+                                }
+                            });
+                    counter++;
+                }
+
                 //UI collections view
                 runCollectionsView(view, user);
                 //UI collections creation

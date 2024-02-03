@@ -138,6 +138,7 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -205,7 +206,7 @@ public class User implements Parcelable {
                 ", collections=" + collections +
                 ", recommended=" + recommended +
                 ", email='" + email + '\'' +
-                ", genre='" + gender + '\'' +
+                ", gender='" + gender + '\'' +
                 ", socialLinks=" + socialLinks +
                 ", username='" + username + '\'' +
                 ", visibility='" + visibility + '\'' +

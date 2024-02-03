@@ -1,7 +1,10 @@
 package it.unimib.readify.data.repository.user;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.data.repository.book.BookResponseCallback;
@@ -19,6 +22,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<Result> workMutableLiveData;
     private final MutableLiveData<Result> userPreferencesMutableLiveData;
+    private final MutableLiveData<List<Result>> userSearchResultLiveData;
+
 
     public UserRepository(BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource,
                           BaseUserDataRemoteDataSource userDataRemoteDataSource) {
@@ -27,6 +32,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         this.userMutableLiveData = new MutableLiveData<>();
         this.userPreferencesMutableLiveData = new MutableLiveData<>();
         this.workMutableLiveData = new MutableLiveData<>();
+        this.userSearchResultLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -97,6 +103,15 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         //todo implementa o rimuovi
     }
 
+    @Override
+    public MutableLiveData<List<Result>> searchUsers(String query){
+        Log.d("UserRepository", "Query: " + query);
+        userDataRemoteDataSource.searchUsers(query);
+        return userSearchResultLiveData;
+    }
+
+
+
     //giusto
     @Override
     public void onSuccessFromAuthentication(User user) {
@@ -123,6 +138,16 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     public void onSuccessFromRemoteDatabase(OLWorkApiResponse work) {
         Result.WorkSuccess result = new Result.WorkSuccess(work);
         workMutableLiveData.postValue(result);
+    }
+
+    @Override
+    public void onSuccessFromRemoteDatabase(List<User> searchResults) {
+        List<Result> resultList = new ArrayList<>();
+        for(User user : searchResults){
+            Log.d("UserRepository", "User: " + user);
+            resultList.add(new Result.UserSuccess(user));
+        }
+        userSearchResultLiveData.postValue(resultList);
     }
 
     //giusto

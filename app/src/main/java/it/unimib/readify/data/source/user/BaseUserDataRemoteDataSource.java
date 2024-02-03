@@ -18,6 +18,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void saveWorkData(OLWorkApiResponse work);
     public abstract void getUser(String idToken);
     public abstract void getWork(String idBook);
+    public abstract void searchUsers(String query);
 
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono

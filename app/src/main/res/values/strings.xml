@@ -103,5 +103,7 @@
     <string name="textview_books_read">Books read:</string>
     <string name="book_details">Book details</string>
     <string name="error_author_not_found">Author not found</string>
+    <string name="notifications_button">Notifications</string>
+    <string name="settings_button_profile">Menu</string>
 
 </resources>

@@ -15,6 +15,7 @@ import it.unimib.readify.model.User;
 public class UserViewModel extends ViewModel {
     private final IUserRepository userRepository;
     private MutableLiveData<Result> userMutableLiveData;
+    private MutableLiveData<Result> externalUserMutableLiveData;
     private MutableLiveData<Result> workMutableLiveData;
     private MutableLiveData<List<Result>> userSearchResultLiveData;
     private boolean authenticationError;
@@ -24,16 +25,32 @@ public class UserViewModel extends ViewModel {
         authenticationError = false;
     }
 
-    public MutableLiveData<Result> getUserMutableLiveData(
-            String email, String password, boolean isUserRegistered) {
-        if (userMutableLiveData == null) {
-            getUserData(email, password, isUserRegistered);
+    public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
+        if(userMutableLiveData == null) {
+            Log.d("viewModel null", "viewModel null");
+            setUserMutableLiveData(email, password, isRegistered);
         }
+        Log.d("viewModel out null", "viewModel out null");
         return userMutableLiveData;
     }
 
-    public MutableLiveData<Result> getUserMutableLiveData() {
-        return userMutableLiveData;
+    public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
+        userMutableLiveData = userRepository.getLoggedUser(email, password, isRegistered);
+    }
+
+    public boolean isAuthenticationError() {
+        return authenticationError;
+    }
+
+    public void setAuthenticationError(boolean authenticationError) {
+        this.authenticationError = authenticationError;
+    }
+
+
+
+    public User getLoggedUser() {
+        //return userMutableLiveData;
+        return userRepository.getLoggedUser();
     }
 
     public MutableLiveData<Result> getGoogleUserMutableLiveData(String token) {
@@ -65,10 +82,7 @@ public class UserViewModel extends ViewModel {
     }
     */
 
-    public MutableLiveData<Result> getLoggedUser() {
-        //return userRepository.getLoggedUser();
-        return userMutableLiveData;
-    }
+
 
     public MutableLiveData<Result> logout() {
         if (userMutableLiveData == null) {
@@ -80,13 +94,7 @@ public class UserViewModel extends ViewModel {
         return userMutableLiveData;
     }
 
-    public boolean isAuthenticationError() {
-        return authenticationError;
-    }
 
-    public void setAuthenticationError(boolean authenticationError) {
-        this.authenticationError = authenticationError;
-    }
 
     private void getUserData(String email, String password, boolean isUserRegistered) {
         userMutableLiveData = userRepository.getUser(email, password, isUserRegistered);
@@ -104,12 +112,6 @@ public class UserViewModel extends ViewModel {
 
     private void getWork(String idToken){
         workMutableLiveData = userRepository.getWork(idToken);
-    }
-
-    public void createUser(String email, String password, String username, String gender) {
-        //todo gestire user = null nel logout
-        userRepository.signUp(email, password, username, gender);
-        userMutableLiveData = userRepository.getLoggedUser();
     }
 
     public MutableLiveData<List<Result>> searchUsers(String query){

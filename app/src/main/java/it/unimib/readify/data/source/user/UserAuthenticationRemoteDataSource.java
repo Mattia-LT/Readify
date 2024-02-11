@@ -30,13 +30,14 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     }
 
     @Override
-    public void signUp(String email, String password, String username, String gender) {
+    public void signUp(String email, String password) {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
+                    Log.d("signUp success", "utente creato con successo");
                     userResponseCallback.onSuccessFromAuthentication
-                            (new User(email, firebaseUser.getUid(), username, gender));
+                            (new User(email, firebaseUser.getUid()));
                 } else {
                     userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
                 }
@@ -77,11 +78,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                     if (firebaseUser != null) {
                         Log.d("USERAUTHREMOTE", "User signed in/up with google");
                         userResponseCallback.onSuccessFromAuthentication(
-                                new User(firebaseUser.getEmail(),
-
-                                        firebaseUser.getUid()
-                                )
-                        );
+                                new User(firebaseUser.getEmail(), firebaseUser.getUid()));
                     } else {
                         userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
                     }
@@ -123,5 +120,15 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
             return USER_COLLISION_ERROR;
         }
         return UNEXPECTED_ERROR;
+    }
+
+    //viewmodel -> repo -> getLoggedUser
+    public User getLoggedUser() {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser == null) {
+            return null;
+        } else {
+            return new User(firebaseUser.getEmail(), firebaseUser.getUid());
+        }
     }
 }

@@ -3,26 +3,98 @@ package it.unimib.readify.viewmodel;
 
 import android.util.Log;
 
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
 
-//todo rifare documentazione dei problemi ed implementazioni perchè sono cambiate molte cose
+//todo redo documentation, various things changed
 public class TestDatabaseViewModel extends ViewModel {
 
     private final TestIDatabaseRepository testDatabaseRepository;
-    private MutableLiveData<Result> userMutableLiveData;
+    private MutableLiveData<Result> repositoryData;
+    private MediatorLiveData<Result> copiedData = new MediatorLiveData<>();
     private boolean authenticationError;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
-        userMutableLiveData = testDatabaseRepository.getUserMutableLiveData();
+        /*
+            With the coming userMutableLiveData initialization, userMutableLiveData(1) (ViewModel)
+            is pointing to the instance of userMutableLiveData(2) (Repository).
+            This means that each of them will overwrite the value of the other with method postValue().
+            Class MutableLiveData seems to have the same behavior as a POINTER, even though
+            pointers don't exist in Java: this class is a type of OBJECT REFERENCE.
+
+            To allow ViewModel to have a different version of the data memorized in Repository,
+            it can be used another MutableLiveData instance(3)
+            which gets (only) the value from the original one (1) using postValue().
+            Using (a) postValue() isn't the same as (b) initialising a MutableLiveData instance with another:
+            (a) changes only the value of an already created instance;
+            (b) changes the reference of the current instance.
+
+            usare un observe che osserva il value di (1), e quando cambia, si cambia quello di (3)
+         */
+        repositoryData = testDatabaseRepository.getUserMutableLiveData();
+        //todo documentation MediatorLiveData vs MutableLiveData
+        copiedData.addSource(repositoryData, newData -> {
+            Log.d("viewModel", "source changed");
+            /*
+            if(newData.isSuccess()) {
+                Result.UserSuccess result = new Result.UserSuccess(((Result.UserSuccess)newData).getData());
+                copiedData.postValue(result);
+            }
+             */
+            copiedData.postValue(newData);
+        });
+
         authenticationError = false;
     }
 
+
+    //new logic
+    public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
+        //userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
+        testDatabaseRepository.getUser(email, password, isRegistered);
+    }
+
+    public MediatorLiveData<Result> getUserMediatorLiveData() {
+        return copiedData;
+    }
+
+    public MutableLiveData<Result> getUserMutableLiveDataFromVM() {
+        return repositoryData;
+    }
+    public MutableLiveData<Result> getUserMutableLiveDataFromRepo() {
+        return testDatabaseRepository.getUserMutableLiveData();
+    }
+
+    public void setUserMediatorLiveData(Result newData) {
+        copiedData.postValue(newData);
+    }
+
+    /*
+        Remember that userMutableLiveData is initialized in the constructor and that in the
+        getLoggedUser method it asks for getLoggedUser.getValue()
+        Take in consideration that this CAN (not sure) cause problems in the future
+        The alternative is to not initialize the variable and ask for getLoggedUser == null
+     */
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //non serve, come molte altre cose
+    /*
     public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
         if(userMutableLiveData.getValue() == null) {
             userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
@@ -30,8 +102,16 @@ public class TestDatabaseViewModel extends ViewModel {
         return userMutableLiveData;
     }
 
+     */
+
     /*
         Problem:
+        (Having only this function)
+            public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
+            if(userMutableLiveData.getValue() == null) {
+                userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
+            }
+            return userMutableLiveData;
         In case the user insert incorrect credentials
         in the login / registration fragment, which are going to cause database error "invalid credentials",
         (such as insert an email that is not memorized in the Authentication Database yet), these
@@ -48,7 +128,11 @@ public class TestDatabaseViewModel extends ViewModel {
         2) implementing a mechanism which will set the value of userMutableLiveData to null / new variable
             in case its value is going to be a Result.Error
             --> this will work for the system logic, but each time the system will set the decided
-                base value, another observer will be created; that's obviously a problem
+                base value, another observer will be created because we return
+                a new instance of userMutableLiveData; that's obviously a problem
+
+         UPDATE:
+         Implementing the new logic, the problem can't happen.
      */
 
     public boolean getAuthenticationError() {
@@ -65,33 +149,6 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.getUser(email, password, isRegistered);
     }
 
-    public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
-        Log.d("viewModel set before", userMutableLiveData.toString());
-        if(userMutableLiveData.getValue() != null) {
-            Log.d("viewModel set before value", userMutableLiveData.getValue().toString());
-        } else {
-            Log.d("viewModel set before value", "null");
-        }
 
-        userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
 
-        Log.d("viewModel set after", userMutableLiveData.toString());
-        if(userMutableLiveData.getValue() != null) {
-            Log.d("viewModel set after value", userMutableLiveData.getValue().toString());
-        } else {
-            Log.d("viewModel set after value", "null");
-        }
-    }
-
-    public MutableLiveData<Result> getUserMutableLiveData() {
-        Log.d("viewModel get", userMutableLiveData.toString());
-        return userMutableLiveData;
-    }
-
-    /*
-        Remember that userMutableLiveData is initialized in he constructor and that in the
-        getLoggedUser method it asks for getLoggedUser.getValue()
-        Take in consideration that this CAN (not sure) cause problems in the future
-        The alternative is to not initialize the variable and ask for getLoggedUser == null
-     */
 }

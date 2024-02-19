@@ -37,18 +37,22 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<Result> getUser(String email, String password, boolean isRegistered) {
+    public void getUser(String email, String password, boolean isRegistered) {
         if(isRegistered) {
             signIn(email, password);
         }
         if(!isRegistered) {
             signUp(email, password);
         }
-        return userMutableLiveData;
+        //return userMutableLiveData;
     }
 
     public MutableLiveData<Result> getUserMutableLiveData() {
         return userMutableLiveData;
+    }
+
+    public void testSet(Result result) {
+        userMutableLiveData.postValue(result);
     }
 
     @Override

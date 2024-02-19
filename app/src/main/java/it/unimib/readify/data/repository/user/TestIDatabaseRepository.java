@@ -6,9 +6,10 @@ import it.unimib.readify.model.Result;
 
 public interface TestIDatabaseRepository {
 
-    MutableLiveData<Result> getUser(String email, String password, boolean isRegistered);
+    void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
 
+    void testSet(Result result);
     MutableLiveData<Result> getUserMutableLiveData();
 }

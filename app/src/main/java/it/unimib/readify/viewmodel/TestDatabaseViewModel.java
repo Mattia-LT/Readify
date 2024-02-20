@@ -10,52 +10,87 @@ import androidx.lifecycle.ViewModel;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Result;
 
-//todo redo documentation, various things changed
+//todo cancel unnecessary methods and comments
 public class TestDatabaseViewModel extends ViewModel {
-
     private final TestIDatabaseRepository testDatabaseRepository;
-    private MutableLiveData<Result> repositoryData;
-    private MediatorLiveData<Result> copiedData = new MediatorLiveData<>();
+    /*
+        With this configuration
+         (having two LiveData variables that memorizes data, repositoryData and copiedData),
+         ViewModel can have a different version of the data in the Repository, and so in the Database.
+        Even if it isn't yet known the purpose of this choice, it is the most flexible one
+         for future changes and implementations.
+
+        How to implement the copy of Database data:
+        1)  Using MutableLiveData
+        2)  Using MediatorLiveData
+            This class can observe one or more other LiveData objects
+             and propagate their changes to its set of observers.
+            It can be used to create complex data update logic in the ViewModel,
+             for example combining data from multiple sources or applying transformations
+             to the data before exposing it to the user interface.
+            This is (again) the most flexible choice for future changes and implementations;
+             in addition, it is an opportunity to use a different JetPack element.
+     */
+    private final MutableLiveData<Result> repositoryData;
+    private final MediatorLiveData<Result> copiedData = new MediatorLiveData<>();
     private boolean authenticationError;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
-            With the coming userMutableLiveData initialization, userMutableLiveData(1) (ViewModel)
-            is pointing to the instance of userMutableLiveData(2) (Repository).
+            With the coming MutableLiveData initialization, repositoryData(1) (ViewModel)
+             is pointing to the instance of userMutableLiveData(2) (Repository).
             This means that each of them will overwrite the value of the other with method postValue().
             Class MutableLiveData seems to have the same behavior as a POINTER, even though
-            pointers don't exist in Java: this class is a type of OBJECT REFERENCE.
-
-            To allow ViewModel to have a different version of the data memorized in Repository,
-            it can be used another MutableLiveData instance(3)
-            which gets (only) the value from the original one (1) using postValue().
-            Using (a) postValue() isn't the same as (b) initialising a MutableLiveData instance with another:
-            (a) changes only the value of an already created instance;
-            (b) changes the reference of the current instance.
-
-            usare un observe che osserva il value di (1), e quando cambia, si cambia quello di (3)
+             pointers don't exist in Java: this is an example of OBJECT REFERENCING.
+            In this case, object referencing is useful: it allows the programmer to not implement
+             any method that would communicate the change of data from ViewModel to Repository
+             (for example)
          */
         repositoryData = testDatabaseRepository.getUserMutableLiveData();
-        //todo documentation MediatorLiveData vs MutableLiveData
+
+        /*
+            To allow ViewModel having a different version of the data memorized in Repository,
+             it can be used another LiveData instance(3)
+             which gets (only) the value from the original one (1 or 2) using postValue().
+            Using (a) postValue() isn't the same as (b) initialising a LiveData with another instance:
+                (a) Changes only the value of an already created instance (instance of LiveData).
+                    es. copiedData.postValue(result);
+                (b) Changes the reference of the current instance (object referencing)
+                    es. repositoryData = testDatabaseRepository.getUserMutableLiveData();
+            Using (a) is the best practice when an INDEPENDENT LiveData instance is needed.
+            Nevertheless, (b) can be useful in some cases.
+         */
         copiedData.addSource(repositoryData, newData -> {
             Log.d("viewModel", "source changed");
-            /*
             if(newData.isSuccess()) {
-                Result.UserSuccess result = new Result.UserSuccess(((Result.UserSuccess)newData).getData());
+                /*
+                    Setting the value of Mutable / MediatorLiveData
+                    Object referencing is a practice
+                     which assets depending on the situation it is used on.
+                    Regarding the assignment of the value of LiveData instances,
+                     object referencing the value is:
+                        1) suboptimal because some memory is going to be allocated
+                            without necessity (not completely unnecessary in this case);
+                        2) definitely useful because, IN THIS CASE, having the reference of the data
+                            contained in the Repository, even for a brief moment, CAN be
+                            a lack of security;
+
+                    In this case, newData and result, despite being of the same class and
+                     memorizing the very same data, they are two DIFFERENT instances.
+                    The instance of LiveData is UNCHANGED because postValue() is used.
+                 */
+                Result.UserSuccess result =
+                        new Result.UserSuccess(((Result.UserSuccess)newData).getData());
                 copiedData.postValue(result);
             }
-             */
-            copiedData.postValue(newData);
         });
-
         authenticationError = false;
     }
 
 
     //new logic
     public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
-        //userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
         testDatabaseRepository.getUser(email, password, isRegistered);
     }
 
@@ -74,12 +109,6 @@ public class TestDatabaseViewModel extends ViewModel {
         copiedData.postValue(newData);
     }
 
-    /*
-        Remember that userMutableLiveData is initialized in the constructor and that in the
-        getLoggedUser method it asks for getLoggedUser.getValue()
-        Take in consideration that this CAN (not sure) cause problems in the future
-        The alternative is to not initialize the variable and ask for getLoggedUser == null
-     */
 
 
 
@@ -89,11 +118,7 @@ public class TestDatabaseViewModel extends ViewModel {
 
 
 
-
-
-
-
-    //non serve, come molte altre cose
+    //tutto questo non serve
     /*
     public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
         if(userMutableLiveData.getValue() == null) {
@@ -101,9 +126,7 @@ public class TestDatabaseViewModel extends ViewModel {
         }
         return userMutableLiveData;
     }
-
      */
-
     /*
         Problem:
         (Having only this function)
@@ -141,14 +164,7 @@ public class TestDatabaseViewModel extends ViewModel {
     public void setAuthenticationError(boolean authenticationError) {
         this.authenticationError = authenticationError;
     }
-
-    //this method update the userMutableLiveData in the Repository
-    //why actually does this method make the system alright?
-    //how this method update the userMutableLiveData in the viewModel?
     public void getUser(String email, String password, boolean isRegistered) {
         testDatabaseRepository.getUser(email, password, isRegistered);
     }
-
-
-
 }

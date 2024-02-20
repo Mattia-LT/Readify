@@ -14,8 +14,10 @@ import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
     This make every Repository class having the same behavior as a Singleton class,
      even though it doesn't implement its classic structure.
     This allows every Activity / Fragment to have access to the same data,
-     decreasing the possibility of having problems regarding asynchronous calls and
-     UI data visualization
+     decreasing the possibility of having problems regarding UI data visualization.
+    It is a good practice when it is needed 1) a general UI update of every Activity / Fragment
+     (each time the data the UI based its appearance changes)
+     and 2) an automatic check of data changing during some particular actions (asynchronous actions)
  */
 public class TestServiceLocator {
 

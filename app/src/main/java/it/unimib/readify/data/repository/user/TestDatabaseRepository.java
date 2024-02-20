@@ -44,7 +44,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         if(!isRegistered) {
             signUp(email, password);
         }
-        //return userMutableLiveData;
     }
 
     public MutableLiveData<Result> getUserMutableLiveData() {

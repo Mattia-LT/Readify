@@ -1,6 +1,5 @@
 package it.unimib.readify.viewmodel;
 
-
 import android.util.Log;
 
 import androidx.lifecycle.MediatorLiveData;
@@ -10,7 +9,6 @@ import androidx.lifecycle.ViewModel;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Result;
 
-//todo cancel unnecessary methods and comments
 public class TestDatabaseViewModel extends ViewModel {
     private final TestIDatabaseRepository testDatabaseRepository;
     /*
@@ -33,7 +31,18 @@ public class TestDatabaseViewModel extends ViewModel {
      */
     private final MutableLiveData<Result> repositoryData;
     private final MediatorLiveData<Result> copiedData = new MediatorLiveData<>();
-    private boolean authenticationError;
+    /*
+        It can happen that the user inserts incorrect credentials
+         (generating userCollisionError, invalidCredentials exceptions).
+        With this implementation, WITHOUT @isUIRunning, IF the user inserts incorrect credentials
+         in the Login AND AFTER moves from Login to Registration, the Registration is going
+         to print the previous error made in the Login; that's because the Observer catches the update
+         (@copiedData has changed to a new Result.Error instance).
+        It is the same with roles reversed (Login printing a Registration error).
+        @isUIRunning prevents the problem, allowing Login / Registration actions only after
+         having set the data using setUserMutableLiveData(), each time a container is created.
+     */
+    private boolean isUIRunning;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
@@ -62,7 +71,8 @@ public class TestDatabaseViewModel extends ViewModel {
             Nevertheless, (b) can be useful in some cases.
          */
         copiedData.addSource(repositoryData, newData -> {
-            Log.d("viewModel", "source changed");
+            Log.d("viewModel", "data changed");
+            Result result;
             if(newData.isSuccess()) {
                 /*
                     Setting the value of Mutable / MediatorLiveData
@@ -80,55 +90,41 @@ public class TestDatabaseViewModel extends ViewModel {
                      memorizing the very same data, they are two DIFFERENT instances.
                     The instance of LiveData is UNCHANGED because postValue() is used.
                  */
-                Result.UserSuccess result =
-                        new Result.UserSuccess(((Result.UserSuccess)newData).getData());
-                copiedData.postValue(result);
+                result = new Result.UserSuccess(((Result.UserSuccess)newData).getData());
+            } else {
+                result = new Result.Error(((Result.Error)newData).getMessage());
             }
+            copiedData.postValue(result);
         });
-        authenticationError = false;
     }
-
 
     //new logic
     public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
+        Log.d("viewModel set", "set");
         testDatabaseRepository.getUser(email, password, isRegistered);
+        if(!isUIRunning) {
+            setUIRunning(true);
+        }
     }
 
     public MediatorLiveData<Result> getUserMediatorLiveData() {
         return copiedData;
     }
 
-    public MutableLiveData<Result> getUserMutableLiveDataFromVM() {
-        return repositoryData;
-    }
-    public MutableLiveData<Result> getUserMutableLiveDataFromRepo() {
-        return testDatabaseRepository.getUserMutableLiveData();
-    }
-
     public void setUserMediatorLiveData(Result newData) {
         copiedData.postValue(newData);
     }
 
-
-
-
-
-
-
-
-
-
-    //tutto questo non serve
-    /*
-    public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
-        if(userMutableLiveData.getValue() == null) {
-            userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
-        }
-        return userMutableLiveData;
+    public boolean isUIRunning() {
+        return isUIRunning;
     }
-     */
+
+    public void setUIRunning(boolean UIRunning) {
+        isUIRunning = UIRunning;
+    }
+
     /*
-        Problem:
+        Why professor use boolean authenticationError (USELESS EXPLANATION)
         (Having only this function)
             public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
             if(userMutableLiveData.getValue() == null) {
@@ -157,14 +153,4 @@ public class TestDatabaseViewModel extends ViewModel {
          UPDATE:
          Implementing the new logic, the problem can't happen.
      */
-
-    public boolean getAuthenticationError() {
-        return authenticationError;
-    }
-    public void setAuthenticationError(boolean authenticationError) {
-        this.authenticationError = authenticationError;
-    }
-    public void getUser(String email, String password, boolean isRegistered) {
-        testDatabaseRepository.getUser(email, password, isRegistered);
-    }
 }

@@ -112,5 +112,7 @@
     <string name="error_author_not_found">Author not found</string>
     <string name="notifications_button">Notifications</string>
     <string name="settings_button_profile">Menu</string>
+    <string name="user_details">User details</string>
+    <string name="collection_settings_button">Collection\'s settings</string>
 
 </resources>

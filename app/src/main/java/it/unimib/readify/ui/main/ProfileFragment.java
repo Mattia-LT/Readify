@@ -1,5 +1,7 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.COLLECTION;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
@@ -77,21 +80,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu(view);
-        //initializing repository and viewModel User
-        IUserRepository userRepository = ServiceLocator.getInstance()
-                .getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
-
-        //initializing repository and viewModel Book
-        IBookRepository bookRepository = ServiceLocator.getInstance()
-                .getBookRepository(requireActivity().getApplication());
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-        ).get(BookViewModel.class);
-
+        initRepositories();
         //get user data from database
         userViewModel.getLoggedUser().observe(getViewLifecycleOwner(), result -> {
             if(result.isSuccess()) {
@@ -102,7 +91,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 int counter = 0;
                 for (int i = 0; i < user.getCollections().size(); i++) {
                     int finalCounter = counter;
-                    bookViewModel.fetchBooks(user.getCollections().get(i).getBooks(), "normal")
+                    bookViewModel.fetchBooks(user.getCollections().get(i).getBooks(), COLLECTION)
                             .observe(getViewLifecycleOwner(), resultsList -> {
                                 for(int j = 0; j < resultsList.size(); j++) {
                                     if(resultsList.get(j).isSuccess()) {
@@ -212,4 +201,24 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
+
+    private void initRepositories(){
+        //initializing repository and viewModel User
+        IUserRepository userRepository = ServiceLocator.getInstance()
+                .getUserRepository(requireActivity().getApplication());
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
+
+        //initializing repository and viewModel Book
+        IBookRepository bookRepository = ServiceLocator.getInstance()
+                .getBookRepository(requireActivity().getApplication());
+        bookViewModel = new ViewModelProvider(
+                requireActivity(),
+                new DataViewModelFactory(bookRepository)
+        ).get(BookViewModel.class);
+    }
+
+
+
 }

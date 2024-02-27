@@ -59,6 +59,7 @@ public class Constants {
     public static final String SUGGESTED = "suggested";
     public static final String RECENT = "recent";
     public static final String SEARCH = "search";
+    public static final String COLLECTION = "collection";
 
 
 
@@ -84,6 +85,9 @@ public class Constants {
     public static final String ALREADY_READ = "already_read";
 
 
+    // Constants for Bundles
+    public static final String BUNDLE_BOOK = "book";
+    public static final String BUNDLE_USER = "user";
 
 
 

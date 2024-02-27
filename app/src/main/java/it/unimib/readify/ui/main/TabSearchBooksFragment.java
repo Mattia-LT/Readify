@@ -1,5 +1,7 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,7 +27,6 @@ import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookSearchResultAdapter;
-import it.unimib.readify.databinding.FragmentSearchBinding;
 import it.unimib.readify.databinding.FragmentTabSearchBooksBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
@@ -62,7 +63,7 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("book", book);
+                bundle.putParcelable(BUNDLE_BOOK, book);
                 Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
             }
 

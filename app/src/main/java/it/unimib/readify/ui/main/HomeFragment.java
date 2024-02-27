@@ -1,5 +1,6 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
@@ -144,7 +145,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("book", book);
+                bundle.putParcelable(BUNDLE_BOOK, book);
                 navigateToBookDetailsFragment(bundle);
             }
 
@@ -199,7 +200,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("book", book);
+                bundle.putParcelable(BUNDLE_BOOK, book);
                 navigateToBookDetailsFragment(bundle);
             }
 
@@ -240,7 +241,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("book", book);
+                bundle.putParcelable(BUNDLE_BOOK, book);
                 navigateToBookDetailsFragment(bundle);
             }
 

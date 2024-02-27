@@ -1,5 +1,6 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -47,8 +48,6 @@ import it.unimib.readify.viewmodel.BookViewModel;
 public class BookDetailsFragment extends Fragment {
 
     private FragmentBookDetailsBinding fragmentBookDetailsBinding;
-    private BookViewModel bookViewModel;
-    private RecyclerView recyclerViewComments;
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
 
@@ -83,7 +82,7 @@ public class BookDetailsFragment extends Fragment {
         loadMenu();
         Bundle arguments = getArguments();
         if (arguments != null) {
-            OLWorkApiResponse receivedBook = arguments.getParcelable("book");
+            OLWorkApiResponse receivedBook = arguments.getParcelable(BUNDLE_BOOK);
             if(receivedBook != null){
                 fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
                 StringBuilder authors = new StringBuilder();

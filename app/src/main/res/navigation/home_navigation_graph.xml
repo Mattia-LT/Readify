@@ -25,8 +25,8 @@
             android:id="@+id/action_searchFragment_to_bookDetailsFragment"
             app:destination="@id/bookDetailsFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_searchFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
         <action
             android:id="@+id/action_searchFragment_to_filter_bottomsheet"
             app:destination="@id/filter_bottomsheet" />
@@ -64,6 +64,19 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@+id/loginFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="it.unimib.readify.ui.main.UserDetailsFragment"
+        android:label="fragment_user_details"
+        tools:layout="@layout/fragment_user_details" >
+        <action
+            android:id="@+id/action_userDetailsFragment_to_collectionFragment"
+            app:destination="@+id/collectionFragment"/>
+        <action
+            android:id="@+id/action_userDetailsFragment_to_searchFragment"
+            app:destination="@+id/searchFragment"/>
     </fragment>
 
     <fragment

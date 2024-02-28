@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 
 
 public interface IUserRepository {
@@ -16,9 +17,10 @@ public interface IUserRepository {
     MutableLiveData<Result> getUserPreferences(String idToken);
     MutableLiveData<List<Result>> searchUsers(String query);
     MutableLiveData<Result> logout();
-    MutableLiveData<Result> getLoggedUser();
+    MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered);
+    User getLoggedUser();
 
-    void signUp(String email, String password, String username, String gender);
+    void signUp(String email, String password);
     void signIn(String email, String password);
     void signInWithGoogle(String token);
     void saveUserPreferences(String message, String idToken);

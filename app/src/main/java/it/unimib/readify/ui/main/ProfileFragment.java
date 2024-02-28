@@ -82,6 +82,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         loadMenu(view);
         initRepositories();
         //get user data from database
+        /*
         userViewModel.getLoggedUser().observe(getViewLifecycleOwner(), result -> {
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
@@ -111,6 +112,8 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 Log.d("profile fragment error", "getLoggedUser");
             }
         });
+
+         */
     }
 
 

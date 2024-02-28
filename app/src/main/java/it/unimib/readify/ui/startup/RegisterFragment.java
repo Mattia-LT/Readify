@@ -1,10 +1,5 @@
 package it.unimib.readify.ui.startup;
 
-import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
-import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
-import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
-import static it.unimib.readify.util.Constants.ID_TOKEN;
-import static it.unimib.readify.util.Constants.PASSWORD;
 import static it.unimib.readify.util.Constants.USER_COLLISION_ERROR;
 import static it.unimib.readify.util.Constants.WEAK_PASSWORD_ERROR;
 
@@ -22,31 +17,38 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.apache.commons.validator.routines.EmailValidator;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import it.unimib.readify.R;
 
 import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
-import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.util.ServiceLocator;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
+
+    private FragmentRegisterBinding fragmentRegisterBinding;
     private UserViewModel userViewModel;
     private IUserRepository userRepository;
-    private FragmentRegisterBinding fragmentRegisterBinding;
+
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private TestIDatabaseRepository testDatabaseRepository;
+    private Observer<Result> observer;
+
 
     public RegisterFragment() {}
 
@@ -61,52 +63,87 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new it.unimib.readify.viewmodel.UserViewModelFactory(userRepository)).get(UserViewModel.class);
+
+        testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+        Log.d("registration fragment", "onCreate");
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentRegisterBinding = FragmentRegisterBinding.inflate(inflater,container,false);
+        Log.d("registration fragment", "onCreateView");
         return fragmentRegisterBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
+        Log.d("registration fragment", "onViewCreated");
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(),
+                R.array.gender, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fragmentRegisterBinding.spinnerGender.setAdapter(adapter);
+        fragmentRegisterBinding.spinnerGender.setOnItemSelectedListener(this);
 
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(),
-                    R.array.gender, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            fragmentRegisterBinding.spinnerGender.setAdapter(adapter);
-            fragmentRegisterBinding.spinnerGender.setOnItemSelectedListener(this);
+        testDatabaseViewModel.setUIRunning(false);
 
-            fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
-
-                //String username = fragmentRegisterBinding.textInputLayoutUsername.getEditText().getText().toString();
-                //String email = fragmentRegisterBinding.textInputLayoutEmail.getEditText().getText().toString();
-                //String password = fragmentRegisterBinding.textInputLayoutPassword.getEditText().getText().toString();
-                //String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
-                //String gender = fragmentRegisterBinding.spinnerGender.getSelectedItem().toString();
-
-                String username = "aww";
-                String email = "prova@gmail.com";
-                String password = "password";
-                String passwordConfirm = "password";
-                String gender = "F";
-
-                if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) &
-                        isPasswordConfirmOk(passwordConfirm) &
-                        (fragmentRegisterBinding.spinnerGender.getSelectedItemPosition() != 0)) {
-                            userViewModel.createUser(email, password, username, gender);
-                            //se la registrazione non va a buon fine, userViewModel.getLoggedUser() sarà uguale ad un Result.Error
-                            if(userViewModel.getLoggedUser() != null) {
-                                Snackbar.make(view, "Utente già esistente", Snackbar.LENGTH_SHORT).show();
-                            } else {
-                                navigateToLoginFragment();
-                            }
-                } else {
-                    Log.d("registration error", "registration error");
+        //registration action
+        observer = result -> {
+            Log.d("registration fragment", "data changed");
+            if(testDatabaseViewModel.isUIRunning()) {
+                if(result != null) {
+                    if(result.isSuccess()) {
+                        navigateToHomeActivity();
+                    } else {
+                        Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
                 }
-            });
+            }
+        };
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
+
+        //registration set data
+        fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
+            //todo is the reference (textInputLayoutEmail) correct?
+            String email = fragmentRegisterBinding.textInputLayoutEmail
+                    .getEditText().getText().toString();
+            /*
+            String password = fragmentRegisterBinding.textInputLayoutPassword
+                    .getEditText().getText().toString();
+            String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm
+                    .getEditText().getText().toString();
+             */
+
+            String password = "password";
+            String passwordConfirm = "password";
+
+            if (isEmailOk(email) && isPasswordOk(password) && isPasswordConfirmOk(passwordConfirm)) {
+                testDatabaseViewModel.setUserMutableLiveData(email, password, false);
+            } else {
+                //todo managing specific behavior when an error occurs
+                Snackbar.make(view, "error data insertion", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("registration fragment", "onStart");
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("registration fragment", "onDestroyView");
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(observer);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("registration fragment", "onDestroy");
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -127,6 +164,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
             return true;
         }
     }
+
     private boolean isEmailOk(String email) {
         if (!EmailValidator.getInstance().isValid((email))) {
             fragmentRegisterBinding.textInputLayoutEmail.setError(getString(R.string.error_email));
@@ -148,6 +186,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     private boolean isPasswordConfirmOk(String passwordConfirm) {
+        //todo it seems incomplete
         if (passwordConfirm.isEmpty()) {
             fragmentRegisterBinding.textInputLayoutPasswordConfirm.setError(getString(R.string.error_password));
             return false;
@@ -156,7 +195,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
             return true;
         }
     }
-
 
     private String getErrorMessage(String message) {
         switch(message) {
@@ -169,7 +207,7 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
         }
     }
 
-    private void navigateToLoginFragment() {
-        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_loginFragment);
+    private void navigateToHomeActivity() {
+        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_homeActivity);
     }
 }

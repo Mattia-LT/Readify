@@ -33,11 +33,15 @@ import java.util.List;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
 import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
@@ -56,11 +60,12 @@ public class HomeFragment extends Fragment {
     private BookViewModel bookViewModel;
     private UserViewModel userViewModel;
 
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private TestIDatabaseRepository testDatabaseRepository;
+
     private User user;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
+    public HomeFragment() {}
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -86,29 +91,30 @@ public class HomeFragment extends Fragment {
         trendingBookList = new ArrayList<>();
         suggestedBookList = new ArrayList<>();
         recentBookList = new ArrayList<>();
+        Log.d("home fragment", "onCreate");
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
+        Log.d("home fragment", "onCreateView");
         return fragmentHomeBinding.getRoot();
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
-        //todo sistemare correttamente l'inserimento del token
-        //get data from realtime database
-        userViewModel.getUserDataFromToken("utente1").observe(getViewLifecycleOwner(), result -> {
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess) result).getData();
-            } else {
-                Log.d("home fragment error", "getUserDataFromToken");
-            }
+        Log.d("home fragment", "onViewCreated");
+
+        testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), result -> {
+
         });
 
         //setting mock data
@@ -135,7 +141,6 @@ public class HomeFragment extends Fragment {
         mockDataRecent.add("/works/OL82565W");
         mockDataRecent.add("/works/OL82560W");
         mockDataRecent.add("/works/OL20874116W");
-
 
         // RecyclerView for trending carousel
         RecyclerView recyclerViewTrendingBooks = fragmentHomeBinding.trendingContainer;
@@ -278,6 +283,23 @@ public class HomeFragment extends Fragment {
 
 
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("home fragment", "onStart");
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("home fragment", "onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("home fragment", "onDestroy");
     }
 
     private void navigateToBookDetailsFragment() {

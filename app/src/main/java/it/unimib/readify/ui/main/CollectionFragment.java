@@ -85,11 +85,7 @@ public class CollectionFragment extends Fragment {
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
 
         //managing viewModel
-        userViewModel.getUserMutableLiveData("prova@gmail.com", "password", true)
-                .observe(getViewLifecycleOwner(), result -> {
-                    collection = ((Result.UserSuccess) result).getData().getCollections().get(0);
-                    Log.d("collection name", collection.getName());
-                });
+
         //servirà in caso di modifiche (?)
         //userViewModel.updateCollectionListLiveData(collectionsList);
 

@@ -22,6 +22,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<Result> workMutableLiveData;
     private final MutableLiveData<Result> userPreferencesMutableLiveData;
+    private MutableLiveData<Result> externalUserMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultLiveData;
 
 
@@ -39,12 +40,28 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
 
 
     @Override
+    public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
+        if(isRegistered) {
+            Log.d("sign in", "sign in");
+            signIn(email, password);
+        }
+        if(!isRegistered) {
+            Log.d("sign up", "sign up");
+            signUp(email, password);
+        }
+        return userMutableLiveData;
+    }
+
+    public User getLoggedUser() {
+        return userAuthRemoteDataSource.getLoggedUser();
+    }
+
+    @Override
     public MutableLiveData<Result> getUser(String email, String password, boolean isUserRegistered) {
         if (isUserRegistered) {
             signIn(email, password);
-            //get data from realtime
         } else {
-            //signUp(email, password);
+            signUp(email, password);
         }
         return userMutableLiveData;
     }
@@ -78,14 +95,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
         return userMutableLiveData;
     }
 
-    @Override
-    public MutableLiveData<Result> getLoggedUser() {
-        return userMutableLiveData;
-    }
+
 
     @Override
-    public void signUp(String email, String password, String username, String gender) {
-        userAuthRemoteDataSource.signUp(email, password, username, gender);
+    public void signUp(String email, String password) {
+        userAuthRemoteDataSource.signUp(email, password);
     }
 
     @Override
@@ -111,7 +125,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     }
 
 
-
     //giusto
     @Override
     public void onSuccessFromAuthentication(User user) {
@@ -123,6 +136,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     @Override
     public void onFailureFromAuthentication(String message) {
         Result.Error result = new Result.Error(message);
+        Log.d("repo onFailureFromAuthentication", "onFailureFromAuthentication");
+        //postValue? setValue?
         userMutableLiveData.postValue(result);
     }
 
@@ -130,6 +145,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
     @Override
     public void onSuccessFromRemoteDatabase(User user) {
         Result.UserSuccess result = new Result.UserSuccess(user);
+        Log.d("sign in on going", "onSuccessFromRemoteDatabase");
         userMutableLiveData.postValue(result);
     }
 
@@ -166,7 +182,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback, Re
 
     @Override
     public void onSuccessLogout() {
-
+        userMutableLiveData.postValue(null);
     }
 
     @Override

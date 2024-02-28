@@ -38,10 +38,6 @@ public abstract class Result {
         }
     }
 
-
-
-
-
     /**
      * Class that represents an error occurred during the interaction
      * with a Web Service or a local database.
@@ -56,8 +52,4 @@ public abstract class Result {
             return message;
         }
     }
-
-
-
-
 }

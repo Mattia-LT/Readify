@@ -10,6 +10,14 @@
             android:icon="@drawable/ic_baseline_settings"
             android:title="Setting"/>
         <item
+            android:id="@+id/nav_visibility"
+            android:icon="@drawable/ic_baseline_lock_open_24"
+            android:title="Privacy"/>
+        <item
+            android:id="@+id/nav_dark_mode"
+            android:icon="@drawable/ic_baseline_brightness_24"
+            android:title="Dark Mode"/>
+        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_baseline_logout"
             android:title="Logout" />

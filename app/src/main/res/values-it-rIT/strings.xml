@@ -23,6 +23,13 @@
         <item>Altro</item>
     </string-array>
 
+    <string-array name="visibility">
+        <item>Visibilità</item>
+        <item>Pubblica</item>
+        <item>Solo Amici</item>
+        <item>Privata</item>
+    </string-array>
+
 
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>

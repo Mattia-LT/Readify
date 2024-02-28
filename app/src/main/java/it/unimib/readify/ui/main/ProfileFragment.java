@@ -26,6 +26,8 @@ import android.widget.ImageView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -190,6 +192,17 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                             int itemId = menuItem.getItemId();
                             if (itemId == R.id.nav_settings) {
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
+                            }
+                            if(itemId == R.id.nav_logout){
+                                userViewModel.logout();
+                                /*FirebaseAuth.getInstance().signOut();*/
+                                Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
+                             }
+                            if (itemId == R.id.nav_dark_mode) {
+                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();;
+                            }
+                            if (itemId == R.id.nav_visibility) {
+                                ;/* Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_visibilityFragment);*/
                             }
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;

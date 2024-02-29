@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,7 +43,6 @@ import it.unimib.readify.databinding.FragmentBookDetailsBinding;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.viewmodel.BookViewModel;
 
 
 public class BookDetailsFragment extends Fragment {
@@ -154,9 +154,10 @@ public class BookDetailsFragment extends Fragment {
                 commentAdapter = new CommentAdapter(commentList, requireActivity().getApplication(), new CommentAdapter.OnItemClickListener() {
                     @Override
                     public void onCommentClick(Comment comment) {
+                        Snackbar.make(view, comment.getUserId(), Snackbar.LENGTH_SHORT).show();;
                         Bundle bundle = new Bundle();
-                        // potrebbe servire viewmodel per fare una chiamata al DB e ottenere i dati ottenuti dall'username
-                        //todo finisci quando avrremo schermata del profilo
+                        //todo aspetto di avere i viewmodel pronti
+                        //potrebbe servire viewmodel per fare una chiamata al DB e ottenere i dati ottenuti dall'username
 
                         //comando di navigation da dettagli a profilo
                     }

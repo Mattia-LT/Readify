@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.CommentItemBinding;
@@ -65,9 +67,21 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void bind(Comment comment) {
-            binding.commentDate.setText(comment.getDate().toString());
+
+            Locale locale = Locale.getDefault();
+            if (locale.getLanguage().equals("it")) {
+                locale = new Locale("it", "IT");
+            }
+
+            String pattern = "dd MMM yyyy";
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
+            String formattedDate = dateFormat.format(comment.getDate());
+
+            binding.commentDate.setText(formattedDate);
             binding.commentText.setText(comment.getComment());
             binding.commentName.setText(comment.getUserId());
+
+            //TODO caricare la foto profilo vera
             Glide.with(application)
                     .load(R.drawable.ic_baseline_profile_24)
                     .into(binding.commentImage);
@@ -76,6 +90,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onClick(View v) {
             //todo gestire azioni quando clicchi sulla foto, dovrebbe aprire il profilo
+            onItemClickListener.onCommentClick(commentList.get(getAdapterPosition()));
         }
     }
 }

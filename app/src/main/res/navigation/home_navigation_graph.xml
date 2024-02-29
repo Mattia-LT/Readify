@@ -119,6 +119,12 @@
             app:popUpTo="@id/collectionFragment"
             app:popUpToInclusive="true"/>
 
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment"
+            app:popUpTo="@id/userDetailsFragment"
+            app:popUpToInclusive="true"/>
+
     </fragment>
 
     <fragment

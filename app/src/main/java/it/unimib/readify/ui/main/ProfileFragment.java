@@ -9,8 +9,8 @@ import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,37 +22,46 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
+import java.util.Locale;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.DataViewModelFactory;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.UserViewModelFactory;
 import it.unimib.readify.util.ServiceLocator;
 
 public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {
-
     private FragmentProfileBinding fragmentProfileBinding;
-    private UserViewModel userViewModel;
+    private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
     private User user;
+    /*
+        Do we want @copiedUser?
+        In database, do we want to save Works (generated from every keyBook, contained in Collections)?
+            No)     we need @copiedUser
+            Yes)    we don't need @copiedUser
+     */
+    private User copiedUser;
+    private Observer<Result> observer;
 
     public ProfileFragment() {}
 
@@ -72,17 +81,17 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         return fragmentProfileBinding.getRoot();
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu(view);
+
         //initializing repository and viewModel User
-        IUserRepository userRepository = ServiceLocator.getInstance()
-                .getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
 
         //initializing repository and viewModel Book
         IBookRepository bookRepository = ServiceLocator.getInstance()
@@ -92,41 +101,44 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 new DataViewModelFactory(bookRepository)
         ).get(BookViewModel.class);
 
-        //get user data from database
-        /*
-        userViewModel.getLoggedUser().observe(getViewLifecycleOwner(), result -> {
+        //initializing Observer
+        observer = result -> {
+            Log.d("profile fragment", "data changed");
             if(result.isSuccess()) {
-                user = ((Result.UserSuccess) result).getData();
-                Log.d("user collections", user.getCollections().toString());
+                user = ((Result.UserSuccess)result).getData();
+                copiedUser = new User(user);
+                updateUI();
 
                 //get books from api
+                /*
                 int counter = 0;
-                for (int i = 0; i < user.getCollections().size(); i++) {
+                for (int i = 0; i < copiedUser.getCollections().size(); i++) {
                     int finalCounter = counter;
-                    bookViewModel.fetchBooks(user.getCollections().get(i).getBooks(), "normal")
+                    //todo update constant "normal"
+                    bookViewModel.fetchBooks(copiedUser.getCollections().get(i).getBooks(), "normal")
                             .observe(getViewLifecycleOwner(), resultsList -> {
                                 for(int j = 0; j < resultsList.size(); j++) {
                                     if(resultsList.get(j).isSuccess()) {
                                         OLWorkApiResponse book = ((Result.WorkSuccess) resultsList.get(j)).getData();
-                                        user.getCollections().get(finalCounter).getWorks().add(j, book);
+                                        copiedUser.getCollections().get(finalCounter).getWorks().add(j, book);
                                     }
                                 }
+                                //UI collections view
+                                //runCollectionsView(view, user);
+                                //UI collections creation
+                                //runCollectionCreationProcess();
                             });
                     counter++;
                 }
-
-                //UI collections view
-                runCollectionsView(view, user);
-                //UI collections creation
-                runCollectionCreationProcess();
+                 */
             } else {
-                Log.d("profile fragment error", "getLoggedUser");
+                //todo navigate to login(?)
+                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
             }
-        });
-
-         */
+        };
+        //get user data from database
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
     }
-
 
     //managing collections existence
     public void runCollectionsView(View view, User user) {
@@ -194,9 +206,11 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
                             }
                             if(itemId == R.id.nav_logout){
-                                userViewModel.logout();
-                                /*FirebaseAuth.getInstance().signOut();*/
+                                /*
+                                testDatabaseViewModel.logout();
+                                //FirebaseAuth.getInstance().signOut();
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
+                                 */
                              }
                             if (itemId == R.id.nav_dark_mode) {
                                 Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();;
@@ -207,12 +221,39 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;
                         }
-
                     });
                     return true;
                 }
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    public void updateUI() {
+        fragmentProfileBinding.textviewUsername.setText(copiedUser.getUsername());
+        fragmentProfileBinding.textViewFollowers.setText(String.format(Locale.ENGLISH, "%d",
+                copiedUser.getFollowers().getCounter()));
+        fragmentProfileBinding.textViewFollowing.setText(String.format(Locale.ENGLISH, "%d",
+                copiedUser.getFollowing().getCounter()));
+
+        fragmentProfileBinding.textViewFacebook.setVisibility(View.GONE);
+        fragmentProfileBinding.textViewTwitter.setVisibility(View.GONE);
+        fragmentProfileBinding.textViewInstagram.setVisibility(View.GONE);
+        for (int i = 0; i < copiedUser.getSocialLinks().size(); i++) {
+            switch (copiedUser.getSocialLinks().get(i).getSocialPlatform()) {
+                case "facebook":
+                    fragmentProfileBinding.textViewFacebook.setText(copiedUser.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textViewFacebook.setVisibility(View.VISIBLE);
+                    break;
+                case "twitter":
+                    fragmentProfileBinding.textViewTwitter.setText(copiedUser.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textViewTwitter.setVisibility(View.VISIBLE);
+                    break;
+                case "instagram":
+                    fragmentProfileBinding.textViewInstagram.setText(copiedUser.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textViewInstagram.setVisibility(View.VISIBLE);
+                    break;
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_USER;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,7 +27,6 @@ import java.util.Objects;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.UserSearchResultAdapter;
 import it.unimib.readify.databinding.FragmentTabSearchUsersBinding;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.UserViewModel;
@@ -55,8 +56,8 @@ public class TabSearchUsersFragment extends Fragment {
             @Override
             public void onUserItemClick(User user) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("user", user);
-                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_profileFragment, bundle);
+                bundle.putParcelable(BUNDLE_USER, user);
+                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_userDetailsFragment, bundle);
             }
 
             @Override

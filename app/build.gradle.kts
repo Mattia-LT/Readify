@@ -40,13 +40,15 @@ android {
 
 dependencies {
 
-    val navVersion ="2.7.6"
+    val navVersion ="2.7.7"
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:$navVersion")
     implementation("androidx.navigation:navigation-ui:$navVersion")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+
 
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.gms:play-services-base:18.3.0")
@@ -62,7 +64,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // import firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
@@ -76,7 +78,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
 
     //ce l'aveva il prof (?)
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
@@ -85,4 +87,3 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
-

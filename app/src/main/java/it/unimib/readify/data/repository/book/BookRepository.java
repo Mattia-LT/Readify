@@ -1,5 +1,6 @@
 package it.unimib.readify.data.repository.book;
 
+import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SEARCH;
 import static it.unimib.readify.util.Constants.SUGGESTED;
@@ -61,7 +62,7 @@ public class BookRepository implements IBookRepository, ResponseCallback{
                 return recentBooksLiveData;
             case SUGGESTED:
                 return suggestedBooksLiveData;
-            case "normal":
+            case COLLECTION:
                 return collectionBooksLiveData;
         }
         return null;

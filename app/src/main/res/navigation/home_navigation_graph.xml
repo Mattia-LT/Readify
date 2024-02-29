@@ -25,8 +25,8 @@
             android:id="@+id/action_searchFragment_to_bookDetailsFragment"
             app:destination="@id/bookDetailsFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_searchFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
         <action
             android:id="@+id/action_searchFragment_to_filter_bottomsheet"
             app:destination="@id/filter_bottomsheet" />
@@ -67,6 +67,19 @@
     </fragment>
 
     <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="it.unimib.readify.ui.main.UserDetailsFragment"
+        android:label="fragment_user_details"
+        tools:layout="@layout/fragment_user_details" >
+        <action
+            android:id="@+id/action_userDetailsFragment_to_collectionFragment"
+            app:destination="@+id/collectionFragment"/>
+        <action
+            android:id="@+id/action_userDetailsFragment_to_searchFragment"
+            app:destination="@+id/searchFragment"/>
+    </fragment>
+
+    <fragment
         android:id="@+id/collectionFragment"
         android:name="it.unimib.readify.ui.main.CollectionFragment"
         android:label="fragment_collection"
@@ -104,6 +117,12 @@
             android:id="@+id/action_bookDetailsFragment_to_collectionFragment"
             app:destination="@id/collectionFragment"
             app:popUpTo="@id/collectionFragment"
+            app:popUpToInclusive="true"/>
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment"
+            app:popUpTo="@id/userDetailsFragment"
             app:popUpToInclusive="true"/>
 
     </fragment>

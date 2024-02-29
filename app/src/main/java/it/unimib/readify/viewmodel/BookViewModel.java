@@ -1,5 +1,6 @@
 package it.unimib.readify.viewmodel;
 
+import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
@@ -60,7 +61,7 @@ public class BookViewModel extends ViewModel {
                     recentCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
                 }
                 return recentCarouselLiveData;
-            case "normal":
+            case COLLECTION:
                 if(collectionResultsLiveData == null)
                     collectionResultsLiveData = bookRepository.getBooksByIdList(idList, reference);
                 return collectionResultsLiveData;

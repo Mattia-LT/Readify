@@ -1,18 +1,34 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
+
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
@@ -47,21 +63,18 @@ public class CollectionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        loadMenu();
+        initRepositories();
 
 
 
-        //repository
-        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
 
-        //initializing viewModel and adapter
-        userViewModel = new ViewModelProvider(requireActivity(), new UserViewModelFactory(userRepository))
-                .get(UserViewModel.class);
         bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 new BookItemCollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onBookItemClick(OLWorkApiResponse book) {
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("book", book);
+                        bundle.putParcelable(BUNDLE_BOOK, book);
                         Navigation.findNavController(view).navigate(R.id.action_collectionFragment_to_bookDetailsFragment, bundle);
                     }
                 }, requireActivity().getApplication());
@@ -110,10 +123,73 @@ public class CollectionFragment extends Fragment {
                 }
             }
         }
-
-        //managing backButton
-        collectionProfileBinding.backButton.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_collectionFragment_to_profileFragment);
-        });
     }
+
+    private void loadMenu(){
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+
+                // TODO: cambiare nome
+                String title = requireContext().getString(R.string.app_name)
+                        .concat(" - ")
+                        .concat("TODO nome collezione");
+                        //.concat(collection.getName());
+                toolbar.setTitle(title);
+                menuInflater.inflate(R.menu.collection_appbar_menu, menu);
+
+                //Set the settings icon to white
+
+                int colorWhite = getResources().getColor(R.color.white, null);
+
+                MenuItem settingsMenuItem = menu.findItem(R.id.action_collection_settings);
+                if (settingsMenuItem != null) {
+                    Drawable settingsIcon = settingsMenuItem.getIcon();
+                    if (settingsIcon != null) {
+                        settingsIcon.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
+                        settingsMenuItem.setIcon(settingsIcon);
+                    }
+                }
+
+                // Enable the back button
+                Drawable backButton = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
+                if (backButton != null) {
+                    backButton.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
+                }
+                toolbar.setNavigationIcon(backButton);
+                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        requireActivity().getSupportFragmentManager().popBackStack();
+                    }
+                });
+
+
+
+            }
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_collection_settings) {
+                    // TODO: Apri impostazioni collection o un menu
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
+
+
+    }
+
+    private void initRepositories(){
+        //repository
+        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
+
+        //initializing viewModel
+        userViewModel = new ViewModelProvider(requireActivity(), new UserViewModelFactory(userRepository))
+                .get(UserViewModel.class);
+    }
+
 }

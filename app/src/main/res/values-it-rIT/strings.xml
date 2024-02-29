@@ -99,5 +99,7 @@
     <string name="undo_changes">Annulla Modifiche</string>
     <string name="notifications_button">Notifiche</string>
     <string name="settings_button_profile">Menù</string>
+    <string name="user_details">Profilo utente</string>
+    <string name="collection_settings_button">Impostazioni della collezione</string>
 
 </resources>

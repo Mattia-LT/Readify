@@ -7,6 +7,7 @@ import android.os.Parcelable;
 public class Social implements Parcelable {
     private String socialPlatform;
     private String link;
+    //todo add String username, extracting it from @link
 
     public Social() {}
 

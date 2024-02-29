@@ -50,6 +50,20 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
+    public User (User user) {
+        this.biography = user.getBiography();
+        this.collections = user.getCollections();
+        this.recommended = user.getRecommended();
+        this.email = user.getEmail();
+        this.gender = user.getGender();
+        this.socialLinks = user.getSocialLinks();
+        this.username = user.getUsername();
+        this.visibility = user.getVisibility();
+        this.followers = user.getFollowers();
+        this.following = user.getFollowing();
+        this.idToken = user.getIdToken();
+    }
+
     public String getBiography() {
         return biography;
     }
@@ -201,7 +215,8 @@ public class User implements Parcelable {
 
     @Override
     public String toString() {
-        return "User{" +
+        return super.toString() +
+                "User{" +
                 "biography='" + biography + '\'' +
                 ", collections=" + collections +
                 ", recommended=" + recommended +

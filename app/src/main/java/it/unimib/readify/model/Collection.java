@@ -3,11 +3,13 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-// TODO: 09/12/2023 gestione della thumbnail
+// TODO: 09/12/2023 managing thumbnail
 public class Collection implements Parcelable {
 
     private String name;
@@ -104,6 +106,7 @@ public class Collection implements Parcelable {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "Collection{" +

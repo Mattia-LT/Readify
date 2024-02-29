@@ -38,12 +38,14 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void saveUserData(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     Log.d("save user data: signIn case", "User already present in Firebase Realtime Database");
-                    userResponseCallback.onSuccessFromRemoteDatabase(user);
+                    //if snapshot exists, return user data (retrieved from Database)
+                    userResponseCallback.onSuccessFromRemoteDatabase(snapshot.getValue(User.class));
                 } else {
                     Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)

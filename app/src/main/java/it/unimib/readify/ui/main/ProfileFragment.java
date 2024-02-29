@@ -188,7 +188,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
                              }
                             if (itemId == R.id.nav_dark_mode) {
-                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();;
+                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();
                             }
                             if (itemId == R.id.nav_visibility) {
                                 ;/* Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_visibilityFragment);*/

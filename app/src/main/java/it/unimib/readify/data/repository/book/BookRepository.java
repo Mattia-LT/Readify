@@ -18,9 +18,8 @@ import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
-import it.unimib.readify.util.ResponseCallback;
 
-public class BookRepository implements IBookRepository, ResponseCallback{
+public class BookRepository implements IBookRepository, BookResponseCallback {
 
     private MutableLiveData<Result> workApiResponseLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;

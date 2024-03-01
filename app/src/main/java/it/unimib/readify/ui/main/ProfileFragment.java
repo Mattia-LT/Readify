@@ -32,11 +32,9 @@ import java.util.Locale;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
@@ -44,9 +42,6 @@ import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import it.unimib.readify.viewmodel.UserViewModel;
-import it.unimib.readify.viewmodel.UserViewModelFactory;
-import it.unimib.readify.util.ServiceLocator;
 
 public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {
     private FragmentProfileBinding fragmentProfileBinding;
@@ -94,8 +89,8 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 .create(TestDatabaseViewModel.class);
 
         //initializing repository and viewModel Book
-        IBookRepository bookRepository = ServiceLocator.getInstance()
-                .getBookRepository(requireActivity().getApplication());
+        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(IBookRepository.class);
         bookViewModel = new ViewModelProvider(
                 requireActivity(),
                 new DataViewModelFactory(bookRepository)
@@ -109,6 +104,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 copiedUser = new User(user);
                 updateUI();
 
+                //todo update collections
                 //get books from api
                 /*
                 int counter = 0;
@@ -213,7 +209,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                                  */
                              }
                             if (itemId == R.id.nav_dark_mode) {
-                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();;
+                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();
                             }
                             if (itemId == R.id.nav_visibility) {
                                 ;/* Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_visibilityFragment);*/

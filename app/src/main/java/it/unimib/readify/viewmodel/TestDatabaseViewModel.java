@@ -6,6 +6,8 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Result;
 
@@ -42,6 +44,7 @@ public class TestDatabaseViewModel extends ViewModel {
         @isUIRunning prevents the problem, allowing Login / Registration actions only after
          having set the data using setUserMutableLiveData(), each time a container is created.
      */
+    private MutableLiveData<List<Result>> userSearchResultLiveData;
     private boolean isUIRunning;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
@@ -153,4 +156,10 @@ public class TestDatabaseViewModel extends ViewModel {
          UPDATE:
          Implementing the new logic, the problem can't happen.
      */
+
+    public MutableLiveData<List<Result>> searchUsers(String query){
+        Log.d("UserViewModel", "Query: " + query);
+        userSearchResultLiveData = testDatabaseRepository.searchUsers(query);
+        return userSearchResultLiveData;
+    }
 }

@@ -5,7 +5,6 @@ import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,36 +15,30 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuProvider;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
-import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.model.Result;
-import it.unimib.readify.viewmodel.UserViewModel;
-import it.unimib.readify.viewmodel.UserViewModelFactory;
-import it.unimib.readify.util.ServiceLocator;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class CollectionFragment extends Fragment {
 
     private FragmentCollectionBinding collectionProfileBinding;
     private BookItemCollectionAdapter bookItemCollectionAdapter;
-    private UserViewModel userViewModel;
+    private TestDatabaseViewModel testDatabaseViewModel;
     private Collection collection;
 
     @Override
@@ -66,9 +59,6 @@ public class CollectionFragment extends Fragment {
         loadMenu();
         initRepositories();
 
-
-
-
         bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 new BookItemCollectionAdapter.OnItemClickListener() {
                     @Override
@@ -88,8 +78,6 @@ public class CollectionFragment extends Fragment {
 
         //servirà in caso di modifiche (?)
         //userViewModel.updateCollectionListLiveData(collectionsList);
-
-
 
 
         //managing data from Profile Fragment
@@ -178,18 +166,12 @@ public class CollectionFragment extends Fragment {
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
-
-
     }
 
     private void initRepositories(){
-        //repository
-        IUserRepository userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
-
-        //initializing viewModel
-        userViewModel = new ViewModelProvider(requireActivity(), new UserViewModelFactory(userRepository))
-                .get(UserViewModel.class);
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
     }
-
 }

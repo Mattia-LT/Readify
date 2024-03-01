@@ -6,12 +6,15 @@ import static it.unimib.readify.util.Constants.SEARCH;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
@@ -19,15 +22,17 @@ import it.unimib.readify.util.ResponseCallback;
 
 public class BookRepository implements IBookRepository, ResponseCallback{
 
-
     private MutableLiveData<Result> workApiResponseLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
     private MutableLiveData<List<Result>> suggestedBooksLiveData;
     private MutableLiveData<List<Result>> recentBooksLiveData;
     private MutableLiveData<List<Result>> trendingBooksLiveData;
     private MutableLiveData<List<Result>> collectionBooksLiveData;
-
     private final BaseBookRemoteDataSource bookRemoteDataSource;
+
+    public static BookRepository getInstance(Application application) {
+        return new BookRepository(new BookRemoteDataSource(application));
+    }
 
     public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource) {
         searchResultsLiveData = new MutableLiveData<>();
@@ -112,7 +117,5 @@ public class BookRepository implements IBookRepository, ResponseCallback{
         suggestedBooksLiveData.postValue(errorList);
         recentBooksLiveData.postValue(errorList);
         trendingBooksLiveData.postValue(errorList);
-
     }
-
 }

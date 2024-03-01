@@ -2,6 +2,8 @@ package it.unimib.readify.data.repository.user;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import it.unimib.readify.model.Result;
 
 public interface TestIDatabaseRepository {
@@ -12,4 +14,6 @@ public interface TestIDatabaseRepository {
 
     void testSet(Result result);
     MutableLiveData<Result> getUserMutableLiveData();
+
+    MutableLiveData<List<Result>> searchUsers(String query);
 }

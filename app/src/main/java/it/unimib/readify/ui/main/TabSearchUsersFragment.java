@@ -13,7 +13,6 @@ import android.view.inputmethod.EditorInfo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,10 +25,13 @@ import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.UserSearchResultAdapter;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentTabSearchUsersBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class TabSearchUsersFragment extends Fragment {
 
@@ -37,7 +39,7 @@ public class TabSearchUsersFragment extends Fragment {
 
     private UserSearchResultAdapter userSearchResultAdapter;
     private List<User> searchResultList;
-    private UserViewModel userViewModel;
+    private TestDatabaseViewModel testDatabaseViewModel;
 
     @Nullable
     @Override
@@ -49,7 +51,12 @@ public class TabSearchUsersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        TestIDatabaseRepository testIDatabaseRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testIDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+
         searchResultList = new ArrayList<>();
         RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
         userSearchResultAdapter = new UserSearchResultAdapter(searchResultList, requireActivity().getApplication(), new UserSearchResultAdapter.OnItemClickListener() {
@@ -80,7 +87,6 @@ public class TabSearchUsersFragment extends Fragment {
             }
             return false;
         });
-
     }
 
     public void startSearch(View view){
@@ -93,7 +99,7 @@ public class TabSearchUsersFragment extends Fragment {
             //todo implementa qui ricerca utenti
             Log.d("UserSearchFragment", "Query: " + query);
             fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
-            userViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
+            testDatabaseViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
                 fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
                 searchResultList.clear();
                 userSearchResultAdapter.notifyItemRangeChanged(0,0);
@@ -116,7 +122,7 @@ public class TabSearchUsersFragment extends Fragment {
     private void resumeSearch(){
         String query = Objects.requireNonNull(fragmentTabSearchUsersBinding.edittextSearchUsers.getText()).toString();
         if(!query.trim().isEmpty()){
-            userViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
+            testDatabaseViewModel.searchUsers(query).observe(getViewLifecycleOwner(), resultList -> {
                 this.searchResultList.clear();
                 for(Result result : resultList){
                     if(result.isSuccess()) {

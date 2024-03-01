@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource;
@@ -21,6 +22,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private  BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
     private  BaseUserDataRemoteDataSource userDataRemoteDataSource;
     private  MutableLiveData<Result> userMutableLiveData;
+    private final MutableLiveData<List<Result>> userSearchResultLiveData;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -32,6 +34,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userAuthRemoteDataSource = userAuthRemoteDataSource;
         this.userDataRemoteDataSource = userDataRemoteDataSource;
         this.userMutableLiveData = new MutableLiveData<>();
+        this.userSearchResultLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -64,7 +67,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         userAuthRemoteDataSource.signUp(email, password);
     }
 
-
+    @Override
+    public MutableLiveData<List<Result>> searchUsers(String query){
+        Log.d("UserRepository", "Query: " + query);
+        userDataRemoteDataSource.searchUsers(query);
+        return userSearchResultLiveData;
+    }
 
     @Override
     public void onSuccessFromAuthentication(User user) {
@@ -92,7 +100,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onSuccessFromRemoteDatabase(List<User> searchResults) {
-
+        List<Result> resultList = new ArrayList<>();
+        for(User user : searchResults){
+            Log.d("UserRepository", "User: " + user);
+            resultList.add(new Result.UserSuccess(user));
+        }
+        userSearchResultLiveData.postValue(resultList);
     }
 
     @Override

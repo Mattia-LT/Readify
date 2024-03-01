@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -45,25 +44,18 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import it.unimib.readify.R;
-import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.util.ServiceLocator;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import it.unimib.readify.viewmodel.UserViewModel;
-import it.unimib.readify.viewmodel.UserViewModelFactory;
 import androidx.activity.result.ActivityResult;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding fragmentLoginBinding;
-    private UserViewModel userViewModel;
-    private IUserRepository userRepository;
 
     private TestDatabaseViewModel testDatabaseViewModel;
-    private TestIDatabaseRepository testDatabaseRepository;
     private Observer<Result> observer;
 
     private final ActivityResultLauncher<IntentSenderRequest> signInLauncher = registerForActivityResult(
@@ -183,12 +175,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d("login fragment", "onViewCreated");
 
-        userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
-
-        testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
                 .getRepository(TestIDatabaseRepository.class);
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
                 .create(TestDatabaseViewModel.class);
@@ -271,10 +258,10 @@ public class LoginFragment extends Fragment {
 
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
-            String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
-            String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
-            //String email = "prova@gmail.com";
-            //String password = "password";
+            //String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
+            //String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
+            String email = "prova@gmail.com";
+            String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 testDatabaseViewModel.setUserMutableLiveData(email, password, true);
             } else {

@@ -6,7 +6,6 @@ import static it.unimib.readify.util.Constants.COLLECTION;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,22 +33,22 @@ import java.util.List;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.IUserRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentUserDetailsBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.ServiceLocator;
+import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.DataViewModelFactory;
-import it.unimib.readify.viewmodel.UserViewModel;
-import it.unimib.readify.viewmodel.UserViewModelFactory;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class UserDetailsFragment extends Fragment {
 
     private FragmentUserDetailsBinding binding;
-    private UserViewModel userViewModel;
+    private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
     private List<Collection> publicCollections;
@@ -119,14 +118,13 @@ public class UserDetailsFragment extends Fragment {
 
     private void initRepositories(){
         //initializing repository and viewModel Book
-        IUserRepository userRepository = ServiceLocator.getInstance()
-                .getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
 
-        IBookRepository bookRepository = ServiceLocator.getInstance()
-                .getBookRepository(requireActivity().getApplication());
+        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(IBookRepository.class);
         bookViewModel = new ViewModelProvider(
                 requireActivity(),
                 new DataViewModelFactory(bookRepository)

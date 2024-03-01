@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 
 /*
@@ -65,7 +64,6 @@ public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
         if (modelClass.isAssignableFrom(TestDatabaseViewModel.class)) {
             return (T) new TestDatabaseViewModel(testDatabaseRepository);
         }
-
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
 }

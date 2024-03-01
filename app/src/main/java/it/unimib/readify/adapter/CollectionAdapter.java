@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,11 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
-import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.util.ServiceLocator;
-import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {

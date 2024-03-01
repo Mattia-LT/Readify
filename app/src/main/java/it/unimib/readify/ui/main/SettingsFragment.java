@@ -10,10 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,30 +19,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
 import it.unimib.readify.R;
-import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.databinding.FragmentSettingsBinding;
-import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.UserViewModel;
-
 
 public class SettingsFragment extends Fragment {
 
-    private UserViewModel userViewModel;
     private FragmentSettingsBinding fragmentSettingsBinding;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.setAuthenticationError(false);
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -80,7 +67,6 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-
 
     private boolean isUsernameOk(String username) {
         if (username.isEmpty()) {
@@ -153,6 +139,5 @@ public class SettingsFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack();
             }
         });
-
     }
 }

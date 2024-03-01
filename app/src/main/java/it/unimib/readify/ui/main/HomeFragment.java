@@ -32,7 +32,6 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
-import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
@@ -42,9 +41,6 @@ import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import it.unimib.readify.viewmodel.UserViewModel;
-import it.unimib.readify.viewmodel.UserViewModelFactory;
-import it.unimib.readify.util.ServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.DataViewModelFactory;
 
@@ -58,10 +54,8 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding fragmentHomeBinding;
 
     private BookViewModel bookViewModel;
-    private UserViewModel userViewModel;
 
     private TestDatabaseViewModel testDatabaseViewModel;
-    private TestIDatabaseRepository testDatabaseRepository;
 
     private User user;
 
@@ -75,14 +69,8 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IUserRepository userRepository = ServiceLocator.getInstance()
-                .getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new UserViewModelFactory(userRepository)).get(UserViewModel.class);
-
-        IBookRepository bookRepository = ServiceLocator.getInstance()
-                .getBookRepository(requireActivity().getApplication());
+        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(IBookRepository.class);
         bookViewModel = new ViewModelProvider(
                 requireActivity(),
                 new DataViewModelFactory(bookRepository)
@@ -108,7 +96,7 @@ public class HomeFragment extends Fragment {
         loadMenu();
         Log.d("home fragment", "onViewCreated");
 
-        testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
                 .getRepository(TestIDatabaseRepository.class);
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
                 .create(TestDatabaseViewModel.class);
@@ -276,13 +264,6 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-
-
-
-
-
-
-
     }
 
     @Override

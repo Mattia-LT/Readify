@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.IUserRepository;
 
 public class DataViewModelFactory implements ViewModelProvider.Factory {
 

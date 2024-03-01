@@ -2,11 +2,20 @@ package it.unimib.readify.util;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import it.unimib.readify.data.repository.book.BookRepository;
+import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.data.service.OLApiService;
+import it.unimib.readify.model.OLDescription;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /*
     TestServiceLocator is a Singleton class which maps every Repository class
@@ -51,9 +60,26 @@ public class TestServiceLocator {
                         repositoryInstance = TestDatabaseRepository.getInstance(application);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
+                    //creating BookRepository instance
+                    if(repositoryClass == IBookRepository.class) {
+                        repositoryInstance = BookRepository.getInstance(application);
+                        repositories.put(repositoryClass, repositoryInstance);
+                    }
                 }
             }
         }
         return repositoryClass.cast(repositoryInstance);
+    }
+
+    public OLApiService getOLApiService() {
+        Gson gsonDescriptionManager = new GsonBuilder()
+                .registerTypeAdapter(OLDescription.class, new OLDescriptionDeserializer())
+                .create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.OL_API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(gsonDescriptionManager))
+                .build();
+        return retrofit.create(OLApiService.class);
     }
 }

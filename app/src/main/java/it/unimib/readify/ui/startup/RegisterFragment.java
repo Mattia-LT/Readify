@@ -18,37 +18,27 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
 import it.unimib.readify.R;
 
-import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.util.ServiceLocator;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import it.unimib.readify.viewmodel.UserViewModel;
-
 
 public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
     private FragmentRegisterBinding fragmentRegisterBinding;
-    private UserViewModel userViewModel;
-    private IUserRepository userRepository;
-
     private TestDatabaseViewModel testDatabaseViewModel;
     private TestIDatabaseRepository testDatabaseRepository;
     private Observer<Result> observer;
-
 
     public RegisterFragment() {}
 
@@ -59,11 +49,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        userRepository = ServiceLocator.getInstance().getUserRepository(requireActivity().getApplication());
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new it.unimib.readify.viewmodel.UserViewModelFactory(userRepository)).get(UserViewModel.class);
-
         testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
                 .getRepository(TestIDatabaseRepository.class);
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)

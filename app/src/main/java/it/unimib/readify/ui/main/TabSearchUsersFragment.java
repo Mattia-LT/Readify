@@ -51,11 +51,7 @@ public class TabSearchUsersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        TestIDatabaseRepository testIDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testIDatabaseRepository)
-                .create(TestDatabaseViewModel.class);
+        initRepositories();
 
         searchResultList = new ArrayList<>();
         RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
@@ -145,4 +141,14 @@ public class TabSearchUsersFragment extends Fragment {
         resumeSearch();
         //todo potrebbero esserci soluzioni migliori
     }
+
+    private void initRepositories(){
+        TestIDatabaseRepository testIDatabaseRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testIDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+    }
+
+
 }

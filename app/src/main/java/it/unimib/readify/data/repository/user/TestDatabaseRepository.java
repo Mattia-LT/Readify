@@ -19,10 +19,11 @@ import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class TestDatabaseRepository implements TestIDatabaseRepository, UserResponseCallback {
 
-    private  BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
-    private  BaseUserDataRemoteDataSource userDataRemoteDataSource;
-    private  MutableLiveData<Result> userMutableLiveData;
+    private final BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
+    private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
+    private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultLiveData;
+    private final MutableLiveData<Result> commentUserLiveData;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -35,6 +36,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userDataRemoteDataSource = userDataRemoteDataSource;
         this.userMutableLiveData = new MutableLiveData<>();
         this.userSearchResultLiveData = new MutableLiveData<>();
+        this.commentUserLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -51,6 +53,9 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     public MutableLiveData<Result> getUserMutableLiveData() {
         return userMutableLiveData;
+    }
+    public MutableLiveData<Result> getCommentUserLiveData(){
+        return commentUserLiveData;
     }
 
     public void testSet(Result result) {
@@ -72,6 +77,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);
         return userSearchResultLiveData;
+    }
+
+    @Override
+    public void getUserFromUsername(String username){
+        Log.d("UserRepository", "Username: " + username);
+        userDataRemoteDataSource.getUserFromUsername(username);
     }
 
     @Override
@@ -117,6 +128,18 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void onFailureFromRemoteDatabaseWork(String message) {
 
+    }
+
+    @Override
+    public void onSuccessFromRemoteDatabaseUserFromUsername(User user) {
+        Result.UserSuccess result = new Result.UserSuccess(user);
+        commentUserLiveData.setValue(result);
+    }
+
+    @Override
+    public void onFailureFromRemoteDatabaseUserFromUsername(String message) {
+        Result.Error result = new Result.Error(message);
+        commentUserLiveData.setValue(result);
     }
 
     @Override

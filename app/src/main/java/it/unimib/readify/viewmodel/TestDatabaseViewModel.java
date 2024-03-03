@@ -45,6 +45,7 @@ public class TestDatabaseViewModel extends ViewModel {
          having set the data using setUserMutableLiveData(), each time a container is created.
      */
     private MutableLiveData<List<Result>> userSearchResultLiveData;
+    private MutableLiveData<Result> commentUserLiveData;
     private boolean isUIRunning;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
@@ -161,5 +162,13 @@ public class TestDatabaseViewModel extends ViewModel {
         Log.d("UserViewModel", "Query: " + query);
         userSearchResultLiveData = testDatabaseRepository.searchUsers(query);
         return userSearchResultLiveData;
+    }
+
+    public MutableLiveData<Result> getCommentUserLiveData(){
+        return testDatabaseRepository.getCommentUserLiveData();
+    }
+
+    public void getUserFromUsername(String username){
+        testDatabaseRepository.getUserFromUsername(username);
     }
 }

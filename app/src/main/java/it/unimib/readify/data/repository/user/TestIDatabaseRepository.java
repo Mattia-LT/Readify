@@ -13,7 +13,8 @@ public interface TestIDatabaseRepository {
     void signUp(String email, String password);
 
     void testSet(Result result);
+    void getUserFromUsername(String username);
     MutableLiveData<Result> getUserMutableLiveData();
-
+    MutableLiveData<Result> getCommentUserLiveData();
     MutableLiveData<List<Result>> searchUsers(String query);
 }

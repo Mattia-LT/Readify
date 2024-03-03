@@ -13,5 +13,7 @@ public interface UserResponseCallback {
     void onSuccessFromRemoteDatabase(List<User> searchResults);
     void onFailureFromRemoteDatabaseUser(String message);
     void onFailureFromRemoteDatabaseWork(String message);
+    void onSuccessFromRemoteDatabaseUserFromUsername(User user);
+    void onFailureFromRemoteDatabaseUserFromUsername(String message);
     void onSuccessLogout();
 }

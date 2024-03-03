@@ -2,6 +2,7 @@ package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
 
 import android.util.Log;
@@ -102,7 +103,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void getUser(String idToken) {
-        databaseReference.child("users").child(idToken).get().addOnCompleteListener(task -> {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
                 userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));
             }
@@ -129,6 +130,36 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    public void getUserFromUsername(String username) {
+        Log.d("DataSource", "Username: " + username);
+        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        Log.d("DataSource", customReference.toString());
+        Query query = customReference.orderByChild(FIREBASE_USERS_USERNAME_FIELD).equalTo(username);
+        query.get().addOnCompleteListener(task -> {
+           if(task.isSuccessful()){
+               for (DataSnapshot userSnapshot : task.getResult().getChildren()){
+                   if(userSnapshot.exists()){
+                       Log.d("DataSource","DataSnapshot: " + userSnapshot.getValue());
+                       User user = userSnapshot.getValue(User.class);
+                       Log.d("Fragment", "UserInfo: " + user.toString());
+                       userResponseCallback.onSuccessFromRemoteDatabaseUserFromUsername(user);
+                   } else {
+                       //todo gestire errore
+                       userResponseCallback.onFailureFromRemoteDatabaseUserFromUsername(task.getException().getLocalizedMessage());
+                   }
+               }
+           } else {
+               //todo gestire errore
+               Exception exception = task.getException();
+               if (exception != null) {
+                   Log.e("GetUserFromUsername", "Error: " + exception.getMessage());
+               }
+               userResponseCallback.onFailureFromRemoteDatabaseUserFromUsername(exception.getMessage());
+           }
+        });
+    }
+
+    @Override
     public void searchUsers(String query) {
         //todo possiamo rimuoverlo o passarlo come parametro. per ora lascio qua
         int limit = 10;
@@ -136,7 +167,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION);
         // query + "\uf8ff" is used to set the end of the range
         Log.d("UserRemoteDataSource", customReference.toString());
-        Query searchQuery = customReference.orderByChild("username").startAt(query).endAt(query + "\uf8ff");
+        Query searchQuery = customReference.orderByChild(FIREBASE_USERS_USERNAME_FIELD).startAt(query).endAt(query + "\uf8ff");
         Log.d("UserRemoteDataSource", searchQuery.toString());
         searchQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

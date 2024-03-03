@@ -1,6 +1,7 @@
 package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
+import static it.unimib.readify.util.Constants.BUNDLE_USER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -11,6 +12,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +26,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,10 +43,16 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CommentAdapter;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentBookDetailsBinding;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 
 public class BookDetailsFragment extends Fragment {
@@ -50,9 +60,7 @@ public class BookDetailsFragment extends Fragment {
     private FragmentBookDetailsBinding fragmentBookDetailsBinding;
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
-
-
-
+    private TestDatabaseViewModel testDatabaseViewModel;
     public BookDetailsFragment() {
         // Required empty public constructor
     }
@@ -80,6 +88,12 @@ public class BookDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
+        initRepositories();
+
+
+
+
+
         Bundle arguments = getArguments();
         if (arguments != null) {
             OLWorkApiResponse receivedBook = arguments.getParcelable(BUNDLE_BOOK);
@@ -154,12 +168,45 @@ public class BookDetailsFragment extends Fragment {
                 commentAdapter = new CommentAdapter(commentList, requireActivity().getApplication(), new CommentAdapter.OnItemClickListener() {
                     @Override
                     public void onCommentClick(Comment comment) {
-                        Snackbar.make(view, comment.getUserId(), Snackbar.LENGTH_SHORT).show();;
-                        Bundle bundle = new Bundle();
-                        //todo aspetto di avere i viewmodel pronti
-                        //potrebbe servire viewmodel per fare una chiamata al DB e ottenere i dati ottenuti dall'username
+                        if (comment != null && comment.getUserId() != null) {
+                            Log.d("Fragment", "Comment username:" + comment.getUserId());
 
-                        //comando di navigation da dettagli a profilo
+                            //TODO: DA MODIFICARE, STESSO PROBLEMA DELL'USER COLLISION PERCHE CARICA LE COSE "IN RITARDO"
+                            // Observe the user LiveData and navigate when it's updated
+                            Observer<Result> userObserver = new Observer<Result>() {
+                                @Override
+                                public void onChanged(Result result) {
+                                    testDatabaseViewModel.getCommentUserLiveData().removeObserver(this);  // Remove the observer to avoid multiple triggers
+                                    if (result instanceof Result.UserSuccess) {
+                                        User user = ((Result.UserSuccess) result).getData();
+                                        Bundle bundle = new Bundle();
+                                        bundle.putParcelable(BUNDLE_USER, user);
+                                        Log.d("Fragment", "COMMENTUSER: " + user.getUsername());
+                                        Log.d("Fragment", "COMMENTCLICKED: " + comment.getUserId());
+                                        //TODO questo if non dovrebbe esserci, era solo un test per capire il problema ma per ora lo lascio
+                                        if(user.getUsername().equals(comment.getUserId())){
+                                            Navigation.findNavController(requireView()).navigate(R.id.action_bookDetailsFragment_to_userDetailsFragment, bundle);
+                                        } else {
+                                            testDatabaseViewModel.getUserFromUsername(comment.getUserId());
+                                            Log.d("Fragment", "COMMENTUSER 2: " + user.getUsername());
+
+                                        }
+                                    } else if (result instanceof Result.Error) {
+                                        // Handle the error
+                                        Log.e("Fragment", "Error: " + ((Result.Error) result).getMessage());
+                                    }
+                                }
+                            };
+                            // Trigger the user retrieval
+                            testDatabaseViewModel.getUserFromUsername(comment.getUserId());
+                            // Observe the user LiveData
+                            testDatabaseViewModel.getCommentUserLiveData().observe(getViewLifecycleOwner(), userObserver);
+
+
+                        } else {
+                            Log.d("Fragment", "Error - comment is null OR userId is null");
+                            // todo handle the error
+                        }
                     }
                 });
                 recyclerViewSearchResults.setAdapter(commentAdapter);
@@ -171,10 +218,10 @@ public class BookDetailsFragment extends Fragment {
 
 
     public List<Comment> fetchComments(String key){
-        Comment comment1 = new Comment("Username1","Bel libro!",new Date(1609459200000L), 1);
-        Comment comment2 = new Comment("Username2","Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at arcu eu velit auctor luctus. Vivamus in lacus vel mauris dignissim fringilla. Integer nec mauris vel nisi fringilla gravida a non augue.\n" +
+        Comment comment1 = new Comment("utente1","Bel libro!",new Date(1609459200000L), 1);
+        Comment comment2 = new Comment("utente2","Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at arcu eu velit auctor luctus. Vivamus in lacus vel mauris dignissim fringilla. Integer nec mauris vel nisi fringilla gravida a non augue.\n" +
                 "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut feugiat, odio vitae tristique hendrerit, urna lectus finibus libero, id feugiat neque elit eget urna.\n", new Date(1554076800000L), 1);
-        Comment comment3 = new Comment("Username3","Brutto libro, non mi è piaciuto" ,new Date(1491004800000L), 1);
+        Comment comment3 = new Comment("utente3","Brutto libro, non mi è piaciuto" ,new Date(1491004800000L), 1);
         List<Comment> comments = new ArrayList<>();
         comments.add(comment1);
         comments.add(comment2);
@@ -224,6 +271,20 @@ public class BookDetailsFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        testDatabaseViewModel.getCommentUserLiveData().removeObservers(getViewLifecycleOwner());
+    }
+
+
+    private void initRepositories(){
+        TestIDatabaseRepository testIDatabaseRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testIDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+    }
 
 
 

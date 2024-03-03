@@ -1,9 +1,7 @@
 package it.unimib.readify.data.source.user;
 
-import java.util.List;
 
 import it.unimib.readify.data.repository.user.UserResponseCallback;
-import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 
@@ -19,7 +17,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void getUser(String idToken);
     public abstract void getWork(String idBook);
     public abstract void searchUsers(String query);
-
+    public abstract void getUserFromUsername(String username);
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);

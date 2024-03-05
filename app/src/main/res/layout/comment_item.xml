@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:orientation="vertical"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorTertiary"
     app:contentPadding="2dp">
 
     <RelativeLayout
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/comment_image"
             android:text="@string/placeholder_comment_name"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnTertiary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
             android:layout_below="@id/comment_name"
             android:layout_toEndOf="@id/comment_image"
             android:text="@string/placeholder_comment"
-            android:textColor="@color/black" />
+            android:textColor="?attr/colorOnTertiary" />
 
         <TextView
             android:id="@+id/comment_date"

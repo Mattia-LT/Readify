@@ -1,9 +1,13 @@
 package it.unimib.readify.ui.main;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -79,6 +83,26 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
+        MenuItem switchMenuItem = navigationView.getMenu().findItem(R.id.nav_switch);
+
+        // Ottieni la vista dell'azione associata all'elemento di menu
+        View actionLayout = switchMenuItem.getActionView();
+
+        // Trova lo SwitchCompat all'interno della vista dell'azione
+        SwitchCompat switchButton = actionLayout.findViewById(R.id.switch_compat);
+
+        // Imposta il listener per il cambio di stato dello switch
+        switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Log.d("SwitchCompat", "Stato dello switch cambiato: " + isChecked);
+            if (isChecked) {
+                Log.d("SwitchCompat", "Tema scuro attivato");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                Log.d("SwitchCompat", "Tema scuro disattivato");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
         loadMenu(view);
 
         //initializing repository and viewModel User
@@ -182,6 +206,8 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 toolbar.setTitle(title);
                 menuInflater.inflate(R.menu.profile_appbar_menu, menu);
             }
+
+
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.action_notifications) {
@@ -194,10 +220,12 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                     } else {
                         drawerLayout.openDrawer(GravityCompat.END);
                     }
+
                     navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                             int itemId = menuItem.getItemId();
+
                             if (itemId == R.id.nav_settings) {
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
                             }
@@ -208,12 +236,17 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
                                  */
                              }
-                            if (itemId == R.id.nav_dark_mode) {
-                                Snackbar.make(view, "Funzione non ancora implementata", Snackbar.LENGTH_SHORT).show();
-                            }
+
                             if (itemId == R.id.nav_visibility) {
-                                ;/* Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_visibilityFragment);*/
+                                // Esegui le azioni per la voce del menu 'Visibility'
+                                // ...
                             }
+
+                            if (itemId == R.id.nav_switch) {
+
+                            }
+
+
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;
                         }

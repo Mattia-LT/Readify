@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn = "navigation_view">
+    tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_baseline_settings"
@@ -13,10 +12,15 @@
             android:id="@+id/nav_visibility"
             android:icon="@drawable/ic_baseline_lock_open_24"
             android:title="Privacy"/>
-        <item
-            android:id="@+id/nav_dark_mode"
-            android:icon="@drawable/ic_baseline_brightness_24"
-            android:title="Dark Mode"/>
+    </group>
+
+    <item
+        android:id="@+id/nav_switch"
+        android:title="Tema"
+        app:actionLayout="@layout/custom_switch"
+        app:showAsAction="always"/>
+
+    <group>
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_baseline_logout"

@@ -1,12 +1,15 @@
 package it.unimib.readify.data.source.book;
 
+import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.SEARCH;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import it.unimib.readify.R;
@@ -75,7 +78,8 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
         for(String id: idList){
             olApiService.fetchBook(id).enqueue(new Callback<OLWorkApiResponse>() {
                 @Override
-                public void onResponse(Call<OLWorkApiResponse> call, Response<OLWorkApiResponse> response) {
+                public void onResponse(@NonNull Call<OLWorkApiResponse> call,
+                                       @NonNull Response<OLWorkApiResponse> response) {
                     if(response.isSuccessful()){
                         OLWorkApiResponse book = response.body();
                         if(book != null){
@@ -95,7 +99,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 }
 
                 @Override
-                public void onFailure(Call<OLWorkApiResponse> call, Throwable t) {
+                public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
                     //todo gestire errori
                 }
             });

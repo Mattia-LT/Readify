@@ -152,9 +152,10 @@ public class LoginFragment extends Fragment {
          such as removal from the Backstack.
         //todo verify that removal from backstack destroys the container
 
-        Differences between Back button and Navigation Component
+        Differences between Back button, Navigation Component and Menu
         Having a Start point and a Destination point, both points being a container:
          Back button destroys the Start point (removing it from the Backstack);
+         Menu (which depends on Navigation Component) destroys the Start point (removing it from the Backstack);
          Navigation doesn't destroys the Start point;
      */
     @Override

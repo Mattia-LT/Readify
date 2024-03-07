@@ -103,7 +103,6 @@ public class TestDatabaseViewModel extends ViewModel {
 
     //new logic
     public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
-        Log.d("viewModel set", "set");
         testDatabaseRepository.getUser(email, password, isRegistered);
         if(!isUIRunning) {
             setUIRunning(true);

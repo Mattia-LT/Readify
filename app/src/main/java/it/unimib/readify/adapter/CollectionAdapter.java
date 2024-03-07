@@ -26,15 +26,14 @@ import it.unimib.readify.model.Collection;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
-
     private List<Collection> collectionsList;
     private final OnItemClickListener onItemClickListener;
     private final Application application;
 
     /*
-    using an interface because
-        1) there may be more different events to manage
-        2) the adapter remains generic
+        using an interface because
+            1) there may be more different events to manage
+            2) the adapter remains generic
      */
     public interface OnItemClickListener {
         void onCollectionItemClick(Collection collection);
@@ -75,10 +74,10 @@ public class CollectionAdapter extends
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private ImageView thumbnail;
-        private TextView name;
-        private ImageView visibilityIcon;
-        private ConstraintLayout container;
+        private final ImageView thumbnail;
+        private final TextView name;
+        private final ImageView visibilityIcon;
+        private final ConstraintLayout container;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,7 +91,7 @@ public class CollectionAdapter extends
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
-            if(collection.getWorks() == null || collection.getWorks().size() == 0)
+            if(collection.getWorks() == null || collection.getWorks().isEmpty())
                 thumbnail.setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;

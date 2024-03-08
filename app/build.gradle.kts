@@ -80,6 +80,9 @@ dependencies {
     //ce l'aveva il prof (?)
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
+    // libreria per le imageview rotonde
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     testImplementation("junit:junit:4.13.2")

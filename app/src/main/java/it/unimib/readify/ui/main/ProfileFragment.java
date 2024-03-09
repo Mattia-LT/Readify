@@ -1,5 +1,7 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.COLLECTION;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,7 @@ import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -27,6 +30,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
 import java.util.Locale;
 
 import it.unimib.readify.R;
@@ -35,6 +39,7 @@ import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
@@ -50,13 +55,12 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     private CollectionAdapter collectionAdapter;
     private User user;
     /*
-        Do we want @copiedUser?
-        In database, do we want to save Works (generated from every keyBook, contained in Collections)?
-            No)     we need @copiedUser
-            Yes)    we don't need @copiedUser
+        todo Do we need a copy of user data?
+         @copiedUser
      */
     private User copiedUser;
     private Observer<Result> observer;
+    private Observer<List<Collection>> collectionsObserver;
 
     public ProfileFragment() {}
 
@@ -78,6 +82,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d("profile lifecycle", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         loadMenu(view);
 
@@ -96,49 +101,63 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 new DataViewModelFactory(bookRepository)
         ).get(BookViewModel.class);
 
-        //initializing Observer
+        //initializing Observers
+        collectionsObserver = collections -> {
+            Log.d("profile fragment", "collections changed");
+            if(collections.size() == copiedUser.getCollections().size()) {
+                runCollectionsView(view, collections);
+            }
+            //todo managing observer deletion (where?)
+        };
+
         observer = result -> {
-            Log.d("profile fragment", "data changed");
+            Log.d("profile fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess)result).getData();
                 copiedUser = new User(user);
                 updateUI();
 
-                //todo update collections
-                //get books from api
                 /*
-                int counter = 0;
-                for (int i = 0; i < copiedUser.getCollections().size(); i++) {
-                    int finalCounter = counter;
-                    //todo update constant "normal"
-                    bookViewModel.fetchBooks(copiedUser.getCollections().get(i).getBooks(), "normal")
-                            .observe(getViewLifecycleOwner(), resultsList -> {
-                                for(int j = 0; j < resultsList.size(); j++) {
-                                    if(resultsList.get(j).isSuccess()) {
-                                        OLWorkApiResponse book = ((Result.WorkSuccess) resultsList.get(j)).getData();
-                                        copiedUser.getCollections().get(finalCounter).getWorks().add(j, book);
-                                    }
-                                }
-                                //UI collections view
-                                //runCollectionsView(view, user);
-                                //UI collections creation
-                                //runCollectionCreationProcess();
-                            });
-                    counter++;
-                }
+                    todo optimize conditions and / or logic of @isCollectionsChanged
+                     maybe we can use user == copiedUser
+                    this resolves the double calling of @collectionsObserver
+                    right now, this is straightforward; it is working but can be optimized most probably
                  */
+                if(testDatabaseViewModel.isCollectionsChanged()) {
+                    bookViewModel.fetchCollections(copiedUser.getCollections(), getViewLifecycleOwner());
+                    testDatabaseViewModel.setCollectionsChanged(false);
+                }
             } else {
                 //todo navigate to login(?)
                 Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
             }
+            //todo managing observer deletion (where?)
         };
         //get user data from database
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
+        bookViewModel.getFetchedCollections().observe(getViewLifecycleOwner(), collectionsObserver);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("profile lifecycle", "onStart");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("profile lifecycle", "onDestroyView");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("profile lifecycle", "onDetach");
     }
 
     //managing collections existence
-    public void runCollectionsView(View view, User user) {
-
+    public void runCollectionsView(View view, List<Collection> collections) {
         //managing collectionAdapter and recycler view
         collectionAdapter = new CollectionAdapter(
                 new CollectionAdapter.OnItemClickListener() {
@@ -150,7 +169,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
         fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
-        collectionAdapter.setCollectionsList(user.getCollections());
+        collectionAdapter.setCollectionsList(copiedUser.getCollections());
     }
 
     public void runCollectionCreationProcess() {
@@ -162,7 +181,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     }
 
     //CollectionCreationBottomSheet.OnInputListener method
-    //todo da fare
+    //todo implement
     @Override
     public void sendInput(Collection newCollection) {
         //collectionsList.add(newCollection);

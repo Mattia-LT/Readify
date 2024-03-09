@@ -8,13 +8,16 @@ import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.data.source.book.BookRemoteDataSource;
+import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
@@ -26,8 +29,10 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private MutableLiveData<List<Result>> suggestedBooksLiveData;
     private MutableLiveData<List<Result>> recentBooksLiveData;
     private MutableLiveData<List<Result>> trendingBooksLiveData;
-    private MutableLiveData<List<Result>> collectionBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
+
+    private final MutableLiveData<List<Collection>> fetchedCollections;
+    private List<MutableLiveData<List<Result>>> collectionsResultsList;
 
     public static BookRepository getInstance(Application application) {
         return new BookRepository(new BookRemoteDataSource(application));
@@ -39,7 +44,9 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         suggestedBooksLiveData = new MutableLiveData<>();
         recentBooksLiveData = new MutableLiveData<>();
         trendingBooksLiveData = new MutableLiveData<>();
-        collectionBooksLiveData = new MutableLiveData<>();
+
+        fetchedCollections = new MutableLiveData<>();
+        collectionsResultsList = new ArrayList<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
         this.bookRemoteDataSource.setResponseCallback(this);
     }
@@ -66,10 +73,51 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 return recentBooksLiveData;
             case SUGGESTED:
                 return suggestedBooksLiveData;
-            case COLLECTION:
-                return collectionBooksLiveData;
         }
         return null;
+    }
+
+    //todo undo separation of methods, most surely getBooksByIdList() can be used
+    public void fetchCollections(List<Collection> collections, LifecycleOwner lifecycleOwner) {
+        List<Collection> tempList = new ArrayList<>();
+        final int[] counter = {0};
+        Observer<List<Result>> observer = fetchedWorks -> {
+            for (int i = 0; i < fetchedWorks.size(); i++) {
+                if(fetchedWorks.get(i).isSuccess()) {
+                    OLWorkApiResponse work = ((Result.WorkSuccess)fetchedWorks.get(i)).getData();
+                    collections.get(counter[0]).getWorks().add(work);
+                }
+            }
+            tempList.add(collections.get(counter[0]));
+            if(tempList.size() == collections.size()) {
+                fetchedCollections.postValue(tempList);
+            }
+            counter[0]++;
+            //todo managing observer deletion (where?)
+        };
+        for (int i = 0; i < collections.size(); i++) {
+            collectionsResultsList.add(new MutableLiveData<>());
+            bookRemoteDataSource.getBooks(collections.get(i).getBooks(), COLLECTION);
+            collectionsResultsList.get(i).observe(lifecycleOwner, observer);
+        }
+    }
+
+    public MutableLiveData<List<Collection>> getFetchedCollections() {
+        return fetchedCollections;
+    }
+
+    public void onSuccessFetchCollectionFromRemote
+            (List<OLWorkApiResponse> workApiResponseList) {
+        List<Result> resultList = new ArrayList<>();
+        for(OLWorkApiResponse work : workApiResponseList){
+            resultList.add(new Result.WorkSuccess(work));
+        }
+        for (MutableLiveData<List<Result>> list: collectionsResultsList) {
+            if(list.getValue() == null) {
+                list.postValue(resultList);
+                break;
+            }
+        }
     }
 
     @Override
@@ -100,9 +148,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 break;
             case SEARCH:
                 searchResultsLiveData.postValue(resultList);
-                break;
-            default:
-                collectionBooksLiveData.postValue(resultList);
                 break;
         }
     }

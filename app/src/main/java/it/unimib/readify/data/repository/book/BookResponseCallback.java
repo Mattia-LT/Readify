@@ -1,8 +1,11 @@
 package it.unimib.readify.data.repository.book;
 
+import androidx.lifecycle.MutableLiveData;
+
 import java.util.List;
 
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.model.Result;
 
 /**
  * Interface to send data from Repositories to Activity/Fragment.
@@ -15,5 +18,6 @@ public interface BookResponseCallback {
     void onSuccessSearchFromRemote(List<OLWorkApiResponse> searchApiResponse);
     void onSuccessFetchBookFromRemote(OLWorkApiResponse workApiResponse);
     void onSuccessFetchBooksFromRemote(List<OLWorkApiResponse> workApiResponseList, String reference);
+    void onSuccessFetchCollectionFromRemote(List<OLWorkApiResponse> workApiResponseList);
     void onFailureFromRemote(Exception exception);
 }

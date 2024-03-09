@@ -46,6 +46,7 @@ public class TestDatabaseViewModel extends ViewModel {
      */
     private MutableLiveData<List<Result>> userSearchResultLiveData;
     private boolean isUIRunning;
+    private boolean isCollectionsChanged;
 
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
@@ -99,6 +100,7 @@ public class TestDatabaseViewModel extends ViewModel {
             }
             copiedData.postValue(result);
         });
+        isCollectionsChanged = true;
     }
 
     //new logic
@@ -123,6 +125,14 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void setUIRunning(boolean UIRunning) {
         isUIRunning = UIRunning;
+    }
+
+    public boolean isCollectionsChanged() {
+        return isCollectionsChanged;
+    }
+
+    public void setCollectionsChanged(boolean collectionsChanged) {
+        isCollectionsChanged = collectionsChanged;
     }
 
     /*

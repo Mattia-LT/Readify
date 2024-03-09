@@ -114,6 +114,24 @@ public class SearchFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("search lifecycle", "onStart");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("search lifecycle", "onDestroyView");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("search lifecycle", "onDetach");
+    }
+
     public void loadMenu(){
         //TODO capire perche se clicco due volte search in basso si cancella la top bar
         //TODO capire perchè per mezzo secondo si vede il nome originale e non subito il nome giusto

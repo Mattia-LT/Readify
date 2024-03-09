@@ -269,18 +269,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("home fragment", "onStart");
+        Log.d("home lifecycle", "onStart");
     }
 
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d("home fragment", "onDestroyView");
+        Log.d("home lifecycle", "onDestroyView");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("home fragment", "onDestroy");
+        Log.d("home lifecycle", "onDestroy");
     }
 
     private void navigateToBookDetailsFragment() {

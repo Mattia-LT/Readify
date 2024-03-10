@@ -15,12 +15,11 @@ import it.unimib.readify.R;
 import it.unimib.readify.databinding.ActivityHomeBinding;
 public class HomeActivity extends AppCompatActivity {
 
-    private ActivityHomeBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
+        ActivityHomeBinding binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         MaterialToolbar toolbar = binding.topAppbarHome;

@@ -25,10 +25,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
@@ -37,7 +37,6 @@ import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -57,25 +56,12 @@ public class HomeFragment extends Fragment {
 
     private TestDatabaseViewModel testDatabaseViewModel;
 
-    private User user;
-
     public HomeFragment() {}
-
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-                ).get(BookViewModel.class);
-
+        initViewModels();
         trendingBookList = new ArrayList<>();
         suggestedBookList = new ArrayList<>();
         recentBookList = new ArrayList<>();
@@ -95,15 +81,6 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
         Log.d("home fragment", "onViewCreated");
-
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
-                .create(TestDatabaseViewModel.class);
-
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), result -> {
-
-        });
 
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();
@@ -130,16 +107,12 @@ public class HomeFragment extends Fragment {
         mockDataRecent.add("/works/OL82560W");
         mockDataRecent.add("/works/OL20874116W");
 
-        // RecyclerView for trending carousel
-        RecyclerView recyclerViewTrendingBooks = fragmentHomeBinding.trendingContainer;
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        // Create an adapter
-        trendingBooksAdapter = new BookCarouselAdapter(trendingBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener(){
+        BookCarouselAdapter.OnItemClickListener onItemClickListener = new BookCarouselAdapter.OnItemClickListener(){
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(BUNDLE_BOOK, book);
-                navigateToBookDetailsFragment(bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
             }
 
             @Override
@@ -148,121 +121,53 @@ public class HomeFragment extends Fragment {
                 //bookList.get(position).setFavorite(!newsList.get(position).isFavorite());
                 //iNewsRepository.updateNews(newsList.get(position));
             }
-        });
+        };
 
-        // Set the adapter on the RecyclerView
-        recyclerViewTrendingBooks.setAdapter(trendingBooksAdapter);
-        recyclerViewTrendingBooks.setLayoutManager(layoutManager);
+        RecyclerView.LayoutManager trendingLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager suggestedLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager recentLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
 
-        bookViewModel.fetchBooks(mockDataTrending, TRENDING).observe(getViewLifecycleOwner(), resultList -> {
-            int counter = 0;
-            for(Result result : resultList){
-                if(result.isSuccess()) {
-                    OLWorkApiResponse trendingBook = ((Result.WorkSuccess) result).getData();
-                    //Log.d("trending "+ trendingBook.getTitle(), trendingBook.toString());
-                    this.trendingBookList.add(trendingBook);
-                    trendingBooksAdapter.notifyItemInserted(counter++);
-                } else {
-                    //Log.e("Result.isSuccess() = false in home fragment", result.toString());
-                    Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        /*
-        bookViewModel.searchBooks("harry+potter", null).observe(getViewLifecycleOwner(), result -> {
-            if(result.isSuccess()) {
-                //Log.e("controllo", ((Result.SearchSuccess) result).getData().toString());
-                int intialSize = this.trendingBookList.size();
-                this.trendingBookList.clear();
-                this.trendingBookList.addAll(((Result.SearchSuccess) result).getData().getWorkList());
-                trendingBooksAdapter.notifyItemRangeInserted(intialSize, this.trendingBookList.size());
-            } else {
-                Log.e("Result.isSuccess() = false in home fragment", result.toString());
-                Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-        */
-
-        // RecyclerView for suggested carousel
-        RecyclerView recyclerViewSuggestedBooks =fragmentHomeBinding.suggestedContainer;
-        RecyclerView.LayoutManager suggestedBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        // Create an adapter
-        suggestedBooksAdapter = new BookCarouselAdapter(suggestedBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {
-            @Override
-            public void onBookItemClick(OLWorkApiResponse book) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_BOOK, book);
-                navigateToBookDetailsFragment(bundle);
-            }
-
-            @Override
-            public void onAddToCollectionButtonPressed(int position) {
-                //TODO da implementare
-            }
-        });
-
-        // Set the adapter on the RecyclerView
-        recyclerViewSuggestedBooks.setAdapter(suggestedBooksAdapter);
-        recyclerViewSuggestedBooks.setLayoutManager(suggestedBooksLayoutManager);
-
-        // view model
-
-        bookViewModel.fetchBooks(mockDataSuggested, SUGGESTED).observe(getViewLifecycleOwner(), resultList -> {
-            int counter = 0;
-            for(Result result : resultList){
-                if(result.isSuccess()) {
-                    OLWorkApiResponse suggestedBook = ((Result.WorkSuccess) result).getData();
-                    //Log.d("suggested "+ suggestedBook.getTitle() + "(" + counter + ")", suggestedBook.toString());
-                    this.suggestedBookList.add(suggestedBook);
-                    suggestedBooksAdapter.notifyItemInserted(counter++);
-                } else {
-                    //Log.e("Result.isSuccess() = false in home fragment", result.toString());
-                    Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        // recycler view for recent books
-
+        RecyclerView recyclerViewTrendingBooks = fragmentHomeBinding.trendingContainer;
+        RecyclerView recyclerViewSuggestedBooks = fragmentHomeBinding.suggestedContainer;
         RecyclerView recyclerViewRecentBooks = fragmentHomeBinding.recentContainer;
-        RecyclerView.LayoutManager recentBooksLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        // Create an adapter
-        recentBooksAdapter = new BookCarouselAdapter(recentBookList, requireActivity().getApplication(), new BookCarouselAdapter.OnItemClickListener() {
-            @Override
-            public void onBookItemClick(OLWorkApiResponse book) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_BOOK, book);
-                navigateToBookDetailsFragment(bundle);
-            }
 
-            @Override
-            public void onAddToCollectionButtonPressed(int position) {
-                //TODO da implementare
-            }
-        });
 
-        // Set the adapter on the RecyclerView
+        trendingBooksAdapter = new BookCarouselAdapter(trendingBookList, requireActivity().getApplication(), onItemClickListener);
+        suggestedBooksAdapter = new BookCarouselAdapter(suggestedBookList, requireActivity().getApplication(), onItemClickListener);
+        recentBooksAdapter = new BookCarouselAdapter(recentBookList, requireActivity().getApplication(), onItemClickListener);
+
+        recyclerViewTrendingBooks.setAdapter(trendingBooksAdapter);
+        recyclerViewSuggestedBooks.setAdapter(suggestedBooksAdapter);
         recyclerViewRecentBooks.setAdapter(recentBooksAdapter);
-        recyclerViewRecentBooks.setLayoutManager(recentBooksLayoutManager);
 
-        // view model
+        recyclerViewTrendingBooks.setLayoutManager(trendingLayoutManager);
+        recyclerViewSuggestedBooks.setLayoutManager(suggestedLayoutManager);
+        recyclerViewRecentBooks.setLayoutManager(recentLayoutManager);
 
+
+        bookViewModel.fetchBooks(mockDataTrending, TRENDING).observe(getViewLifecycleOwner(),resultList -> {
+            List<OLWorkApiResponse> workResultList = resultList.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+
+            trendingBooksAdapter.refreshList(workResultList);
+        });
+        bookViewModel.fetchBooks(mockDataSuggested, SUGGESTED).observe(getViewLifecycleOwner(), resultList -> {
+            List<OLWorkApiResponse> workResultList = resultList.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+
+            suggestedBooksAdapter.refreshList(workResultList);
+        });
         bookViewModel.fetchBooks(mockDataRecent, RECENT).observe(getViewLifecycleOwner(), resultList -> {
-            int counter = 0;
-            for(Result result : resultList){
-                if(result.isSuccess()) {
-                    OLWorkApiResponse recentBook = ((Result.WorkSuccess) result).getData();
-                    //Log.d("recent "+ recentBook.getTitle() + "(" + counter + ")", recentBook.toString());
-                    this.recentBookList.add(recentBook);
-                    recentBooksAdapter.notifyItemInserted(counter++);
-                } else {
-                    //Log.e("Result.isSuccess() = false in home fragment", result.toString());
-                    Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-                }
-            }
+            List<OLWorkApiResponse> workResultList = resultList.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+
+            recentBooksAdapter.refreshList(workResultList);
         });
     }
 
@@ -283,16 +188,11 @@ public class HomeFragment extends Fragment {
         Log.d("home fragment", "onDestroy");
     }
 
-    private void navigateToBookDetailsFragment() {
-        Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment);
-    }
-
-    private void navigateToBookDetailsFragment(Bundle bundle) {
-        Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
-    }
 
 
-    public void loadMenu(){
+
+
+    private void loadMenu(){
         // Set up the toolbar and remove all icons
         MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
         requireActivity().addMenuProvider(new MenuProvider() {
@@ -313,4 +213,29 @@ public class HomeFragment extends Fragment {
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
     }
+
+    private void initViewModels(){
+        IBookRepository bookRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(IBookRepository.class);
+
+        bookViewModel = new ViewModelProvider
+                (
+                        requireActivity(),
+                        new DataViewModelFactory(bookRepository)
+                )
+                .get(BookViewModel.class);
+
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
+                .getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+
+        testDatabaseViewModel = TestDatabaseViewModelFactory
+                .getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+
+    }
+
+
+
 }

@@ -17,31 +17,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:paddingHorizontal="20dp"
         android:gravity="top|start">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            >
 
             <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="130dp"
-                android:layout_height="130dp"
+                android:id="@+id/avatar_image_view"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="40dp"
                 android:contentDescription="@string/pa_description_photo"
-                android:src="@drawable/ic_baseline_profile_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_baseline_profile_24"
+                />
 
             <LinearLayout
                 android:id="@+id/follower_counter_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/imageView"
+                app:layout_constraintStart_toEndOf="@id/avatar_image_view"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
@@ -55,15 +58,17 @@
                         android:id="@+id/textview_follower_counter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="19"
-                        android:textSize="23sp" />
+                        android:textSize="23sp"
+                        tools:text="200"
+                        />
 
                     <TextView
                         android:id="@+id/textview_follower_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="follower"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:text="@string/textview_followers"
+                        />
                 </LinearLayout>
 
                 <LinearLayout
@@ -79,14 +84,15 @@
                         android:id="@+id/textview_following_counter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7"
-                        android:textSize="23sp" />
+                        android:textSize="23sp"
+                        tools:text="150"
+                        />
 
                     <TextView
                         android:id="@+id/textview_following_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="followed"
+                        android:text="@string/textview_following"
                         android:textSize="20sp" />
                 </LinearLayout>
 
@@ -99,11 +105,11 @@
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintTop_toBottomOf="@id/follower_counter_container"
-                app:layout_constraintStart_toEndOf="@id/imageView"
+                app:layout_constraintStart_toEndOf="@id/avatar_image_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:icon="@drawable/person_add_black_24dp"
                 android:layout_marginTop="14dp"
-                android:text="Follow"
+                android:text="@string/follow_button_string"
                 style="@style/Widget.MaterialComponents.Button"
                 />
 
@@ -111,20 +117,21 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- condivisione social VERSIONE 1-->
         <TextView
             android:id="@+id/textview_user_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ema_bon__"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:text="Name"
+            />
 
         <TextView
             android:id="@+id/textview_user_biography"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ema01"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            tools:text="Biography"
+            />
 
         <!-- collections -->
         <TextView

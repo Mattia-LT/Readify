@@ -19,12 +19,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -165,6 +165,17 @@ public class UserDetailsFragment extends Fragment {
         binding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
         binding.textviewUserUsername.setText(user.getUsername());
         binding.textviewUserBiography.setText(user.getBiography());
+        int avatarId;
+        try {
+            avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+        } catch (Exception e) {
+            avatarId = R.drawable.ic_baseline_profile_24;
+        }
+        Glide.with(requireActivity().getApplicationContext())
+                .load(avatarId)
+                .dontAnimate()
+                .into(binding.avatarImageView);
+
         // todo devo ancora implementare
         loadUserCollections(user);
 

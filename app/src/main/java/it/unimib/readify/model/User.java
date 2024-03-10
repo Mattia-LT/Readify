@@ -7,6 +7,7 @@ import java.util.List;
 
 public class User implements Parcelable {
 
+    private String avatar;
     private String biography;
     private List<Collection> collections;
     private List<Factor> recommended;
@@ -33,10 +34,11 @@ public class User implements Parcelable {
         this.gender = gender;
     }
 
-    public User(String biography, List<Collection> collections, List<Factor> recommended,
+    public User(String avatar, String biography, List<Collection> collections, List<Factor> recommended,
                 String email, String gender, List<Social> socialLinks, String username,
                 String visibility, ExternalGroup followers, ExternalGroup following,
                 String idToken) {
+        this.avatar = avatar;
         this.biography = biography;
         this.collections = collections;
         this.recommended = recommended;
@@ -51,6 +53,7 @@ public class User implements Parcelable {
     }
 
     public User (User user) {
+        this.avatar = user.getAvatar();
         this.biography = user.getBiography();
         this.collections = user.getCollections();
         this.recommended = user.getRecommended();
@@ -62,6 +65,14 @@ public class User implements Parcelable {
         this.followers = user.getFollowers();
         this.following = user.getFollowing();
         this.idToken = user.getIdToken();
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getBiography() {
@@ -160,6 +171,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.avatar);
         dest.writeString(this.biography);
         dest.writeTypedList(this.collections);
         dest.writeTypedList(this.recommended);
@@ -174,6 +186,7 @@ public class User implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
+        this.avatar = source.readString();
         this.biography = source.readString();
         this.collections = source.createTypedArrayList(Collection.CREATOR);
         this.recommended = source.createTypedArrayList(Factor.CREATOR);
@@ -188,6 +201,7 @@ public class User implements Parcelable {
     }
 
     protected User(Parcel in) {
+        this.avatar = in.readString();
         this.biography = in.readString();
         this.collections = in.createTypedArrayList(Collection.CREATOR);
         this.recommended = in.createTypedArrayList(Factor.CREATOR);
@@ -215,9 +229,9 @@ public class User implements Parcelable {
 
     @Override
     public String toString() {
-        return super.toString() +
-                "User{" +
-                "biography='" + biography + '\'' +
+        return "User{" +
+                "avatar='" + avatar + '\'' +
+                ", biography='" + biography + '\'' +
                 ", collections=" + collections +
                 ", recommended=" + recommended +
                 ", email='" + email + '\'' +

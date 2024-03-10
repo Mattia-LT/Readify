@@ -39,7 +39,7 @@
             android:layout_marginTop="10dp">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/avatar_image_view"
                 android:layout_width="130dp"
                 android:layout_height="130dp"
                 android:contentDescription="@string/pa_description_photo"
@@ -62,12 +62,14 @@
                     android:id="@+id/textView_followers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="23sp" />
+                    android:textSize="23sp"
+                    tools:text="150"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="follower"
+                    android:text="@string/textview_followers"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -86,12 +88,14 @@
                     android:id="@+id/textView_following"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="23sp" />
+                    android:textSize="23sp"
+                    tools:text="200"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="following"
+                    android:text="@string/textview_following"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -123,7 +127,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Collections"
+            android:text="@string/pa_collections"
             android:textSize="30sp"
             android:layout_marginTop="30dp"/>
 
@@ -149,7 +153,8 @@
                 android:src="@drawable/ic_arrow_right"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="TODO" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

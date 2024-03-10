@@ -1,53 +1,122 @@
 package it.unimib.readify.model;
 
-import java.util.Date;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-//todo da cambiare per il database
-public class Comment {
-    private String userId;
-    private String comment;
-    private Date date;
-    private int postId;
 
-    // Constructor
-    public Comment(String userId, String comment, Date date, int postId) {
-        this.userId = userId;
-        this.comment = comment;
-        this.date = date;
-        this.postId = postId;
+public class Comment implements Parcelable {
+
+    private String commentId;
+    private String content;
+    private String idToken;
+    private long timestamp;
+
+    //todo rimuovi seguente commento
+    //Non va salvato nel database
+    private User user;
+
+    public Comment() {
+        // Default constructor for Firebase
     }
 
-    // Getter and Setter methods
-
-    public String getUserId() {
-        return userId;
+    public Comment(String commentId, String content, String idToken, long timestamp) {
+        this.commentId = commentId;
+        this.content = content;
+        this.idToken = idToken;
+        this.timestamp = timestamp;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getCommentId() {
+        return commentId;
     }
 
-    public String getComment() {
-        return comment;
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public String getContent() {
+        return content;
     }
 
-    public Date getDate() {
-        return date;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public String getIdToken() {
+        return idToken;
     }
 
-    public int getPostId() {
-        return postId;
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 
-    public void setPostId(int postId) {
-        this.postId = postId;
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.commentId);
+        dest.writeString(this.content);
+        dest.writeString(this.idToken);
+        dest.writeLong(this.timestamp);
+        dest.writeParcelable(this.user, flags);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.commentId = source.readString();
+        this.content = source.readString();
+        this.idToken = source.readString();
+        this.timestamp = source.readLong();
+        this.user = source.readParcelable(User.class.getClassLoader());
+    }
+
+    protected Comment(Parcel in) {
+        this.commentId = in.readString();
+        this.content = in.readString();
+        this.idToken = in.readString();
+        this.timestamp = in.readLong();
+        this.user = in.readParcelable(User.class.getClassLoader());
+    }
+
+    public static final Creator<Comment> CREATOR = new Creator<Comment>() {
+        @Override
+        public Comment createFromParcel(Parcel source) {
+            return new Comment(source);
+        }
+
+        @Override
+        public Comment[] newArray(int size) {
+            return new Comment[size];
+        }
+    };
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "commentId='" + commentId + '\'' +
+                ", content='" + content + '\'' +
+                ", idToken='" + idToken + '\'' +
+                ", timestamp=" + timestamp +
+                ", user=" + user +
+                '}';
     }
 }

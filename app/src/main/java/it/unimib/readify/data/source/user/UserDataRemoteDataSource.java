@@ -2,6 +2,7 @@ package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
 
@@ -22,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -130,32 +132,59 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void getUserFromUsername(String username) {
-        Log.d("DataSource", "Username: " + username);
-        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION);
-        Log.d("DataSource", customReference.toString());
-        Query query = customReference.orderByChild(FIREBASE_USERS_USERNAME_FIELD).equalTo(username);
-        query.get().addOnCompleteListener(task -> {
-           if(task.isSuccessful()){
-               for (DataSnapshot userSnapshot : task.getResult().getChildren()){
-                   if(userSnapshot.exists()){
-                       Log.d("DataSource","DataSnapshot: " + userSnapshot.getValue());
-                       User user = userSnapshot.getValue(User.class);
-                       Log.d("Fragment", "UserInfo: " + user.toString());
-                       userResponseCallback.onSuccessFromRemoteDatabaseUserFromUsername(user);
-                   } else {
-                       //todo gestire errore
-                       userResponseCallback.onFailureFromRemoteDatabaseUserFromUsername(task.getException().getLocalizedMessage());
-                   }
-               }
-           } else {
-               //todo gestire errore
-               Exception exception = task.getException();
-               if (exception != null) {
-                   Log.e("GetUserFromUsername", "Error: " + exception.getMessage());
-               }
-               userResponseCallback.onFailureFromRemoteDatabaseUserFromUsername(exception.getMessage());
-           }
+    public void fetchComments(String bookId){
+        Log.d("DataSource", "fetchComments start");
+        if (bookId.startsWith("/works/")) {
+            bookId = bookId.substring("/works/".length());
+        }
+        DatabaseReference customReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(bookId).child(FIREBASE_WORKS_COMMENTS_FIELD);
+        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("DataSource", "onDataChange ok");
+                List<Comment> comments = new ArrayList<>();
+                int totalComments = (int) snapshot.getChildrenCount();
+                final int[] commentLoaded = {0};
+                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
+                    Comment comment = commentSnapshot.getValue(Comment.class);
+                    if (comment != null) {
+                        Log.d("DataSource", "retrieve user information");
+                        fetchUserFromComment(comment, new UserFetchCallback(){
+                            @Override
+                            public void onUserFetched(Comment comment) {
+                                Log.d("DataSource", "user information retrieved " + comment.getUser().toString());
+                                comments.add(comment);
+                                commentLoaded[0]++;
+
+                                if(commentLoaded[0] == totalComments){
+                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                                }
+                            }
+
+                            @Override
+                            public void onUserFetchFailed(Comment comment) {
+                                commentLoaded[0]++;
+                                Log.d("DataSource", "user information failed");
+                                if (commentLoaded[0] == totalComments) {
+                                    // All user information retrieved (even if some failed), trigger callback
+                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                                }
+                            }
+                        });
+                    } else {
+                        commentLoaded[0]++;
+                        Log.d("DataSource", "Comment was null");
+                    }
+                }
+                Log.d("DataSource", "comments value " + comments);
+                userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("DataSource", "comments retrieve failed");
+                userResponseCallback.onFailureFetchCommentsFromRemoteDatabase(error.getMessage());
+            }
         });
     }
 
@@ -258,5 +287,34 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 child(SHARED_PREFERENCES_TOPICS_OF_INTEREST).setValue(new ArrayList<>(favoriteTopics));
     }
     */
+
+    private void fetchUserFromComment(Comment comment, UserFetchCallback callback){
+        Log.d("DataSource", "start user retrieve");
+
+        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION).child(comment.getIdToken());
+        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                comment.setUser(user);
+                Log.d("DataSource", "user retrieve OK, " + comment.getUser().toString());
+                callback.onUserFetched(comment);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("DataSource", "user retrieve FAIL");
+                comment.setUser(null);
+                callback.onUserFetched(comment);
+            }
+        });
+    }
+
+
+    public interface UserFetchCallback {
+        void onUserFetched(Comment comment);
+
+        void onUserFetchFailed(Comment comment);
+    }
 
 }

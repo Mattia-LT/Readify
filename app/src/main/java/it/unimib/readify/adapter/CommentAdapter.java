@@ -1,6 +1,7 @@
 package it.unimib.readify.adapter;
 
 import android.app.Application;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.CommentItemBinding;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.User;
 
 public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -56,6 +59,14 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return 0;
     }
 
+    public void refreshList(List<Comment> comments){
+        int size = commentList.size();
+        commentList.clear();
+        notifyItemRangeRemoved(0, size);
+        commentList.addAll(comments);
+        notifyItemRangeInserted(0, comments.size());
+    }
+
     public class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final CommentItemBinding binding;
 
@@ -67,30 +78,47 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void bind(Comment comment) {
+            if(comment != null){
+                Locale locale = Locale.getDefault();
+                if (locale.getLanguage().equals("it")) {
+                    locale = new Locale("it", "IT");
+                }
 
-            Locale locale = Locale.getDefault();
-            if (locale.getLanguage().equals("it")) {
-                locale = new Locale("it", "IT");
+                Date commentDate = new Date(comment.getTimestamp());
+                String pattern = "dd MMM yyyy";
+                SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
+                String formattedDate = dateFormat.format(commentDate);
+
+                binding.commentDate.setText(formattedDate);
+                binding.commentText.setText(comment.getContent());
+
+                User user = comment.getUser();
+                int avatarId;
+                if(user != null){
+                    Log.d("USER OK", "USER OK");
+                    binding.commentName.setText(comment.getUser().getUsername());
+                    try {
+                        avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+                    } catch (Exception e) {
+                        avatarId = R.drawable.ic_baseline_profile_24;
+                    }
+                    Glide.with(application)
+                            .load(avatarId)
+                            .dontAnimate()
+                            .into(binding.commentImage);
+                } else {
+                    Log.d("USER NULL", "USER NULL");
+                    //todo aggiungi errore nel caricamento dell'utente
+                }
             }
 
-            String pattern = "dd MMM yyyy";
-            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
-            String formattedDate = dateFormat.format(comment.getDate());
 
-            binding.commentDate.setText(formattedDate);
-            binding.commentText.setText(comment.getComment());
-            binding.commentName.setText(comment.getUserId());
-
-            //TODO caricare la foto profilo vera
-            Glide.with(application)
-                    .load(R.drawable.ic_baseline_profile_24)
-                    .into(binding.commentImage);
         }
 
         @Override
         public void onClick(View v) {
-            //todo gestire azioni quando clicchi sulla foto, dovrebbe aprire il profilo
-            onItemClickListener.onCommentClick(commentList.get(getAdapterPosition()));
+            Comment comment = commentList.get(getAdapterPosition());
+            onItemClickListener.onCommentClick(comment);
         }
     }
 }

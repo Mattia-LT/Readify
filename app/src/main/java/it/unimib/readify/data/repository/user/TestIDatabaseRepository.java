@@ -12,9 +12,9 @@ public interface TestIDatabaseRepository {
     void signIn(String email, String password);
     void signUp(String email, String password);
 
-    void testSet(Result result);
-    void getUserFromUsername(String username);
+    void fetchComments(String bookId);
     MutableLiveData<Result> getUserMutableLiveData();
-    MutableLiveData<Result> getCommentUserLiveData();
     MutableLiveData<List<Result>> searchUsers(String query);
+    MutableLiveData<List<Result>> getCommentListLiveData();
+
 }

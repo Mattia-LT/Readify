@@ -12,6 +12,7 @@ import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource
 import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
 import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
@@ -21,9 +22,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     private final BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
     private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
+
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultLiveData;
-    private final MutableLiveData<Result> commentUserLiveData;
+    private final MutableLiveData<List<Result>> commentListLiveData;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -36,7 +38,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userDataRemoteDataSource = userDataRemoteDataSource;
         this.userMutableLiveData = new MutableLiveData<>();
         this.userSearchResultLiveData = new MutableLiveData<>();
-        this.commentUserLiveData = new MutableLiveData<>();
+        this.commentListLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -53,9 +55,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     public MutableLiveData<Result> getUserMutableLiveData() {
         return userMutableLiveData;
-    }
-    public MutableLiveData<Result> getCommentUserLiveData(){
-        return commentUserLiveData;
     }
 
     public void testSet(Result result) {
@@ -80,9 +79,15 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void getUserFromUsername(String username){
-        Log.d("UserRepository", "Username: " + username);
-        userDataRemoteDataSource.getUserFromUsername(username);
+    public MutableLiveData<List<Result>> getCommentListLiveData() {
+        Log.d("Repository", "getCommentsListLiveData");
+        return commentListLiveData;
+    }
+
+    @Override
+    public void fetchComments(String bookId) {
+        Log.d("Repository", "fetch comments : START");
+        userDataRemoteDataSource.fetchComments(bookId);
     }
 
     @Override
@@ -131,15 +136,22 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onSuccessFromRemoteDatabaseUserFromUsername(User user) {
-        Result.UserSuccess result = new Result.UserSuccess(user);
-        commentUserLiveData.setValue(result);
+    public void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments) {
+        Log.d("Repository", "fetchComments result OK");
+        List<Result> commentResultList = new ArrayList<>();
+        for(Comment comment : comments){
+            commentResultList.add(new Result.CommentSuccess(comment));
+        }
+        Log.d("Repository", "fetchComments result --> " + commentResultList);
+        commentListLiveData.postValue(commentResultList);
     }
 
     @Override
-    public void onFailureFromRemoteDatabaseUserFromUsername(String message) {
+    public void onFailureFetchCommentsFromRemoteDatabase(String message) {
         Result.Error result = new Result.Error(message);
-        commentUserLiveData.setValue(result);
+        List<Result> commentResultList = new ArrayList<>();
+        commentResultList.add(result);
+        commentListLiveData.setValue(commentResultList);
     }
 
     @Override

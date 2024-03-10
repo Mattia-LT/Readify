@@ -38,6 +38,16 @@ public abstract class Result {
         }
     }
 
+    public static final class CommentSuccess extends Result{
+        private final Comment comment;
+        public CommentSuccess(Comment comment) {
+            this.comment = comment;
+        }
+        public Comment getData() {
+            return comment;
+        }
+    }
+
     /**
      * Class that represents an error occurred during the interaction
      * with a Web Service or a local database.

@@ -17,7 +17,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void getUser(String idToken);
     public abstract void getWork(String idBook);
     public abstract void searchUsers(String query);
-    public abstract void getUserFromUsername(String username);
+    public abstract void fetchComments(String bookId);
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);

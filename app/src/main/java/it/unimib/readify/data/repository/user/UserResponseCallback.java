@@ -2,6 +2,7 @@ package it.unimib.readify.data.repository.user;
 
 import java.util.List;
 
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 
@@ -13,7 +14,7 @@ public interface UserResponseCallback {
     void onSuccessFromRemoteDatabase(List<User> searchResults);
     void onFailureFromRemoteDatabaseUser(String message);
     void onFailureFromRemoteDatabaseWork(String message);
-    void onSuccessFromRemoteDatabaseUserFromUsername(User user);
-    void onFailureFromRemoteDatabaseUserFromUsername(String message);
+    void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments);
+    void onFailureFetchCommentsFromRemoteDatabase(String message);
     void onSuccessLogout();
 }

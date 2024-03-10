@@ -40,10 +40,11 @@ public class HomeActivity extends AppCompatActivity {
                 R.id.profileFragment
         ).build();
 
-        //For the toolbar
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        //For the bottom navigation view
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        if (navController != null) {
+            //For the toolbar
+            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+            //For the bottom navigation view
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        }
     }
 }

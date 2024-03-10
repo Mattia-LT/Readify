@@ -36,6 +36,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -234,7 +235,7 @@ public class BookDetailsFragment extends Fragment {
                     .map(result -> ((Result.CommentSuccess) result).getData())
                     .collect(Collectors.toList());
             Log.d("BookDetails Fragment", "Comment list : " + commentResultList);
-
+            commentResultList.sort(Comparator.comparing(Comment::getTimestamp));
             commentList = commentResultList;
             commentAdapter.refreshList(commentResultList);
         };

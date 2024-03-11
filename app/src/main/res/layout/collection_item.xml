@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/collection_name_visibility_constraintLayout"
         android:layout_width="200sp"
         android:paddingStart="18dp"
         android:paddingEnd="15dp"

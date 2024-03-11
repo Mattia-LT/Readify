@@ -1,9 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,7 +11,6 @@ import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -43,7 +38,6 @@ import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
@@ -129,7 +123,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         collectionsObserver = collections -> {
             Log.d("profile fragment", "collections changed");
             if(collections.size() == copiedUser.getCollections().size()) {
-                runCollectionsView(view, collections);
+                runCollectionsView(view);
             }
             //todo managing observer deletion (where?)
         };
@@ -181,7 +175,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     }
 
     //managing collections existence
-    public void runCollectionsView(View view, List<Collection> collections) {
+    public void runCollectionsView(View view) {
         //managing collectionAdapter and recycler view
         collectionAdapter = new CollectionAdapter(
                 new CollectionAdapter.OnItemClickListener() {

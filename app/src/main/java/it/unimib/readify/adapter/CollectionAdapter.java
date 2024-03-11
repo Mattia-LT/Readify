@@ -7,12 +7,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
+import it.unimib.readify.databinding.CollectionItemBinding;
 import it.unimib.readify.model.Collection;
 
 public class CollectionAdapter extends
@@ -29,9 +27,10 @@ public class CollectionAdapter extends
     private List<Collection> collectionsList;
     private final OnItemClickListener onItemClickListener;
     private final Application application;
+    private CollectionItemBinding collectionItemBinding;
 
     /*
-        using an interface because
+        Using an interface because
             1) there may be more different events to manage
             2) the adapter remains generic
      */
@@ -50,16 +49,15 @@ public class CollectionAdapter extends
         notifyItemRangeChanged(0, this.collectionsList.size());
     }
 
-    //managing layout
+    //Managing layout
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).
-                inflate(R.layout.collection_item, parent, false);
-        return new ViewHolder(view);
+        collectionItemBinding = CollectionItemBinding.inflate(LayoutInflater.from(application.getApplicationContext()));
+        return new ViewHolder(collectionItemBinding.getRoot());
     }
 
-    //association between the actual data and the layout
+    //Association between actual data and layout
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(collectionsList.get(position), position);
@@ -74,25 +72,19 @@ public class CollectionAdapter extends
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final ImageView thumbnail;
-        private final TextView name;
-        private final ImageView visibilityIcon;
-        private final ConstraintLayout container;
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            thumbnail = itemView.findViewById(R.id.collection_thumbnail_imageview);
-            name = itemView.findViewById(R.id.collection_name_textview);
-            visibilityIcon = itemView.findViewById(R.id.collection_visibility_icon);
-            container = itemView.findViewById(R.id.collection_container);
             itemView.setOnClickListener(this);
         }
 
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
+            //implement correct version
+            //todo insert same size for each thumbnail (maybe?)
             if(collection.getWorks() == null || collection.getWorks().isEmpty())
-                thumbnail.setImageResource(R.drawable.image_not_available);
+                collectionItemBinding.collectionThumbnailImageview
+                        .setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;
                 for (int i = 0; i < collection.getWorks().size(); i++) {
@@ -111,30 +103,37 @@ public class CollectionAdapter extends
                                                     + collection.getWorks().get(i).getCovers().get(j)
                                                     + "-L.jpg")
                                             .apply(requestOptions)
-                                            .into(thumbnail);
+                                            .into(collectionItemBinding.collectionThumbnailImageview);
                                     break;
                                 }
                             }
                 }
                 if(!isThumbnailAvailable)
-                    thumbnail.setImageResource(R.drawable.image_not_available);
+                    collectionItemBinding.collectionThumbnailImageview
+                            .setImageResource(R.drawable.image_not_available);
             }
 
             //set collection name and visibility
-            name.setText(collection.getName());
+            //todo correct private icon (true, false, onlyFriends maybe)
+            //check database
+            collectionItemBinding.collectionNameTextview.setText(collection.getName());
             if(collection.isVisible())
-                visibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
+                collectionItemBinding.collectionVisibilityIcon
+                        .setImageResource(R.drawable.baseline_visibility_24);
             else
-                visibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
+                collectionItemBinding.collectionVisibilityIcon
+                        .setImageResource(R.drawable.baseline_lock_outline_24);
 
-            //managing layout margin
-            GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) container.getLayoutParams();
-                //convert 5dp in px depending on the user's device
+            //Managing layout margin
+            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams
+                    (ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+            //Convert 5dp in px depending on the user's device
             float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, Resources.getSystem().getDisplayMetrics());
             if(position % 2 == 0)
                 layoutParams.rightMargin = (int) margin;
             else
                 layoutParams.leftMargin = (int) margin;
+            collectionItemBinding.collectionContainer.setLayoutParams(layoutParams);
         }
 
         @Override

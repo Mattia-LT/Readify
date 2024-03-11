@@ -85,6 +85,13 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return 0;
     }
 
+    public void refreshList(List<OLWorkApiResponse> books){
+        int size = bookList.size();
+        bookList.clear();
+        notifyItemRangeRemoved(0, size);
+        bookList.addAll(books);
+        notifyItemRangeInserted(0, books.size());
+    }
 
     // Custom ViewHolder
     public class BookHomeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -2,10 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background_color">#0047AB</color>
-    <color name="primary_color">#000080</color>
-    <color name="secondary_color">#ADD8E6</color>
-    <color name="tertiary_color">#008080</color>
     <color name="login_blue">#4b62f0</color>
     <color name="orange">#FFA500</color>
     <color name="red_undo">#CC0101</color>

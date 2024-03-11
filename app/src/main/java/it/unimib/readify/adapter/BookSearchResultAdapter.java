@@ -70,6 +70,14 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
         return 0;
     }
 
+    public void refreshList(List<OLWorkApiResponse> books){
+        int size = this.bookList.size();
+        bookList.clear();
+        notifyItemRangeRemoved(0,size);
+        bookList.addAll(books);
+        notifyItemRangeInserted(0, books.size());
+    }
+
     // custom viewholder to bind data to recyclerview items (search result items)
     public class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final BookSearchItemBinding binding;

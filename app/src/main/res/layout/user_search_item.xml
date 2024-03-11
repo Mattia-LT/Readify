@@ -13,13 +13,14 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <ImageView
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageview_user"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:scaleType="centerCrop"
             android:layout_gravity="center_vertical"
-            tools:src="@tools:sample/avatars"
+            android:contentDescription="TODO"
+            tools:src="@drawable/ic_baseline_profile_24"
             />
 
         <LinearLayout

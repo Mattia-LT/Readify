@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="64dp"
-            android:background="@color/light_gray_background"
+            android:background="?attr/backgroundColor"
             >
 
 
@@ -278,10 +278,11 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview_comments"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="wrap_content"
                     android:divider="@color/black"
                     android:dividerHeight="1dp"
                     android:layout_marginBottom="20dp"
+                    tools:itemCount="6"
                     tools:listitem="@layout/comment_item"
                     />
 

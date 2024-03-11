@@ -2,24 +2,29 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:orientation="vertical"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorTertiary"
     app:contentPadding="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comment_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/ic_baseline_profile_24"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="15dp"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000"
             android:contentDescription="@string/placeholder_comment"
+            tools:src="@drawable/ic_baseline_profile_24"
             />
 
         <TextView
@@ -28,9 +33,10 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/comment_image"
             android:text="@string/placeholder_comment_name"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnTertiary"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            />
 
         <TextView
             android:id="@+id/comment_text"
@@ -39,7 +45,7 @@
             android:layout_below="@id/comment_name"
             android:layout_toEndOf="@id/comment_image"
             android:text="@string/placeholder_comment"
-            android:textColor="@color/black" />
+            android:textColor="?attr/colorOnTertiary" />
 
         <TextView
             android:id="@+id/comment_date"

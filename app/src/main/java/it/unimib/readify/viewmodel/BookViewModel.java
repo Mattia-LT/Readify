@@ -55,9 +55,15 @@ public class BookViewModel extends ViewModel {
         userCollections = bookRepository.getFetchedCollections();
     }
 
-    public MutableLiveData<List<Result>> searchBooks(String query, String sort, String subjects) {
-        searchResultsLiveData = bookRepository.searchBooks(query, sort, limit, offset, subjects);
+    public MutableLiveData<List<Result>> getSearchResultsLiveData(){
+        if(searchResultsLiveData == null){
+            searchResultsLiveData = bookRepository.getSearchResultsLiveData();
+        }
         return searchResultsLiveData;
+    }
+
+    public void searchBooks(String query, String sort, String subjects) {
+        bookRepository.searchBooks(query, sort, limit, offset, subjects);
     }
 
     public LiveData<Result> fetchBook(String id){

@@ -101,5 +101,9 @@
     <string name="settings_button_profile">Menù</string>
     <string name="user_details">Profilo utente</string>
     <string name="collection_settings_button">Impostazioni della collezione</string>
+    <string name="textview_followers">Seguaci</string>
+    <string name="textview_following">Seguiti</string>
+    <string name="follow_button_string">Segui</string>
+    <string name="unfollow_button_string">Smetti di seguire</string>
 
 </resources>

@@ -175,13 +175,8 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("login fragment", "onViewCreated");
+        initRepositories();
 
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
-                .create(TestDatabaseViewModel.class);
-
-        testDatabaseViewModel.setUIRunning(false);
 
         /*
             Observer Class allows to observe a particular instance of LiveData,
@@ -482,4 +477,15 @@ public class LoginFragment extends Fragment {
                 return requireActivity().getString(R.string.unexpected_error);
         }
     }
+
+    private void initRepositories(){
+        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
+                .getRepository(TestIDatabaseRepository.class);
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+                .create(TestDatabaseViewModel.class);
+
+        testDatabaseViewModel.setUIRunning(false);
+    }
+
+
 }

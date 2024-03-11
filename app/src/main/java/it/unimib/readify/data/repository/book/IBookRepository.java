@@ -9,9 +9,10 @@ import it.unimib.readify.model.Result;
 
 public interface IBookRepository {
 
-    MutableLiveData<List<Result>> searchBooks(String query, String sort, int limit, int offset, String genres);
-
+    void searchBooks(String query, String sort, int limit, int offset, String genres);
+    MutableLiveData<List<Result>> getSearchResultsLiveData();
     LiveData<Result> fetchBook(String id);
 
     MutableLiveData<List<Result>> getBooksByIdList(List<String> idList, String reference);
+
 }

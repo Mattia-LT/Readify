@@ -3,7 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +13,7 @@ import android.view.inputmethod.EditorInfo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookSearchResultAdapter;
@@ -37,13 +38,11 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
     private FragmentTabSearchBooksBinding fragmentTabSearchBooksBinding;
 
     private BookSearchResultAdapter searchResultsAdapter;
-    private List<OLWorkApiResponse> searchResultList;
+    private List<OLWorkApiResponse> searchResultsList;
     private BookViewModel bookViewModel;
 
     private String sortMode;
     private String subjects;
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,11 +54,11 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        bookViewModel = new ViewModelProvider(requireActivity()).get(BookViewModel.class);
-        searchResultList = new ArrayList<>();
+        initViewModels();
+        initObserver();
+        searchResultsList = new ArrayList<>();
         RecyclerView recyclerViewSearchResults = fragmentTabSearchBooksBinding.recyclerviewSearch;
-        searchResultsAdapter = new BookSearchResultAdapter(searchResultList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
+        searchResultsAdapter = new BookSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 Bundle bundle = new Bundle();
@@ -72,6 +71,7 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
 
             }
         });
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         recyclerViewSearchResults.setAdapter(searchResultsAdapter);
         recyclerViewSearchResults.setLayoutManager(layoutManager);
@@ -84,12 +84,11 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
             filterBottomSheet.show(getChildFragmentManager(), filterBottomSheet.getTag());
         });
 
-        fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
         // Add an OnEditorActionListener to listen for the "Enter" key press
         fragmentTabSearchBooksBinding.edittextSearch.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (keyEvent != null && (actionId == KeyEvent.ACTION_DOWN || actionId == KeyEvent.KEYCODE_ENTER ||  actionId == EditorInfo.IME_ACTION_SEARCH || keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                 fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
-                startSearch(view);
+                startSearch();
                 return true;
             }
             return false;
@@ -99,54 +98,18 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
 
 
 
-    public void startSearch(View view){
+    public void startSearch(){
         // Perform the search when the "Enter" key is pressed
-        String query = Objects.requireNonNull(fragmentTabSearchBooksBinding.edittextSearch.getText()).toString();
-        Snackbar.make(view, "Query: " + query, Snackbar.LENGTH_SHORT).show();
-        if(query.trim().isEmpty()){
-            Snackbar.make(view, getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
+        Editable text = fragmentTabSearchBooksBinding.edittextSearch.getText();
+        String query = (text != null) ? text.toString() : "";
+        query = query.trim();
+        Snackbar.make(requireView(), "Query: " + query, Snackbar.LENGTH_SHORT).show();
+        if(query.isEmpty()){
+            Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
         } else {
-            fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
-            bookViewModel.searchBooks(query, sortMode, subjects).observe(getViewLifecycleOwner(), resultList -> {
-                fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
-                searchResultList.clear();
-                searchResultsAdapter.notifyItemRangeChanged(0,0);
-                for(Result result : resultList){
-                    if(result.isSuccess()) {
-                        OLWorkApiResponse searchedBook = ((Result.WorkSuccess) result).getData();
-                        //Log.d("book", searchedBook.toString());
-                        searchResultList.add(searchedBook);
-                    } else {
-                        Log.e("Result.isSuccess() = false in SearchBooks fragment", result.toString());
-                        Snackbar.make(view, "ERRORE", Snackbar.LENGTH_SHORT).show();
-                    }
-                }
-                searchResultsAdapter.notifyItemRangeChanged(0, searchResultList.size());
-                fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
-            });
+            bookViewModel.searchBooks(query, sortMode, subjects);
         }
-    }
 
-
-
-    private void resumeSearch(){
-        String query = Objects.requireNonNull(fragmentTabSearchBooksBinding.edittextSearch.getText()).toString();
-        if(!query.trim().isEmpty()){
-            bookViewModel.searchBooks(query, sortMode, subjects).observe(getViewLifecycleOwner(), resultList -> {
-                this.searchResultList.clear();
-                for(Result result : resultList){
-                    if(result.isSuccess()) {
-                        OLWorkApiResponse searchedBook = ((Result.WorkSuccess) result).getData();
-                        Log.d("book", searchedBook.toString());
-                        this.searchResultList.add(searchedBook);
-                    } else {
-                        Log.e("Result.isSuccess() = false in SearchBooks fragment", result.toString());
-                    }
-                }
-                searchResultsAdapter.notifyItemRangeChanged(0,searchResultList.size());
-                fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
-            });
-        }
     }
 
     @Override
@@ -162,10 +125,22 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        resumeSearch();
-        //todo potrebbero esserci soluzioni migliori
+    private void initViewModels(){
+        bookViewModel = new ViewModelProvider(requireActivity()).get(BookViewModel.class);
     }
+
+    private void initObserver(){
+        this.searchResultsList = new ArrayList<>();
+        final Observer<List<Result>> searchResultsListObserver = results -> {
+            List<OLWorkApiResponse> searchResults = results.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+            searchResultsList = searchResults;
+            searchResultsAdapter.refreshList(searchResults);
+            fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
+        };
+        bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
+    }
+
 }

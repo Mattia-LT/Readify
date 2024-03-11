@@ -24,7 +24,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
 
     private final MutableLiveData<Result> userMutableLiveData;
-    private final MutableLiveData<List<Result>> userSearchResultLiveData;
+    private final MutableLiveData<List<Result>> userSearchResultsLiveData;
     private final MutableLiveData<List<Result>> commentListLiveData;
 
     public static TestIDatabaseRepository getInstance(Application application) {
@@ -37,7 +37,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userAuthRemoteDataSource = userAuthRemoteDataSource;
         this.userDataRemoteDataSource = userDataRemoteDataSource;
         this.userMutableLiveData = new MutableLiveData<>();
-        this.userSearchResultLiveData = new MutableLiveData<>();
+        this.userSearchResultsLiveData = new MutableLiveData<>();
         this.commentListLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
@@ -72,16 +72,20 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<List<Result>> searchUsers(String query){
+    public void searchUsers(String query){
         Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);
-        return userSearchResultLiveData;
     }
 
     @Override
     public MutableLiveData<List<Result>> getCommentListLiveData() {
         Log.d("Repository", "getCommentsListLiveData");
         return commentListLiveData;
+    }
+
+    @Override
+    public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){
+        return userSearchResultsLiveData;
     }
 
     @Override
@@ -121,7 +125,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
             Log.d("UserRepository", "User: " + user);
             resultList.add(new Result.UserSuccess(user));
         }
-        userSearchResultLiveData.postValue(resultList);
+        userSearchResultsLiveData.postValue(resultList);
     }
 
     @Override

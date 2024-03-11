@@ -204,10 +204,8 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 int count = 0;
                 for (DataSnapshot userSnapshot : task.getResult().getChildren()) {
                     if (count < limit) {
-                        // Assuming you have a User class to represent the user data
                         User user = userSnapshot.getValue(User.class);
                         if (user != null) {
-                            // Do something with the user, e.g., display it in your UI
                             Log.d("UserSearch", "Found user: " + user);
                             userSearchResults.add(user);
                             count++;

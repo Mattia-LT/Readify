@@ -44,7 +44,7 @@ public class TestDatabaseViewModel extends ViewModel {
         @isUIRunning prevents the problem, allowing Login / Registration actions only after
          having set the data using setUserMutableLiveData(), each time a container is created.
      */
-    private MutableLiveData<List<Result>> userSearchResultLiveData;
+    private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
     private boolean isUIRunning;
 
@@ -158,10 +158,16 @@ public class TestDatabaseViewModel extends ViewModel {
          Implementing the new logic, the problem can't happen.
      */
 
-    public MutableLiveData<List<Result>> searchUsers(String query){
+    public void searchUsers(String query){
         Log.d("UserViewModel", "Query: " + query);
-        userSearchResultLiveData = testDatabaseRepository.searchUsers(query);
-        return userSearchResultLiveData;
+        testDatabaseRepository.searchUsers(query);
+    }
+
+    public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){
+        if(userSearchResultsLiveData == null){
+            userSearchResultsLiveData = testDatabaseRepository.getUserSearchResultsLiveData();
+        }
+        return userSearchResultsLiveData;
     }
 
     public MutableLiveData<List<Result>> getCommentList(){
@@ -177,8 +183,5 @@ public class TestDatabaseViewModel extends ViewModel {
     public void fetchComments(String bookId){
         Log.d("ViewModel", "fetchComments start");
         testDatabaseRepository.fetchComments(bookId);
-        //Log.d("ViewModel", "fetchComments result : " + commentListLiveData.getValue());
-
-        //commentListLiveData = testDatabaseRepository.getCommentListLiveData();
     }
 }

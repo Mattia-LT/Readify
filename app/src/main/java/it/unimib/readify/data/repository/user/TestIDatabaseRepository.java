@@ -13,8 +13,9 @@ public interface TestIDatabaseRepository {
     void signUp(String email, String password);
 
     void fetchComments(String bookId);
+    void searchUsers(String query);
     MutableLiveData<Result> getUserMutableLiveData();
-    MutableLiveData<List<Result>> searchUsers(String query);
+    MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
 
 }

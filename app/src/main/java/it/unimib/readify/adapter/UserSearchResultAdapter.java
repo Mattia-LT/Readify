@@ -61,6 +61,14 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
         return 0;
     }
 
+    public void refreshList(List<User> users){
+        int size = this.userList.size();
+        userList.clear();
+        notifyItemRangeRemoved(0,size);
+        userList.addAll(users);
+        notifyItemRangeInserted(0, users.size());
+    }
+
     // custom viewholder to bind data to recyclerview items (search result items)
     public class UserSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final UserSearchItemBinding binding;

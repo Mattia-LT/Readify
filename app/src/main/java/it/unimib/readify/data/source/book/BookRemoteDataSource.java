@@ -88,12 +88,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             fetchRatingForWork(book);
                             books.add(book);
                             if(books.size() == idList.size()){
-                                //todo is there a better way?
-                                if(reference.equals(COLLECTION)) {
-                                    responseCallback.onSuccessFetchCollectionFromRemote(books);
-                                } else {
-                                    responseCallback.onSuccessFetchBooksFromRemote(books, reference);
-                                }
+                                responseCallback.onSuccessFetchBooksFromRemote(books, reference);
                             }
                         } else {
                             //todo gestire errore

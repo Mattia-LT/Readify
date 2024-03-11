@@ -106,20 +106,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         return fetchedCollections;
     }
 
-    public void onSuccessFetchCollectionFromRemote
-            (List<OLWorkApiResponse> workApiResponseList) {
-        List<Result> resultList = new ArrayList<>();
-        for(OLWorkApiResponse work : workApiResponseList){
-            resultList.add(new Result.WorkSuccess(work));
-        }
-        for (MutableLiveData<List<Result>> list: collectionsResultsList) {
-            if(list.getValue() == null) {
-                list.postValue(resultList);
-                break;
-            }
-        }
-    }
-
     @Override
     public void onSuccessSearchFromRemote(List<OLWorkApiResponse> searchApiResponse) {
 
@@ -148,6 +134,15 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 break;
             case SEARCH:
                 searchResultsLiveData.postValue(resultList);
+                break;
+            case COLLECTION:
+                for (MutableLiveData<List<Result>> list: collectionsResultsList) {
+                    //todo it unexpectedly works, will it always work?
+                    if(list.getValue() == null) {
+                        list.postValue(resultList);
+                        break;
+                    }
+                }
                 break;
         }
     }

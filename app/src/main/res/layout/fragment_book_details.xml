@@ -42,6 +42,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:scaleType="centerCrop"
+                    android:contentDescription="@string/content_description_background_book"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
 
@@ -128,7 +129,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/outline_bookmark_add_24"
                         android:background="#0000"
-                        android:contentDescription="TODO" />
+                        android:contentDescription="@string/content_description_add_to_collection" />
 
                     <TextView
                         android:id="@+id/textview_add_to"
@@ -296,6 +297,7 @@
                     android:hint="@string/hint_comment"
                     android:inputType="textMultiLine"
                     android:layout_marginTop="8dp"
+                    android:importantForAutofill="no"
                     />
 
                 <Button

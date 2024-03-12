@@ -92,7 +92,7 @@
     <string name="empty_search_snackbar">The searchbar is empty</string>
     <string name="textview_home_suggested">Suggested for you</string>
     <string name="textview_new_books">New Books</string>
-    <string name="textview_loading">Loading...</string>
+    <string name="textview_loading">Loading…</string>
     <string name="rating_not_available">Rating not available</string>
     <string name="unexpected_error">An unexpected error occurred, please retry.</string>
     <string name="error_login_user_message">An error occurred during login, please retry</string>
@@ -118,5 +118,7 @@
     <string name="textview_following">Following</string>
     <string name="follow_button_string">Follow</string>
     <string name="unfollow_button_string">Unfollow</string>
+    <string name="content_description_background_book">A background containning a blurred version of the book\'s cover.</string>
+    <string name="content_description_add_to_collection">Button used to add a book into a collection.</string>
 
 </resources>

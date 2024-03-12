@@ -12,6 +12,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,6 +50,7 @@ import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -59,6 +62,8 @@ public class BookDetailsFragment extends Fragment {
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
     private TestDatabaseViewModel testDatabaseViewModel;
+    //todo rimuovi user quando cambi logica login
+    private User user;
     public BookDetailsFragment() {
         // Required empty public constructor
     }
@@ -126,6 +131,7 @@ public class BookDetailsFragment extends Fragment {
                 loadCover(receivedBook);
                 loadRating(receivedBook);
                 loadComments(receivedBook);
+                loadAddCommentSection(receivedBook);
                 fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
             }
         }
@@ -226,6 +232,29 @@ public class BookDetailsFragment extends Fragment {
         testDatabaseViewModel.fetchComments(book.getKey());
     }
 
+    private void loadAddCommentSection(OLWorkApiResponse book){
+        fragmentBookDetailsBinding.buttonAddComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Editable text = fragmentBookDetailsBinding.edittextComment.getText();
+                String commentContent = (text != null) ? text.toString() : "";
+                commentContent = commentContent.trim();
+                Snackbar.make(requireView(), "commentContent: " + commentContent, Snackbar.LENGTH_SHORT).show();
+                if(commentContent.isEmpty()){
+                    //todo cambia stringa
+                    Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    //TODO rivedi logica login, ho una idea
+                    String bookId = book.getKey();
+                    //String idToken = user.getIdToken();
+                    String idToken = "15yxdq8s6nM3y5LQ8kTkL94D2MC3";
+                    testDatabaseViewModel.addComment(commentContent,bookId,idToken);
+                    text.clear();
+                }
+            }
+        });
+    }
+
     private void initObserver(){
         this.commentList = new ArrayList<>();
 
@@ -240,6 +269,16 @@ public class BookDetailsFragment extends Fragment {
             commentAdapter.refreshList(commentResultList);
         };
         testDatabaseViewModel.getCommentList().observe(this, commentListObserver);
+
+        //TODO CAMBIA LOGICA DIETRO A QUESTO
+        final Observer<Result> loggedUserObserver = result -> {
+            Log.d("profile fragment", "user changed");
+            if(result.isSuccess()) {
+                this.user = ((Result.UserSuccess) result).getData();
+            }
+        };
+        //get user data from database
+        testDatabaseViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
     }
 
 

@@ -149,7 +149,11 @@ public class BookDetailsFragment extends Fragment {
         if(book.getRating() != null && book.getRating().getSummary().getAverage() != 0){
             float rating = (float) book.getRating().getSummary().getAverage();
             fragmentBookDetailsBinding.ratingbarBook.setRating(rating);
-            fragmentBookDetailsBinding.textviewRating.setText(String.format("%s", rating).substring(0,3));
+            String ratingString = String.format("%s", rating).substring(0,3)
+                    .concat(" (")
+                    .concat(String.format("%s", book.getRating().getSummary().getCount()))
+                    .concat(")");
+            fragmentBookDetailsBinding.textviewRating.setText(ratingString);
         } else {
             fragmentBookDetailsBinding.ratingbarBook.setRating(0);
             fragmentBookDetailsBinding.textviewRating.setText(R.string.rating_not_available);
@@ -233,24 +237,21 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void loadAddCommentSection(OLWorkApiResponse book){
-        fragmentBookDetailsBinding.buttonAddComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Editable text = fragmentBookDetailsBinding.edittextComment.getText();
-                String commentContent = (text != null) ? text.toString() : "";
-                commentContent = commentContent.trim();
-                Snackbar.make(requireView(), "commentContent: " + commentContent, Snackbar.LENGTH_SHORT).show();
-                if(commentContent.isEmpty()){
-                    //todo cambia stringa
-                    Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
-                } else {
-                    //TODO rivedi logica login, ho una idea
-                    String bookId = book.getKey();
-                    //String idToken = user.getIdToken();
-                    String idToken = "15yxdq8s6nM3y5LQ8kTkL94D2MC3";
-                    testDatabaseViewModel.addComment(commentContent,bookId,idToken);
-                    text.clear();
-                }
+        fragmentBookDetailsBinding.buttonAddComment.setOnClickListener(v -> {
+            Editable text = fragmentBookDetailsBinding.edittextComment.getText();
+            String commentContent = (text != null) ? text.toString() : "";
+            commentContent = commentContent.trim();
+            Snackbar.make(requireView(), "commentContent: " + commentContent, Snackbar.LENGTH_SHORT).show();
+            if(commentContent.isEmpty()){
+                //todo cambia stringa
+                Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
+            } else {
+                //TODO rivedi logica login, ho una idea
+                String bookId = book.getKey();
+                //String idToken = user.getIdToken();
+                String idToken = "15yxdq8s6nM3y5LQ8kTkL94D2MC3";
+                testDatabaseViewModel.addComment(commentContent,bookId,idToken);
+                text.clear();
             }
         });
     }

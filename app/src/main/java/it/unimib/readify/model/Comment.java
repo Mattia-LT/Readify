@@ -3,6 +3,10 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
+import java.util.Objects;
+
 
 public class Comment implements Parcelable {
 
@@ -109,6 +113,7 @@ public class Comment implements Parcelable {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "Comment{" +
@@ -118,5 +123,18 @@ public class Comment implements Parcelable {
                 ", timestamp=" + timestamp +
                 ", user=" + user +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comment = (Comment) o;
+        return timestamp == comment.timestamp && Objects.equals(commentId, comment.commentId) && Objects.equals(content, comment.content) && Objects.equals(idToken, comment.idToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(commentId, content, idToken, timestamp);
     }
 }

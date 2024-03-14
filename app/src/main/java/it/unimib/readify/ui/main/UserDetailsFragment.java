@@ -177,7 +177,7 @@ public class UserDetailsFragment extends Fragment {
                 .into(binding.avatarImageView);
 
         // todo devo ancora implementare
-        loadUserCollections(user);
+        //loadUserCollections(user);
 
     }
 

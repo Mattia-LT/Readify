@@ -231,44 +231,21 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     @Override
     public void addComment(String content,String bookId, String idToken){
         String finalBookId = bookId.substring("/works/".length());
-        DatabaseReference worksReference = databaseReference.child(FIREBASE_WORKS_COLLECTION);
-        DatabaseReference commentsReference = worksReference.child(finalBookId).child(FIREBASE_WORKS_COMMENTS_FIELD);
 
-        Comment newComment = new Comment();
+        DatabaseReference commentsReference = databaseReference
+                .child(FIREBASE_WORKS_COLLECTION)
+                .child(finalBookId)
+                .child(FIREBASE_WORKS_COMMENTS_FIELD);
+
         DatabaseReference newCommentReference = commentsReference.push();
 
         String commentId = newCommentReference.getKey();
         long timestamp = new Date().getTime();
-        newComment.setCommentId(commentId);
-        newComment.setContent(content);
-        newComment.setIdToken(idToken);
-        newComment.setTimestamp(timestamp);
-        worksReference.child(finalBookId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    //esistono già altri commenti
-                    if (commentId != null) {
-                        newCommentReference.setValue(newComment);
-                        fetchComments(bookId);
-                        userResponseCallback.onAddCommentResult(newComment);
-                    } else {
-                        //TODO error, in teoria non dovrebbe mai entrare qua
-                    }
-                } else {
-                    // Instance does not exist, create it
-                    commentsReference.setValue(Collections.singletonList(newComment));
-                    fetchComments(bookId);
-                    userResponseCallback.onAddCommentResult(newComment);
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error checking instance: " + databaseError.getMessage());
-                userResponseCallback.onAddCommentResult(null);
-            }
-        });
+        Comment newComment = new Comment(commentId, content, idToken, timestamp);
+
+        newCommentReference.setValue(newComment);
+        userResponseCallback.onAddCommentResult(newComment);
     }
 
     @Override

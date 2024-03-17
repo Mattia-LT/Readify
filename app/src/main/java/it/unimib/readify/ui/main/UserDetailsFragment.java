@@ -1,24 +1,18 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_USER;
 import static it.unimib.readify.util.Constants.COLLECTION;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -84,22 +78,6 @@ public class UserDetailsFragment extends Fragment {
     private void loadMenu(){
         // Set up the toolbar and remove all icons
         MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menu.clear();
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat(requireContext().getString(R.string.user_details));
-                toolbar.setTitle(title);
-                menuInflater.inflate(R.menu.default_appbar_menu, menu);
-            }
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
         // Enable the back button
         Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
         int newColor = getResources().getColor(R.color.white, null);
@@ -147,17 +125,10 @@ public class UserDetailsFragment extends Fragment {
         collectionAdapter.setCollectionsList(publicCollections);
     }
     private void fetchUserData(){
-        Bundle arguments = getArguments();
-        if(arguments != null){
-            User receivedUser = arguments.getParcelable(BUNDLE_USER);
-            if(receivedUser != null){
-                showUserInfo(receivedUser);
-            } else {
-                // todo gestire errore user = null
-            }
-        } else {
-            // todo errore arguments = null
-        }
+        User receivedUser = UserDetailsFragmentArgs.fromBundle(getArguments()).getUser();
+        String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
+        requireActivity().setTitle(username);
+        showUserInfo(receivedUser);
     }
 
     private void showUserInfo(User user){

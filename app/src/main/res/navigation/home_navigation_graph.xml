@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="it.unimib.readify.ui.main.HomeFragment"
-        android:label="fragment_home"
+        android:label="@string/navigation_bar_item_home"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_bookDetailsFragment"
@@ -19,7 +19,7 @@
     <fragment
         android:id="@+id/searchFragment"
         android:name="it.unimib.readify.ui.main.SearchFragment"
-        android:label="fragment_search"
+        android:label="@string/navigation_bar_item_search"
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment_to_bookDetailsFragment"
@@ -48,7 +48,7 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="it.unimib.readify.ui.main.ProfileFragment"
-        android:label="fragment_profile"
+        android:label="@string/navigation_bar_item_profile"
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment_to_collectionFragment"
@@ -69,8 +69,16 @@
     <fragment
         android:id="@+id/userDetailsFragment"
         android:name="it.unimib.readify.ui.main.UserDetailsFragment"
-        android:label="fragment_user_details"
-        tools:layout="@layout/fragment_user_details" >
+        android:label="{username}"
+        tools:layout="@layout/fragment_user_details">
+        <argument
+            android:name="user"
+            app:argType="it.unimib.readify.model.User" />
+        <argument
+            android:name="username"
+            app:argType="string"
+            />
+
         <action
             android:id="@+id/action_userDetailsFragment_to_collectionFragment"
             app:destination="@+id/collectionFragment"/>
@@ -82,8 +90,14 @@
     <fragment
         android:id="@+id/collectionFragment"
         android:name="it.unimib.readify.ui.main.CollectionFragment"
-        android:label="fragment_collection"
+        android:label="{collectionName}"
         tools:layout="@layout/fragment_collection" >
+        <argument
+            android:name="collectionData"
+            app:argType="it.unimib.readify.model.Collection" />
+        <argument
+            android:name="collectionName"
+            app:argType="string"/>
         <action
             android:id="@+id/action_collectionFragment_to_profileFragment"
             app:destination=
@@ -98,8 +112,12 @@
     <fragment
         android:id="@+id/bookDetailsFragment"
         android:name="it.unimib.readify.ui.main.BookDetailsFragment"
-        android:label="fragment_book_details"
+        android:label="@string/book_details"
         tools:layout="@layout/fragment_book_details" >
+        <argument
+            android:name="book"
+            app:argType="it.unimib.readify.model.OLWorkApiResponse" />
+
 
         <action
             android:id="@+id/action_bookDetailsFragment_to_homeFragment"
@@ -130,7 +148,7 @@
     <fragment
         android:id="@+id/settingFragment"
         android:name="it.unimib.readify.ui.main.SettingsFragment"
-        android:label="fragment_settings"
+        android:label="@string/pa_settings"
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"

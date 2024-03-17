@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
-import static it.unimib.readify.util.Constants.BUNDLE_USER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -15,21 +13,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,7 +69,6 @@ public class BookDetailsFragment extends Fragment {
         fragmentBookDetailsBinding = FragmentBookDetailsBinding.inflate(inflater, container, false);
         initViewModels();
         initObserver();
-        fetchArguments();
         return fragmentBookDetailsBinding.getRoot();
     }
 
@@ -88,45 +80,15 @@ public class BookDetailsFragment extends Fragment {
         fetchBookData();
     }
 
-    public void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menu.clear();
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat(requireContext().getString(R.string.book_details));
-                toolbar.setTitle(title);
-                menuInflater.inflate(R.menu.default_appbar_menu, menu);
-            }
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
-        // Enable the back button
-        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-        int newColor = getResources().getColor(R.color.white, null);
-        if (coloredIcon != null) {
-            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
-        }
-        toolbar.setNavigationIcon(coloredIcon);
-        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
-
-    }
-
     private void fetchBookData() {
-        if (receivedBook != null) {
-            loadCover();
-            loadAuthors();
-            loadRating();
-            fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
-            loadComments();
-            loadAddCommentSection();
-        }
+        receivedBook =  BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
+        testDatabaseViewModel.fetchComments(receivedBook.getKey());
+        loadCover();
+        loadAuthors();
+        loadRating();
+        fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
+        loadComments();
+        loadAddCommentSection();
     }
 
     private void initViewModels(){
@@ -214,9 +176,8 @@ public class BookDetailsFragment extends Fragment {
         commentAdapter = new CommentAdapter(comment -> {
             if (comment != null && comment.getIdToken() != null) {
                 Log.d("Fragment", "Comment username:" + comment.getIdToken());
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_USER, comment.getUser());
-                Navigation.findNavController(requireView()).navigate(R.id.action_bookDetailsFragment_to_userDetailsFragment, bundle);
+                NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser(),comment.getUser().getUsername());
+                Navigation.findNavController(requireView()).navigate(action);
             } else {
                 Log.d("Fragment", "Error - comment is null OR userId is null");
                 // todo handle the error
@@ -277,14 +238,18 @@ public class BookDetailsFragment extends Fragment {
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
-    private void fetchArguments(){
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            this.receivedBook = arguments.getParcelable(BUNDLE_BOOK);
-            if(receivedBook != null){
-                testDatabaseViewModel.fetchComments(receivedBook.getKey());
-            }
+    private void loadMenu(){
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        // Enable the back button
+        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
+        int newColor = getResources().getColor(R.color.white, null);
+        if (coloredIcon != null) {
+            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
         }
+        toolbar.setNavigationIcon(coloredIcon);
+        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+
     }
 
 }

@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -15,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,9 +60,8 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         searchResultsAdapter = new BookSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_BOOK, book);
-                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_bookDetailsFragment, bundle);
+                NavDirections action = SearchFragmentDirections.actionSearchFragmentToBookDetailsFragment(book);
+                Navigation.findNavController(requireView()).navigate(action);
             }
 
             @Override

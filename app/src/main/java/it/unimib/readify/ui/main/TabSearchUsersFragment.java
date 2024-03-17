@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_USER;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -15,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,9 +60,8 @@ public class TabSearchUsersFragment extends Fragment {
         userSearchResultAdapter = new UserSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new UserSearchResultAdapter.OnItemClickListener() {
             @Override
             public void onUserItemClick(User user) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_USER, user);
-                Navigation.findNavController(requireView()).navigate(R.id.action_searchFragment_to_userDetailsFragment, bundle);
+                NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user, user.getUsername());
+                Navigation.findNavController(requireView()).navigate(action);
             }
 
             @Override

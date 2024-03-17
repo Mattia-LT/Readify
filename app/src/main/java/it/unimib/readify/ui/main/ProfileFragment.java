@@ -1,10 +1,13 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,22 +18,13 @@ import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -43,7 +37,6 @@ import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
@@ -187,7 +180,8 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 new CollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onCollectionItemClick(Collection collection) {
-                        Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_collectionFragment);
+                        NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName());
+                        Navigation.findNavController(view).navigate(action);
                     }
                 }, requireActivity().getApplication());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
@@ -214,18 +208,12 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
 
     public void loadMenu(View view){
         // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menu.clear();
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat(requireContext().getString(R.string.book_details));
-                toolbar.setTitle(title);
                 menuInflater.inflate(R.menu.profile_appbar_menu, menu);
             }
-
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {

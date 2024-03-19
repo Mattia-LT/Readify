@@ -2,7 +2,6 @@ package it.unimib.readify.adapter;
 
 import android.app.Application;
 import android.content.res.Resources;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,34 +78,38 @@ public class CollectionAdapter extends
 
         public void bind(Collection collection, int position) {
             //set collection thumbnail
-            //todo verify correct behavior with multiple books in a collection
-            //implement correct version
-            //todo insert same size for each thumbnail (maybe?)
+            /*
+                todo sometimes behavior is incorrect
+                 - works contained in wrong collection
+                 - thumbnail does not correspond to the first cover of the first work
+                todo insert same size for each thumbnail (maybe?)
+            */
             if(collection.getWorks() == null || collection.getWorks().isEmpty())
                 collectionItemBinding.collectionThumbnailImageview
                         .setImageResource(R.drawable.image_not_available);
             else {
                 boolean isThumbnailAvailable = false;
                 for (int i = 0; i < collection.getWorks().size(); i++) {
-                        if(collection.getWorks().get(i) != null && collection.getWorks().get(i).getCovers() != null)
-                            for (int j = 0; j < collection.getWorks().get(i).getCovers().size(); j++) {
-                                if(collection.getWorks().get(i).getCovers().get(j) != -1) {
-                                    isThumbnailAvailable = true;
-                                    Log.d("url", "https://covers.openlibrary.org/b/id/"
-                                            + collection.getWorks().get(i).getCovers().get(j)
-                                            + "-L.jpg");
-                                    RequestOptions requestOptions = new RequestOptions()
-                                            .placeholder(R.drawable.loading_image_gif)
-                                            .error(R.drawable.image_not_available);
-                                    Glide.with(application)
-                                            .load("https://covers.openlibrary.org/b/id/"
-                                                    + collection.getWorks().get(i).getCovers().get(j)
-                                                    + "-L.jpg")
-                                            .apply(requestOptions)
-                                            .into(collectionItemBinding.collectionThumbnailImageview);
-                                    break;
-                                }
+                    if(collection.getWorks().get(i) != null && collection.getWorks().get(i).getCovers() != null) {
+                        for (int j = 0; j < collection.getWorks().get(i).getCovers().size(); j++) {
+                            if(collection.getWorks().get(i).getCovers().get(j) != -1) {
+                                isThumbnailAvailable = true;
+                                RequestOptions requestOptions = new RequestOptions()
+                                        .placeholder(R.drawable.loading_image_gif)
+                                        .error(R.drawable.image_not_available);
+                                Glide.with(application)
+                                        .load("https://covers.openlibrary.org/b/id/"
+                                                + collection.getWorks().get(i).getCovers().get(j)
+                                                + "-L.jpg")
+                                        .apply(requestOptions)
+                                        .into(collectionItemBinding.collectionThumbnailImageview);
+                                break;
                             }
+                        }
+                    }
+                    if(isThumbnailAvailable) {
+                        break;
+                    }
                 }
                 if(!isThumbnailAvailable)
                     collectionItemBinding.collectionThumbnailImageview
@@ -114,15 +117,14 @@ public class CollectionAdapter extends
             }
 
             //set collection name and visibility
-            //todo correct private icon (true, false, onlyFriends maybe)
-            //check database
             collectionItemBinding.collectionNameTextview.setText(collection.getName());
-            if(collection.isVisible())
+            if(collection.isVisible()) {
                 collectionItemBinding.collectionVisibilityIcon
                         .setImageResource(R.drawable.baseline_visibility_24);
-            else
+            } else {
                 collectionItemBinding.collectionVisibilityIcon
                         .setImageResource(R.drawable.baseline_lock_outline_24);
+            }
 
             //Managing layout margin
             ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams

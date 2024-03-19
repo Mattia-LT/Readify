@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import it.unimib.readify.R;
@@ -23,13 +26,15 @@ import it.unimib.readify.model.User;
 
 public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
+    private final User loggedUser;
     public interface OnItemClickListener {
         void onCommentClick(Comment comment);
+        void onCommentDelete(Comment comment);
     }
 
     private final OnItemClickListener onItemClickListener;
 
-    public CommentAdapter(OnItemClickListener onItemClickListener) {
+    public CommentAdapter(User loggedUser, OnItemClickListener onItemClickListener) {
         super(new DiffUtil.ItemCallback<Comment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
@@ -42,6 +47,7 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
             }
         });
         this.onItemClickListener = onItemClickListener;
+        this.loggedUser = loggedUser;
     }
 
     @NonNull
@@ -58,7 +64,13 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
         holder.bind(comment);
     }
 
-
+    @Override
+    public void submitList(@Nullable List<Comment> list) {
+        if (list != null) {
+            list.sort(Comparator.comparing(Comment::getTimestamp));
+        }
+        super.submitList(list);
+    }
 
     public class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final CommentItemBinding binding;
@@ -66,8 +78,9 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
         public CommentViewHolder(@NonNull CommentItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.getRoot().setOnClickListener(this);
-            // todo mettere il listener sulla foto profilo? parliamone
+            binding.commentImage.setOnClickListener(this);
+            binding.commentName.setOnClickListener(this);
+            binding.deleteCommentButton.setOnClickListener(this);
         }
 
         public void bind(Comment comment) {
@@ -99,6 +112,13 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
                             .load(avatarId)
                             .dontAnimate()
                             .into(binding.commentImage);
+
+                    // Show the button only if the logged user is the creator of the comment
+                    if(comment.getIdToken().equals(loggedUser.getIdToken())){
+                        binding.deleteCommentButton.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.deleteCommentButton.setVisibility(View.INVISIBLE);
+                    }
                 } else {
                     Log.d("USER NULL", "USER NULL");
                     //todo aggiungi errore nel caricamento dell'utente
@@ -113,7 +133,11 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Comment comment = getItem(position);
-                onItemClickListener.onCommentClick(comment);
+                if(v.getId() == binding.deleteCommentButton.getId()){
+                    onItemClickListener.onCommentDelete(comment);
+                } else {
+                    onItemClickListener.onCommentClick(comment);
+                }
             }
         }
     }

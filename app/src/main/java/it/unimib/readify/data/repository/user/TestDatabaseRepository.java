@@ -164,12 +164,21 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void deleteComment(String bookId, Comment comment) {
+        userDataRemoteDataSource.deleteComment(bookId, comment);
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
         }
     }
 
+    @Override
+    public void onDeleteCommentResult() {
+
+    }
 
 
     @Override

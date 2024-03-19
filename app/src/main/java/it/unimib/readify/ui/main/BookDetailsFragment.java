@@ -33,6 +33,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -172,15 +173,28 @@ public class BookDetailsFragment extends Fragment {
 
         RecyclerView recyclerviewComments = fragmentBookDetailsBinding.recyclerviewComments;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        //todo PASSARE LOGGED USER
+        User testUser = new User();
+        testUser.setIdToken("15yxdq8s6nM3y5LQ8kTkL94D2MC3");
+        commentAdapter = new CommentAdapter(testUser, new CommentAdapter.OnItemClickListener() {
+            @Override
+            public void onCommentClick(Comment comment) {
+                if (comment != null && comment.getIdToken() != null) {
+                    Log.d("Fragment", "Comment username:" + comment.getIdToken());
+                    NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser(),comment.getUser().getUsername());
+                    Navigation.findNavController(requireView()).navigate(action);
+                } else {
+                    Log.d("Fragment", "Error - comment is null OR userId is null");
+                    // todo handle the error
+                }
+            }
 
-        commentAdapter = new CommentAdapter(comment -> {
-            if (comment != null && comment.getIdToken() != null) {
-                Log.d("Fragment", "Comment username:" + comment.getIdToken());
-                NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser(),comment.getUser().getUsername());
-                Navigation.findNavController(requireView()).navigate(action);
-            } else {
-                Log.d("Fragment", "Error - comment is null OR userId is null");
-                // todo handle the error
+            @Override
+            public void onCommentDelete(Comment comment) {
+                testDatabaseViewModel.deleteComment(receivedBook.getKey(), comment);
+                List<Comment> newCommentsList = new ArrayList<>(commentAdapter.getCurrentList());
+                newCommentsList.remove(comment);
+                commentAdapter.submitList(newCommentsList);
             }
         });
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Result;
 
 public interface TestIDatabaseRepository {
@@ -15,6 +16,7 @@ public interface TestIDatabaseRepository {
     void fetchComments(String bookId);
     void searchUsers(String query);
     void addComment(String content, String bookId, String idToken);
+    void deleteComment(String bookId, Comment comment);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

@@ -248,6 +248,13 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    public void deleteComment(String bookId, Comment comment) {
+        String finalBookId = bookId.substring("/works/".length());
+        DatabaseReference commentsReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(finalBookId).child(FIREBASE_WORKS_COMMENTS_FIELD).child(comment.getCommentId());
+        commentsReference.removeValue();
+    }
+
+    @Override
     public void getUserPreferences(String idToken) {
         //todo da implementare
     }

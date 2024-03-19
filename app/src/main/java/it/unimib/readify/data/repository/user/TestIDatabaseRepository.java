@@ -14,6 +14,7 @@ public interface TestIDatabaseRepository {
 
     void fetchComments(String bookId);
     void searchUsers(String query);
+    void addComment(String content, String bookId, String idToken);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     // Google services gradle plugin
     id("com.google.gms.google-services")
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -52,7 +53,7 @@ dependencies {
 
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.gms:play-services-base:18.3.0")
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("commons-io:commons-io:2.15.0")
@@ -64,7 +65,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // import firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")

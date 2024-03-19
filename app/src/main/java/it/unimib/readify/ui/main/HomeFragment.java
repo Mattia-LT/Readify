@@ -1,6 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
@@ -8,29 +7,21 @@ import static it.unimib.readify.util.Constants.TRENDING;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
@@ -79,7 +70,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadMenu();
         Log.d("home fragment", "onViewCreated");
 
         //setting mock data
@@ -110,9 +100,8 @@ public class HomeFragment extends Fragment {
         BookCarouselAdapter.OnItemClickListener onItemClickListener = new BookCarouselAdapter.OnItemClickListener(){
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_BOOK, book);
-                Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailsFragment, bundle);
+                NavDirections action = HomeFragmentDirections.actionHomeFragmentToBookDetailsFragment(book);
+                Navigation.findNavController(requireView()).navigate(action);
             }
 
             @Override
@@ -161,6 +150,7 @@ public class HomeFragment extends Fragment {
 
             suggestedBooksAdapter.refreshList(workResultList);
         });
+
         bookViewModel.fetchBooks(mockDataRecent, RECENT).observe(getViewLifecycleOwner(), resultList -> {
             List<OLWorkApiResponse> workResultList = resultList.stream()
                     .filter(result -> result instanceof Result.WorkSuccess)
@@ -186,32 +176,6 @@ public class HomeFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d("home lifecycle", "onDestroy");
-    }
-
-
-
-
-
-    private void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menu.clear();
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat(requireContext().getString(R.string.navigation_bar_item_home));
-                toolbar.setTitle(title);
-                menuInflater.inflate(R.menu.default_appbar_menu, menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
     }
 
     private void initViewModels(){

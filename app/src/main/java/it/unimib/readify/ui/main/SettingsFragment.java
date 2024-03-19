@@ -7,14 +7,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -110,21 +105,6 @@ public class SettingsFragment extends Fragment {
     public void loadMenu(){
         // Set up the toolbar and remove all icons
         MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menu.clear();
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat(requireContext().getString(R.string.pa_settings));
-                toolbar.setTitle(title);
-                menuInflater.inflate(R.menu.default_appbar_menu, menu);
-            }
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         // Enable the back button
         Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);

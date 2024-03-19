@@ -32,18 +32,17 @@ public class HomeActivity extends AppCompatActivity {
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
         }
+
         BottomNavigationView bottomNavigationView = binding.bottomNavigationViewHome;
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment,
-                R.id.searchFragment,
-                R.id.profileFragment
-        ).build();
-
         if (navController != null) {
-            //For the toolbar
+            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.homeFragment,
+                    R.id.searchFragment,
+                    R.id.profileFragment
+            ).build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-            //For the bottom navigation view
+
             NavigationUI.setupWithNavController(bottomNavigationView, navController);
         }
     }

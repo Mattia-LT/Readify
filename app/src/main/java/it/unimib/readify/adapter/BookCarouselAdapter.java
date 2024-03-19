@@ -1,7 +1,5 @@
 package it.unimib.readify.adapter;
 
-// BookAdapter.java
-
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -145,7 +143,9 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
             } else {
                 //hai premuto qualcos'altro
-                onBookItemClickListener.onBookItemClick(bookList.get(getAdapterPosition()));
+                //controllo perchè a volte in circostanze strane potrebbe crashare, cosi si evita sicuramente
+                int position = Math.max(getAdapterPosition(), 0);
+                onBookItemClickListener.onBookItemClick(bookList.get(position));
             }
         }
 

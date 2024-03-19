@@ -3,17 +3,14 @@
 
     <item
         android:id="@+id/homeFragment"
-        android:enabled="true"
         android:icon="@drawable/ic_baseline_home_24"
         android:title="@string/navigation_bar_item_home" />
     <item
         android:id="@+id/searchFragment"
-        android:enabled="true"
         android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/navigation_bar_item_search"/>
     <item
         android:id="@+id/profileFragment"
-        android:enabled="true"
         android:icon="@drawable/ic_baseline_profile_24"
         android:title="@string/navigation_bar_item_profile"/>
 </menu>

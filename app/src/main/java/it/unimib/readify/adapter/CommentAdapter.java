@@ -1,19 +1,19 @@
 package it.unimib.readify.adapter;
 
-import android.app.Application;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import it.unimib.readify.R;
@@ -21,51 +21,44 @@ import it.unimib.readify.databinding.CommentItemBinding;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.User;
 
-public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
     public interface OnItemClickListener {
         void onCommentClick(Comment comment);
     }
 
-    private final List<Comment> commentList;
-    private final Application application;
     private final OnItemClickListener onItemClickListener;
 
-    public CommentAdapter(List<Comment> commentList, Application application, OnItemClickListener onItemClickListener) {
-        this.commentList = commentList;
-        this.application = application;
+    public CommentAdapter(OnItemClickListener onItemClickListener) {
+        super(new DiffUtil.ItemCallback<Comment>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
+                return oldItem.getCommentId().equals(newItem.getCommentId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
         this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         CommentItemBinding binding = CommentItemBinding.inflate(inflater, parent, false);
         return new CommentViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Comment comment = commentList.get(position);
-        ( (CommentViewHolder) holder).bind(comment);
+    public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
+        Comment comment = getItem(position);
+        holder.bind(comment);
     }
 
-    @Override
-    public int getItemCount() {
-        if(commentList != null){
-            return commentList.size();
-        }
-        return 0;
-    }
 
-    public void refreshList(List<Comment> comments){
-        int size = commentList.size();
-        commentList.clear();
-        notifyItemRangeRemoved(0, size);
-        commentList.addAll(comments);
-        notifyItemRangeInserted(0, comments.size());
-    }
 
     public class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final CommentItemBinding binding;
@@ -80,7 +73,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public void bind(Comment comment) {
             if(comment != null){
                 Locale locale = Locale.getDefault();
-                if (locale.getLanguage().equals("it")) {
+                if (locale.getLanguage().startsWith("it")) {
                     locale = new Locale("it", "IT");
                 }
 
@@ -102,7 +95,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     } catch (Exception e) {
                         avatarId = R.drawable.ic_baseline_profile_24;
                     }
-                    Glide.with(application)
+                    Glide.with(this.itemView.getContext())
                             .load(avatarId)
                             .dontAnimate()
                             .into(binding.commentImage);
@@ -117,8 +110,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(View v) {
-            Comment comment = commentList.get(getAdapterPosition());
-            onItemClickListener.onCommentClick(comment);
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Comment comment = getItem(position);
+                onItemClickListener.onCommentClick(comment);
+            }
         }
     }
 }

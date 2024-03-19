@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.BUNDLE_BOOK;
-
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,14 +57,12 @@ public class CollectionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
         initRepositories();
-
         bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 new BookItemCollectionAdapter.OnItemClickListener() {
                     @Override
                     public void onBookItemClick(OLWorkApiResponse book) {
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(BUNDLE_BOOK, book);
-                        Navigation.findNavController(view).navigate(R.id.action_collectionFragment_to_bookDetailsFragment, bundle);
+                        NavDirections action = CollectionFragmentDirections.actionCollectionFragmentToBookDetailsFragment(book);
+                        Navigation.findNavController(requireView()).navigate(action);
                     }
                 }, requireActivity().getApplication());
 
@@ -81,35 +78,28 @@ public class CollectionFragment extends Fragment {
 
 
         //managing data from Profile Fragment
-        Bundle bundle = getArguments();
-        if(bundle != null) {
-            collection = bundle.getParcelable("collectionData");
-
-            //set layout data
-            if(collection != null) {
-                if (collection.getName() != null) {
-                    //set collection name
-                    collectionProfileBinding.collectionFragmentCollectionName.setText(collection.getName());
-                    //set collection visibility icon
-                    if(collection.isVisible())
-                        collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_open_24);
-                    else
-                        collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
-                    //set number of books in the collection
-                    if(collection.getBooks() != null) {
-                        String booksNumber = Integer.toString(collection.getBooks().size()) + " ";
-                        if(collection.getBooks().size() > 1)
-                            booksNumber += getResources().getString(R.string.books);
-                        else
-                            booksNumber += getResources().getString(R.string.book);
-                        collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
-                    }
-                    else {
-                        collectionProfileBinding.collectionFragmentBooksNumber.setText(getResources()
-                                .getString(R.string.empty_collection));
-                    }
-                }
-            }
+        collection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
+        String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
+        requireActivity().setTitle(collectionName);
+        //TODO DA IMPLEMENTARE ANCORA in USER DETAILS
+        //set collection name
+        collectionProfileBinding.collectionFragmentCollectionName.setText(collection.getName());
+        //set collection visibility icon
+        if (collection.isVisible())
+            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_open_24);
+        else
+            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
+        //set number of books in the collection
+        if (collection.getBooks() != null) {
+            String booksNumber = Integer.toString(collection.getBooks().size()) + " ";
+            if (collection.getBooks().size() > 1)
+                booksNumber += getResources().getString(R.string.books);
+            else
+                booksNumber += getResources().getString(R.string.book);
+            collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
+        } else {
+            collectionProfileBinding.collectionFragmentBooksNumber.setText(getResources()
+                    .getString(R.string.empty_collection));
         }
     }
 
@@ -120,19 +110,10 @@ public class CollectionFragment extends Fragment {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menu.clear();
-
-                // TODO: cambiare nome
-                String title = requireContext().getString(R.string.app_name)
-                        .concat(" - ")
-                        .concat("TODO nome collezione");
-                        //.concat(collection.getName());
-                toolbar.setTitle(title);
                 menuInflater.inflate(R.menu.collection_appbar_menu, menu);
-
                 //Set the settings icon to white
-
+                //todo va cambiato qui? va fatto da xml? da chiedere a michi
                 int colorWhite = getResources().getColor(R.color.white, null);
-
                 MenuItem settingsMenuItem = menu.findItem(R.id.action_collection_settings);
                 if (settingsMenuItem != null) {
                     Drawable settingsIcon = settingsMenuItem.getIcon();
@@ -148,14 +129,7 @@ public class CollectionFragment extends Fragment {
                     backButton.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
                 }
                 toolbar.setNavigationIcon(backButton);
-                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        requireActivity().getSupportFragmentManager().popBackStack();
-                    }
-                });
-
-
+                toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
 
             }
             @Override

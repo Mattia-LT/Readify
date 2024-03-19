@@ -159,6 +159,20 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void addComment(String content, String bookId, String idToken){
+        userDataRemoteDataSource.addComment(content,bookId,idToken);
+    }
+
+    @Override
+    public void onAddCommentResult(Comment comment) {
+        if(comment == null){
+            //todo error
+        }
+    }
+
+
+
+    @Override
     public void onSuccessLogout() {
 
     }

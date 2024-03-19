@@ -80,7 +80,7 @@
     <string name="empty_search_snackbar">La barra di ricerca é vuota</string>
     <string name="textview_home_suggested">Suggeriti per te</string>
     <string name="textview_new_books">Nuovi libri</string>
-    <string name="textview_loading">Caricamento...</string>
+    <string name="textview_loading">Caricamento…</string>
     <string name="rating_not_available">Valutazione non disponibile</string>
     <string name="books">libri</string>
     <string name="book">libro</string>
@@ -105,5 +105,8 @@
     <string name="textview_following">Seguiti</string>
     <string name="follow_button_string">Segui</string>
     <string name="unfollow_button_string">Smetti di seguire</string>
+    <string name="content_description_background_book">Sfondo contenente una versione blurrata della copertina del libro.</string>
+    <string name="content_description_add_to_collection">Bottone utilizzato per aggiungere un libro ad una collezione.</string>
+    <string name="snackbar_empty_comment">Non puoi inserire un commento vuoto.</string>
 
 </resources>

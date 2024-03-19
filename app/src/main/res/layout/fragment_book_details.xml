@@ -42,6 +42,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:scaleType="centerCrop"
+                    android:contentDescription="@string/content_description_background_book"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
 
@@ -128,7 +129,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/outline_bookmark_add_24"
                         android:background="#0000"
-                        android:contentDescription="TODO" />
+                        android:contentDescription="@string/content_description_add_to_collection" />
 
                     <TextView
                         android:id="@+id/textview_add_to"
@@ -286,27 +287,28 @@
                     tools:listitem="@layout/comment_item"
                     />
 
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/edittext_comment"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_comment"
                     android:layout_below="@id/recyclerview_comments"
                     android:minHeight="48dp"
                     android:imeOptions="flagNoExtractUi"
-                    android:hint="@string/hint_comment"
                     android:inputType="textMultiLine"
                     android:layout_marginTop="8dp"
-                    />
+                    android:layout_marginBottom="24dp"
+                    android:importantForAutofill="no"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/send_24px"
+                    app:endIconContentDescription="TODO">
 
-                <Button
-                    android:layout_centerHorizontal="true"
-                    android:id="@+id/button_add_comment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/edittext_comment"
-                    android:text="@string/button_add_comment"
-                    android:layout_marginTop="8dp"
-                    />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </RelativeLayout>
 

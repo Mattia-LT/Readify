@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import it.unimib.readify.model.Comment;
@@ -227,6 +228,26 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    public void addComment(String content,String bookId, String idToken){
+        String finalBookId = bookId.substring("/works/".length());
+
+        DatabaseReference commentsReference = databaseReference
+                .child(FIREBASE_WORKS_COLLECTION)
+                .child(finalBookId)
+                .child(FIREBASE_WORKS_COMMENTS_FIELD);
+
+        DatabaseReference newCommentReference = commentsReference.push();
+
+        String commentId = newCommentReference.getKey();
+        long timestamp = new Date().getTime();
+
+        Comment newComment = new Comment(commentId, content, idToken, timestamp);
+
+        newCommentReference.setValue(newComment);
+        userResponseCallback.onAddCommentResult(newComment);
+    }
+
+    @Override
     public void getUserPreferences(String idToken) {
         //todo da implementare
     }
@@ -314,5 +335,4 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
         void onUserFetchFailed(Comment comment);
     }
-
 }

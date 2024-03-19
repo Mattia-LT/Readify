@@ -193,4 +193,9 @@ public class TestDatabaseViewModel extends ViewModel {
         Log.d("ViewModel", "fetchComments start");
         testDatabaseRepository.fetchComments(bookId);
     }
+
+    public void addComment(String content, String bookId, String idToken){
+        testDatabaseRepository.addComment(content,bookId,idToken);
+    }
+
 }

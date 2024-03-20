@@ -57,10 +57,14 @@ public class BookDetailsFragment extends Fragment {
     private CommentAdapter commentAdapter;
     private TestDatabaseViewModel testDatabaseViewModel;
     private OLWorkApiResponse receivedBook;
-    //todo rimuovi user quando cambi logica login
     private User user;
     public BookDetailsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -68,8 +72,6 @@ public class BookDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentBookDetailsBinding = FragmentBookDetailsBinding.inflate(inflater, container, false);
-        initViewModels();
-        initObserver();
         return fragmentBookDetailsBinding.getRoot();
     }
 
@@ -77,6 +79,8 @@ public class BookDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initViewModels();
+        initObserver();
         loadMenu();
         fetchBookData();
     }
@@ -173,10 +177,8 @@ public class BookDetailsFragment extends Fragment {
 
         RecyclerView recyclerviewComments = fragmentBookDetailsBinding.recyclerviewComments;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        //todo PASSARE LOGGED USER
-        User testUser = new User();
-        testUser.setIdToken("15yxdq8s6nM3y5LQ8kTkL94D2MC3");
-        commentAdapter = new CommentAdapter(testUser, new CommentAdapter.OnItemClickListener() {
+        user = new User();
+        commentAdapter = new CommentAdapter(user, new CommentAdapter.OnItemClickListener() {
             @Override
             public void onCommentClick(Comment comment) {
                 if (comment != null && comment.getIdToken() != null) {
@@ -213,15 +215,12 @@ public class BookDetailsFragment extends Fragment {
             if(commentContent.isEmpty()){
                 Snackbar.make(requireView(), getString(R.string.snackbar_empty_comment), Snackbar.LENGTH_SHORT).show();
             } else {
-                //TODO rivedi logica login, ho una idea
                 String bookId = receivedBook.getKey();
-                //String idToken = user.getIdToken();
-                String idToken = "15yxdq8s6nM3y5LQ8kTkL94D2MC3";
+                String idToken = user.getIdToken();
                 testDatabaseViewModel.addComment(commentContent, bookId, idToken);
                 editText.getText().clear();
-                View view = requireView();
                 InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
                 testDatabaseViewModel.fetchComments(bookId);
             }
         };
@@ -236,16 +235,16 @@ public class BookDetailsFragment extends Fragment {
                     .map(result -> ((Result.CommentSuccess) result).getData())
                     .collect(Collectors.toList());
             Log.d("BookDetails Fragment", "Comment list : " + commentResultList);
-            //commentResultList.sort(Comparator.comparing(Comment::getTimestamp));
             commentAdapter.submitList(commentResultList);
         };
         testDatabaseViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
         //TODO CAMBIA LOGICA DIETRO A QUESTO
-        final Observer<Result> loggedUserObserver = result -> {
-            Log.d("profile fragment", "user changed");
+        Observer<Result> loggedUserObserver = result -> {
+            Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
-                this.user = ((Result.UserSuccess) result).getData();
+                user = ((Result.UserSuccess) result).getData();
+                commentAdapter.submitUser(user);
             }
         };
         //get user data from database

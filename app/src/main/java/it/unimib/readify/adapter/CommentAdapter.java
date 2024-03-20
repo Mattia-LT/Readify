@@ -26,7 +26,7 @@ import it.unimib.readify.model.User;
 
 public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
-    private final User loggedUser;
+    private User loggedUser;
     public interface OnItemClickListener {
         void onCommentClick(Comment comment);
         void onCommentDelete(Comment comment);
@@ -62,6 +62,10 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = getItem(position);
         holder.bind(comment);
+    }
+
+    public void submitUser(User user){
+        this.loggedUser = user;
     }
 
     @Override

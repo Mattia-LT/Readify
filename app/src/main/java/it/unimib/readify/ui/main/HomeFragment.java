@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -22,12 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.model.User;
 import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -52,7 +55,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initViewModels();
         trendingBookList = new ArrayList<>();
         suggestedBookList = new ArrayList<>();
         recentBookList = new ArrayList<>();
@@ -71,6 +73,8 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("home fragment", "onViewCreated");
+        initViewModels();
+        initObservers();
 
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();
@@ -198,6 +202,24 @@ public class HomeFragment extends Fragment {
                 .getInstance(testDatabaseRepository)
                 .create(TestDatabaseViewModel.class);
 
+    }
+
+    private void initObservers(){
+        Observer<Result> loggedUserObserver = result -> {
+            Log.d("BookDetails fragment", "user changed");
+            if(result.isSuccess()) {
+                User user = ((Result.UserSuccess) result).getData();
+                String welcomeMessage = getString(R.string.placeholder_home_welcome)
+                        .concat(" ")
+                        .concat(user.getUsername())
+                        .concat(" ")
+                        .concat("\uD83D\uDC4B")
+                        ;
+                fragmentHomeBinding.textviewHomeTitle.setText(welcomeMessage);
+            }
+        };
+        //get user data from database
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
 

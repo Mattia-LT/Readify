@@ -84,7 +84,7 @@
     <string name="placeholder_error_message">An error occurred. Please, retry.</string>
     <string name="button_retry">Retry</string>
     <string name="content_description_filter_button">Filter Search Button</string>
-    <string name="placeholder_home_welcome">Hi, username!</string>
+    <string name="placeholder_home_welcome">Hi,</string>
     <string name="textview_home_continue_label">Let\'s continue where we left off</string>
     <string name="textview_trending_books">Trending books</string>
     <string name="book_search_error">An error occurred during the search, please retry.</string>

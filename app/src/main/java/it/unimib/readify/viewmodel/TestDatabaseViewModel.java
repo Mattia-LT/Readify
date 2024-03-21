@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Result;
 
 public class TestDatabaseViewModel extends ViewModel {
@@ -196,6 +197,10 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void addComment(String content, String bookId, String idToken){
         testDatabaseRepository.addComment(content,bookId,idToken);
+    }
+
+    public void deleteComment(String bookId, Comment comment){
+        testDatabaseRepository.deleteComment(bookId, comment);
     }
 
 }

@@ -17,5 +17,6 @@ public interface UserResponseCallback {
     void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments);
     void onFailureFetchCommentsFromRemoteDatabase(String message);
     void onAddCommentResult(Comment comment);
+    void onDeleteCommentResult();
     void onSuccessLogout();
 }

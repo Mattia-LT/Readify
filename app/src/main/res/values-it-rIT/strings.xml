@@ -72,7 +72,7 @@
     <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
     <string name="button_retry">Riprova</string>
     <string name="content_description_filter_button">Bottone per i filtri della ricerca</string>
-    <string name="placeholder_home_welcome">Ciao. username!</string>
+    <string name="placeholder_home_welcome">Ciao,</string>
     <string name="textview_home_continue_label">Continuiamo da dove eravamo rimasti</string>
     <string name="textview_trending_books">Libri in tendenza</string>
     <string name="book_search_error">Si è verificato un errore durante la ricerca, riprova.</string>
@@ -108,5 +108,6 @@
     <string name="content_description_background_book">Sfondo contenente una versione blurrata della copertina del libro.</string>
     <string name="content_description_add_to_collection">Bottone utilizzato per aggiungere un libro ad una collezione.</string>
     <string name="snackbar_empty_comment">Non puoi inserire un commento vuoto.</string>
+    <string name="delete_comment_button">Elimina questo commento</string>
 
 </resources>

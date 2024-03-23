@@ -47,6 +47,15 @@ public abstract class Result {
             return comment;
         }
     }
+    public static final class CollectionSuccess extends Result{
+        private final Collection collection;
+        public CollectionSuccess(Collection collection) {
+            this.collection = collection;
+        }
+        public Collection getData() {
+            return collection;
+        }
+    }
 
     /**
      * Class that represents an error occurred during the interaction

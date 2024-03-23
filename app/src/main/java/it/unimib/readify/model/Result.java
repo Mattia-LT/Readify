@@ -5,7 +5,7 @@ public abstract class Result {
     private Result() {}
 
     public boolean isSuccess(){
-        if (this instanceof WorkSuccess || this instanceof UserSuccess) {
+        if (this instanceof WorkSuccess || this instanceof UserSuccess || this instanceof CommentSuccess || this instanceof CollectionSuccess) {
             return true;
         } else {
             return false;

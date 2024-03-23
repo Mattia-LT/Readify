@@ -60,6 +60,8 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         initObservers();
         this.bookId = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBookId();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
+        testDatabaseViewModel.fetchCollections(idToken);
+
         // Get the BottomSheetBehavior
         BottomSheetBehavior<View> behavior = BottomSheetBehavior.from((View) view.getParent());
         // Set the state to EXPANDED
@@ -78,9 +80,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
         recyclerViewCollections.setLayoutManager(layoutManager);
         recyclerViewCollections.setAdapter(addToCollectionAdapter);
-
-
-        testDatabaseViewModel.fetchCollections(idToken);
 
         binding.characterCounter.setText("0");
         binding.characterLimit.setText(String.valueOf(COLLECTION_NAME_CHARACTERS_LIMIT));
@@ -117,6 +116,9 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             showAddCollectionButton.setVisibility(View.VISIBLE);
         });
 
+        confirmButton.setOnClickListener(v -> {
+
+        });
 
 
     }

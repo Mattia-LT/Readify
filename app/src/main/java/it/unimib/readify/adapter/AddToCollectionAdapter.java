@@ -68,10 +68,10 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
                         .concat(" ")
                         .concat(this.itemView.getContext().getString(R.string.books));
                 binding.textviewNumberOfBooks.setText(booksRead);
-                String finalBookId = bookId.substring("/works/".length());
+                //String finalBookId = bookId.substring("/works/".length());
                 for(Collection c : getCurrentList()){
                     List<String> books = c.getBooks();
-                    binding.checkboxAddToCollection.setChecked(books.contains(finalBookId));
+                    binding.checkboxAddToCollection.setChecked(books.contains(bookId));
                 }
             }
         }

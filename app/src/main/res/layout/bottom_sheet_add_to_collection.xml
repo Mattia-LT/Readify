@@ -143,8 +143,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="12"
-
-
                 />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -152,15 +150,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/textview_hint_insert_collection_name"
+                android:layout_marginTop="6dp"
                 app:endIconMode="clear_text"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/collection_name_placeholder">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_create_collection"
-                    style="@style/ThemeOverlay.Material3.TextInputEditText.FilledBox"
+                    style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionDone"
@@ -170,14 +169,6 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/material_divider_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="15dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_input_layout_add_collection" />
 
             <TextView
                 android:id="@+id/textview_visibility_title"
@@ -185,7 +176,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/textview_make_collection_public"
                 android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@id/material_divider_2"
+                app:layout_constraintTop_toBottomOf="@id/text_input_layout_add_collection"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="10dp" />
 
@@ -194,7 +185,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:shadowColor="?attr/colorAccent"
-                app:layout_constraintTop_toBottomOf="@id/material_divider_2"
+                app:layout_constraintTop_toBottomOf="@id/text_input_layout_add_collection"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView

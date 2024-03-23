@@ -1,9 +1,6 @@
 package it.unimib.readify.ui.main;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +35,7 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.bottom_collection_creation, container, false);
+        return inflater.inflate(R.layout.bottom_sheet_collection_creation, container, false);
     }
 
     @Override
@@ -54,12 +51,14 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         Button createCollectionButton = view.findViewById(R.id.CollectionCreationConfirm);
 
         // TODO: 27/01/2024 aggiungere controllo lunghezza nome raccolta
+        // TODO: use binding instead of findViewById
 
         //collection creation
         createCollectionButton.setOnClickListener( e -> {
             if(collectionName.getEditableText().toString().equals(""))
                 Snackbar.make(view, "Nome non inserito", Snackbar.LENGTH_SHORT).show();
             else {
+                //TODO forse da sistemare --> molto simile a quello di AddToCollection
                 Collection newCollection = new Collection(collectionName.getEditableText().toString(),
                         collectionVisibility.isChecked(), null);
                 inputListener.sendInput(newCollection);

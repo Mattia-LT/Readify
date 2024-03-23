@@ -1,8 +1,11 @@
 package it.unimib.readify.adapter;
 
+import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
+
 import android.app.Application;
 import android.content.res.Resources;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +26,7 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
@@ -91,33 +95,32 @@ public class CollectionAdapter extends
         public void bind(Collection collection, int position) {
             //set collection thumbnail
             //todo verify correct behavior with multiple books in a collection
-            if(collection.getWorks() == null || collection.getWorks().isEmpty())
+            boolean isThumbnailAvailable = false;
+            if(collection.getWorks() == null || collection.getWorks().isEmpty()) {
                 thumbnail.setImageResource(R.drawable.image_not_available);
-            else {
-                boolean isThumbnailAvailable = false;
-                for (int i = 0; i < collection.getWorks().size(); i++) {
-                        if(collection.getWorks().get(i) != null && collection.getWorks().get(i).getCovers() != null)
-                            for (int j = 0; j < collection.getWorks().get(i).getCovers().size(); j++) {
-                                if(collection.getWorks().get(i).getCovers().get(j) != -1) {
-                                    isThumbnailAvailable = true;
-                                    Log.d("url", "https://covers.openlibrary.org/b/id/"
-                                            + collection.getWorks().get(i).getCovers().get(j)
-                                            + "-L.jpg");
-                                    RequestOptions requestOptions = new RequestOptions()
-                                            .placeholder(R.drawable.loading_image_gif)
-                                            .error(R.drawable.image_not_available);
-                                    Glide.with(application)
-                                            .load("https://covers.openlibrary.org/b/id/"
-                                                    + collection.getWorks().get(i).getCovers().get(j)
-                                                    + "-L.jpg")
-                                            .apply(requestOptions)
-                                            .into(thumbnail);
-                                    break;
-                                }
-                            }
+            } else {
+                for(OLWorkApiResponse work : collection.getWorks()) {
+                    int pos = 0;
+                    int cover = -1;
+                    while (cover == -1 && pos < work.getCovers().size()) {
+                        cover = work.getCovers().get(pos);
+                        pos++;
+                    }
+                    if (cover != -1) {
+                        RequestOptions requestOptions = new RequestOptions()
+                                .placeholder(R.drawable.loading_image_gif)
+                                .error(R.drawable.image_not_available);
+                        Glide.with(application)
+                                .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
+                                .apply(requestOptions)
+                                .into(thumbnail);
+                        isThumbnailAvailable = true;
+                        break;
+                    }
                 }
-                if(!isThumbnailAvailable)
+                if(!isThumbnailAvailable){
                     thumbnail.setImageResource(R.drawable.image_not_available);
+                }
             }
 
             //set collection name and visibility

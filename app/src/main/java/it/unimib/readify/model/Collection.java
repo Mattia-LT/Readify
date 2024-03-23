@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 // TODO: 09/12/2023 managing thumbnail
@@ -14,9 +15,7 @@ public class Collection implements Parcelable {
 
     private String name;
     private boolean visible;
-    //book id
     private List <String> books;
-    //work got from api
     private List<OLWorkApiResponse> works = new ArrayList<>();
 
     public Collection() {}
@@ -25,6 +24,7 @@ public class Collection implements Parcelable {
         this.name = name;
         this.visible = visible;
         this.books = books;
+        this.works = new ArrayList<>();
     }
 
     public Collection(String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
@@ -115,5 +115,18 @@ public class Collection implements Parcelable {
                 ", books=" + books +
                 ", works=" + works +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Collection that = (Collection) o;
+        return visible == that.visible && Objects.equals(name, that.name) && Objects.equals(books, that.books) && Objects.equals(works, that.works);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, visible, books, works);
     }
 }

@@ -155,21 +155,21 @@ public class UserDetailsFragment extends Fragment {
     private void loadUserCollections(User user) {
         //get books from api
         int counter = 0;
-        for (int i = 0; i < user.getCollections().size(); i++) {
+        for (int i = 0; i < user.getFetchedCollections().size(); i++) {
             int finalCounter = counter;
-            bookViewModel.fetchBooks(user.getCollections().get(i).getBooks(), COLLECTION)
+            bookViewModel.fetchBooks(user.getFetchedCollections().get(i).getBooks(), COLLECTION)
                     .observe(getViewLifecycleOwner(), resultsList -> {
                         for (int j = 0; j < resultsList.size(); j++) {
                             if (resultsList.get(j).isSuccess()) {
                                 OLWorkApiResponse book = ((Result.WorkSuccess) resultsList.get(j)).getData();
-                                user.getCollections().get(finalCounter).getWorks().add(j, book);
+                                user.getFetchedCollections().get(finalCounter).getWorks().add(j, book);
                             }
                         }
                     });
             counter++;
         }
 
-        publicCollections = user.getCollections();
+        publicCollections = user.getFetchedCollections();
         collectionAdapter.setCollectionsList(publicCollections);
         //todo
     }

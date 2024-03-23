@@ -62,7 +62,7 @@
     <string name="textview_comments_title">Comments</string>
     <string name="textview_description_title">Description</string>
     <string name="textview_icon_already_read">Already read?</string>
-    <string name="textview_icon_readlist">ReadList</string>
+    <string name="textview_icon_add_to_collection">Add to …</string>
     <string name="textview_slogan">Reading.\nThe Clever Way.</string>
     <string name="hint_search_book">Enter book title</string>
     <string name="button_search">Search</string>
@@ -122,5 +122,14 @@
     <string name="content_description_add_to_collection">Button used to add a book into a collection.</string>
     <string name="snackbar_empty_comment">You cannot enter an empty comment.</string>
     <string name="delete_comment_button">Delete this comment</string>
+    <string name="textview_add_to_collection_title">Select a collection</string>
+    <string name="button_create_new_collection">Create a new collection</string>
+    <string name="textview_collection_name_placeholder">Collection\'s name</string>
+    <string name="slash">/</string>
+    <string name="textview_hint_insert_collection_name">Insert the name of the collection</string>
+    <string name="textview_make_collection_public">Make it public</string>
+    <string name="textview_visibility_description">The collections made public will be shown on your profile and can be viewed by your followers</string>
+    <string name="button_add_collection">Add collection</string>
+    <string name="button_cancel_add_collection">Cancel</string>
 
 </resources>

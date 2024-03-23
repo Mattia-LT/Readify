@@ -29,7 +29,7 @@
     -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/textview_home_title"
-        style="@style/TextAppearance.Material3.DisplayMedium"
+        style="@style/TextAppearance.Material3.HeadlineMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

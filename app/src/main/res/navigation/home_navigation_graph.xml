@@ -39,7 +39,7 @@
         android:id="@+id/filter_bottomsheet"
         android:name="it.unimib.readify.ui.main.FilterBottomSheet"
         android:label="dialog_filter_bottomsheet"
-        tools:layout="@layout/bottom_search_filter">
+        tools:layout="@layout/bottom_sheet_search_filter">
 
         <!-- TODO forse argument necessario, da vedere -->
     </dialog>
@@ -52,18 +52,16 @@
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment_to_collectionFragment"
-            app:destination=
-                "@+id/collectionFragment"/>
+            app:destination="@id/collectionFragment"/>
         <action
             android:id="@+id/action_profileFragment_to_settingsFragment"
-            app:destination=
-                "@+id/settingFragment"/>
+            app:destination="@id/settingFragment"/>
         <action
             android:id="@+id/action_profileFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
-            app:destination="@+id/loginFragment"/>
+            app:destination="@id/loginFragment"/>
     </fragment>
 
     <fragment
@@ -81,10 +79,10 @@
 
         <action
             android:id="@+id/action_userDetailsFragment_to_collectionFragment"
-            app:destination="@+id/collectionFragment"/>
+            app:destination="@id/collectionFragment"/>
         <action
             android:id="@+id/action_userDetailsFragment_to_searchFragment"
-            app:destination="@+id/searchFragment"/>
+            app:destination="@id/searchFragment"/>
     </fragment>
 
     <fragment
@@ -100,12 +98,10 @@
             app:argType="string"/>
         <action
             android:id="@+id/action_collectionFragment_to_profileFragment"
-            app:destination=
-                "@+id/profileFragment"/>
+            app:destination="@id/profileFragment"/>
         <action
             android:id="@+id/action_collectionFragment_to_bookDetailsFragment"
-            app:destination=
-                "@+id/bookDetailsFragment"/>
+            app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
 
@@ -143,6 +139,11 @@
             app:popUpTo="@id/userDetailsFragment"
             app:popUpToInclusive="true"/>
 
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_addToCollectionDialog"
+            app:destination="@id/addToCollectionDialog"
+            />
+
     </fragment>
 
     <fragment
@@ -152,9 +153,24 @@
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"
-            app:destination= "@+id/profileFragment"/>
+            app:destination= "@id/profileFragment"/>
     </fragment>
 
+    <dialog
+        android:id="@+id/addToCollectionDialog"
+        android:name="it.unimib.readify.ui.main.AddToCollectionBottomSheet"
+        android:label="add_to_collection_dialog"
+        tools:layout="@layout/bottom_sheet_add_to_collection">
+
+        <argument
+            android:name="bookId"
+            app:argType="string"
+            />
+        <argument
+            android:name="idToken"
+            app:argType="string"
+            />
+    </dialog>
 
 
     <include app:graph="@navigation/login_navigation_graph" />

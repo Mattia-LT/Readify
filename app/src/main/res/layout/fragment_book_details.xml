@@ -112,11 +112,11 @@
                     android:id="@+id/icon_container_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:layout_constrainedWidth="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/divider_book_details_vertical_1"
-                    android:layout_marginHorizontal="16dp"
                     >
 
                     <ImageButton
@@ -128,17 +128,18 @@
                         android:layout_height="48dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/outline_bookmark_add_24"
-                        android:background="#0000"
+                        android:background="?attr/backgroundColor"
                         android:contentDescription="@string/content_description_add_to_collection" />
 
                     <TextView
                         android:id="@+id/textview_add_to"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/textview_icon_readlist"
+                        android:text="@string/textview_icon_add_to_collection"
                         app:layout_constraintTop_toBottomOf="@id/icon_add"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
+                        android:textAlignment="center"
                         android:layout_marginTop="15dp"
                         style="@style/TextAppearance.Material3.LabelMedium"
                         />

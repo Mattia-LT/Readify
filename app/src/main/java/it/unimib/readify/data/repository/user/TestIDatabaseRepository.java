@@ -14,11 +14,14 @@ public interface TestIDatabaseRepository {
     void signUp(String email, String password);
 
     void fetchComments(String bookId);
+    void fetchCollections(String idToken);
     void searchUsers(String query);
     void addComment(String content, String bookId, String idToken);
     void deleteComment(String bookId, Comment comment);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
+    MutableLiveData<List<Result>> getCollectionListLiveData();
+
 
 }

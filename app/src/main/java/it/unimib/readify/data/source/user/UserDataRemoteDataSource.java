@@ -1,5 +1,6 @@
 package it.unimib.readify.data.source.user;
 
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
@@ -36,7 +38,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     public UserDataRemoteDataSource(SharedPreferencesUtil sharedPreferencesUtil) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);
-        databaseReference = firebaseDatabase.getReference().getRef();
+        databaseReference = firebaseDatabase.getReference();
         this.sharedPreferencesUtil = sharedPreferencesUtil;
     }
 
@@ -49,22 +51,18 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 if (snapshot.exists()) {
                     Log.d("save user data: signIn case", "User already present in Firebase Realtime Database");
                     //if snapshot exists, return user data (retrieved from Database)
-                    userResponseCallback.onSuccessFromRemoteDatabase(snapshot.getValue(User.class));
+                    User existingUser = snapshot.getValue(User.class);
+                    if(existingUser != null){
+                        fetchCollectionsFromUser(existingUser, collections -> {
+                            existingUser.setFetchedCollections(collections);
+                            userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
+                        });
+                    }
                 } else {
                     Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                userResponseCallback.onSuccessFromRemoteDatabase(user);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage());
-                            }
-                        });
+                        .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                        .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                 }
             }
             @Override
@@ -248,10 +246,53 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    public void createCollection(String name, boolean visibility) {
+        //todo
+    }
+
+    @Override
+    public void addToCollection(String collectionId, String bookId) {
+        //todo
+    }
+
+    @Override
+    public void removeFromCollection(String collectionId, String bookId) {
+        //todo
+    }
+
+    @Override
     public void deleteComment(String bookId, Comment comment) {
         String finalBookId = bookId.substring("/works/".length());
         DatabaseReference commentsReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(finalBookId).child(FIREBASE_WORKS_COMMENTS_FIELD).child(comment.getCommentId());
         commentsReference.removeValue();
+    }
+
+    @Override
+    public void fetchCollections(String idToken) {
+        DatabaseReference collectionsReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(idToken);
+        Log.d("query", collectionsReference.toString());
+        Log.d("query", collectionsReference.getKey());
+
+        collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Collection> collections = new ArrayList<>();
+                for (DataSnapshot collectionSnapshot : snapshot.getChildren()) {
+                    Log.d("snap", snapshot.toString());
+                    Collection collection = collectionSnapshot.getValue(Collection.class);
+                    collections.add(collection);
+                }
+                Log.d("LOG "+ idToken, collections.toString());
+                userResponseCallback.onSuccessFetchCollectionsFromRemoteDatabase(collections);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFetchCollectionsFromRemoteDatabase(error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -336,10 +377,38 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
+    private void fetchCollectionsFromUser(User user, CollectionFetchCallback callback){
+        DatabaseReference collectionsReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(user.getIdToken());
+        collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Collection> collections = new ArrayList<>();
+                for (DataSnapshot collectionSnapshot : snapshot.getChildren()) {
+                    Collection collection = collectionSnapshot.getValue(Collection.class);
+                    if (collection != null) {
+                        collections.add(collection);
+                    }
+                }
+                callback.onCollectionsFetched(collections);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                //todo
+            }
+        });
+    }
+
 
     public interface UserFetchCallback {
         void onUserFetched(Comment comment);
 
         void onUserFetchFailed(Comment comment);
+    }
+
+    public interface CollectionFetchCallback {
+        void onCollectionsFetched(List<Collection> collections);
     }
 }

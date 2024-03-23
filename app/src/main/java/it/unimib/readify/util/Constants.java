@@ -80,11 +80,18 @@ public class Constants {
     public static final String FIREBASE_USERS_COLLECTION = "users";
     public static final String FIREBASE_REALTIME_DATABASE = "https://readify-9b50c-default-rtdb.europe-west1.firebasedatabase.app/";
     public static final String FIREBASE_WORKS_COLLECTION = "books";
+    public static final String FIREBASE_COLLECTIONS_COLLECTION = "collections";
+
 
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
+    public static final String FIREBASE_USERS_COLLECTIONS_BOOKS_FIELD = "books";
 
 
     public static final String TO_READ = "to_read";
     public static final String ALREADY_READ = "already_read";
+
+
+    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
+
 }

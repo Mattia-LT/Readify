@@ -12,6 +12,7 @@ import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource
 import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
 import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
+import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
@@ -26,6 +27,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultsLiveData;
     private final MutableLiveData<List<Result>> commentListLiveData;
+    private final MutableLiveData<List<Result>> collectionListLiveData;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -39,6 +41,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userMutableLiveData = new MutableLiveData<>();
         this.userSearchResultsLiveData = new MutableLiveData<>();
         this.commentListLiveData = new MutableLiveData<>();
+        this.collectionListLiveData = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -84,6 +87,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public MutableLiveData<List<Result>> getCollectionListLiveData() {
+        return collectionListLiveData;
+    }
+
+    @Override
     public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){
         return userSearchResultsLiveData;
     }
@@ -92,6 +100,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public void fetchComments(String bookId) {
         Log.d("Repository", "fetch comments : START");
         userDataRemoteDataSource.fetchComments(bookId);
+    }
+
+    @Override
+    public void fetchCollections(String idToken) {
+        userDataRemoteDataSource.fetchCollections(idToken);
     }
 
     @Override
@@ -177,6 +190,20 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onDeleteCommentResult() {
+
+    }
+
+    @Override
+    public void onSuccessFetchCollectionsFromRemoteDatabase(List<Collection> collections) {
+        List<Result> collectionResultList = new ArrayList<>();
+        for(Collection collection : collections){
+            collectionResultList.add(new Result.CollectionSuccess(collection));
+        }
+        collectionListLiveData.postValue(collectionResultList);
+    }
+
+    @Override
+    public void onFailureFetchCollectionsFromRemoteDatabase(String message) {
 
     }
 

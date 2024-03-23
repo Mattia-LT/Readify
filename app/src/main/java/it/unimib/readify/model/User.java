@@ -3,13 +3,16 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class User implements Parcelable {
 
     private String avatar;
     private String biography;
-    private List<Collection> collections;
     private List<Factor> recommended;
     private String email;
     private String gender;
@@ -19,6 +22,7 @@ public class User implements Parcelable {
     private ExternalGroup followers;
     private ExternalGroup following;
     private String idToken;
+    private List<Collection> fetchedCollections = new ArrayList<>();
 
     public User() {}
 
@@ -34,13 +38,12 @@ public class User implements Parcelable {
         this.gender = gender;
     }
 
-    public User(String avatar, String biography, List<Collection> collections, List<Factor> recommended,
+    public User(String avatar, String biography, List<Factor> recommended,
                 String email, String gender, List<Social> socialLinks, String username,
                 String visibility, ExternalGroup followers, ExternalGroup following,
                 String idToken) {
         this.avatar = avatar;
         this.biography = biography;
-        this.collections = collections;
         this.recommended = recommended;
         this.email = email;
         this.gender = gender;
@@ -55,7 +58,6 @@ public class User implements Parcelable {
     public User (User user) {
         this.avatar = user.getAvatar();
         this.biography = user.getBiography();
-        this.collections = user.getCollections();
         this.recommended = user.getRecommended();
         this.email = user.getEmail();
         this.gender = user.getGender();
@@ -65,6 +67,7 @@ public class User implements Parcelable {
         this.followers = user.getFollowers();
         this.following = user.getFollowing();
         this.idToken = user.getIdToken();
+        this.fetchedCollections = user.getFetchedCollections();
     }
 
     public String getAvatar() {
@@ -81,14 +84,6 @@ public class User implements Parcelable {
 
     public void setBiography(String biography) {
         this.biography = biography;
-    }
-
-    public List<Collection> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<Collection> collections) {
-        this.collections = collections;
     }
 
     public List<Factor> getRecommended() {
@@ -163,7 +158,13 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
+    public List<Collection> getFetchedCollections() {
+        return fetchedCollections;
+    }
 
+    public void setFetchedCollections(List<Collection> fetchedCollections) {
+        this.fetchedCollections = fetchedCollections;
+    }
     @Override
     public int describeContents() {
         return 0;
@@ -173,7 +174,6 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.avatar);
         dest.writeString(this.biography);
-        dest.writeTypedList(this.collections);
         dest.writeTypedList(this.recommended);
         dest.writeString(this.email);
         dest.writeString(this.gender);
@@ -188,7 +188,6 @@ public class User implements Parcelable {
     public void readFromParcel(Parcel source) {
         this.avatar = source.readString();
         this.biography = source.readString();
-        this.collections = source.createTypedArrayList(Collection.CREATOR);
         this.recommended = source.createTypedArrayList(Factor.CREATOR);
         this.email = source.readString();
         this.gender = source.readString();
@@ -203,7 +202,6 @@ public class User implements Parcelable {
     protected User(Parcel in) {
         this.avatar = in.readString();
         this.biography = in.readString();
-        this.collections = in.createTypedArrayList(Collection.CREATOR);
         this.recommended = in.createTypedArrayList(Factor.CREATOR);
         this.email = in.readString();
         this.gender = in.readString();
@@ -228,11 +226,24 @@ public class User implements Parcelable {
     };
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(avatar, user.avatar) && Objects.equals(biography, user.biography) && Objects.equals(recommended, user.recommended) && Objects.equals(email, user.email) && Objects.equals(gender, user.gender) && Objects.equals(socialLinks, user.socialLinks) && Objects.equals(username, user.username) && Objects.equals(visibility, user.visibility) && Objects.equals(followers, user.followers) && Objects.equals(following, user.following) && Objects.equals(idToken, user.idToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(avatar, biography, recommended, email, gender, socialLinks, username, visibility, followers, following, idToken);
+    }
+
+    @NonNull
+    @Override
     public String toString() {
         return "User{" +
                 "avatar='" + avatar + '\'' +
                 ", biography='" + biography + '\'' +
-                ", collections=" + collections +
                 ", recommended=" + recommended +
                 ", email='" + email + '\'' +
                 ", gender='" + gender + '\'' +
@@ -242,6 +253,7 @@ public class User implements Parcelable {
                 ", followers=" + followers +
                 ", following=" + following +
                 ", idToken='" + idToken + '\'' +
+                ", fetchedCollections=" + fetchedCollections +
                 '}';
     }
 }

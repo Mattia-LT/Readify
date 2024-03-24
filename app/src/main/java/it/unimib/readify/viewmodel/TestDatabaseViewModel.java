@@ -202,6 +202,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.fetchCollections(idToken);
     }
 
+    public void createCollection(String idToken, String collectionName, boolean visible){
+        testDatabaseRepository.createCollection(idToken, collectionName, visible);
+    }
+
 
     public void fetchComments(String bookId){
         Log.d("ViewModel", "fetchComments start");

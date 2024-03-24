@@ -18,6 +18,9 @@ public interface TestIDatabaseRepository {
     void searchUsers(String query);
     void addComment(String content, String bookId, String idToken);
     void deleteComment(String bookId, Comment comment);
+    void createCollection(String bookId, String collectionName, boolean visibility);
+    void deleteCollection(String idToken, String collectionId);
+    void addBookToCollection(String bookId, String collectionId);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

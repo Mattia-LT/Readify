@@ -182,10 +182,40 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void createCollection(String idToken, String collectionName, boolean visible) {
+        userDataRemoteDataSource.createCollection(idToken, collectionName, visible);
+    }
+
+    @Override
+    public void deleteCollection(String idToken, String collectionId) {
+
+    }
+
+    @Override
+    public void addBookToCollection(String bookId, String collectionId) {
+
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
         }
+    }
+
+    @Override
+    public void onCreateCollectionResult(Collection collection) {
+
+    }
+
+    @Override
+    public void onDeleteCollectionResult() {
+
+    }
+
+    @Override
+    public void onAddBookToCollectionResult() {
+
     }
 
     @Override

@@ -64,14 +64,17 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
         public void bind(Collection collection){
             if(collection != null){
                 binding.textviewCollectionName.setText(collection.getName());
-                String booksRead = String.valueOf(collection.getBooks().size())
+                int numberOfBooks = collection.getBooks() == null ? 0 : collection.getBooks().size();
+                String booksRead = String.valueOf(numberOfBooks)
                         .concat(" ")
                         .concat(this.itemView.getContext().getString(R.string.books));
                 binding.textviewNumberOfBooks.setText(booksRead);
                 //String finalBookId = bookId.substring("/works/".length());
                 for(Collection c : getCurrentList()){
                     List<String> books = c.getBooks();
-                    binding.checkboxAddToCollection.setChecked(books.contains(bookId));
+                    if(books != null){
+                        binding.checkboxAddToCollection.setChecked(books.contains(bookId));
+                    }
                 }
             }
         }

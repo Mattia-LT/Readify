@@ -131,5 +131,6 @@
     <string name="textview_visibility_description">The collections made public will be shown on your profile and can be viewed by your followers</string>
     <string name="button_add_collection">Add collection</string>
     <string name="button_cancel_add_collection">Cancel</string>
+    <string name="snackbar_empty_collection_name">Collection\'s name cannot be empty</string>
 
 </resources>

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +20,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.unimib.readify.R;
 import it.unimib.readify.adapter.AddToCollectionAdapter;
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
@@ -61,11 +64,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         this.bookId = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBookId();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
         testDatabaseViewModel.fetchCollections(idToken);
-
-        // Get the BottomSheetBehavior
-        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from((View) view.getParent());
-        // Set the state to EXPANDED
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
         Button confirmButton = binding.buttonConfirmCollectionInsertion;
@@ -117,15 +115,22 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         });
 
         confirmButton.setOnClickListener(v -> {
-
+            TextInputLayout textInputLayout = binding.textInputLayoutAddCollection;
+            EditText editText = textInputLayout.getEditText();
+            String collectionName = (editText != null) ? editText.getText().toString() : "";
+            collectionName = collectionName.trim();
+            if(collectionName.isEmpty()){
+                Snackbar.make(requireView(), getString(R.string.snackbar_empty_collection_name), Snackbar.LENGTH_SHORT).show();
+            } else {
+                boolean visible = binding.switchCollectionVisibility.isChecked();
+                testDatabaseViewModel.createCollection(idToken, collectionName, visible);
+                testDatabaseViewModel.fetchCollections(idToken);
+                clearAddSection();
+            }
         });
 
 
     }
-
-
-
-
 
 
 

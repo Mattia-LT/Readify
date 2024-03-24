@@ -53,19 +53,21 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         // TODO: 27/01/2024 aggiungere controllo lunghezza nome raccolta
         // TODO: use binding instead of findViewById
 
+        //TODO commentata questa sezione perchè faceva crashare l'app a causa dei cambiamenti di collection
+        // secondo me conviene finire la parte di AddToCollection e poi implementare lo stesso codice pure qua
         //collection creation
-        createCollectionButton.setOnClickListener( e -> {
-            if(collectionName.getEditableText().toString().equals(""))
-                Snackbar.make(view, "Nome non inserito", Snackbar.LENGTH_SHORT).show();
-            else {
-                //TODO forse da sistemare --> molto simile a quello di AddToCollection
-                Collection newCollection = new Collection(collectionName.getEditableText().toString(),
-                        collectionVisibility.isChecked(), null);
-                inputListener.sendInput(newCollection);
-                //close dialog
-                Objects.requireNonNull(getDialog()).dismiss();
-            }
-        });
+//        createCollectionButton.setOnClickListener( e -> {
+//            if(collectionName.getEditableText().toString().equals(""))
+//                Snackbar.make(view, "Nome non inserito", Snackbar.LENGTH_SHORT).show();
+//            else {
+//                //TODO forse da sistemare --> molto simile a quello di AddToCollection
+//                Collection newCollection = new Collection(collectionName.getEditableText().toString(),
+//                        collectionVisibility.isChecked(), null);
+//                inputListener.sendInput(newCollection);
+//                //close dialog
+//                Objects.requireNonNull(getDialog()).dismiss();
+//            }
+//        });
     }
 
     @Override

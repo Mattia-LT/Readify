@@ -118,4 +118,5 @@
     <string name="textview_visibility_description">Le collezioni rese pubbliche verranno mostrate sul tuo profilo e potranno essere visualizzate dai tuoi followers</string>
     <string name="button_add_collection">Aggiungi collezione</string>
     <string name="button_cancel_add_collection">Annulla</string>
+    <string name="snackbar_empty_collection_name">Il nome della collezione non può essere vuoto.</string>
 </resources>

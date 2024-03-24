@@ -246,8 +246,17 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void createCollection(String name, boolean visibility) {
-        //todo
+    public void createCollection(String idToken, String collectionName, boolean visible) {
+        DatabaseReference collectionsReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(idToken);
+
+        DatabaseReference newCollectionReference = collectionsReference.push();
+
+        String collectionId = newCollectionReference.getKey();
+        Collection newCollection = new Collection(collectionId, collectionName, visible, new ArrayList<>());
+        newCollectionReference.setValue(newCollection);
+        userResponseCallback.onCreateCollectionResult(newCollection);
     }
 
     @Override
@@ -272,8 +281,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         DatabaseReference collectionsReference = databaseReference
                 .child(FIREBASE_COLLECTIONS_COLLECTION)
                 .child(idToken);
-        Log.d("query", collectionsReference.toString());
-        Log.d("query", collectionsReference.getKey());
 
         collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

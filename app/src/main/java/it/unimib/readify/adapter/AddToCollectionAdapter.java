@@ -70,12 +70,13 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
                         .concat(this.itemView.getContext().getString(R.string.books));
                 binding.textviewNumberOfBooks.setText(booksRead);
                 //String finalBookId = bookId.substring("/works/".length());
-                for(Collection c : getCurrentList()){
-                    List<String> books = c.getBooks();
-                    if(books != null){
-                        binding.checkboxAddToCollection.setChecked(books.contains(bookId));
-                    }
+                List<String> books = collection.getBooks();
+                if(books != null){
+                    binding.checkboxAddToCollection.setChecked(books.contains(bookId));
+                } else {
+                    binding.checkboxAddToCollection.setChecked(false);
                 }
+
             }
         }
 
@@ -84,7 +85,7 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Collection collection = getItem(position);
-
+                //todo implement checkbox behavior
             }
         }
     }

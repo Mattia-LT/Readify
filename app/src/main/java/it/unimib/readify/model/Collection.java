@@ -37,6 +37,14 @@ public class Collection implements Parcelable {
         this.works = works;
     }
 
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+    }
+
     public String getName() {
         return name;
     }

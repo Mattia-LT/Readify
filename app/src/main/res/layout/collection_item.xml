@@ -13,6 +13,7 @@
         android:id="@+id/collection_thumbnail_imageview"
         android:layout_width="200sp"
         android:layout_height="250sp"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

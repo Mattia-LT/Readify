@@ -23,6 +23,7 @@ import it.unimib.readify.model.Collection;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
+
     private List<Collection> collectionsList;
     private final OnItemClickListener onItemClickListener;
     private final Application application;
@@ -77,7 +78,7 @@ public class CollectionAdapter extends
         }
 
         public void bind(Collection collection, int position) {
-            //set collection thumbnail
+            //Set collection thumbnail
             /*
                 todo sometimes behavior is incorrect
                  - works contained in wrong collection
@@ -116,7 +117,7 @@ public class CollectionAdapter extends
                             .setImageResource(R.drawable.image_not_available);
             }
 
-            //set collection name and visibility
+            //Set collection name and visibility
             collectionItemBinding.collectionNameTextview.setText(collection.getName());
             if(collection.isVisible()) {
                 collectionItemBinding.collectionVisibilityIcon

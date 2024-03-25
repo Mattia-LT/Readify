@@ -92,6 +92,10 @@ public class BookDetailsFragment extends Fragment {
         loadAuthors();
         loadRating();
         fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
+        fragmentBookDetailsBinding.iconAdd.setOnClickListener(v -> {
+            NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook.getKey(), user.getIdToken());
+            Navigation.findNavController(requireView()).navigate(action);
+        });
         loadComments();
         loadAddCommentSection();
     }

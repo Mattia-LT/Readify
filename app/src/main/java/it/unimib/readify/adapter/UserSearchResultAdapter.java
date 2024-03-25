@@ -82,7 +82,7 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
         public void bind(User user) {
             binding.textviewUsername.setText(user.getUsername());
             int numberOfBooks = 0;
-            List<Collection> collections = user.getCollections();
+            List<Collection> collections = user.getFetchedCollections();
             if(collections != null){
                 for(Collection collection : collections){
                     if(collection != null && collection.getName().equals(ALREADY_READ)){

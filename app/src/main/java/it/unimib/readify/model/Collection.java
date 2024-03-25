@@ -7,31 +7,42 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 // TODO: 09/12/2023 managing thumbnail
 public class Collection implements Parcelable {
 
+    private String collectionId;
     private String name;
     private boolean visible;
-    //book id
     private List <String> books;
-    //work got from api
     private List<OLWorkApiResponse> works = new ArrayList<>();
 
     public Collection() {}
 
-    public Collection(String name, boolean visible, List<String> books) {
+    public Collection(String collectionId, String name, boolean visible, List<String> books) {
+        this.collectionId = collectionId;
         this.name = name;
         this.visible = visible;
         this.books = books;
+        this.works = new ArrayList<>();
     }
 
-    public Collection(String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
+    public Collection(String collectionId, String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
+        this.collectionId = collectionId;
         this.name = name;
         this.visible = visible;
         this.books = books;
         this.works = works;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
     }
 
     public String getName() {
@@ -74,6 +85,7 @@ public class Collection implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.collectionId);
         dest.writeString(this.name);
         dest.writeByte(this.visible ? (byte) 1 : (byte) 0);
         dest.writeStringList(this.books);
@@ -81,6 +93,7 @@ public class Collection implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
+        this.collectionId = source.readString();
         this.name = source.readString();
         this.visible = source.readByte() != 0;
         this.books = source.createStringArrayList();
@@ -88,6 +101,7 @@ public class Collection implements Parcelable {
     }
 
     protected Collection(Parcel in) {
+        this.collectionId = in.readString();
         this.name = in.readString();
         this.visible = in.readByte() != 0;
         this.books = in.createStringArrayList();
@@ -110,10 +124,28 @@ public class Collection implements Parcelable {
     @Override
     public String toString() {
         return "Collection{" +
-                "name='" + name + '\'' +
+                "collectionId='" + collectionId + '\'' +
+                ", name='" + name + '\'' +
                 ", visible=" + visible +
                 ", books=" + books +
                 ", works=" + works +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Collection that = (Collection) o;
+        return visible == that.visible &&
+                Objects.equals(collectionId, that.collectionId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(books, that.books) &&
+                Objects.equals(works, that.works);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(collectionId, name, visible, books, works);
     }
 }

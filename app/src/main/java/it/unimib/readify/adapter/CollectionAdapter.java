@@ -1,14 +1,22 @@
 package it.unimib.readify.adapter;
 
+import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
+
 import android.app.Application;
 import android.content.res.Resources;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,6 +28,7 @@ import java.util.List;
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.CollectionItemBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
 
 public class CollectionAdapter extends
         RecyclerView.Adapter<CollectionAdapter.ViewHolder> {
@@ -72,8 +81,17 @@ public class CollectionAdapter extends
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private final ImageView thumbnail;
+        private final TextView name;
+        private final ImageView visibilityIcon;
+        private final ConstraintLayout container;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            thumbnail = itemView.findViewById(R.id.collection_thumbnail_imageview);
+            name = itemView.findViewById(R.id.collection_name_textview);
+            visibilityIcon = itemView.findViewById(R.id.collection_visibility_icon);
+            container = itemView.findViewById(R.id.collection_container);
             itemView.setOnClickListener(this);
         }
 
@@ -85,30 +103,26 @@ public class CollectionAdapter extends
                  - thumbnail does not correspond to the first cover of the first work
                 todo insert same size for each thumbnail (maybe?)
             */
-            if(collection.getWorks() == null || collection.getWorks().isEmpty())
-                collectionItemBinding.collectionThumbnailImageview
-                        .setImageResource(R.drawable.image_not_available);
-            else {
-                boolean isThumbnailAvailable = false;
-                for (int i = 0; i < collection.getWorks().size(); i++) {
-                    if(collection.getWorks().get(i) != null && collection.getWorks().get(i).getCovers() != null) {
-                        for (int j = 0; j < collection.getWorks().get(i).getCovers().size(); j++) {
-                            if(collection.getWorks().get(i).getCovers().get(j) != -1) {
-                                isThumbnailAvailable = true;
-                                RequestOptions requestOptions = new RequestOptions()
-                                        .placeholder(R.drawable.loading_image_gif)
-                                        .error(R.drawable.image_not_available);
-                                Glide.with(application)
-                                        .load("https://covers.openlibrary.org/b/id/"
-                                                + collection.getWorks().get(i).getCovers().get(j)
-                                                + "-L.jpg")
-                                        .apply(requestOptions)
-                                        .into(collectionItemBinding.collectionThumbnailImageview);
-                                break;
-                            }
-                        }
+            boolean isThumbnailAvailable = false;
+            if(collection.getWorks() == null || collection.getWorks().isEmpty()) {
+                thumbnail.setImageResource(R.drawable.image_not_available);
+            } else {
+                for(OLWorkApiResponse work : collection.getWorks()) {
+                    int pos = 0;
+                    int cover = -1;
+                    while (cover == -1 && pos < work.getCovers().size()) {
+                        cover = work.getCovers().get(pos);
+                        pos++;
                     }
-                    if(isThumbnailAvailable) {
+                    if (cover != -1) {
+                        RequestOptions requestOptions = new RequestOptions()
+                                .placeholder(R.drawable.loading_image_gif)
+                                .error(R.drawable.image_not_available);
+                        Glide.with(application)
+                                .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
+                                .apply(requestOptions)
+                                .into(thumbnail);
+                        isThumbnailAvailable = true;
                         break;
                     }
                 }

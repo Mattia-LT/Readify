@@ -121,7 +121,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         //initializing Observers
         collectionsObserver = collections -> {
             Log.d("profile fragment", "collections changed");
-            if(collections.size() == copiedUser.getCollections().size()) {
+            if(collections.size() == copiedUser.getFetchedCollections().size()) {
                 runCollectionsView(view);
             }
             //todo managing observer deletion (where?)
@@ -134,6 +134,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                 copiedUser = new User(user);
                 updateUI();
 
+                //TODO fix using new collections logic (?) idk
                 /*
                     todo optimize conditions and / or logic of @isCollectionsChanged
                      maybe we can use user == copiedUser
@@ -141,7 +142,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                     right now, this is straightforward; it is working but can be optimized most probably
                  */
                 if(testDatabaseViewModel.isCollectionsChanged()) {
-                    bookViewModel.fetchCollections(copiedUser.getCollections(), getViewLifecycleOwner());
+                    bookViewModel.fetchCollections(copiedUser.getFetchedCollections(), getViewLifecycleOwner());
                     testDatabaseViewModel.setCollectionsChanged(false);
                 }
             } else {
@@ -187,7 +188,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
         fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
-        collectionAdapter.setCollectionsList(copiedUser.getCollections());
+        collectionAdapter.setCollectionsList(copiedUser.getFetchedCollections());
     }
 
     public void runCollectionCreationProcess() {

@@ -17,17 +17,16 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unimib.readify.R;
-import it.unimib.readify.databinding.BottomSearchFilterBinding;
+import it.unimib.readify.databinding.BottomSheetSearchFilterBinding;
 
 public class FilterBottomSheet extends BottomSheetDialogFragment {
 
     private FilterBottomSheetListener mListener;
-    private BottomSearchFilterBinding binding;
+    private BottomSheetSearchFilterBinding binding;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = BottomSearchFilterBinding.inflate(inflater, container, false);
+        binding = BottomSheetSearchFilterBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 

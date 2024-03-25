@@ -98,9 +98,13 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
             counter[0]++;
             //todo managing observer deletion (where?)
         };
+        //TODO, IF AGGIUNTO PER NON FAR CRASHARE L'APP --> RIVEDERE LOGICA DELLE API DI OPENLIBRARY
+        // non si dovrebbe usare il viewlifecycle owner in classi che non siano fragment
         for (int i = 0; i < collections.size(); i++) {
             collectionsResultsList.add(new MutableLiveData<>());
-            bookRemoteDataSource.getBooks(collections.get(i).getBooks(), COLLECTION);
+            if(collections.get(i).getBooks() != null){
+                bookRemoteDataSource.getBooks(collections.get(i).getBooks(), COLLECTION);
+            }
             collectionsResultsList.get(i).observe(lifecycleOwner, observer);
         }
     }

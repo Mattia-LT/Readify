@@ -47,6 +47,7 @@ public class TestDatabaseViewModel extends ViewModel {
      */
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
+    private MutableLiveData<List<Result>> collectionListLiveData;
     private boolean isUIRunning;
     private boolean isCollectionsChanged;
 
@@ -189,6 +190,22 @@ public class TestDatabaseViewModel extends ViewModel {
         }
         return commentListLiveData;
     }
+
+    public MutableLiveData<List<Result>> getCollectionListLiveData(){
+        if(collectionListLiveData == null){
+            collectionListLiveData = testDatabaseRepository.getCollectionListLiveData();
+        }
+        return collectionListLiveData;
+    }
+
+    public void fetchCollections(String idToken){
+        testDatabaseRepository.fetchCollections(idToken);
+    }
+
+    public void createCollection(String idToken, String collectionName, boolean visible){
+        testDatabaseRepository.createCollection(idToken, collectionName, visible);
+    }
+
 
     public void fetchComments(String bookId){
         Log.d("ViewModel", "fetchComments start");

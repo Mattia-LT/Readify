@@ -20,7 +20,7 @@ public interface UserResponseCallback {
     void onAddCommentResult(Comment comment);
     void onCreateCollectionResult(Collection collection);
     void onDeleteCollectionResult();
-    void onAddBookToCollectionResult();
+    void onAddBookToCollectionResult(List<String> books);
     void onDeleteCommentResult();
     void onSuccessFetchCollectionsFromRemoteDatabase(List <Collection> collections);
     void onFailureFetchCollectionsFromRemoteDatabase(String message);

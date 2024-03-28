@@ -17,6 +17,7 @@ public class Collection implements Parcelable {
     private String name;
     private boolean visible;
     private List <String> books;
+    private int numberOfBooks;
     private List<OLWorkApiResponse> works = new ArrayList<>();
 
     public Collection() {}
@@ -27,6 +28,7 @@ public class Collection implements Parcelable {
         this.visible = visible;
         this.books = books;
         this.works = new ArrayList<>();
+        this.numberOfBooks = 0;
     }
 
     public Collection(String collectionId, String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
@@ -35,6 +37,7 @@ public class Collection implements Parcelable {
         this.visible = visible;
         this.books = books;
         this.works = works;
+        this.numberOfBooks = works.size();
     }
 
     public String getCollectionId() {
@@ -77,6 +80,13 @@ public class Collection implements Parcelable {
         this.works = works;
     }
 
+    public int getNumberOfBooks() {
+        return numberOfBooks;
+    }
+
+    public void setNumberOfBooks(int numberOfBooks) {
+        this.numberOfBooks = numberOfBooks;
+    }
 
     @Override
     public int describeContents() {
@@ -89,6 +99,7 @@ public class Collection implements Parcelable {
         dest.writeString(this.name);
         dest.writeByte(this.visible ? (byte) 1 : (byte) 0);
         dest.writeStringList(this.books);
+        dest.writeInt(this.numberOfBooks);
         dest.writeTypedList(this.works);
     }
 
@@ -97,6 +108,7 @@ public class Collection implements Parcelable {
         this.name = source.readString();
         this.visible = source.readByte() != 0;
         this.books = source.createStringArrayList();
+        this.numberOfBooks = source.readInt();
         this.works = source.createTypedArrayList(OLWorkApiResponse.CREATOR);
     }
 
@@ -105,6 +117,7 @@ public class Collection implements Parcelable {
         this.name = in.readString();
         this.visible = in.readByte() != 0;
         this.books = in.createStringArrayList();
+        this.numberOfBooks = in.readInt();
         this.works = in.createTypedArrayList(OLWorkApiResponse.CREATOR);
     }
 
@@ -120,7 +133,19 @@ public class Collection implements Parcelable {
         }
     };
 
-    @NonNull
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Collection that = (Collection) o;
+        return visible == that.visible && numberOfBooks == that.numberOfBooks && Objects.equals(collectionId, that.collectionId) && Objects.equals(name, that.name) && Objects.equals(books, that.books) && Objects.equals(works, that.works);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(collectionId, name, visible, books, numberOfBooks, works);
+    }
+
     @Override
     public String toString() {
         return "Collection{" +
@@ -128,24 +153,8 @@ public class Collection implements Parcelable {
                 ", name='" + name + '\'' +
                 ", visible=" + visible +
                 ", books=" + books +
+                ", numberOfBooks=" + numberOfBooks +
                 ", works=" + works +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Collection that = (Collection) o;
-        return visible == that.visible &&
-                Objects.equals(collectionId, that.collectionId) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(books, that.books) &&
-                Objects.equals(works, that.works);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(collectionId, name, visible, books, works);
     }
 }

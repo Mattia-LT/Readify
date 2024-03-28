@@ -21,8 +21,9 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void fetchComments(String bookId);
     public abstract void addComment(String content, String bookId, String idToken);
     public abstract void createCollection(String idToken, String name, boolean visible);
-    public abstract void addToCollection(String collectionId, String bookId);
-    public abstract void removeFromCollection(String collectionId, String bookId);
+    public abstract void deleteCollection(String idToken, String collectionId);
+    public abstract void addBookToCollection(String idToken, String collectionId, String bookId);
+    public abstract void removeBookFromCollection(String idToken, String collectionId, String bookId);
     public abstract void deleteComment(String bookId, Comment comment);
     public abstract void fetchCollections(String idToken);
 

@@ -85,7 +85,8 @@ public class Constants {
 
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
-    public static final String FIREBASE_USERS_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
 
 
     public static final String TO_READ = "to_read";

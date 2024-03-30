@@ -46,6 +46,17 @@
 
 
     <fragment
+        android:id="@+id/profileImageSelectorFragment"
+        android:name="it.unimib.readify.ui.main.ProfileImageSelector"
+        android:label="BOH"
+        tools:layout="@layout/fragment_profile_image_selector" >
+
+        <action
+            android:id="@+id/action_profileImageSelectorFragment_to_settingsFragment"
+            app:destination="@id/settingFragment"/>
+    </fragment>
+
+    <fragment
         android:id="@+id/profileFragment"
         android:name="it.unimib.readify.ui.main.ProfileFragment"
         android:label="@string/navigation_bar_item_profile"
@@ -146,14 +157,24 @@
 
     </fragment>
 
+
     <fragment
         android:id="@+id/settingFragment"
         android:name="it.unimib.readify.ui.main.SettingsFragment"
         android:label="@string/pa_settings"
         tools:layout="@layout/fragment_settings">
+
+        <argument
+            android:name="imageResourceId"
+            app:argType="integer"
+            />
+
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"
             app:destination= "@id/profileFragment"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_profileImageSelectorFragment"
+            app:destination= "@+id/profileImageSelectorFragment"/>
     </fragment>
 
     <dialog

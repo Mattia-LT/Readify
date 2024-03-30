@@ -29,7 +29,16 @@
         android:label="RegisterFragment"
         tools:layout="@layout/fragment_register">
         <action
-            android:id="@+id/action_registerFragment_to_homeActivity"
+            android:id="@+id/action_registerFragment_to_continueRegistrationFragment"
+            app:destination="@id/continueRegistrationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/continueRegistrationFragment"
+        android:name="it.unimib.readify.ui.startup.ContinueRegistrationFragment"
+        android:label="ContinueRegistrationFragment"
+        tools:layout="@layout/fragment_continue_registration">
+        <action
+            android:id="@+id/action_continueRegistrationFragment_to_homeActivity"
             app:destination="@id/homeActivity" />
     </fragment>
 

@@ -33,7 +33,7 @@ import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
-public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
+public class RegisterFragment extends Fragment{
 
     private FragmentRegisterBinding fragmentRegisterBinding;
     private TestDatabaseViewModel testDatabaseViewModel;
@@ -65,12 +65,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         Log.d("registration fragment", "onViewCreated");
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(),
-                R.array.gender, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        fragmentRegisterBinding.spinnerGender.setAdapter(adapter);
-        fragmentRegisterBinding.spinnerGender.setOnItemSelectedListener(this);
-
         testDatabaseViewModel.setUIRunning(false);
 
         //registration action
@@ -130,25 +124,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
         Log.d("registration fragment", "onDestroy");
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        ((TextView) view).setTextColor(Color.WHITE);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    private boolean isUsernameOk(String username) {
-        if (username.isEmpty()) {
-            fragmentRegisterBinding.textInputLayoutUsername.setError(getString(R.string.error_username));
-            return false;
-        } else {
-            fragmentRegisterBinding.textInputLayoutUsername.setError(null);
-            return true;
-        }
-    }
 
     private boolean isEmailOk(String email) {
         if (!EmailValidator.getInstance().isValid((email))) {
@@ -193,6 +168,6 @@ public class RegisterFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     private void navigateToHomeActivity() {
-        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_homeActivity);
+        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_continueRegistrationFragment);
     }
 }

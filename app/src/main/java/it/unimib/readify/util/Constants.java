@@ -93,6 +93,8 @@ public class Constants {
     public static final String ALREADY_READ = "already_read";
 
 
-    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
+    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
+
+    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]" };
 
 }

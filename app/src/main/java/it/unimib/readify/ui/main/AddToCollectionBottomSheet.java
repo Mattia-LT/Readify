@@ -16,6 +16,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,11 +29,15 @@ import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.AddToCollectionAdapter;
+import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.BottomSheetAddToCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -67,8 +72,16 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         RecyclerView recyclerViewCollections = binding.recyclerviewSelectCollections;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
 
-        addToCollectionAdapter = new AddToCollectionAdapter(bookId, collection -> {
+        addToCollectionAdapter = new AddToCollectionAdapter(bookId, new AddToCollectionAdapter.OnCheckboxStatusChanged() {
+            @Override
+            public void onCollectionSelected(Collection collection) {
+                testDatabaseViewModel.addBookToCollection(idToken, bookId, collection.getCollectionId());
+            }
 
+            @Override
+            public void onCollectionUnselected(Collection collection) {
+                testDatabaseViewModel.removeBookFromCollection(idToken, bookId, collection.getCollectionId());
+            }
         });
 
         recyclerViewCollections.setLayoutManager(layoutManager);
@@ -104,9 +117,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         });
 
         cancelButton.setOnClickListener(v -> {
-            binding.createSection.setVisibility(View.GONE);
             clearAddSection();
-            showAddCollectionButton.setVisibility(View.VISIBLE);
         });
 
         confirmButton.setOnClickListener(v -> {
@@ -119,8 +130,8 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             } else {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);
-                testDatabaseViewModel.fetchCollections(idToken);
                 clearAddSection();
+                testDatabaseViewModel.fetchCollections(idToken);
             }
         });
 
@@ -139,21 +150,13 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 .create(TestDatabaseViewModel.class);
     }
     private void clearAddSection(){
+        binding.createSection.setVisibility(View.GONE);
         binding.characterCounter.setText("0");
         binding.switchCollectionVisibility.setChecked(false);
         binding.editTextCreateCollection.setText("");
+        binding.buttonConfirmCollectionInsertion.setVisibility(View.VISIBLE);
     }
     private void initObservers(){
-        Observer<Result> loggedUserObserver = result -> {
-            Log.d("BookDetails fragment", "user changed");
-            if(result.isSuccess()) {
-                User user = ((Result.UserSuccess) result).getData();
-                this.idToken = user.getIdToken();
-            }
-        };
-        //get user data from database
-        //testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-
         Observer<List<Result>> collectionsObserver = results -> {
             List<Collection> collectionsResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
@@ -161,18 +164,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     .collect(Collectors.toList());
             addToCollectionAdapter.submitList(collectionsResultList);
         };
-
         testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
-
-
-
-
-
-
-
     }
-
-
-
-
 }

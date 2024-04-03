@@ -4,81 +4,64 @@ import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
 
-import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.List;
-
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BookSearchItemBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 
-public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, BookSearchResultAdapter.SearchResultViewHolder> {
 
     public interface OnItemClickListener {
         void onBookItemClick(OLWorkApiResponse book);
         void onAddToCollectionButtonPressed(int position);
     }
 
-    private final List<OLWorkApiResponse> bookList;
-    private final Application application;
     private final OnItemClickListener onItemClickListener;
 
 
-    public BookSearchResultAdapter(List<OLWorkApiResponse> bookList, Application application, OnItemClickListener onItemClickListener) {
-        this.bookList = bookList;
-        this.application = application;
+    public BookSearchResultAdapter(OnItemClickListener onItemClickListener) {
+        super(new DiffUtil.ItemCallback<OLWorkApiResponse>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull OLWorkApiResponse oldItem, @NonNull OLWorkApiResponse newItem) {
+                return oldItem.getKey().equals(newItem.getKey());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull OLWorkApiResponse oldItem, @NonNull OLWorkApiResponse newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
         this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         BookSearchItemBinding binding = BookSearchItemBinding.inflate(inflater, parent, false);
         return new SearchResultViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchResultViewHolder holder, int position) {
         if(position != RecyclerView.NO_POSITION){
-            if(holder instanceof SearchResultViewHolder){
-                ((SearchResultViewHolder) holder).bind(bookList.get(position));
-            }
+            OLWorkApiResponse book = getItem(position);
+            holder.bind(book);
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return position;
-    }
-
-    @Override
-    public int getItemCount() {
-        if(bookList != null){
-            return bookList.size();
-        }
-        return 0;
-    }
-
-    public void refreshList(List<OLWorkApiResponse> books){
-        int size = this.bookList.size();
-        bookList.clear();
-        notifyItemRangeRemoved(0,size);
-        bookList.addAll(books);
-        notifyItemRangeInserted(0, books.size());
-    }
-
-    // custom viewholder to bind data to recyclerview items (search result items)
     public class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final BookSearchItemBinding binding;
 
@@ -105,17 +88,17 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                     binding.imageviewBookCover.setImageResource(R.drawable.image_not_available);
                 } else {
                     RequestOptions requestOptions = new RequestOptions()
-                            .placeholder(R.drawable.loading_image_gif)
+                            .placeholder(R.drawable.loading_spinner)
                             .error(R.drawable.image_not_available)
                             .transform(new CenterCrop());
 
-                    Glide.with(application)
+                    Glide.with(this.itemView.getContext())
                             .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                             .apply(requestOptions)
                             .into(binding.imageviewBookCover);
                 }
             } else {
-                Glide.with(application)
+                Glide.with(this.itemView.getContext())
                         .load(R.drawable.image_not_available)
                         .into(binding.imageviewBookCover);
             }
@@ -123,14 +106,18 @@ public class BookSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.imagebutton_add_icon) {
-                // hai premuto il bottone per aggiungere alla raccolta
-                //todo gestire aggiunta alla raccolta
-                //setImageViewFavoriteNews(!newsList.get(getAdapterPosition()).isFavorite());
-                //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
-            } else {
-                //hai premuto qualcos'altro
-                onItemClickListener.onBookItemClick(bookList.get(getAdapterPosition()));
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION){
+                OLWorkApiResponse book = getItem(position);
+                if (v.getId() == R.id.imagebutton_add_icon) {
+                    // hai premuto il bottone per aggiungere alla raccolta
+                    //todo gestire aggiunta alla raccolta
+                    //setImageViewFavoriteNews(!newsList.get(getAdapterPosition()).isFavorite());
+                    //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
+                } else {
+                    //hai premuto qualcos'altro
+                    onItemClickListener.onBookItemClick(book);
+                }
             }
         }
 

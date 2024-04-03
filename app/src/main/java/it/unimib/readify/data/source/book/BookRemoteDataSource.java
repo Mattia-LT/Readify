@@ -1,15 +1,12 @@
 package it.unimib.readify.data.source.book;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.SEARCH;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import it.unimib.readify.R;
@@ -40,7 +37,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
     public void searchBooks(String query, String sort, int limit, int offset, String subjects) {
         olApiService.searchBooks(query, sort, limit, offset, subjects).enqueue(new Callback<OLSearchApiResponse>() {
             @Override
-            public void onResponse(Call<OLSearchApiResponse> call, Response<OLSearchApiResponse> response) {
+            public void onResponse(@NonNull Call<OLSearchApiResponse> call, @NonNull Response<OLSearchApiResponse> response) {
                 if(response.isSuccessful()){
                     OLSearchApiResponse searchApiResponse = response.body();
                     if(searchApiResponse != null && searchApiResponse.getDocs() != null){
@@ -61,20 +58,19 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
             }
 
             @Override
-            public void onFailure(Call<OLSearchApiResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<OLSearchApiResponse> call, @NonNull Throwable t) {
                 //todo altro altro errore
             }
         });
     }
 
-    @Override
-    public void fetchBook(String id) {
 
-    }
 
     @Override
     public void getBooks(List<String> idList, String reference) {
         List<OLWorkApiResponse> books = new ArrayList<>();
+        int totalRequests = idList.size();
+        final int[] completedRequests = {0};
         for(String id: idList){
             olApiService.fetchBook(id).enqueue(new Callback<OLWorkApiResponse>() {
                 @Override
@@ -84,10 +80,11 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                         OLWorkApiResponse book = response.body();
                         if(book != null){
                             checkBookData(book);
-                            fetchAuthorsForWork(book);
+                            fetchAuthors(book);
                             fetchRatingForWork(book);
                             books.add(book);
-                            if(books.size() == idList.size()){
+                            completedRequests[0]++;
+                            if(books.size() == idList.size() && completedRequests[0] == totalRequests){
                                 responseCallback.onSuccessFetchBooksFromRemote(books, reference);
                             }
                         } else {
@@ -124,7 +121,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
             }
 
             @Override
-            public void onFailure(Call<OLRatingResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<OLRatingResponse> call, @NonNull Throwable t) {
                 //todo errore
             }
         });
@@ -132,10 +129,12 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
 
     }
 
-    private void fetchAuthorsForWork(OLWorkApiResponse book){
+    private void fetchAuthors(OLWorkApiResponse book){
         List<OLAuthorApiResponse> authors = new ArrayList<>();
         List<OLAuthorKeys> authorsKeys = book.getAuthors();
         if(authorsKeys != null && !authorsKeys.isEmpty()){
+            int totalRequests = authorsKeys.size();
+            final int[] completedRequests = {0};
             for(OLAuthorKeys authorKey : authorsKeys) {
                 String key = null;
                 if(authorKey.getAuthor() != null){
@@ -146,12 +145,13 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 }
                 olApiService.fetchAuthor(key).enqueue(new Callback<OLAuthorApiResponse>() {
                     @Override
-                    public void onResponse(Call<OLAuthorApiResponse> call, Response<OLAuthorApiResponse> response) {
+                    public void onResponse(@NonNull Call<OLAuthorApiResponse> call, @NonNull Response<OLAuthorApiResponse> response) {
                         if(response.isSuccessful()){
                             OLAuthorApiResponse author = response.body();
                             if(author != null){
                                 authors.add(author);
-                                if(authors.size() == authorsKeys.size()){
+                                completedRequests[0]++;
+                                if(authors.size() == authorsKeys.size() && completedRequests[0] == totalRequests){
                                     book.setAuthorList(authors);
                                 }
                             } else {
@@ -163,7 +163,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                     }
 
                     @Override
-                    public void onFailure(Call<OLAuthorApiResponse> call, Throwable t) {
+                    public void onFailure(@NonNull Call<OLAuthorApiResponse> call, @NonNull Throwable t) {
                         //todo errore
                     }
                 });

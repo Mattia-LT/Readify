@@ -188,12 +188,17 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void deleteCollection(String idToken, String collectionId) {
-
+        userDataRemoteDataSource.deleteCollection(idToken, collectionId);
     }
 
     @Override
-    public void addBookToCollection(String bookId, String collectionId) {
+    public void addBookToCollection(String idToken, String bookId, String collectionId) {
+        userDataRemoteDataSource.addBookToCollection(idToken, bookId, collectionId);
+    }
 
+    @Override
+    public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
+        userDataRemoteDataSource.removeBookFromCollection(idToken, bookId, collectionId);
     }
 
     @Override
@@ -214,7 +219,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onAddBookToCollectionResult() {
+    public void onAddBookToCollectionResult(List<String> books) {                                                                                                                                                                   
 
     }
 

@@ -85,13 +85,16 @@ public class Constants {
 
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
-    public static final String FIREBASE_USERS_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
 
 
     public static final String TO_READ = "to_read";
     public static final String ALREADY_READ = "already_read";
 
 
-    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
+    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
+
+    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]" };
 
 }

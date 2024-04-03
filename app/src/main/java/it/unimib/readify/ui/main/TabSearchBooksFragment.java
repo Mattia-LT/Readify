@@ -56,7 +56,7 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         initObserver();
         searchResultsList = new ArrayList<>();
         RecyclerView recyclerViewSearchResults = fragmentTabSearchBooksBinding.recyclerviewSearch;
-        searchResultsAdapter = new BookSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new BookSearchResultAdapter.OnItemClickListener() {
+        searchResultsAdapter = new BookSearchResultAdapter(new BookSearchResultAdapter.OnItemClickListener() {
             @Override
             public void onBookItemClick(OLWorkApiResponse book) {
                 NavDirections action = SearchFragmentDirections.actionSearchFragmentToBookDetailsFragment(book);
@@ -133,7 +133,7 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
             searchResultsList = searchResults;
-            searchResultsAdapter.refreshList(searchResults);
+            searchResultsAdapter.submitList(searchResults);
             fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
         };
         bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);

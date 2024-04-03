@@ -36,7 +36,6 @@ public class BookViewModel extends ViewModel {
     private final IBookRepository bookRepository;
     private final int offset;
     private final int limit;
-    private LiveData<Result> workLiveData;
     private MutableLiveData<List<Result>> suggestedCarouselLiveData;
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
@@ -64,13 +63,6 @@ public class BookViewModel extends ViewModel {
 
     public void searchBooks(String query, String sort, String subjects) {
         bookRepository.searchBooks(query, sort, limit, offset, subjects);
-    }
-
-    public LiveData<Result> fetchBook(String id){
-        if(workLiveData == null){
-            workLiveData = bookRepository.fetchBook(id);
-        }
-        return workLiveData;
     }
 
     public MutableLiveData<List<Result>> fetchBooks(List<String> idList, String reference) {

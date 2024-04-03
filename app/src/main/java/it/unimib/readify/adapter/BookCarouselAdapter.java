@@ -120,7 +120,7 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     binding.bookCover.setImageResource(R.drawable.image_not_available);
                 } else {
                     RequestOptions requestOptions = new RequestOptions()
-                            .placeholder(R.drawable.loading_image_gif)
+                            .placeholder(R.drawable.loading_spinner)
                             .error(R.drawable.image_not_available);
                     Glide.with(application)
                             .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)

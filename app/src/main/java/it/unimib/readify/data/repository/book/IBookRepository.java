@@ -13,7 +13,6 @@ public interface IBookRepository {
 
     void searchBooks(String query, String sort, int limit, int offset, String genres);
     MutableLiveData<List<Result>> getSearchResultsLiveData();
-    LiveData<Result> fetchBook(String id);
     MutableLiveData<List<Result>> getBooksByIdList(List<String> idList, String reference);
 
     void fetchCollections(List<Collection> collections, LifecycleOwner lifecycleOwner);

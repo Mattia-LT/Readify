@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,17 +24,13 @@ import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookCarouselAdapter;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 
 public class HomeFragment extends Fragment {
     private List<OLWorkApiResponse> trendingBookList;
@@ -183,25 +178,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void initViewModels(){
-        IBookRepository bookRepository = TestServiceLocator
+        bookViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-
-        bookViewModel = new ViewModelProvider
-                (
-                        requireActivity(),
-                        new DataViewModelFactory(bookRepository)
-                )
-                .get(BookViewModel.class);
-
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
+                .create(BookViewModel.class);
 
         testDatabaseViewModel = TestDatabaseViewModelFactory
-                .getInstance(testDatabaseRepository)
+                .getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
-
     }
 
     private void initObservers(){
@@ -221,7 +204,4 @@ public class HomeFragment extends Fragment {
         //get user data from database
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
-
-
-
 }

@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,16 +25,12 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
-import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentUserDetailsBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -95,18 +90,12 @@ public class UserDetailsFragment extends Fragment {
     }
 
     private void initRepositories(){
-        //initializing repository and viewModel Book
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+        //initializing viewModels
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
-        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-        ).get(BookViewModel.class);
+        bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
     }
 
     private void initRecyclerView(View view){
@@ -174,21 +163,3 @@ public class UserDetailsFragment extends Fragment {
         //todo
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

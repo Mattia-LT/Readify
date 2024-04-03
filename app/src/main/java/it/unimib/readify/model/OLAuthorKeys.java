@@ -12,6 +12,8 @@ public class OLAuthorKeys implements Parcelable {
     private OLDocs author;
     private String key;
 
+    public OLAuthorKeys() {};
+
     public OLAuthorKeys(OLDocs author, String key) {
         this.author = author;
         this.key = key;

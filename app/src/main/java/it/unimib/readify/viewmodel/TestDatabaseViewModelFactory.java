@@ -1,5 +1,7 @@
 package it.unimib.readify.viewmodel;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -7,7 +9,9 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.util.TestServiceLocator;
 
 /*
     TestDatabaseViewModelFactory is a Singleton class which maps every ViewModel class
@@ -19,22 +23,28 @@ import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
     It is a good practice when it is needed 1) a general UI update of every Activity / Fragment
      (each time the data the UI based its appearance changes)
      and 2) an automatic check of data changing during some particular actions (asynchronous actions)
+
+     EDITED: TestDatabaseViewModelFactory now manages the creation of every ViewModel Class
  */
 public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
 
     private static volatile TestDatabaseViewModelFactory INSTANCE = null;
     private final Map<Class<? extends ViewModel>, ViewModel> viewModels = new ConcurrentHashMap<>();
-    private final TestIDatabaseRepository testDatabaseRepository;
+    private final TestIDatabaseRepository testIDatabaseRepository;
+    private final IBookRepository iBookRepository;
 
-    private TestDatabaseViewModelFactory(TestIDatabaseRepository testDatabaseRepository) {
-        this.testDatabaseRepository = testDatabaseRepository;
+    private TestDatabaseViewModelFactory(Application application) {
+        this.testIDatabaseRepository = TestServiceLocator.getInstance(application)
+                .getRepository(TestIDatabaseRepository.class);
+        this.iBookRepository = TestServiceLocator.getInstance(application)
+                .getRepository(IBookRepository.class);
     }
 
-    public static TestDatabaseViewModelFactory getInstance(TestIDatabaseRepository testDatabaseRepository) {
+    public static TestDatabaseViewModelFactory getInstance(Application application) {
         if (INSTANCE == null) {
             synchronized (TestDatabaseViewModelFactory.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TestDatabaseViewModelFactory(testDatabaseRepository);
+                    INSTANCE = new TestDatabaseViewModelFactory(application);
                 }
             }
         }
@@ -62,9 +72,12 @@ public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
     private <T extends ViewModel> T createViewModel(Class<T> modelClass) {
         //creating TestDatabaseViewModel instance
         if (modelClass.isAssignableFrom(TestDatabaseViewModel.class)) {
-            return (T) new TestDatabaseViewModel(testDatabaseRepository);
+            return (T) new TestDatabaseViewModel(testIDatabaseRepository);
+        }
+        //creating BookViewModel instance
+        if (modelClass.isAssignableFrom(BookViewModel.class)) {
+            return (T) new BookViewModel(iBookRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
 }
-

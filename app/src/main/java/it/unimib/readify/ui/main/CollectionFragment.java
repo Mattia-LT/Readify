@@ -25,11 +25,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -138,9 +136,7 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initRepositories(){
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
 }

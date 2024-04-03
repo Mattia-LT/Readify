@@ -16,7 +16,6 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,15 +28,11 @@ import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.AddToCollectionAdapter;
-import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.BottomSheetAddToCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -135,22 +130,12 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
 
     private void initViewModels(){
-        IBookRepository bookRepository = TestServiceLocator
+        bookViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-        )
-                .get(BookViewModel.class);
-
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
+                .create(BookViewModel.class);
 
         testDatabaseViewModel = TestDatabaseViewModelFactory
-                .getInstance(testDatabaseRepository)
+                .getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
     private void clearAddSection(){

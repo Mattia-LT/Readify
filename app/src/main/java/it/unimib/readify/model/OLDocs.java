@@ -7,6 +7,8 @@ public class OLDocs implements Parcelable {
 
     private String key;
 
+    public OLDocs() {};
+
     public OLDocs(String key) {
         this.key = key;
     }

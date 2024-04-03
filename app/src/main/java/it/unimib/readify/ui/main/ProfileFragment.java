@@ -19,7 +19,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -33,15 +32,11 @@ import java.util.Locale;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
-import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -103,20 +98,13 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         });
         loadMenu(view);
 
-        //initializing repository and viewModel User
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+        //initializing viewModel Database
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
-        //initializing repository and viewModel Book
-        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-        ).get(BookViewModel.class);
+        //initializing viewModel Book
+        bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
 
         //initializing Observers
         collectionsObserver = collections -> {
@@ -132,6 +120,19 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess)result).getData();
                 copiedUser = new User(user);
+                Log.d("profile test", copiedUser.getFetchedCollections().toString());
+
+                /*
+                TEST
+                se collections == null, il campo fetchedCollections viene cancellato nel databse
+                copiedUser.setFetchedCollections(null);
+                FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);
+                DatabaseReference databaseReference = firebaseDatabase.getReference();
+                databaseReference.child(FIREBASE_USERS_COLLECTION).child(copiedUser.getIdToken()).setValue(copiedUser)
+                        .addOnSuccessListener(aVoid -> Log.d("profile", "success"))
+                        .addOnFailureListener(e -> Log.d("profile", "error"));
+                 */
+
                 updateUI();
 
                 //TODO fix using new collections logic (?) idk

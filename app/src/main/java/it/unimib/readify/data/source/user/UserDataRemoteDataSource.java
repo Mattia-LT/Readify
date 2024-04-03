@@ -57,6 +57,24 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             existingUser.setFetchedCollections(collections);
                             userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
                         });
+                        /*
+                        if(existingUser.equals(user)) {
+                                //User has been saved without changes
+                                userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
+                            } else {
+                                //User has been updated
+                                List<Collection> userCollections = user.getFetchedCollections();
+                                //user.setFetchedCollections(null);
+                                /*
+                                    todo probably remove collections
+                                     if collections are present in user, they are going to be saved in database
+                                */
+                        /*
+                                databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)
+                                        .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                                        .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                            }
+                         */
                     }
                 } else {
                     Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");

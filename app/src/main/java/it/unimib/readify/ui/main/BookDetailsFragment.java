@@ -39,14 +39,12 @@ import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CommentAdapter;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentBookDetailsBinding;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -101,10 +99,7 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void initViewModels(){
-        TestIDatabaseRepository testIDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testIDatabaseRepository)
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
 
@@ -265,7 +260,5 @@ public class BookDetailsFragment extends Fragment {
         }
         toolbar.setNavigationIcon(coloredIcon);
         toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
-
     }
-
 }

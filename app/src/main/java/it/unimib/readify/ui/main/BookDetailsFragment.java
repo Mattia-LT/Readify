@@ -1,5 +1,6 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DESCRIPTION_TRIM_OPTIONS;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -91,7 +92,7 @@ public class BookDetailsFragment extends Fragment {
         loadCover();
         loadAuthors();
         loadRating();
-        fragmentBookDetailsBinding.bookDescription.setText(receivedBook.getDescription().getValue());
+        loadDescription();
         fragmentBookDetailsBinding.iconAdd.setOnClickListener(v -> {
             NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook.getKey(), user.getIdToken());
             Navigation.findNavController(requireView()).navigate(action);
@@ -136,10 +137,21 @@ public class BookDetailsFragment extends Fragment {
         fragmentBookDetailsBinding.bookAuthor.setText(authors.toString());
     }
 
+    private void loadDescription() {
+        String description = receivedBook.getDescription().getValue();
+        for(String option : DESCRIPTION_TRIM_OPTIONS){
+            if(description.contains(option)){
+                int position = description.indexOf(option);
+                description = description.substring(0, position);
+            }
+        }
+        description = description.trim();
+        fragmentBookDetailsBinding.bookDescription.setText(description);
+    }
+
     private void loadCover(){
-        //TODO should change loading image maybe
         RequestOptions requestOptions = new RequestOptions()
-                .placeholder(R.drawable.loading_image_gif)
+                .placeholder(R.drawable.loading_spinner)
                 .error(R.drawable.image_not_available);
 
         if(receivedBook.getCovers() != null){

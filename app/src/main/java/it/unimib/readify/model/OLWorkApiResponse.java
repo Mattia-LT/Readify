@@ -3,6 +3,8 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -198,6 +200,7 @@ public class OLWorkApiResponse implements Parcelable {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "OLWorkApiResponse{" +
@@ -212,5 +215,18 @@ public class OLWorkApiResponse implements Parcelable {
                 ", authorList=" + authorList +
                 ", comments=" + comments +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OLWorkApiResponse that = (OLWorkApiResponse) o;
+        return Objects.equals(description, that.description) && Objects.equals(title, that.title) && Objects.equals(covers, that.covers) && Objects.equals(firstPublishDate, that.firstPublishDate) && Objects.equals(key, that.key) && Objects.equals(authors, that.authors) && Objects.equals(subjects, that.subjects) && Objects.equals(rating, that.rating) && Objects.equals(authorList, that.authorList) && Objects.equals(comments, that.comments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, title, covers, firstPublishDate, key, authors, subjects, rating, authorList, comments);
     }
 }

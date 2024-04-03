@@ -24,15 +24,15 @@ import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
 
 public class BookRepository implements IBookRepository, BookResponseCallback {
 
-    private MutableLiveData<Result> workApiResponseLiveData;
-    private MutableLiveData<List<Result>> searchResultsLiveData;
-    private MutableLiveData<List<Result>> suggestedBooksLiveData;
-    private MutableLiveData<List<Result>> recentBooksLiveData;
-    private MutableLiveData<List<Result>> trendingBooksLiveData;
+    private final MutableLiveData<Result> workApiResponseLiveData;
+    private final MutableLiveData<List<Result>> searchResultsLiveData;
+    private final MutableLiveData<List<Result>> suggestedBooksLiveData;
+    private final MutableLiveData<List<Result>> recentBooksLiveData;
+    private final MutableLiveData<List<Result>> trendingBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
 
     private final MutableLiveData<List<Collection>> fetchedCollections;
-    private List<MutableLiveData<List<Result>>> collectionsResultsList;
+    private final List<MutableLiveData<List<Result>>> collectionsResultsList;
 
     public static BookRepository getInstance(Application application) {
         return new BookRepository(new BookRemoteDataSource(application));
@@ -60,11 +60,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         return searchResultsLiveData;
     }
 
-    @Override
-    public LiveData<Result> fetchBook(String id) {
-        bookRemoteDataSource.fetchBook(id);
-        return workApiResponseLiveData;
-    }
+
 
     @Override
     public MutableLiveData<List<Result>> getBooksByIdList(List<String> idList, String reference) {
@@ -120,7 +116,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     @Override
     public void onSuccessFetchBookFromRemote(OLWorkApiResponse workApiResponse) {
-        workApiResponseLiveData.postValue(new Result.WorkSuccess((OLWorkApiResponse) workApiResponse));
+        workApiResponseLiveData.postValue(new Result.WorkSuccess(workApiResponse));
     }
 
     @Override

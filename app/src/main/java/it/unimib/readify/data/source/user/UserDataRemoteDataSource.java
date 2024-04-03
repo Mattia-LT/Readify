@@ -1,8 +1,10 @@
 package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_BOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
@@ -23,7 +25,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
@@ -260,19 +264,83 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void addToCollection(String collectionId, String bookId) {
-        //todo
+    public void deleteCollection(String idToken, String collectionId) {
+        //TODO da testare
+        DatabaseReference collectionReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(idToken)
+                .child(collectionId);
+
+        collectionReference.removeValue();
     }
 
     @Override
-    public void removeFromCollection(String collectionId, String bookId) {
-        //todo
+    public void addBookToCollection(String idToken, String bookId, String collectionId) {
+        DatabaseReference collectionReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(idToken)
+                .child(collectionId);
+
+        DatabaseReference booksReference = collectionReference.child(FIREBASE_COLLECTIONS_BOOKS_FIELD);
+        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD);
+        booksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Set<String> books = new HashSet<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String book = snapshot.getValue(String.class);
+                    books.add(book);
+                }
+                books.add(bookId);
+                booksReference.setValue(new ArrayList<>(books));
+                numberOfBooksReference.setValue(books.size());
+                fetchCollections(idToken);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
+    }
+
+    @Override
+    public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
+        DatabaseReference collectionReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(idToken)
+                .child(collectionId);
+
+        DatabaseReference booksReference = collectionReference.child(FIREBASE_COLLECTIONS_BOOKS_FIELD);
+        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD);
+        booksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Set<String> books = new HashSet<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String book = snapshot.getValue(String.class);
+                    if(book!= null && !book.equals(bookId)){
+                        books.add(book);
+                    }
+                }
+                booksReference.setValue(new ArrayList<>(books));
+                numberOfBooksReference.setValue(books.size());
+                fetchCollections(idToken);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
     }
 
     @Override
     public void deleteComment(String bookId, Comment comment) {
         String finalBookId = bookId.substring("/works/".length());
-        DatabaseReference commentsReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(finalBookId).child(FIREBASE_WORKS_COMMENTS_FIELD).child(comment.getCommentId());
+        DatabaseReference commentsReference = databaseReference
+                .child(FIREBASE_WORKS_COLLECTION)
+                .child(finalBookId)
+                .child(FIREBASE_WORKS_COMMENTS_FIELD)
+                .child(comment.getCommentId());
         commentsReference.removeValue();
     }
 
@@ -281,17 +349,17 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         DatabaseReference collectionsReference = databaseReference
                 .child(FIREBASE_COLLECTIONS_COLLECTION)
                 .child(idToken);
-
         collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Collection> collections = new ArrayList<>();
                 for (DataSnapshot collectionSnapshot : snapshot.getChildren()) {
-                    Log.d("snap", snapshot.toString());
                     Collection collection = collectionSnapshot.getValue(Collection.class);
+                    if(collection != null && collection.getBooks() == null){
+                        collection.setBooks(new ArrayList<>());
+                    }
                     collections.add(collection);
                 }
-                Log.d("LOG "+ idToken, collections.toString());
                 userResponseCallback.onSuccessFetchCollectionsFromRemoteDatabase(collections);
             }
 

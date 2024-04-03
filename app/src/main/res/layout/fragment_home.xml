@@ -20,8 +20,6 @@
 
     >
 
-
-
     <!--
             style="@style/TextAppearance.Material3.TitleLarge"
             style="@style/TextAppearance.Material3.DisplayLarge"
@@ -62,8 +60,18 @@
         android:layout_marginTop="10dp"
         android:textSize="18sp"
         />
-
-
+    
+        <ProgressBar
+            android:id="@+id/progressbar_trending"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_home_trending"
+            android:indeterminate="true"
+            tools:visibility="visible"
+            />
+    
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/trending_container"
             android:layout_width="match_parent"
@@ -93,6 +101,16 @@
         android:textSize="18sp"
         />
 
+    <ProgressBar
+        android:id="@+id/progressbar_suggested"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textview_home_suggested"
+        android:indeterminate="true"
+        tools:visibility="visible"
+        />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -123,6 +141,16 @@
         android:textSize="18sp"
         />
 
+    <ProgressBar
+        android:id="@+id/progressbar_recent"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textview_home_recent"
+        android:indeterminate="true"
+        tools:visibility="visible"
+        />
 
 
     <androidx.recyclerview.widget.RecyclerView

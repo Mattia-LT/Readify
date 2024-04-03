@@ -206,6 +206,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.createCollection(idToken, collectionName, visible);
     }
 
+    public void deleteCollection(String idToken, String collectionId){
+        testDatabaseRepository.deleteCollection(idToken, collectionId);
+    }
+
 
     public void fetchComments(String bookId){
         Log.d("ViewModel", "fetchComments start");
@@ -220,4 +224,11 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.deleteComment(bookId, comment);
     }
 
+    public void addBookToCollection(String idToken, String bookId, String collectionId) {
+        testDatabaseRepository.addBookToCollection(idToken, bookId, collectionId);
+    }
+
+    public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
+        testDatabaseRepository.removeBookFromCollection(idToken, bookId, collectionId);
+    }
 }

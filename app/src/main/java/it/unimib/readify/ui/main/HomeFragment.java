@@ -76,6 +76,10 @@ public class HomeFragment extends Fragment {
         initViewModels();
         initObservers();
 
+        fragmentHomeBinding.progressbarRecent.setVisibility(View.VISIBLE);
+        fragmentHomeBinding.progressbarTrending.setVisibility(View.VISIBLE);
+        fragmentHomeBinding.progressbarSuggested.setVisibility(View.VISIBLE);
+
         //setting mock data
         List<String> mockDataSuggested = new ArrayList<>();
         mockDataSuggested.add("/works/OL14933414W");
@@ -143,7 +147,7 @@ public class HomeFragment extends Fragment {
                     .filter(result -> result instanceof Result.WorkSuccess)
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
-
+            fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
             trendingBooksAdapter.refreshList(workResultList);
         });
         bookViewModel.fetchBooks(mockDataSuggested, SUGGESTED).observe(getViewLifecycleOwner(), resultList -> {
@@ -151,7 +155,7 @@ public class HomeFragment extends Fragment {
                     .filter(result -> result instanceof Result.WorkSuccess)
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
-
+            fragmentHomeBinding.progressbarSuggested.setVisibility(View.GONE);
             suggestedBooksAdapter.refreshList(workResultList);
         });
 
@@ -160,7 +164,7 @@ public class HomeFragment extends Fragment {
                     .filter(result -> result instanceof Result.WorkSuccess)
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
-
+            fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
             recentBooksAdapter.refreshList(workResultList);
         });
     }

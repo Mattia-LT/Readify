@@ -1,7 +1,6 @@
 package it.unimib.readify.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -16,17 +15,18 @@ import it.unimib.readify.databinding.SelectCollectionItemBinding;
 import it.unimib.readify.model.Collection;
 
 public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollectionAdapter.AddToCollectionViewHolder> {
-    public interface OnItemClickListener {
-        void onCollectionAdd(Collection collection);
+    public interface OnCheckboxStatusChanged {
+        void onCollectionSelected(Collection collection);
+        void onCollectionUnselected(Collection collection);
     }
 
-    private final OnItemClickListener onItemClickListener;
+    private final OnCheckboxStatusChanged onCheckboxStatusChanged;
     private final String bookId;
-    public AddToCollectionAdapter(String bookId, OnItemClickListener onItemClickListener){
+    public AddToCollectionAdapter(String bookId, OnCheckboxStatusChanged onCheckboxStatusChanged){
         super(new DiffUtil.ItemCallback<Collection>() {
             @Override
             public boolean areItemsTheSame(@NonNull Collection oldItem, @NonNull Collection newItem) {
-                return oldItem.getName().equals(newItem.getName());
+                return oldItem.getCollectionId().equals(newItem.getCollectionId());
             }
 
             @Override
@@ -34,7 +34,7 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
                 return oldItem.equals(newItem);
             }
         });
-        this.onItemClickListener = onItemClickListener;
+        this.onCheckboxStatusChanged = onCheckboxStatusChanged;
         this.bookId = bookId;
     }
 
@@ -52,41 +52,39 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
         holder.bind(collection);
     }
 
-    public class AddToCollectionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class AddToCollectionViewHolder extends RecyclerView.ViewHolder{
 
         private final SelectCollectionItemBinding binding;
+
         public AddToCollectionViewHolder(@NonNull SelectCollectionItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-
+            binding.checkboxAddToCollection.addOnCheckedStateChangedListener((checkBox, state) -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Collection selectedCollection = getItem(position);
+                    if(checkBox.isChecked()){
+                        onCheckboxStatusChanged.onCollectionSelected(selectedCollection);
+                    } else{
+                        onCheckboxStatusChanged.onCollectionUnselected(selectedCollection);
+                    }
+                }
+            });
         }
 
-        public void bind(Collection collection){
-            if(collection != null){
+        public void bind(Collection collection) {
+            if (collection != null) {
                 binding.textviewCollectionName.setText(collection.getName());
-                int numberOfBooks = collection.getBooks() == null ? 0 : collection.getBooks().size();
-                String booksRead = String.valueOf(numberOfBooks)
+                String booksRead = String.valueOf(collection.getNumberOfBooks())
                         .concat(" ")
                         .concat(this.itemView.getContext().getString(R.string.books));
                 binding.textviewNumberOfBooks.setText(booksRead);
-                //String finalBookId = bookId.substring("/works/".length());
                 List<String> books = collection.getBooks();
-                if(books != null){
+                if (books != null) {
                     binding.checkboxAddToCollection.setChecked(books.contains(bookId));
-                } else {
-                    binding.checkboxAddToCollection.setChecked(false);
                 }
-
             }
         }
 
-        @Override
-        public void onClick(View v) {
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                Collection collection = getItem(position);
-                //todo implement checkbox behavior
-            }
-        }
     }
 }

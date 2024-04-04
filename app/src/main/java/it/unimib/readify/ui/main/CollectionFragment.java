@@ -84,11 +84,12 @@ public class CollectionFragment extends Fragment {
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
         //Set number of books in the collection
         if (collection.getBooks() != null) {
-            String booksNumber = collection.getBooks().size() + " ";
-            if (collection.getBooks().size() > 1)
-                booksNumber += getResources().getString(R.string.books);
-            else
+            String booksNumber = collection.getNumberOfBooks() + " ";
+            if (collection.getNumberOfBooks() == 1){
                 booksNumber += getResources().getString(R.string.book);
+            } else {
+                booksNumber += getResources().getString(R.string.books);
+            }
             collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
         } else {
             collectionProfileBinding.collectionFragmentBooksNumber.setText(getResources()

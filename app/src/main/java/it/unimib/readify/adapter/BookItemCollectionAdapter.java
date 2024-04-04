@@ -73,7 +73,7 @@ public class BookItemCollectionAdapter extends
                 for (Integer cover: book.getCovers()) {
                     if(cover != -1) {
                         RequestOptions requestOptions = new RequestOptions()
-                                .placeholder(R.drawable.loading_image_gif)
+                                .placeholder(R.drawable.loading_spinner)
                                 .error(R.drawable.image_not_available);
                         Glide.with(application)
                                 .load("https://covers.openlibrary.org/b/id/"

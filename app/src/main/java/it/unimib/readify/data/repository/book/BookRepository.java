@@ -7,12 +7,7 @@ import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
-import android.util.Log;
-
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
 import java.util.List;

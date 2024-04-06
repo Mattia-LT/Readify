@@ -3,7 +3,6 @@ package it.unimib.readify.data.source.book;
 import static it.unimib.readify.util.Constants.SEARCH;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 

@@ -107,9 +107,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             binding.createSection.setVisibility(View.VISIBLE);
         });
 
-        cancelButton.setOnClickListener(v -> {
-            clearAddSection();
-        });
+        cancelButton.setOnClickListener(v -> clearAddSection());
 
         confirmButton.setOnClickListener(v -> {
             TextInputLayout textInputLayout = binding.textInputLayoutAddCollection;

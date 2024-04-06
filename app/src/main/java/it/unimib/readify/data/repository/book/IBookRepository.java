@@ -1,7 +1,5 @@
 package it.unimib.readify.data.repository.book;
 
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;

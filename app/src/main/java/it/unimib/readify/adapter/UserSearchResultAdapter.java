@@ -1,7 +1,5 @@
 package it.unimib.readify.adapter;
 
-import static it.unimib.readify.util.Constants.ALREADY_READ;
-
 import android.app.Application;
 
 import android.view.LayoutInflater;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.UserSearchItemBinding;
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.User;
 
 public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

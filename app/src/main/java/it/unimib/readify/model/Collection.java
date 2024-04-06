@@ -146,6 +146,7 @@ public class Collection implements Parcelable {
         return Objects.hash(collectionId, name, visible, books, numberOfBooks, works);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Collection{" +

@@ -1,10 +1,9 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
-
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,14 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentUserDetailsBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
@@ -40,7 +40,6 @@ public class UserDetailsFragment extends Fragment {
     private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
-    private List<Collection> publicCollections;
 
     public UserDetailsFragment() {}
 
@@ -64,8 +63,9 @@ public class UserDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
-        initRepositories();
-        initRecyclerView(view);
+        initViewModels();
+        initObservers();
+        initRecyclerView();
         fetchUserData();
     }
 
@@ -80,16 +80,11 @@ public class UserDetailsFragment extends Fragment {
             coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
         }
         toolbar.setNavigationIcon(coloredIcon);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requireActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
 
     }
 
-    private void initRepositories(){
+    private void initViewModels(){
         //initializing viewModels
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
@@ -97,21 +92,41 @@ public class UserDetailsFragment extends Fragment {
         bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(BookViewModel.class);
     }
+    private void initObservers() {
+        final Observer<List<Result>> fetchedCollectionsObserver = results -> {
+            List<Collection> collectionResultList = results.stream()
+                    .filter(result -> result instanceof Result.CollectionSuccess)
+                    .map(result -> ((Result.CollectionSuccess) result).getData())
+                    .collect(Collectors.toList());
+            Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
+            collectionAdapter.submitList(collectionResultList);
+            binding.collectionsProgressBar.setVisibility(View.GONE);
+            binding.recyclerviewUserCollections.setVisibility(View.VISIBLE);
+        };
 
-    private void initRecyclerView(View view){
-        publicCollections = new ArrayList<>();
-        collectionAdapter = new CollectionAdapter(
-                new CollectionAdapter.OnItemClickListener() {
-                    @Override
-                    public void onCollectionItemClick(Collection collection) {
-                        Navigation.findNavController(view).navigate(R.id.action_userDetailsFragment_to_collectionFragment);
-                    }
-                }, requireActivity().getApplication());
+        final Observer<List<Result>> emptyCollectionsObserver = results -> {
+            binding.collectionsProgressBar.setVisibility(View.VISIBLE);
+            binding.recyclerviewUserCollections.setVisibility(View.GONE);
+            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
+            List<Collection> collectionsResultList = results.stream()
+                    .filter(result -> result instanceof Result.CollectionSuccess)
+                    .map(result -> ((Result.CollectionSuccess) result).getData())
+                    .filter(Collection::isVisible)
+                    .collect(Collectors.toList());
+            bookViewModel.fetchWorksForCollections(collectionsResultList);
+        };
 
+        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
+        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+    }
+    private void initRecyclerView(){
+        collectionAdapter = new CollectionAdapter(collection -> {
+            NavDirections action = UserDetailsFragmentDirections.actionUserDetailsFragmentToCollectionFragment(collection, collection.getName());
+            Navigation.findNavController(requireView()).navigate(action);
+        });
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         binding.recyclerviewUserCollections.setLayoutManager(layoutManager);
         binding.recyclerviewUserCollections.setAdapter(collectionAdapter);
-        collectionAdapter.setCollectionsList(publicCollections);
     }
     private void fetchUserData(){
         User receivedUser = UserDetailsFragmentArgs.fromBundle(getArguments()).getUser();
@@ -121,6 +136,9 @@ public class UserDetailsFragment extends Fragment {
     }
 
     private void showUserInfo(User user){
+        binding.recyclerviewUserCollections.setVisibility(View.GONE);
+        testDatabaseViewModel.fetchCollections(user.getIdToken());
+
         binding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
         binding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
         binding.textviewUserUsername.setText(user.getUsername());
@@ -135,31 +153,5 @@ public class UserDetailsFragment extends Fragment {
                 .load(avatarId)
                 .dontAnimate()
                 .into(binding.avatarImageView);
-
-        // todo devo ancora implementare
-        //loadUserCollections(user);
-
-    }
-
-    private void loadUserCollections(User user) {
-        //get books from api
-        int counter = 0;
-        for (int i = 0; i < user.getFetchedCollections().size(); i++) {
-            int finalCounter = counter;
-            bookViewModel.fetchBooks(user.getFetchedCollections().get(i).getBooks(), COLLECTION)
-                    .observe(getViewLifecycleOwner(), resultsList -> {
-                        for (int j = 0; j < resultsList.size(); j++) {
-                            if (resultsList.get(j).isSuccess()) {
-                                OLWorkApiResponse book = ((Result.WorkSuccess) resultsList.get(j)).getData();
-                                user.getFetchedCollections().get(finalCounter).getWorks().add(j, book);
-                            }
-                        }
-                    });
-            counter++;
-        }
-
-        publicCollections = user.getFetchedCollections();
-        collectionAdapter.setCollectionsList(publicCollections);
-        //todo
     }
 }

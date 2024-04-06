@@ -81,10 +81,10 @@ public class BookDetailsFragment extends Fragment {
         initViewModels();
         initObserver();
         loadMenu();
-        fetchBookData();
+        showBookInfo();
     }
 
-    private void fetchBookData() {
+    private void showBookInfo() {
         receivedBook =  BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
         testDatabaseViewModel.fetchComments(receivedBook.getKey());
         loadCover();
@@ -245,12 +245,11 @@ public class BookDetailsFragment extends Fragment {
                     .filter(result -> result instanceof Result.CommentSuccess)
                     .map(result -> ((Result.CommentSuccess) result).getData())
                     .collect(Collectors.toList());
-            Log.d("BookDetails Fragment", "Comment list : " + commentResultList);
             commentAdapter.submitList(commentResultList);
         };
         testDatabaseViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
-        Observer<Result> loggedUserObserver = result -> {
+        final Observer<Result> loggedUserObserver = result -> {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();

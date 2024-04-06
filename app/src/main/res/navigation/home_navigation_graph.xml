@@ -34,14 +34,11 @@
 
     </fragment>
 
-    <!-- dialog è necessario? -->
     <dialog
         android:id="@+id/filter_bottomsheet"
         android:name="it.unimib.readify.ui.main.FilterBottomSheet"
         android:label="dialog_filter_bottomsheet"
         tools:layout="@layout/bottom_sheet_search_filter">
-
-        <!-- TODO forse argument necessario, da vedere -->
     </dialog>
 
 
@@ -62,6 +59,10 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
+        <action
+            android:id="@+id/action_profileFragment_to_createCollectionDialog"
+            app:destination="@id/createCollectionDialog"/>
+
     </fragment>
 
     <fragment
@@ -172,6 +173,17 @@
             />
     </dialog>
 
+    <dialog
+        android:id="@+id/createCollectionDialog"
+        android:name="it.unimib.readify.ui.main.CollectionCreationBottomSheet"
+        android:label="create_collection_dialog"
+        tools:layout="@layout/bottom_sheet_collection_creation">
+
+        <argument
+            android:name="idToken"
+            app:argType="string"
+            />
+    </dialog>
 
     <include app:graph="@navigation/login_navigation_graph" />
 

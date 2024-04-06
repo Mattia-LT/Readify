@@ -58,10 +58,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                     //if snapshot exists, return user data (retrieved from Database)
                     User existingUser = snapshot.getValue(User.class);
                     if(existingUser != null){
-                        fetchCollectionsFromUser(existingUser, collections -> {
-                            existingUser.setFetchedCollections(collections);
-                            userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
-                        });
+                        userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
                     }
                 } else {
                     Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
@@ -518,37 +515,9 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    private void fetchCollectionsFromUser(User user, CollectionFetchCallback callback){
-        DatabaseReference collectionsReference = databaseReference
-                .child(FIREBASE_COLLECTIONS_COLLECTION)
-                .child(user.getIdToken());
-        collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<Collection> collections = new ArrayList<>();
-                for (DataSnapshot collectionSnapshot : snapshot.getChildren()) {
-                    Collection collection = collectionSnapshot.getValue(Collection.class);
-                    if (collection != null) {
-                        collections.add(collection);
-                    }
-                }
-                callback.onCollectionsFetched(collections);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //todo
-            }
-        });
-    }
-
     public interface UserFetchCallback {
         void onUserFetched(Comment comment);
 
         void onUserFetchFailed(Comment comment);
-    }
-
-    public interface CollectionFetchCallback {
-        void onCollectionsFetched(List<Collection> collections);
     }
 }

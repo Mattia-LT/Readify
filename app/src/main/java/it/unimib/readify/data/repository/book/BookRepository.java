@@ -7,12 +7,7 @@ import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
-import android.util.Log;
-
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +27,8 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private final MutableLiveData<List<Result>> trendingBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
 
-    private final MutableLiveData<List<Collection>> fetchedCollections;
-    private final List<MutableLiveData<List<Result>>> collectionsResultsList;
+    private final MutableLiveData<List<Result>> fetchedCollectionsLiveData;
+    private final MutableLiveData<List<Result>> singleCollectionLiveData;
 
     public static BookRepository getInstance(Application application) {
         return new BookRepository(new BookRemoteDataSource(application));
@@ -45,9 +40,8 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         suggestedBooksLiveData = new MutableLiveData<>();
         recentBooksLiveData = new MutableLiveData<>();
         trendingBooksLiveData = new MutableLiveData<>();
-
-        fetchedCollections = new MutableLiveData<>();
-        collectionsResultsList = new ArrayList<>();
+        fetchedCollectionsLiveData = new MutableLiveData<>();
+        singleCollectionLiveData = new MutableLiveData<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
         this.bookRemoteDataSource.setResponseCallback(this);
     }
@@ -77,37 +71,14 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         return null;
     }
 
-    //todo undo separation of methods, most surely getBooksByIdList() can be used
-    public void fetchCollections(List<Collection> collections, LifecycleOwner lifecycleOwner) {
-        List<Collection> tempList = new ArrayList<>();
-        final int[] counter = {0};
-        Observer<List<Result>> observer = fetchedWorks -> {
-            for (int i = 0; i < fetchedWorks.size(); i++) {
-                if(fetchedWorks.get(i).isSuccess()) {
-                    OLWorkApiResponse work = ((Result.WorkSuccess)fetchedWorks.get(i)).getData();
-                    collections.get(counter[0]).getWorks().add(work);
-                }
-            }
-            tempList.add(collections.get(counter[0]));
-            if(tempList.size() == collections.size()) {
-                fetchedCollections.postValue(tempList);
-            }
-            counter[0]++;
-            //todo managing observer deletion (where?)
-        };
-        //TODO, IF AGGIUNTO PER NON FAR CRASHARE L'APP --> RIVEDERE LOGICA DELLE API DI OPENLIBRARY
-        // non si dovrebbe usare il viewlifecycle owner in classi che non siano fragment
-        for (int i = 0; i < collections.size(); i++) {
-            collectionsResultsList.add(new MutableLiveData<>());
-            if(collections.get(i).getBooks() != null){
-                bookRemoteDataSource.getBooks(collections.get(i).getBooks(), COLLECTION);
-            }
-            collectionsResultsList.get(i).observe(lifecycleOwner, observer);
-        }
+    @Override
+    public void fetchWorksForCollections(List<Collection> collections) {
+        bookRemoteDataSource.fetchWorksForCollections(collections);
     }
 
-    public MutableLiveData<List<Collection>> getFetchedCollections() {
-        return fetchedCollections;
+    @Override
+    public MutableLiveData<List<Result>> getFetchedCollectionsLiveData() {
+        return fetchedCollectionsLiveData;
     }
 
     @Override
@@ -140,25 +111,33 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 searchResultsLiveData.postValue(resultList);
                 break;
             case COLLECTION:
-                for (MutableLiveData<List<Result>> list: collectionsResultsList) {
-                    //todo it unexpectedly works, will it always work?
-                    if(list.getValue() == null) {
-                        list.postValue(resultList);
-                        break;
-                    }
-                }
+                singleCollectionLiveData.postValue(resultList);
                 break;
         }
     }
 
     @Override
+    public void onSuccessFetchCollectionsFromRemote(List<Collection> collectionList) {
+        List<Result> resultList = new ArrayList<>();
+        for(Collection collection : collectionList){
+            resultList.add(new Result.CollectionSuccess(collection));
+        }
+        fetchedCollectionsLiveData.setValue(resultList);
+    }
+
+    @Override
     public void onFailureFromRemote(Exception exception) {
         List<Result> errorList = new ArrayList<>();
+        //todo dividi vari errori in metodi diversi nel callback
         errorList.add(new Result.Error(exception.getMessage()));
         searchResultsLiveData.postValue(errorList);
         workApiResponseLiveData.postValue(new Result.Error(exception.getMessage()));
         suggestedBooksLiveData.postValue(errorList);
         recentBooksLiveData.postValue(errorList);
         trendingBooksLiveData.postValue(errorList);
+    }
+
+    public MutableLiveData<List<Result>> getSingleCollectionLiveData() {
+        return singleCollectionLiveData;
     }
 }

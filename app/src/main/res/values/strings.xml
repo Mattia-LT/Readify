@@ -132,5 +132,6 @@
     <string name="button_add_collection">Add collection</string>
     <string name="button_cancel_add_collection">Cancel</string>
     <string name="snackbar_empty_collection_name">Collection\'s name cannot be empty</string>
+    <string name="create_new_collection">Create a new collection</string>
 
 </resources>

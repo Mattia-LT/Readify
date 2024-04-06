@@ -30,14 +30,12 @@ import it.unimib.readify.adapter.AddToCollectionAdapter;
 import it.unimib.readify.databinding.BottomSheetAddToCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
     private BottomSheetAddToCollectionBinding binding;
-    private BookViewModel bookViewModel;
     private TestDatabaseViewModel testDatabaseViewModel;
     private AddToCollectionAdapter addToCollectionAdapter;
     private String bookId;
@@ -109,9 +107,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             binding.createSection.setVisibility(View.VISIBLE);
         });
 
-        cancelButton.setOnClickListener(v -> {
-            clearAddSection();
-        });
+        cancelButton.setOnClickListener(v -> clearAddSection());
 
         confirmButton.setOnClickListener(v -> {
             TextInputLayout textInputLayout = binding.textInputLayoutAddCollection;
@@ -127,27 +123,19 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 testDatabaseViewModel.fetchCollections(idToken);
             }
         });
-
-
     }
 
-
-
     private void initViewModels(){
-        bookViewModel = TestDatabaseViewModelFactory
-                .getInstance(requireActivity().getApplication())
-                .create(BookViewModel.class);
-
         testDatabaseViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
     private void clearAddSection(){
+        binding.buttonCreateNewCollection.setVisibility(View.VISIBLE);
         binding.createSection.setVisibility(View.GONE);
         binding.characterCounter.setText("0");
         binding.switchCollectionVisibility.setChecked(false);
         binding.editTextCreateCollection.setText("");
-        binding.buttonConfirmCollectionInsertion.setVisibility(View.VISIBLE);
     }
     private void initObservers(){
         Observer<List<Result>> collectionsObserver = results -> {

@@ -46,6 +46,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
 
+    public interface UpdateUserDataCallback {
+        void onUsernameAvailable(String result);
+    }
+
     @Override
     public void getUser(String email, String password, boolean isRegistered) {
         if(isRegistered) {
@@ -72,6 +76,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void signUp(String email, String password) {
         userAuthRemoteDataSource.signUp(email, password);
+    }
+
+    @Override
+    public void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        userDataRemoteDataSource.updateUserData(user, callback);
     }
 
     @Override
@@ -241,7 +250,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public void onFailureFetchCollectionsFromRemoteDatabase(String message) {
 
     }
-
 
     @Override
     public void onSuccessLogout() {

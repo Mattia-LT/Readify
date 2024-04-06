@@ -8,21 +8,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.appbar.MaterialToolbar;
-
-import org.apache.commons.validator.routines.EmailValidator;
+import com.google.android.material.snackbar.Snackbar;
 
 import it.unimib.readify.R;
+import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.databinding.FragmentSettingsBinding;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding fragmentSettingsBinding;
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private User user;
+    private User onSaveUser;
+    private Observer<Result> userObserver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,18 +47,44 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        loadMenu();
-        fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
 
-            String username = fragmentSettingsBinding.textInputLayoutUsername.getEditText().getText().toString();
-            String email = fragmentSettingsBinding.textInputLayoutEmail.getEditText().getText().toString();
-            String password = fragmentSettingsBinding.textInputLayoutPassword.getEditText().getText().toString();
-            String passwordConfirm = fragmentSettingsBinding.textInputLayoutPasswordConfirm.getEditText().getText().toString();
-
-            if (isUsernameOk(username) & isEmailOk(email) & isPasswordOk(password) & isPasswordConfirmOk(passwordConfirm)) {
-                //collegarsi col db e modificare i dati
+        userObserver = result -> {
+            if(result.isSuccess()) {
+                user = ((Result.UserSuccess)result).getData();
+                onSaveUser = new User(user);
             } else {
-                // ????
+                //todo navigate to login(?)
+                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        };
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+
+        loadMenu();
+
+        fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
+            if (isUsernameOk(view) & isEmailOk() & isPasswordOk() & isPasswordConfirmOk()) {
+                Log.d("settings if", "okay");
+                testDatabaseViewModel.updateUserData(onSaveUser, new TestDatabaseRepository.UpdateUserDataCallback() {
+                    @Override
+                    public void onUsernameAvailable(String result) {
+                        switch (result) {
+                            case "available":
+                                Snackbar.make(view, "Username updated", Snackbar.LENGTH_SHORT).show();
+                                break;
+                            case "notAvailable":
+                                Snackbar.make(view, "Username already taken", Snackbar.LENGTH_SHORT).show();
+                                break;
+                            case "identical":
+                                Snackbar.make(view, "This is already your username", Snackbar.LENGTH_SHORT).show();
+                                break;
+                            case "error":
+                                Snackbar.make(view, "System error", Snackbar.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
             }
         });
 
@@ -63,43 +99,36 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private boolean isUsernameOk(String username) {
-        if (username.isEmpty()) {
-            fragmentSettingsBinding.textInputLayoutUsername.setError(getString(R.string.error_username));
-            return false;
-        } else {
-            fragmentSettingsBinding.textInputLayoutUsername.setError(null);
+    private boolean isUsernameOk(View view) {
+        if(fragmentSettingsBinding.textInputEditTextUsername.getText() != null) {
+            if (!fragmentSettingsBinding.textInputEditTextUsername.getText().toString().isEmpty()) {
+                if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().length() > 20) {
+                    Snackbar.make(view, "Username error: username length < 21", Snackbar.LENGTH_SHORT).show();
+                    return false;
+                }
+                else if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().contains("/")) {
+                    Snackbar.make(view, "Username error: illegal symbol /", Snackbar.LENGTH_SHORT).show();
+                    return false;
+                }
+                onSaveUser.setUsername(fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim());
+                return true;
+            }
             return true;
         }
-    }
-    private boolean isEmailOk(String email) {
-        if (!EmailValidator.getInstance().isValid((email))) {
-            fragmentSettingsBinding.textInputLayoutEmail.setError(getString(R.string.error_email));
-            return false;
-        } else {
-            fragmentSettingsBinding.textInputLayoutEmail.setError(null);
-            return true;
-        }
-    }
-
-    private boolean isPasswordOk(String password) {
-        if (password.isEmpty()) {
-            fragmentSettingsBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
-            return false;
-        } else {
-            fragmentSettingsBinding.textInputLayoutPassword.setError(null);
-            return true;
-        }
+        Snackbar.make(view, "System error: Username null", Snackbar.LENGTH_SHORT).show();
+        return false;
     }
 
-    private boolean isPasswordConfirmOk(String passwordConfirm) {
-        if (passwordConfirm.isEmpty()) {
-            fragmentSettingsBinding.textInputLayoutPasswordConfirm.setError(getString(R.string.error_password));
-            return false;
-        } else {
-            fragmentSettingsBinding.textInputLayoutPasswordConfirm.setError(null);
-            return true;
-        }
+    private boolean isEmailOk() {
+        return  true;
+    }
+
+    private boolean isPasswordOk() {
+        return true;
+    }
+
+    private boolean isPasswordConfirmOk() {
+        return true;
     }
 
     public void loadMenu(){

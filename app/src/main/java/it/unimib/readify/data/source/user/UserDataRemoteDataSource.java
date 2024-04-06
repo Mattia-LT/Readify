@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
@@ -61,24 +62,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             existingUser.setFetchedCollections(collections);
                             userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
                         });
-                        /*
-                        if(existingUser.equals(user)) {
-                                //User has been saved without changes
-                                userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
-                            } else {
-                                //User has been updated
-                                List<Collection> userCollections = user.getFetchedCollections();
-                                //user.setFetchedCollections(null);
-                                /*
-                                    todo probably remove collections
-                                     if collections are present in user, they are going to be saved in database
-                                */
-                        /*
-                                databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)
-                                        .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                        .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                            }
-                         */
                     }
                 } else {
                     Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
@@ -90,6 +73,71 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            User existingUser = snapshot.getValue(User.class);
+                            if(existingUser != null){
+                                if(existingUser.equals(user)) {
+                                    //return User without changes
+                                    Log.d("source", "equals true");
+                                    userResponseCallback.onSuccessFromRemoteDatabase(user);
+                                } else {
+                                    //User has been updated
+                                    Log.d("source", "equals false");
+                                    //Availability Checks
+                                    if(!user.getUsername().equals(existingUser.getUsername())) {
+                                        onUsernameAvailable(user, callback);
+                                    } else {
+                                        callback.onUsernameAvailable("identical");
+                                    }
+                                }
+                            }
+                        } else {
+                            //todo manage typo
+                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    public void onUsernameAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        DatabaseReference usernamesRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        Log.d("onAvailable", usernamesRef.orderByChild("username").toString());
+        usernamesRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Log.d("verifyUsername", "username already exists");
+                    callback.onUsernameAvailable("notAvailable");
+                } else {
+                    Log.d("verifyUsername", "username available");
+                    Log.d("username available", user.getUsername());
+                    //todo update username
+                    databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                            .child(FIREBASE_USERS_USERNAME_FIELD).setValue(user.getUsername())
+                            .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                            .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                    callback.onUsernameAvailable("available");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("verifyUsername Firebase error", databaseError.getMessage());
+                callback.onUsernameAvailable("error");
             }
         });
     }
@@ -493,7 +541,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             }
         });
     }
-
 
     public interface UserFetchCallback {
         void onUserFetched(Comment comment);

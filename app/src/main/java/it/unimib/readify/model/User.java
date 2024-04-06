@@ -256,4 +256,8 @@ public class User implements Parcelable {
                 ", fetchedCollections=" + fetchedCollections +
                 '}';
     }
+
+    public String printReference() {
+        return super.toString();
+    }
 }

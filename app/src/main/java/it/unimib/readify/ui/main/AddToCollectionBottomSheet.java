@@ -126,18 +126,18 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             }
         });
     }
-    
+
     private void initViewModels(){
         testDatabaseViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
     private void clearAddSection(){
+        binding.buttonCreateNewCollection.setVisibility(View.VISIBLE);
         binding.createSection.setVisibility(View.GONE);
         binding.characterCounter.setText("0");
         binding.switchCollectionVisibility.setChecked(false);
         binding.editTextCreateCollection.setText("");
-        binding.buttonConfirmCollectionInsertion.setVisibility(View.VISIBLE);
     }
     private void initObservers(){
         Observer<List<Result>> collectionsObserver = results -> {

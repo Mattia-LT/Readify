@@ -6,172 +6,199 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/draw_layout"
-    tools:openDrawer="right"
-    app:navGraph="@navigation/home_navigation_graph">
+    >
+    <!-- tools:openDrawer="right" -->
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        android:layout_marginBottom="100dp"
         tools:context=".ui.main.ProfileFragment"
-        android:layout_marginBottom="100dp">
+        >
 
-
-    <!-- TODO: Update profile fragment -->
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:gravity="top|start">
-
-        <TextView
-            android:id="@+id/textview_username"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:gravity="top|start">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <ImageView
-                android:id="@+id/avatar_image_view"
-                android:layout_width="130dp"
-                android:layout_height="130dp"
-                android:contentDescription="@string/pa_description_photo"
-                android:src="@drawable/ic_baseline_profile_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textview_username"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/linearLayout"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginEnd="25dp">
+                android:textSize="30sp"
+                tools:text="@string/username"
+                />
 
-                <TextView
-                    android:id="@+id/textView_followers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="23sp"
-                    tools:text="150"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:id="@+id/avatar_image_view"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/pa_description_photo"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@drawable/ic_baseline_profile_24"
                     />
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/follower_counter_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/textview_followers"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                    android:layout_marginStart="35dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/avatar_image_view"
+                    app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
-                android:id="@+id/linearLayout"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="25dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textview_follower_counter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="23sp"
+                            tools:text="150"
+                            />
+
+                        <TextView
+                            android:id="@+id/textview_follower_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/textview_followers"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="20dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textview_following_counter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="23sp"
+                            tools:text="200" />
+
+                        <TextView
+                            android:id="@+id/textview_following_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/textview_following"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/textview_user_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:textSize="20sp"
+                tools:text="@string/name" />
 
-                <TextView
-                    android:id="@+id/textView_following"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="23sp"
-                    tools:text="200"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/textview_following"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- social links -->
-        <TextView
-            android:id="@+id/textView_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/textView_twitter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/textView_instagram"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:visibility="gone"/>
-
-        <!-- collections -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pa_collections"
-            android:textSize="30sp"
-            android:layout_marginTop="30dp"/>
+            <TextView
+                android:id="@+id/textview_user_biography"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                tools:text="Biography"
+                />
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:id="@+id/createCollection">
+            <!-- social links -->
+            <TextView
+                android:id="@+id/textview_facebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:visibility="gone"/>
 
+            <TextView
+                android:id="@+id/textview_twitter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/textview_instagram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:visibility="gone"/>
+
+            <!-- collections -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+ Create new collection"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_arrow_right"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="TODO" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_collections"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"/>
+                android:text="@string/pa_collections"
+                android:textSize="30sp"
+                android:layout_marginTop="30dp"/>
 
 
-    </LinearLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/create_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                >
 
-</androidx.core.widget.NestedScrollView>
-        <com.google.android.material.navigation.NavigationView
-            android:layout_width="270dp"
-            android:layout_height="match_parent"
-            android:id="@+id/nav_view"
-            android:layout_gravity="end"
-            app:menu="@menu/navigation_drawer_menu" />
-    </androidx.drawerlayout.widget.DrawerLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/create_new_collection"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:drawableStartCompat="@drawable/outline_add_circle_24"
+                    android:drawablePadding="6dp"
+                    app:drawableEndCompat="@drawable/baseline_arrow_forward_ios_24"
+                    app:drawableTint="?attr/colorOnBackground" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar_profile"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_collections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"/>
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="270dp"
+        android:layout_height="match_parent"
+        android:id="@+id/nav_view"
+        android:layout_gravity="end"
+        app:menu="@menu/navigation_drawer_menu" />
+</androidx.drawerlayout.widget.DrawerLayout>

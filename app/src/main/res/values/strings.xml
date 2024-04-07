@@ -134,4 +134,9 @@
     <string name="snackbar_empty_collection_name">Collection\'s name cannot be empty</string>
     <string name="create_new_collection">Create a new collection</string>
 
+    <!-- errors -->
+    <string name="username_already_taken">Username already taken</string>
+    <string name="error_username_length">Username length must be less than 21 chars</string>
+    <string name="error_username_illegal_symbols">Username must not contains these symbols: /@</string>
+
 </resources>

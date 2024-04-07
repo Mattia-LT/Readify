@@ -65,6 +65,7 @@ public class SettingsFragment extends Fragment {
 
         fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
             if (isUsernameOk(view) & isEmailOk() & isPasswordOk() & isPasswordConfirmOk()) {
+                //todo add loading screen
                 Log.d("settings if", "okay");
                 testDatabaseViewModel.updateUserData(onSaveUser, new TestDatabaseRepository.UpdateUserDataCallback() {
                     @Override
@@ -74,7 +75,8 @@ public class SettingsFragment extends Fragment {
                                 Snackbar.make(view, "Username updated", Snackbar.LENGTH_SHORT).show();
                                 break;
                             case "notAvailable":
-                                Snackbar.make(view, "Username already taken", Snackbar.LENGTH_SHORT).show();
+                                fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
+                                fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                                 break;
                             case "identical":
                                 Snackbar.make(view, "This is already your username", Snackbar.LENGTH_SHORT).show();
@@ -103,16 +105,23 @@ public class SettingsFragment extends Fragment {
         if(fragmentSettingsBinding.textInputEditTextUsername.getText() != null) {
             if (!fragmentSettingsBinding.textInputEditTextUsername.getText().toString().isEmpty()) {
                 if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().length() > 20) {
-                    Snackbar.make(view, "Username error: username length < 21", Snackbar.LENGTH_SHORT).show();
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.error_username_length);
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                     return false;
                 }
-                else if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().contains("/")) {
-                    Snackbar.make(view, "Username error: illegal symbol /", Snackbar.LENGTH_SHORT).show();
+                else if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().contains("/")
+                            || fragmentSettingsBinding.textInputEditTextUsername.getText().toString().contains("@")) {
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.error_username_illegal_symbols);
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                     return false;
                 }
                 onSaveUser.setUsername(fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim());
+                fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
+                fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
                 return true;
             }
+            fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
+            fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
             return true;
         }
         Snackbar.make(view, "System error: Username null", Snackbar.LENGTH_SHORT).show();

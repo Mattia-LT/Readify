@@ -120,4 +120,9 @@
     <string name="button_cancel_add_collection">Annulla</string>
     <string name="snackbar_empty_collection_name">Il nome della collezione non può essere vuoto.</string>
     <string name="create_new_collection">Crea una nuova collezione</string>
+
+    <!-- errors -->
+    <string name="username_already_taken">Nome utente già in uso</string>
+    <string name="error_username_length">La lunghezza del nome utente deve essere inferiore a 21 caratteri</string>
+    <string name="error_username_illegal_symbols">Il nome utente non deve contenere questi simboli: /@</string>
 </resources>

@@ -125,4 +125,6 @@
     <string name="username_already_taken">Nome utente già in uso</string>
     <string name="error_username_length">La lunghezza del nome utente deve essere inferiore a 21 caratteri</string>
     <string name="error_username_illegal_symbols">Il nome utente non deve contenere questi simboli: /@</string>
+    <string name="email_already_taken">Email già in uso</string>
+    <string name="email_invalid_input">Errore email: input non valido</string>
 </resources>

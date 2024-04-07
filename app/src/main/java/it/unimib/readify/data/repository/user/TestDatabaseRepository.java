@@ -48,6 +48,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     public interface UpdateUserDataCallback {
         void onUsernameAvailable(String result);
+        void onEmailAvailable(String result);
     }
 
     @Override

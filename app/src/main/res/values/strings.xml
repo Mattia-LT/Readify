@@ -138,5 +138,7 @@
     <string name="username_already_taken">Username already taken</string>
     <string name="error_username_length">Username length must be less than 21 chars</string>
     <string name="error_username_illegal_symbols">Username must not contains these symbols: /@</string>
+    <string name="email_already_taken">Email already taken</string>
+    <string name="email_invalid_input">Email error: invalid input</string>
 
 </resources>

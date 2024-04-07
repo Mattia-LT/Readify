@@ -1,6 +1,7 @@
 package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
@@ -85,16 +86,17 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             if(existingUser != null){
                                 if(existingUser.equals(user)) {
                                     //return User without changes
-                                    Log.d("source", "equals true");
                                     userResponseCallback.onSuccessFromRemoteDatabase(user);
                                 } else {
                                     //User has been updated
-                                    Log.d("source", "equals false");
                                     //Availability Checks
+                                    //Username
                                     if(!user.getUsername().equals(existingUser.getUsername())) {
                                         onUsernameAvailable(user, callback);
-                                    } else {
-                                        callback.onUsernameAvailable("identical");
+                                    }
+                                    //Email
+                                    if(!user.getEmail().equals(existingUser.getEmail())) {
+                                        onEmailAvailable(user, callback);
                                     }
                                 }
                             }
@@ -111,18 +113,13 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     public void onUsernameAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
-        DatabaseReference usernamesRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
-        Log.d("onAvailable", usernamesRef.orderByChild("username").toString());
-        usernamesRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        usersRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    Log.d("verifyUsername", "username already exists");
                     callback.onUsernameAvailable("notAvailable");
                 } else {
-                    Log.d("verifyUsername", "username available");
-                    Log.d("username available", user.getUsername());
-                    //todo update username
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                             .child(FIREBASE_USERS_USERNAME_FIELD).setValue(user.getUsername())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
@@ -135,6 +132,31 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("verifyUsername Firebase error", databaseError.getMessage());
                 callback.onUsernameAvailable("error");
+            }
+        });
+    }
+
+    @Override
+    public void onEmailAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        usersRef.orderByChild(FIREBASE_COLLECTIONS_EMAILS_FIELD).equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    callback.onEmailAvailable("notAvailable");
+                } else {
+                    databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                            .child(FIREBASE_COLLECTIONS_EMAILS_FIELD).setValue(user.getEmail())
+                            .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                            .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                    callback.onEmailAvailable("available");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("verifyEmail Firebase error", databaseError.getMessage());
+                callback.onEmailAvailable("error");
             }
         });
     }

@@ -17,6 +17,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void saveUserData(User user);
     public abstract void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
     public abstract void onUsernameAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
+    public abstract void onEmailAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
     public abstract void saveWorkData(OLWorkApiResponse work);
     public abstract void getUser(String idToken);
     public abstract void getWork(String idBook);

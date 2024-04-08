@@ -42,7 +42,7 @@
 
     <string name="register">Register</string>
     <string name="name">Name</string>
-    <string name="surname">Surame</string>
+    <string name="surname">Surname</string>
     <string name="username" translatable="false">Username</string>
 
     <string-array name="gender">

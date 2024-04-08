@@ -115,7 +115,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             String collectionName = (editText != null) ? editText.getText().toString() : "";
             collectionName = collectionName.trim();
             if(collectionName.isEmpty()){
-                Snackbar.make(requireView(), getString(R.string.snackbar_empty_collection_name), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(requireView(), getString(R.string.snack_bar_empty_collection_name), Snackbar.LENGTH_SHORT).show();
             } else {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);

@@ -49,6 +49,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public interface UpdateUserDataCallback {
         void onUsernameAvailable(String result);
         void onEmailAvailable(String result);
+        void onPasswordChanged(Boolean result);
     }
 
     @Override
@@ -80,8 +81,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
         userDataRemoteDataSource.updateUserData(user, callback);
+        if(newPassword != null) {
+            userAuthRemoteDataSource.changePassword(newPassword, callback);
+        }
     }
 
     @Override

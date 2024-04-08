@@ -109,6 +109,16 @@
             android:drawablePadding="20dp"
             android:hint="@string/password"
             android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/settings_password_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:textSize="20sp"
+            android:visibility="gone"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -131,6 +141,16 @@
             android:drawablePadding="20dp"
             android:hint="@string/password_confirm"
             android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/settings_confirm_password_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:textSize="20sp"
+            android:visibility="gone"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

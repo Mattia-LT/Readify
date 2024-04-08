@@ -234,7 +234,7 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.removeBookFromCollection(idToken, bookId, collectionId);
     }
 
-    public void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
-        testDatabaseRepository.updateUserData(user, callback);
+    public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        testDatabaseRepository.updateUserData(user, newPassword, callback);
     }
 }

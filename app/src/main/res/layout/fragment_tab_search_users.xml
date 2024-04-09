@@ -8,7 +8,6 @@
     android:id="@+id/search_users_layout"
     >
 
-    <!-- TODO isVisible solo quando carica, da vedere -->
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progressindicator_search_users"
         android:layout_width="match_parent"

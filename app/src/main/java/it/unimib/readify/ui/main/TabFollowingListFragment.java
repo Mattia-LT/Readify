@@ -34,7 +34,7 @@ public class TabFollowingListFragment extends Fragment {
     private List<ExternalUser> searchResultsList;
     private TestDatabaseViewModel testDatabaseViewModel;
     private FollowListAdapter followListAdapter;
-    private String idToken;
+    private final String idToken;
     public TabFollowingListFragment(String idToken){
         this.idToken = idToken;
     }

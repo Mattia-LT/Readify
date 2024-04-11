@@ -42,6 +42,8 @@
         android:clickable="true"
         android:focusable="true"
         android:text="@string/follow_button_string"
+        android:textColor="?attr/colorOnBackground"
+        app:iconTint="?attr/colorOnBackground"
         app:layout_constrainedWidth="true"
         app:icon="@drawable/person_add_black_24dp"
         app:iconPadding="5dp"
@@ -49,7 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
-        tools:visibility="gone"
+        tools:visibility="visible"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -72,7 +74,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:backgroundTint="?attr/colorButtonNormal"
         android:visibility="gone"
-        tools:visibility="visible"
+        tools:visibility="gone"
         />
 
 

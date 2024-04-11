@@ -62,6 +62,9 @@
         <action
             android:id="@+id/action_profileFragment_to_createCollectionDialog"
             app:destination="@id/createCollectionDialog"/>
+        <action
+            android:id="@+id/action_profileFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
 
     </fragment>
 
@@ -84,6 +87,9 @@
         <action
             android:id="@+id/action_userDetailsFragment_to_searchFragment"
             app:destination="@id/searchFragment"/>
+        <action
+            android:id="@+id/action_userDetailsFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
     </fragment>
 
     <fragment
@@ -184,6 +190,32 @@
             app:argType="string"
             />
     </dialog>
+
+    <fragment
+        android:id="@+id/followListFragment"
+        android:name="it.unimib.readify.ui.main.FollowListFragment"
+        android:label="{username}"
+        tools:layout="@layout/fragment_follow_list">
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+        <argument
+            android:name="username"
+            app:argType="string" />
+
+        <argument
+            android:name="destination"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_followListFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+
+    </fragment>
+
 
     <include app:graph="@navigation/login_navigation_graph" />
 

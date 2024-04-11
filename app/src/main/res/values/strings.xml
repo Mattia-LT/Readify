@@ -133,6 +133,7 @@
     <string name="button_cancel_add_collection">Cancel</string>
     <string name="snack_bar_empty_collection_name">Collection\'s name cannot be empty</string>
     <string name="create_new_collection">Create a new collection</string>
+    <string name="imageview_avatar">Avatar of the user</string>
 
     <!-- errors -->
     <string name="username_already_taken">Username already taken</string>

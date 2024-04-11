@@ -30,6 +30,9 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void removeBookFromCollection(String idToken, String collectionId, String bookId);
     public abstract void deleteComment(String bookId, Comment comment);
     public abstract void fetchCollections(String idToken);
+    public abstract void fetchFollowers(String idToken);
+    public abstract void fetchFollowings(String idToken);
+
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);

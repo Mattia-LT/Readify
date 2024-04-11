@@ -57,6 +57,16 @@ public abstract class Result {
         }
     }
 
+    public static final class ExternalUserSuccess extends Result{
+        private final ExternalUser externalUser;
+        public ExternalUserSuccess(ExternalUser externalUser) {
+            this.externalUser = externalUser;
+        }
+        public ExternalUser getData() {
+            return externalUser;
+        }
+    }
+
     /**
      * Class that represents an error occurred during the interaction
      * with a Web Service or a local database.

@@ -65,9 +65,12 @@
         app:layout_constrainedWidth="true"
         app:icon="@drawable/person_remove_black_24dp"
         app:iconPadding="5dp"
+        android:textColor="?attr/colorOnBackground"
+        app:iconTint="?attr/colorOnBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:visibility="gone"
         tools:visibility="visible"
         />

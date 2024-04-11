@@ -76,7 +76,6 @@ public class FollowListFragment extends Fragment {
                 viewPager.setCurrentItem(tab.getPosition());
             }
         });
-        tabLayout.selectTab(tabLayout.getTabAt(tabSelected));
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -87,6 +86,8 @@ public class FollowListFragment extends Fragment {
                 }
             }
         });
+
+        viewPager.setCurrentItem(tabSelected, false);
     }
 
     private void loadMenu(){

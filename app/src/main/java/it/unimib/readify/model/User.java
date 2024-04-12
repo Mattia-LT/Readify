@@ -5,7 +5,6 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +21,6 @@ public class User implements Parcelable {
     private ExternalGroup followers;
     private ExternalGroup following;
     private String idToken;
-    private List<Collection> fetchedCollections = new ArrayList<>();
 
     public User() {}
 
@@ -67,7 +65,6 @@ public class User implements Parcelable {
         this.followers = user.getFollowers();
         this.following = user.getFollowing();
         this.idToken = user.getIdToken();
-        this.fetchedCollections = user.getFetchedCollections();
     }
 
     public String getAvatar() {
@@ -158,13 +155,6 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
-    public List<Collection> getFetchedCollections() {
-        return fetchedCollections;
-    }
-
-    public void setFetchedCollections(List<Collection> fetchedCollections) {
-        this.fetchedCollections = fetchedCollections;
-    }
     @Override
     public int describeContents() {
         return 0;
@@ -253,7 +243,10 @@ public class User implements Parcelable {
                 ", followers=" + followers +
                 ", following=" + following +
                 ", idToken='" + idToken + '\'' +
-                ", fetchedCollections=" + fetchedCollections +
                 '}';
+    }
+
+    public String printReference() {
+        return super.toString();
     }
 }

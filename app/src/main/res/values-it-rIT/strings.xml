@@ -118,5 +118,17 @@
     <string name="textview_visibility_description">Le collezioni rese pubbliche verranno mostrate sul tuo profilo e potranno essere visualizzate dai tuoi followers</string>
     <string name="button_add_collection">Aggiungi collezione</string>
     <string name="button_cancel_add_collection">Annulla</string>
-    <string name="snackbar_empty_collection_name">Il nome della collezione non può essere vuoto.</string>
+    <string name="snack_bar_empty_collection_name">Il nome della collezione non può essere vuoto.</string>
+    <string name="create_new_collection">Crea una nuova collezione</string>
+    <string name="imageview_avatar">Avatar dell\'utente</string>
+
+    <!-- errors -->
+    <string name="username_already_taken">Nome utente già in uso</string>
+    <string name="error_username_length">La lunghezza del nome utente deve essere di 20 caratteri o inferiore</string>
+    <string name="error_username_illegal_symbols">Il nome utente non deve contenere questi simboli: /@</string>
+    <string name="email_already_taken">Email già in uso</string>
+    <string name="email_invalid_input">Errore email: input non valido</string>
+    <string name="field_not_filled_in">Compila il campo</string>
+    <string name="error_password_length">La lunghezza della password deve essere di 6 caratteri o più</string>
+    <string name="error_confirm_password_equal">Conferma Password deve essere uguale al campo Password</string>
 </resources>

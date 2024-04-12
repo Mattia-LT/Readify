@@ -15,7 +15,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
 
-import it.unimib.readify.adapter.ViewPagerAdapter;
+import it.unimib.readify.adapter.SearchViewPagerAdapter;
 import it.unimib.readify.databinding.FragmentSearchBinding;
 
 public class SearchFragment extends Fragment {
@@ -55,8 +55,8 @@ public class SearchFragment extends Fragment {
 
         tabLayout = fragmentSearchBinding.tabLayout;
         viewPager = fragmentSearchBinding.viewpager;
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
-        viewPager.setAdapter(viewPagerAdapter);
+        SearchViewPagerAdapter searchViewPagerAdapter = new SearchViewPagerAdapter(this);
+        viewPager.setAdapter(searchViewPagerAdapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

@@ -8,9 +8,11 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
+import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 
 public class TestDatabaseViewModel extends ViewModel {
     private final TestIDatabaseRepository testDatabaseRepository;
@@ -48,6 +50,9 @@ public class TestDatabaseViewModel extends ViewModel {
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
     private MutableLiveData<List<Result>> collectionListLiveData;
+    private MutableLiveData<List<Result>> followersListLiveData;
+    private MutableLiveData<List<Result>> followingListLiveData;
+
     private boolean isUIRunning;
     private boolean isCollectionsChanged;
 
@@ -230,5 +235,31 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
         testDatabaseRepository.removeBookFromCollection(idToken, bookId, collectionId);
+    }
+
+    public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        testDatabaseRepository.updateUserData(user, newPassword, callback);
+    }
+
+    public void fetchFollowers(String idToken){
+        testDatabaseRepository.fetchFollowers(idToken);
+    }
+
+    public void fetchFollowing(String idToken){
+        testDatabaseRepository.fetchFollowing(idToken);
+    }
+
+    public MutableLiveData<List<Result>> getFollowersListLiveData() {
+        if(followersListLiveData == null){
+            followersListLiveData = testDatabaseRepository.getFollowersListLiveData();
+        }
+        return followersListLiveData;
+    }
+
+    public MutableLiveData<List<Result>> getFollowingListLiveData() {
+        if(followingListLiveData == null){
+            followingListLiveData = testDatabaseRepository.getFollowingListLiveData();
+        }
+        return followingListLiveData;
     }
 }

@@ -10,8 +10,8 @@ public class Constants {
     public static final String SHARED_PREFERENCES_TOPICS_OF_INTEREST = "topics_of_interest";
     public static final String SHARED_PREFERENCES_FIRST_LOADING = "first_loading";
 
-    // Constants for EncryptedSharedPreferences
 
+    // Constants for EncryptedSharedPreferences
     public static final String ENCRYPTED_SHARED_PREFERENCES_FILE_NAME = "it.unimib.worldnews.encrypted_preferences";
     public static final String EMAIL_ADDRESS = "email_address";
     public static final String PASSWORD = "password";
@@ -22,11 +22,7 @@ public class Constants {
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.worldnews.encrypted_file.txt";
 
 
-
-
-
     // Constants for API
-
     public static final String OL_API_BASE_URL = "https://openlibrary.org";
     public static final String OL_SEARCH_ENDPOINT = "/search.json";
     public static final String OL_WORKS_ENDPOINT = "/works/";
@@ -39,8 +35,8 @@ public class Constants {
     public static final String OL_COVERS_API_IMAGE_SIZE_M = "-M.jpg";
     public static final String OL_COVERS_API_IMAGE_SIZE_L = "-L.jpg";
 
-    // Constants for Search Api
 
+    // Constants for Search Api
     public static final String OL_SEARCH_Q_PARAMETER = "q";
     public static final String OL_SEARCH_PAGE_PARAMETER = "page";
     public static final String OL_SEARCH_SORT_PARAMETER = "sort";
@@ -51,9 +47,6 @@ public class Constants {
     public static final String OL_SEARCH_SUBJECT_PARAMETER = "subject";
 
 
-
-
-
     // Constants for recycler views
     public static final String TRENDING = "trending";
     public static final String SUGGESTED = "suggested";
@@ -62,10 +55,7 @@ public class Constants {
     public static final String COLLECTION = "collection";
 
 
-
-
-
-    //error messages
+    // Constants or error messages
     public static final String RETROFIT_ERROR = "retrofit_error";
     public static final String API_KEY_ERROR = "api_key_error";
     public static final String UNEXPECTED_ERROR = "unexpected_error";
@@ -76,25 +66,30 @@ public class Constants {
 
 
     // Constants for Firebase
-
     public static final String FIREBASE_USERS_COLLECTION = "users";
     public static final String FIREBASE_REALTIME_DATABASE = "https://readify-9b50c-default-rtdb.europe-west1.firebasedatabase.app/";
     public static final String FIREBASE_WORKS_COLLECTION = "books";
     public static final String FIREBASE_COLLECTIONS_COLLECTION = "collections";
 
-
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
     public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
+    public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
+    public static final String FIREBASE_USERS_FOLLOWING_FIELD = "following";
+    //TODO magari rinominare o spostare numberOfFollowers come parametro dell'user stesso andando a eliminare external group
+    public static final String FIREBASE_USERS_USERS_LIST_FIELD = "users";
 
 
     public static final String TO_READ = "to_read";
     public static final String ALREADY_READ = "already_read";
 
-
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
 
     public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]" };
+
+    public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
+    public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
 
 }

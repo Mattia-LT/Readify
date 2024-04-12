@@ -6,11 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:layout_marginBottom="100dp"
     tools:context=".ui.main.UserDetailsFragment"
-    android:layout_marginBottom="100dp">
-
-
-    <!-- TODO: Update profile fragment -->
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,7 +20,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:layout_marginTop="10dp">
 
             <ImageView
                 android:id="@+id/avatar_image_view"
@@ -71,7 +69,6 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
@@ -98,7 +95,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/followButton"
+                android:id="@+id/follow_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -139,6 +136,14 @@
             android:text="@string/pa_collections"
             android:textSize="30sp"
             android:layout_marginTop="30dp"/>
+
+        <ProgressBar
+            android:id="@+id/collections_progress_bar"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_user_collections"

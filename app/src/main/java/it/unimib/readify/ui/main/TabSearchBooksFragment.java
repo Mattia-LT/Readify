@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,6 +30,7 @@ import it.unimib.readify.databinding.FragmentTabSearchBooksBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class TabSearchBooksFragment extends Fragment implements FilterBottomSheet.FilterBottomSheetListener {
 
@@ -48,7 +48,6 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         fragmentTabSearchBooksBinding = FragmentTabSearchBooksBinding.inflate(inflater,container,false);
         return fragmentTabSearchBooksBinding.getRoot();
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -93,9 +92,6 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         });
     }
 
-
-
-
     public void startSearch(){
         // Perform the search when the "Enter" key is pressed
         Editable text = fragmentTabSearchBooksBinding.edittextSearch.getText();
@@ -124,7 +120,9 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
     }
 
     private void initViewModels(){
-        bookViewModel = new ViewModelProvider(requireActivity()).get(BookViewModel.class);
+        bookViewModel = TestDatabaseViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
     }
 
     private void initObserver(){
@@ -140,5 +138,4 @@ public class TabSearchBooksFragment extends Fragment implements FilterBottomShee
         };
         bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
     }
-
 }

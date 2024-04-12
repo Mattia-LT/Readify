@@ -44,10 +44,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import it.unimib.readify.R;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import androidx.activity.result.ActivityResult;
@@ -479,9 +477,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void initRepositories(){
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
         testDatabaseViewModel.setUIRunning(false);

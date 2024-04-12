@@ -18,18 +18,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -57,6 +55,9 @@ public class CollectionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loadMenu();
         initRepositories();
+
+        collection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
+
         bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 new BookItemCollectionAdapter.OnItemClickListener() {
                     @Override
@@ -65,37 +66,30 @@ public class CollectionFragment extends Fragment {
                         Navigation.findNavController(requireView()).navigate(action);
                     }
                 }, requireActivity().getApplication());
-
-        //managing recycler view
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
+        bookItemCollectionAdapter.setBooks(collection.getWorks());
 
-        //managing viewModel
-
-        //servirà in caso di modifiche (?)
-        //userViewModel.updateCollectionListLiveData(collectionsList);
-
-
-        //managing data from Profile Fragment
-        collection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
+        //Managing data from Profile Fragment
         String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
         requireActivity().setTitle(collectionName);
         //TODO DA IMPLEMENTARE ANCORA in USER DETAILS
-        //set collection name
+        //Set collection name
         collectionProfileBinding.collectionFragmentCollectionName.setText(collection.getName());
-        //set collection visibility icon
+        //Set collection visibility icon
         if (collection.isVisible())
-            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_open_24);
+            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_visibility_24);
         else
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
-        //set number of books in the collection
+        //Set number of books in the collection
         if (collection.getBooks() != null) {
-            String booksNumber = Integer.toString(collection.getBooks().size()) + " ";
-            if (collection.getBooks().size() > 1)
-                booksNumber += getResources().getString(R.string.books);
-            else
+            String booksNumber = collection.getNumberOfBooks() + " ";
+            if (collection.getNumberOfBooks() == 1){
                 booksNumber += getResources().getString(R.string.book);
+            } else {
+                booksNumber += getResources().getString(R.string.books);
+            }
             collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
         } else {
             collectionProfileBinding.collectionFragmentBooksNumber.setText(getResources()
@@ -143,9 +137,7 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initRepositories(){
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
     }
 }

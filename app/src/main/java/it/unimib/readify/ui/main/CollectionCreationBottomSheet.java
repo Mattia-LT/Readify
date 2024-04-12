@@ -1,77 +1,90 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
+
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.android.material.textfield.TextInputEditText;
-
-import java.util.Objects;
+import com.google.android.material.textfield.TextInputLayout;
 
 import it.unimib.readify.R;
-import it.unimib.readify.model.Collection;
+import it.unimib.readify.databinding.BottomSheetCollectionCreationBinding;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
-
-    public OnInputListener inputListener;
-
-    public interface OnInputListener {
-        void sendInput(Collection newCollection);
-    }
-
-    public void onInputListener(OnInputListener listener) {
-        this.inputListener = listener;
-    }
+    private BottomSheetCollectionCreationBinding binding;
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private String idToken;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.bottom_sheet_collection_creation, container, false);
+        binding = BottomSheetCollectionCreationBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //open dialog
-        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from((View) view.getParent());
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        initViewModels();
+        this.idToken = CollectionCreationBottomSheetArgs.fromBundle(getArguments()).getIdToken();
+        binding.characterCounter.setText("0");
+        binding.characterLimit.setText(String.valueOf(COLLECTION_NAME_CHARACTERS_LIMIT));
+        binding.editTextCollectionCreationName.setFilters(new InputFilter[]{
+                new InputFilter.LengthFilter(COLLECTION_NAME_CHARACTERS_LIMIT)
+        });
+        binding.editTextCollectionCreationName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed for this implementation
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed for this implementation
+            }
 
-        TextInputEditText collectionName = view.findViewById(R.id.CollectionCreationName);
-        SwitchMaterial collectionVisibility = view.findViewById(R.id.CollectionCreationVisibility);
-        Button createCollectionButton = view.findViewById(R.id.CollectionCreationConfirm);
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Update character count
+                int currentLength = s.length();
+                binding.characterCounter.setText(String.valueOf(currentLength));
+            }
+        });
 
-        // TODO: 27/01/2024 aggiungere controllo lunghezza nome raccolta
-        // TODO: use binding instead of findViewById
-
-        //TODO commentata questa sezione perchè faceva crashare l'app a causa dei cambiamenti di collection
-        // secondo me conviene finire la parte di AddToCollection e poi implementare lo stesso codice pure qua
-        //collection creation
-//        createCollectionButton.setOnClickListener( e -> {
-//            if(collectionName.getEditableText().toString().equals(""))
-//                Snackbar.make(view, "Nome non inserito", Snackbar.LENGTH_SHORT).show();
-//            else {
-//                //TODO forse da sistemare --> molto simile a quello di AddToCollection
-//                Collection newCollection = new Collection(collectionName.getEditableText().toString(),
-//                        collectionVisibility.isChecked(), null);
-//                inputListener.sendInput(newCollection);
-//                //close dialog
-//                Objects.requireNonNull(getDialog()).dismiss();
-//            }
-//        });
+        Button confirmButton = binding.buttonCollectionCreationConfirm;
+        confirmButton.setOnClickListener(v -> {
+            TextInputLayout textInputLayout = binding.createTextInputLayoutAddCollection;
+            EditText editText = textInputLayout.getEditText();
+            String collectionName = (editText != null) ? editText.getText().toString() : "";
+            collectionName = collectionName.trim();
+            if(collectionName.isEmpty()){
+                Snackbar.make(requireView(), getString(R.string.snack_bar_empty_collection_name), Snackbar.LENGTH_SHORT).show();
+            } else {
+                boolean visible = binding.switchCollectionVisibility.isChecked();
+                testDatabaseViewModel.createCollection(idToken, collectionName, visible);
+                testDatabaseViewModel.fetchCollections(idToken);
+                requireDialog().dismiss();
+            }
+        });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    private void initViewModels() {
+        testDatabaseViewModel = TestDatabaseViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
     }
 }

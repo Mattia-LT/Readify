@@ -1,6 +1,7 @@
 package it.unimib.readify.data.source.user;
 
 
+import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.UserResponseCallback;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.OLWorkApiResponse;
@@ -14,6 +15,9 @@ public abstract class BaseUserDataRemoteDataSource {
     }
 
     public abstract void saveUserData(User user);
+    public abstract void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
+    public abstract void onUsernameAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
+    public abstract void onEmailAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback);
     public abstract void saveWorkData(OLWorkApiResponse work);
     public abstract void getUser(String idToken);
     public abstract void getWork(String idBook);
@@ -26,6 +30,9 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void removeBookFromCollection(String idToken, String collectionId, String bookId);
     public abstract void deleteComment(String bookId, Comment comment);
     public abstract void fetchCollections(String idToken);
+    public abstract void fetchFollowers(String idToken);
+    public abstract void fetchFollowings(String idToken);
+
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);

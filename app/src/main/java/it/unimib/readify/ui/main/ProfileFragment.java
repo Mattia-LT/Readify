@@ -1,5 +1,8 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,46 +22,34 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
-import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.DataViewModelFactory;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
-public class ProfileFragment extends Fragment implements CollectionCreationBottomSheet.OnInputListener {
+public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
     private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
     private User user;
-    /*
-        todo Do we need a copy of user data?
-         @copiedUser
-     */
-    private User copiedUser;
-    private Observer<Result> observer;
-    private Observer<List<Collection>> collectionsObserver;
-
     public ProfileFragment() {}
 
     public static ProfileFragment newInstance() {
@@ -81,133 +72,77 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d("profile lifecycle", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
-        MenuItem switchMenuItem = navigationView.getMenu().findItem(R.id.nav_switch);
+        initViewModels();
+        initObservers();
+        loadMenu();
+        initRecyclerView();
+        initCreateCollectionSection();
+        initFollowersSection();
+    }
 
-        // Ottieni la vista dell'azione associata all'elemento di menu
-        View actionLayout = switchMenuItem.getActionView();
+    private void initViewModels() {
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
 
-        // Trova lo SwitchCompat all'interno della vista dell'azione
-        SwitchCompat switchButton = actionLayout.findViewById(R.id.switch_compat);
+        bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
+    }
 
-        // Imposta il listener per il cambio di stato dello switch
+    private void initObservers() {
+        final Observer<List<Result>> fetchedCollectionsObserver = results -> {
+            List<Collection> collectionResultList = results.stream()
+                    .filter(result -> result instanceof Result.CollectionSuccess)
+                    .map(result -> ((Result.CollectionSuccess) result).getData())
+                    .collect(Collectors.toList());
+            Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
+            collectionAdapter.submitList(collectionResultList);
+            fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
+        };
+
+        final Observer<Result> loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                this.user = ((Result.UserSuccess) result).getData();
+                Log.e("USER OBSERVER","TRIGGERED");
+                testDatabaseViewModel.fetchCollections(user.getIdToken());
+                updateUI();
+            }
+        };
+
+        final Observer<List<Result>> emptyCollectionsObserver = results -> {
+            fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
+            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
+            List<Collection> collectionsResultList = results.stream()
+                    .filter(result -> result instanceof Result.CollectionSuccess)
+                    .map(result -> ((Result.CollectionSuccess) result).getData())
+                    .collect(Collectors.toList());
+            bookViewModel.fetchWorksForCollections(collectionsResultList);
+        };
+
+        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+    }
+
+   private void initRecyclerView(){
+       collectionAdapter = new CollectionAdapter(collection -> {
+                   NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName());
+                   Navigation.findNavController(requireView()).navigate(action);
+               });
+       RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
+       fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
+       fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
+   }
+
+    public void loadMenu(){
+        SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu().findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Log.d("SwitchCompat", "Stato dello switch cambiato: " + isChecked);
             if (isChecked) {
-                Log.d("SwitchCompat", "Tema scuro attivato");
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
-                Log.d("SwitchCompat", "Tema scuro disattivato");
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
         });
-        loadMenu(view);
 
-        //initializing repository and viewModel User
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
-                .create(TestDatabaseViewModel.class);
-
-        //initializing repository and viewModel Book
-        IBookRepository bookRepository = TestServiceLocator.getInstance(requireActivity().getApplication())
-                .getRepository(IBookRepository.class);
-        bookViewModel = new ViewModelProvider(
-                requireActivity(),
-                new DataViewModelFactory(bookRepository)
-        ).get(BookViewModel.class);
-
-        //initializing Observers
-        collectionsObserver = collections -> {
-            Log.d("profile fragment", "collections changed");
-            if(collections.size() == copiedUser.getFetchedCollections().size()) {
-                runCollectionsView(view, collections);
-            }
-            //todo managing observer deletion (where?)
-        };
-
-        observer = result -> {
-            Log.d("profile fragment", "user changed");
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess)result).getData();
-                copiedUser = new User(user);
-                updateUI();
-
-                //TODO fix using new collections logic (?) idk
-                /*
-                    todo optimize conditions and / or logic of @isCollectionsChanged
-                     maybe we can use user == copiedUser
-                    this resolves the double calling of @collectionsObserver
-                    right now, this is straightforward; it is working but can be optimized most probably
-                 */
-                if(testDatabaseViewModel.isCollectionsChanged()) {
-                    bookViewModel.fetchCollections(copiedUser.getFetchedCollections(), getViewLifecycleOwner());
-                    testDatabaseViewModel.setCollectionsChanged(false);
-                }
-            } else {
-                //todo navigate to login(?)
-                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-            //todo managing observer deletion (where?)
-        };
-        //get user data from database
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
-        bookViewModel.getFetchedCollections().observe(getViewLifecycleOwner(), collectionsObserver);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("profile lifecycle", "onStart");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("profile lifecycle", "onDestroyView");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("profile lifecycle", "onDetach");
-    }
-
-    //managing collections existence
-    public void runCollectionsView(View view, List<Collection> collections) {
-        //managing collectionAdapter and recycler view
-        collectionAdapter = new CollectionAdapter(
-                new CollectionAdapter.OnItemClickListener() {
-                    @Override
-                    public void onCollectionItemClick(Collection collection) {
-                        NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName());
-                        Navigation.findNavController(view).navigate(action);
-                    }
-                }, requireActivity().getApplication());
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
-        fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
-        fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
-        collectionAdapter.setCollectionsList(copiedUser.getFetchedCollections());
-    }
-
-    public void runCollectionCreationProcess() {
-        CollectionCreationBottomSheet collectionCreationBottomSheet = new CollectionCreationBottomSheet();
-        collectionCreationBottomSheet.onInputListener(this);
-        fragmentProfileBinding.createCollection.setOnClickListener( v -> {
-            collectionCreationBottomSheet.show(getChildFragmentManager(), collectionCreationBottomSheet.getTag());
-        });
-    }
-
-    //CollectionCreationBottomSheet.OnInputListener method
-    //todo implement
-    @Override
-    public void sendInput(Collection newCollection) {
-        //collectionsList.add(newCollection);
-        //userViewModel.updateCollectionListLiveData(collectionsList);
-    }
-
-    public void loadMenu(View view){
         // Set up the toolbar and remove all icons
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
@@ -235,7 +170,7 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
                             int itemId = menuItem.getItemId();
 
                             if (itemId == R.id.nav_settings) {
-                                Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_settingsFragment);
+                                Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_settingsFragment);
                             }
                             if(itemId == R.id.nav_logout){
                                 /*
@@ -266,29 +201,65 @@ public class ProfileFragment extends Fragment implements CollectionCreationBotto
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
-    public void updateUI() {
-        fragmentProfileBinding.textviewUsername.setText(copiedUser.getUsername());
-        fragmentProfileBinding.textViewFollowers.setText(String.format(Locale.ENGLISH, "%d",
-                copiedUser.getFollowers().getCounter()));
-        fragmentProfileBinding.textViewFollowing.setText(String.format(Locale.ENGLISH, "%d",
-                copiedUser.getFollowing().getCounter()));
+    private void initCreateCollectionSection() {
+        fragmentProfileBinding.createCollection.setOnClickListener(v -> {
+            NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCreateCollectionDialog(user.getIdToken());
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+    }
+    private void initFollowersSection() {
+        View.OnClickListener followClickListener = v -> {
+            NavDirections action = null;
+            if(v.getId() == fragmentProfileBinding.textviewFollowerCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowerLabel.getId() ){
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWER);
+            } else if(v.getId() == fragmentProfileBinding.textviewFollowingCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowingLabel.getId()) {
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWING);
+            }
+            if(action != null){
+                Navigation.findNavController(requireView()).navigate(action);
+            }
+        };
+        fragmentProfileBinding.textviewFollowerCounter.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowerLabel.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowingCounter.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowingLabel.setOnClickListener(followClickListener);
+    }
 
-        fragmentProfileBinding.textViewFacebook.setVisibility(View.GONE);
-        fragmentProfileBinding.textViewTwitter.setVisibility(View.GONE);
-        fragmentProfileBinding.textViewInstagram.setVisibility(View.GONE);
-        for (int i = 0; i < copiedUser.getSocialLinks().size(); i++) {
-            switch (copiedUser.getSocialLinks().get(i).getSocialPlatform()) {
+
+    public void updateUI() {
+        int avatarId;
+        try {
+            avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+        } catch (Exception e) {
+            avatarId = R.drawable.ic_baseline_profile_24;
+        }
+        Glide.with(requireActivity().getApplicationContext())
+                .load(avatarId)
+                .dontAnimate()
+                .into(fragmentProfileBinding.avatarImageView);
+
+        fragmentProfileBinding.textviewUsername.setText(user.getUsername());
+        fragmentProfileBinding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
+        fragmentProfileBinding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
+
+        fragmentProfileBinding.textviewUserBiography.setText(user.getBiography());
+
+        fragmentProfileBinding.textviewFacebook.setVisibility(View.GONE);
+        fragmentProfileBinding.textviewTwitter.setVisibility(View.GONE);
+        fragmentProfileBinding.textviewInstagram.setVisibility(View.GONE);
+        for (int i = 0; i < user.getSocialLinks().size(); i++) {
+            switch (user.getSocialLinks().get(i).getSocialPlatform()) {
                 case "facebook":
-                    fragmentProfileBinding.textViewFacebook.setText(copiedUser.getSocialLinks().get(i).getLink());
-                    fragmentProfileBinding.textViewFacebook.setVisibility(View.VISIBLE);
+                    fragmentProfileBinding.textviewFacebook.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewFacebook.setVisibility(View.VISIBLE);
                     break;
                 case "twitter":
-                    fragmentProfileBinding.textViewTwitter.setText(copiedUser.getSocialLinks().get(i).getLink());
-                    fragmentProfileBinding.textViewTwitter.setVisibility(View.VISIBLE);
+                    fragmentProfileBinding.textviewTwitter.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewTwitter.setVisibility(View.VISIBLE);
                     break;
                 case "instagram":
-                    fragmentProfileBinding.textViewInstagram.setText(copiedUser.getSocialLinks().get(i).getLink());
-                    fragmentProfileBinding.textViewInstagram.setVisibility(View.VISIBLE);
+                    fragmentProfileBinding.textviewInstagram.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewInstagram.setVisibility(View.VISIBLE);
                     break;
             }
         }

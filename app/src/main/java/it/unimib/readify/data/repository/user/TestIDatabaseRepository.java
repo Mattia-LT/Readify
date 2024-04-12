@@ -6,12 +6,14 @@ import java.util.List;
 
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 
 public interface TestIDatabaseRepository {
 
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
+    void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback);
 
     void fetchComments(String bookId);
     void fetchCollections(String idToken);
@@ -22,10 +24,12 @@ public interface TestIDatabaseRepository {
     void deleteCollection(String idToken, String collectionId);
     void addBookToCollection(String idToken, String bookId, String collectionId);
     void removeBookFromCollection(String idToken, String bookId, String collectionId);
+    void fetchFollowers(String idToken);
+    void fetchFollowing(String idToken);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
     MutableLiveData<List<Result>> getCollectionListLiveData();
-
-
+    MutableLiveData<List<Result>> getFollowersListLiveData();
+    MutableLiveData<List<Result>> getFollowingListLiveData();
 }

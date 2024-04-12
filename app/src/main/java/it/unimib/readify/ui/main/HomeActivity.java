@@ -13,27 +13,28 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.ActivityHomeBinding;
-public class HomeActivity extends AppCompatActivity {
+
+public class HomeActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActivityHomeBinding binding = ActivityHomeBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        ActivityHomeBinding activityHomeBinding = ActivityHomeBinding.inflate(getLayoutInflater());
+        setContentView(activityHomeBinding.getRoot());
 
-        MaterialToolbar toolbar = binding.topAppbarHome;
+        MaterialToolbar toolbar = activityHomeBinding.topAppbarHome;
         setSupportActionBar(toolbar);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().
-                findFragmentById(binding.fragmentContainerViewHome.getId());
+                findFragmentById(activityHomeBinding.fragmentContainerViewHome.getId());
 
         NavController navController = null;
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
         }
 
-        BottomNavigationView bottomNavigationView = binding.bottomNavigationViewHome;
+        BottomNavigationView bottomNavigationView = activityHomeBinding.bottomNavigationViewHome;
 
         if (navController != null) {
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(

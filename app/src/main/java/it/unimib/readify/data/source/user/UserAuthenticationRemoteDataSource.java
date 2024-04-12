@@ -10,6 +10,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.model.User;
 
 public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRemoteDataSource{
@@ -63,6 +66,21 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                 userResponseCallback.onFailureFromAuthentication(getErrorMessage(task.getException()));
             }
         });
+    }
+
+    @Override
+    public void changePassword(String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        //todo substitute with if(?)
+        assert user != null;
+        user.updatePassword(newPassword)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        callback.onPasswordChanged(task.isSuccessful());
+                    }
+                });
     }
 
     @Override

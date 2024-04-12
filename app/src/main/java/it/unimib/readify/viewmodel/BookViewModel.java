@@ -1,24 +1,15 @@
 package it.unimib.readify.viewmodel;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
-import android.util.Log;
-
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
 
@@ -40,18 +31,12 @@ public class BookViewModel extends ViewModel {
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
-
-    /*
-        todo do we need a copy of userCollections to manage updates of data in database?
-         (as user in databaseViewModel)
-     */
-    private MutableLiveData<List<Collection>> userCollections;
+    private MutableLiveData<List<Result>> collectionListLiveData;
 
     public BookViewModel(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
         this.offset = 0;
         this.limit = 10;
-        userCollections = bookRepository.getFetchedCollections();
     }
 
     public MutableLiveData<List<Result>> getSearchResultsLiveData(){
@@ -87,11 +72,14 @@ public class BookViewModel extends ViewModel {
         }
     }
 
-    public void fetchCollections(List<Collection> collections, LifecycleOwner lifecycleOwner) {
-        bookRepository.fetchCollections(collections, lifecycleOwner);
+    public void fetchWorksForCollections(List<Collection> collections){
+       bookRepository.fetchWorksForCollections(collections);
     }
 
-    public MutableLiveData<List<Collection>> getFetchedCollections()  {
-        return userCollections;
+    public MutableLiveData<List<Result>> getCompleteCollectionListLiveData(){
+        if(collectionListLiveData == null){
+            collectionListLiveData = bookRepository.getFetchedCollectionsLiveData();
+        }
+        return collectionListLiveData;
     }
 }

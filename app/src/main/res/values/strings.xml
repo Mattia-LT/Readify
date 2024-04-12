@@ -42,7 +42,7 @@
 
     <string name="register">Register</string>
     <string name="name">Name</string>
-    <string name="surname">Surame</string>
+    <string name="surname">Surname</string>
     <string name="username" translatable="false">Username</string>
 
     <string-array name="gender">
@@ -131,6 +131,18 @@
     <string name="textview_visibility_description">The collections made public will be shown on your profile and can be viewed by your followers</string>
     <string name="button_add_collection">Add collection</string>
     <string name="button_cancel_add_collection">Cancel</string>
-    <string name="snackbar_empty_collection_name">Collection\'s name cannot be empty</string>
+    <string name="snack_bar_empty_collection_name">Collection\'s name cannot be empty</string>
+    <string name="create_new_collection">Create a new collection</string>
+    <string name="imageview_avatar">Avatar of the user</string>
+
+    <!-- errors -->
+    <string name="username_already_taken">Username already taken</string>
+    <string name="error_username_length">Username length must be 20 characters or lower</string>
+    <string name="error_username_illegal_symbols">Username must not contains these symbols: /@</string>
+    <string name="email_already_taken">Email already taken</string>
+    <string name="email_invalid_input">Email error: invalid input</string>
+    <string name="field_not_filled_in">Fill in the field</string>
+    <string name="error_password_length">Password length must be 6 characters or higher</string>
+    <string name="error_confirm_password_equal">Confirm Password must be equal to Password field</string>
 
 </resources>

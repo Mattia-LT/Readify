@@ -34,14 +34,11 @@
 
     </fragment>
 
-    <!-- dialog è necessario? -->
     <dialog
         android:id="@+id/filter_bottomsheet"
         android:name="it.unimib.readify.ui.main.FilterBottomSheet"
         android:label="dialog_filter_bottomsheet"
         tools:layout="@layout/bottom_sheet_search_filter">
-
-        <!-- TODO forse argument necessario, da vedere -->
     </dialog>
 
 
@@ -73,6 +70,13 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
+        <action
+            android:id="@+id/action_profileFragment_to_createCollectionDialog"
+            app:destination="@id/createCollectionDialog"/>
+        <action
+            android:id="@+id/action_profileFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
+
     </fragment>
 
     <fragment
@@ -94,6 +98,9 @@
         <action
             android:id="@+id/action_userDetailsFragment_to_searchFragment"
             app:destination="@id/searchFragment"/>
+        <action
+            android:id="@+id/action_userDetailsFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
     </fragment>
 
     <fragment
@@ -192,6 +199,43 @@
             app:argType="string"
             />
     </dialog>
+
+    <dialog
+        android:id="@+id/createCollectionDialog"
+        android:name="it.unimib.readify.ui.main.CollectionCreationBottomSheet"
+        android:label="create_collection_dialog"
+        tools:layout="@layout/bottom_sheet_collection_creation">
+
+        <argument
+            android:name="idToken"
+            app:argType="string"
+            />
+    </dialog>
+
+    <fragment
+        android:id="@+id/followListFragment"
+        android:name="it.unimib.readify.ui.main.FollowListFragment"
+        android:label="{username}"
+        tools:layout="@layout/fragment_follow_list">
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+        <argument
+            android:name="username"
+            app:argType="string" />
+
+        <argument
+            android:name="destination"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_followListFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+
+    </fragment>
 
 
     <include app:graph="@navigation/login_navigation_graph" />

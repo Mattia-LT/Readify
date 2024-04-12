@@ -13,12 +13,14 @@
         android:id="@+id/collection_thumbnail_imageview"
         android:layout_width="200sp"
         android:layout_height="250sp"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/collection_name_visibility_constraintLayout"
         android:layout_width="200sp"
         android:paddingStart="18dp"
         android:paddingEnd="15dp"

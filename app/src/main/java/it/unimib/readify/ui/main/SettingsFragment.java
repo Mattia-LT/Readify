@@ -54,10 +54,6 @@ public class SettingsFragment extends Fragment {
     private String newPassword;
     private int imageResourceId;
 
-    private TestDatabaseViewModel  testDatabaseViewModel;
-    private Observer<Result> observer;
-    private User user;
-    private User copiedUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,31 +81,23 @@ public class SettingsFragment extends Fragment {
             }
         };
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
-
         loadMenu();
-        TestIDatabaseRepository testDatabaseRepository = TestServiceLocator
-                .getInstance(requireActivity().getApplication())
-                .getRepository(TestIDatabaseRepository.class);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(testDatabaseRepository)
-                .create(TestDatabaseViewModel.class);
-
-        CircleImageView profileImageView = fragmentSettingsBinding.profileImageSelect;
-        observer = result -> {
-            Log.d("profile fragment", "user changed");
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess)result).getData();
-                copiedUser = new User(user);
-                updateUIObserver();
-            } else {
-                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+        fragmentSettingsBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(requireView()).navigate(R.id.action_settingsFragment_to_profileImageSelectorFragment);
             }
-        };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
-
-
-        profileImageView.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_settingsFragment_to_profileImageSelectorFragment);
         });
+
+        updateUIObserver();
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("imageResourceId")) {
+            imageResourceId = args.getInt("imageResourceId");
+            updateUI(imageResourceId);
+        } else {
+            imageResourceId = R.drawable.ic_baseline_profile_24;
+            fragmentSettingsBinding.profileImageSelect.setImageResource(imageResourceId);
+        }
 
 
         fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
@@ -209,7 +197,7 @@ public class SettingsFragment extends Fragment {
                     return false;
                 }
                 else if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("/")
-                            || fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("@")) {
+                        || fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("@")) {
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.error_username_illegal_symbols);
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                     return false;
@@ -274,7 +262,7 @@ public class SettingsFragment extends Fragment {
                 fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
                 return false;
             } else if(!fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
-                        && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
+                    && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
                 if(fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().length() < 6) {
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setText(R.string.error_password_length);
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
@@ -345,15 +333,6 @@ public class SettingsFragment extends Fragment {
                     .into(fragmentSettingsBinding.profileImageSelect);
         } else {
             Log.d("USER NULL", "USER NULL");
-        }
-
-        Bundle args = getArguments();
-        if (args != null && args.containsKey("imageResourceId")) {
-            imageResourceId = args.getInt("imageResourceId");
-            updateUI(imageResourceId);
-        } else {
-            imageResourceId = R.drawable.ic_baseline_profile_24;
-            fragmentSettingsBinding.profileImageSelect.setImageResource(imageResourceId);
         }
     }
 }

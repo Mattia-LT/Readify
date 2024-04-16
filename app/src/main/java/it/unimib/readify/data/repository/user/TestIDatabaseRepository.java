@@ -29,4 +29,6 @@ public interface TestIDatabaseRepository {
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
     MutableLiveData<List<Result>> getCollectionListLiveData();
+    MutableLiveData<String> getSourceUsernameError();
+    MutableLiveData<String> getSourceEmailError();
 }

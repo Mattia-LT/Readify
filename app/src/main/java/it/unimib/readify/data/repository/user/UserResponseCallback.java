@@ -25,4 +25,6 @@ public interface UserResponseCallback {
     void onSuccessFetchCollectionsFromRemoteDatabase(List <Collection> collections);
     void onFailureFetchCollectionsFromRemoteDatabase(String message);
     void onSuccessLogout();
+    void onUsernameAvailable(String result);
+    void onEmailAvailable(String result);
 }

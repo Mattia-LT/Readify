@@ -76,7 +76,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void updateUserData(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void updateUserData(User user) {
         databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -92,11 +92,11 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                     //Availability Checks
                                     //Username
                                     if(!user.getUsername().equals(existingUser.getUsername())) {
-                                        onUsernameAvailable(user, callback);
+                                        onUsernameAvailable(user);
                                     }
                                     //Email
                                     if(!user.getEmail().equals(existingUser.getEmail())) {
-                                        onEmailAvailable(user, callback);
+                                        onEmailAvailable(user);
                                     }
                                 }
                             }
@@ -112,51 +112,51 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 });
     }
 
-    public void onUsernameAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void onUsernameAvailable(User user) {
         DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
         usersRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    callback.onUsernameAvailable("notAvailable");
+                    userResponseCallback.onUsernameAvailable("notAvailable");
                 } else {
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                             .child(FIREBASE_USERS_USERNAME_FIELD).setValue(user.getUsername())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                             .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                    callback.onUsernameAvailable("available");
+                    userResponseCallback.onUsernameAvailable("available");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("verifyUsername Firebase error", databaseError.getMessage());
-                callback.onUsernameAvailable("error");
+                userResponseCallback.onUsernameAvailable("error");
             }
         });
     }
 
     @Override
-    public void onEmailAvailable(User user, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void onEmailAvailable(User user) {
         DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
         usersRef.orderByChild(FIREBASE_COLLECTIONS_EMAILS_FIELD).equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    callback.onEmailAvailable("notAvailable");
+                    userResponseCallback.onEmailAvailable("notAvailable");
                 } else {
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                             .child(FIREBASE_COLLECTIONS_EMAILS_FIELD).setValue(user.getEmail())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                             .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                    callback.onEmailAvailable("available");
+                    userResponseCallback.onEmailAvailable("available");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("verifyEmail Firebase error", databaseError.getMessage());
-                callback.onEmailAvailable("error");
+                userResponseCallback.onEmailAvailable("error");
             }
         });
     }

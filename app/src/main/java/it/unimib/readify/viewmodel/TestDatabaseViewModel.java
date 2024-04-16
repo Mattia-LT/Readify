@@ -50,6 +50,8 @@ public class TestDatabaseViewModel extends ViewModel {
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
     private MutableLiveData<List<Result>> collectionListLiveData;
+    private final MutableLiveData<String> sourceUsernameError;
+    private final MutableLiveData<String> sourceEmailError;
     private boolean isUIRunning;
     private boolean isCollectionsChanged;
 
@@ -105,6 +107,8 @@ public class TestDatabaseViewModel extends ViewModel {
             }
             copiedData.postValue(result);
         });
+        sourceUsernameError = testDatabaseRepository.getSourceUsernameError();
+        sourceEmailError = testDatabaseRepository.getSourceEmailError();
         isCollectionsChanged = true;
     }
 
@@ -236,5 +240,13 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
         testDatabaseRepository.updateUserData(user, newPassword, callback);
+    }
+
+    public MutableLiveData<String> getSourceUsernameError() {
+        return sourceUsernameError;
+    }
+
+    public MutableLiveData<String> getSourceEmailError() {
+        return sourceEmailError;
     }
 }

@@ -35,6 +35,8 @@ public class SettingsFragment extends Fragment {
     private User user;
     private User onSaveUser;
     private Observer<Result> userObserver;
+    private Observer<String> usernameErrorObserver;
+    private Observer<String> emailErrorObserver;
     private String newPassword;
 
     @Override
@@ -62,6 +64,44 @@ public class SettingsFragment extends Fragment {
                 Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         };
+
+        usernameErrorObserver = result -> {
+            switch (result) {
+                case "available":
+                    Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();
+                    fragmentSettingsBinding.textInputEditTextUsername.setText("");
+                    break;
+                case "notAvailable":
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
+                    fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
+                    break;
+                case "error":
+                    //todo use snack bar instead (to implement an action)?
+                    Toast.makeText(requireContext(), "System: username error", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        };
+
+        emailErrorObserver = result -> {
+            switch (result) {
+                case "available":
+                    Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
+                    fragmentSettingsBinding.textInputEditTextEmail.setText("");
+                    break;
+                case "notAvailable":
+                    fragmentSettingsBinding.settingsEmailErrorMessage.setText(R.string.email_already_taken);
+                    fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
+                    break;
+                case "identical":
+                    Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
+                    break;
+                case "error":
+                    //todo use snack bar instead (to implement an action)?
+                    Toast.makeText(requireContext(), "System: email error", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        };
+
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
 
         loadMenu();
@@ -83,45 +123,6 @@ public class SettingsFragment extends Fragment {
                         //todo put result icon?
                         testDatabaseViewModel.updateUserData(onSaveUser, newPassword, new TestDatabaseRepository.UpdateUserDataCallback() {
                             @Override
-                            public void onUsernameAvailable(String result) {
-                                switch (result) {
-                                    case "available":
-                                        Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();
-                                        fragmentSettingsBinding.textInputEditTextUsername.setText("");
-                                        break;
-                                    case "notAvailable":
-                                        fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
-                                        fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
-                                        break;
-                                    case "error":
-                                        //todo use snack bar instead (to implement an action)?
-                                        Toast.makeText(requireContext(), "System: username error", Toast.LENGTH_SHORT).show();
-                                        break;
-                                }
-                            }
-
-                            @Override
-                            public void onEmailAvailable(String result) {
-                                switch (result) {
-                                    case "available":
-                                        Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
-                                        fragmentSettingsBinding.textInputEditTextEmail.setText("");
-                                        break;
-                                    case "notAvailable":
-                                        fragmentSettingsBinding.settingsEmailErrorMessage.setText(R.string.email_already_taken);
-                                        fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
-                                        break;
-                                    case "identical":
-                                        Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case "error":
-                                        //todo use snack bar instead (to implement an action)?
-                                        Toast.makeText(requireContext(), "System: email error", Toast.LENGTH_SHORT).show();
-                                        break;
-                                }
-                            }
-
-                            @Override
                             public void onPasswordChanged(Boolean result) {
                                 if(result) {
                                     Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
@@ -133,6 +134,8 @@ public class SettingsFragment extends Fragment {
                                 }
                             }
                         });
+                        testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
+                        testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
                     }
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();

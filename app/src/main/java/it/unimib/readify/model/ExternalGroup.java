@@ -3,11 +3,13 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 public class ExternalGroup implements Parcelable {
-    int counter;
-    List<ExternalUser> users;
+    private int counter;
+    private List<ExternalUser> users;
 
     public ExternalGroup() {}
 
@@ -66,6 +68,7 @@ public class ExternalGroup implements Parcelable {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "Followers{" +

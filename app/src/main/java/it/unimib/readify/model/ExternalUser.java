@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class ExternalUser implements Parcelable {
     private boolean read;
-    private String timestamp;
+    private long timestamp;
     private String idToken;
     private User user;
 
@@ -24,11 +24,11 @@ public class ExternalUser implements Parcelable {
         this.read = read;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -70,21 +70,21 @@ public class ExternalUser implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte(this.read ? (byte) 1 : (byte) 0);
-        dest.writeString(this.timestamp);
+        dest.writeLong(this.timestamp);
         dest.writeString(this.idToken);
         dest.writeParcelable(this.user, flags);
     }
 
     public void readFromParcel(Parcel source) {
         this.read = source.readByte() != 0;
-        this.timestamp = source.readString();
+        this.timestamp = source.readLong();
         this.idToken = source.readString();
         this.user = source.readParcelable(User.class.getClassLoader());
     }
 
     protected ExternalUser(Parcel in) {
         this.read = in.readByte() != 0;
-        this.timestamp = in.readString();
+        this.timestamp = in.readLong();
         this.idToken = in.readString();
         this.user = in.readParcelable(User.class.getClassLoader());
     }

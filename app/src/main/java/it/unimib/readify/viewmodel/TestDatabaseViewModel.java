@@ -50,6 +50,9 @@ public class TestDatabaseViewModel extends ViewModel {
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
     private MutableLiveData<List<Result>> collectionListLiveData;
+    private MutableLiveData<List<Result>> followersListLiveData;
+    private MutableLiveData<List<Result>> followingListLiveData;
+
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private boolean isUIRunning;
@@ -240,6 +243,28 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
         testDatabaseRepository.updateUserData(user, newPassword, callback);
+    }
+
+    public void fetchFollowers(String idToken){
+        testDatabaseRepository.fetchFollowers(idToken);
+    }
+
+    public void fetchFollowing(String idToken){
+        testDatabaseRepository.fetchFollowing(idToken);
+    }
+
+    public MutableLiveData<List<Result>> getFollowersListLiveData() {
+        if(followersListLiveData == null){
+            followersListLiveData = testDatabaseRepository.getFollowersListLiveData();
+        }
+        return followersListLiveData;
+    }
+
+    public MutableLiveData<List<Result>> getFollowingListLiveData() {
+        if(followingListLiveData == null){
+            followingListLiveData = testDatabaseRepository.getFollowingListLiveData();
+        }
+        return followingListLiveData;
     }
 
     public MutableLiveData<String> getSourceUsernameError() {

@@ -120,6 +120,7 @@
     <string name="button_cancel_add_collection">Annulla</string>
     <string name="snack_bar_empty_collection_name">Il nome della collezione non può essere vuoto.</string>
     <string name="create_new_collection">Crea una nuova collezione</string>
+    <string name="imageview_avatar">Avatar dell\'utente</string>
 
     <!-- errors -->
     <string name="username_already_taken">Nome utente già in uso</string>

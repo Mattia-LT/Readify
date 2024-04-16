@@ -76,6 +76,11 @@ public class Constants {
     public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
     public static final String FIREBASE_COLLECTIONS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
+    public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
+    public static final String FIREBASE_USERS_FOLLOWING_FIELD = "following";
+    //TODO magari rinominare o spostare numberOfFollowers come parametro dell'user stesso andando a eliminare external group
+    public static final String FIREBASE_USERS_USERS_LIST_FIELD = "users";
+
 
     public static final String TO_READ = "to_read";
     public static final String ALREADY_READ = "already_read";
@@ -83,4 +88,8 @@ public class Constants {
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
 
     public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]" };
+
+    public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
+    public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
+
 }

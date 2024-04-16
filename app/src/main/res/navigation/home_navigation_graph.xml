@@ -43,6 +43,17 @@
 
 
     <fragment
+        android:id="@+id/profileImageSelectorFragment"
+        android:name="it.unimib.readify.ui.main.ProfileImageSelector"
+        android:label="BOH"
+        tools:layout="@layout/fragment_profile_image_selector" >
+
+        <action
+            android:id="@+id/action_profileImageSelectorFragment_to_settingsFragment"
+            app:destination="@id/settingFragment"/>
+    </fragment>
+
+    <fragment
         android:id="@+id/profileFragment"
         android:name="it.unimib.readify.ui.main.ProfileFragment"
         android:label="@string/navigation_bar_item_profile"
@@ -62,6 +73,9 @@
         <action
             android:id="@+id/action_profileFragment_to_createCollectionDialog"
             app:destination="@id/createCollectionDialog"/>
+        <action
+            android:id="@+id/action_profileFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
 
     </fragment>
 
@@ -84,6 +98,9 @@
         <action
             android:id="@+id/action_userDetailsFragment_to_searchFragment"
             app:destination="@id/searchFragment"/>
+        <action
+            android:id="@+id/action_userDetailsFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
     </fragment>
 
     <fragment
@@ -147,14 +164,24 @@
 
     </fragment>
 
+
     <fragment
         android:id="@+id/settingFragment"
         android:name="it.unimib.readify.ui.main.SettingsFragment"
         android:label="@string/pa_settings"
         tools:layout="@layout/fragment_settings">
+
+        <argument
+            android:name="imageResourceId"
+            app:argType="integer"
+            />
+
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"
             app:destination= "@id/profileFragment"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_profileImageSelectorFragment"
+            app:destination= "@+id/profileImageSelectorFragment"/>
     </fragment>
 
     <dialog
@@ -184,6 +211,32 @@
             app:argType="string"
             />
     </dialog>
+
+    <fragment
+        android:id="@+id/followListFragment"
+        android:name="it.unimib.readify.ui.main.FollowListFragment"
+        android:label="{username}"
+        tools:layout="@layout/fragment_follow_list">
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+        <argument
+            android:name="username"
+            app:argType="string" />
+
+        <argument
+            android:name="destination"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_followListFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+
+    </fragment>
+
 
     <include app:graph="@navigation/login_navigation_graph" />
 

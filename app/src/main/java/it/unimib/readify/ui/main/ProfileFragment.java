@@ -1,5 +1,8 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,6 +77,7 @@ public class ProfileFragment extends Fragment{
         loadMenu();
         initRecyclerView();
         initCreateCollectionSection();
+        initFollowersSection();
     }
 
     private void initViewModels() {
@@ -120,8 +124,7 @@ public class ProfileFragment extends Fragment{
     }
 
    private void initRecyclerView(){
-       collectionAdapter = new CollectionAdapter(
-               (CollectionAdapter.OnItemClickListener) collection -> {
+       collectionAdapter = new CollectionAdapter(collection -> {
                    NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName());
                    Navigation.findNavController(requireView()).navigate(action);
                });
@@ -204,6 +207,24 @@ public class ProfileFragment extends Fragment{
             Navigation.findNavController(requireView()).navigate(action);
         });
     }
+    private void initFollowersSection() {
+        View.OnClickListener followClickListener = v -> {
+            NavDirections action = null;
+            if(v.getId() == fragmentProfileBinding.textviewFollowerCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowerLabel.getId() ){
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWER);
+            } else if(v.getId() == fragmentProfileBinding.textviewFollowingCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowingLabel.getId()) {
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWING);
+            }
+            if(action != null){
+                Navigation.findNavController(requireView()).navigate(action);
+            }
+        };
+        fragmentProfileBinding.textviewFollowerCounter.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowerLabel.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowingCounter.setOnClickListener(followClickListener);
+        fragmentProfileBinding.textviewFollowingLabel.setOnClickListener(followClickListener);
+    }
+
 
     public void updateUI() {
         int avatarId;

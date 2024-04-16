@@ -1,5 +1,9 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
+
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,20 +13,32 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.Navigation;
+import androidx.lifecycle.Observer;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.unimib.readify.R;
+import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.databinding.FragmentSettingsBinding;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
@@ -38,6 +54,8 @@ public class SettingsFragment extends Fragment {
     private Observer<String> usernameErrorObserver;
     private Observer<String> emailErrorObserver;
     private String newPassword;
+    private int imageResourceId;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,8 +121,24 @@ public class SettingsFragment extends Fragment {
         };
 
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
-
         loadMenu();
+        fragmentSettingsBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(requireView()).navigate(R.id.action_settingsFragment_to_profileImageSelectorFragment);
+            }
+        });
+
+        updateUIObserver();
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("imageResourceId")) {
+            imageResourceId = args.getInt("imageResourceId");
+            updateUI(imageResourceId);
+        } else {
+            imageResourceId = R.drawable.ic_baseline_profile_24;
+            fragmentSettingsBinding.profileImageSelect.setImageResource(imageResourceId);
+        }
+
 
         fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
             newPassword = null;
@@ -166,7 +200,7 @@ public class SettingsFragment extends Fragment {
                     return false;
                 }
                 else if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("/")
-                            || fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("@")) {
+                        || fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().contains("@")) {
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.error_username_illegal_symbols);
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                     return false;
@@ -231,7 +265,7 @@ public class SettingsFragment extends Fragment {
                 fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
                 return false;
             } else if(!fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
-                        && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
+                    && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
                 if(fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().length() < 6) {
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setText(R.string.error_password_length);
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
@@ -279,5 +313,29 @@ public class SettingsFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack();
             }
         });
+    }
+
+    public void updateUI(int imageResourceId){
+        Glide.with(requireActivity().getApplication())
+                .load(imageResourceId)
+                .dontAnimate()
+                .into(fragmentSettingsBinding.profileImageSelect);
+    }
+
+    public void updateUIObserver(){
+        int avatarId;
+        if(user != null){
+            try {
+                avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+            } catch (Exception e) {
+                avatarId = R.drawable.ic_baseline_profile_24;
+            }
+            Glide.with(requireActivity().getApplication())
+                    .load(avatarId)
+                    .dontAnimate()
+                    .into(fragmentSettingsBinding.profileImageSelect);
+        } else {
+            Log.d("USER NULL", "USER NULL");
+        }
     }
 }

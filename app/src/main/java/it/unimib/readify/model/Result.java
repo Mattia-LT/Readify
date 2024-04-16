@@ -5,11 +5,11 @@ public abstract class Result {
     private Result() {}
 
     public boolean isSuccess(){
-        if (this instanceof WorkSuccess || this instanceof UserSuccess || this instanceof CommentSuccess || this instanceof CollectionSuccess) {
-            return true;
-        } else {
-            return false;
-        }
+        return this instanceof WorkSuccess ||
+                this instanceof UserSuccess ||
+                this instanceof CommentSuccess ||
+                this instanceof CollectionSuccess ||
+                this instanceof ExternalUserSuccess;
     }
 
     /**
@@ -54,6 +54,16 @@ public abstract class Result {
         }
         public Collection getData() {
             return collection;
+        }
+    }
+
+    public static final class ExternalUserSuccess extends Result{
+        private final ExternalUser externalUser;
+        public ExternalUserSuccess(ExternalUser externalUser) {
+            this.externalUser = externalUser;
+        }
+        public ExternalUser getData() {
+            return externalUser;
         }
     }
 

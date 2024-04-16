@@ -6,6 +6,9 @@ import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOK
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_BOOKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWERS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWING_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERS_LIST_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
@@ -33,6 +36,7 @@ import java.util.Set;
 import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -237,7 +241,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                     Comment comment = commentSnapshot.getValue(Comment.class);
                     if (comment != null) {
                         Log.d("DataSource", "retrieve user information");
-                        fetchUserFromComment(comment, new UserFetchCallback(){
+                        fetchUserFromComment(comment, new UserFetchFromCommentCallback(){
                             @Override
                             public void onUserFetched(Comment comment) {
                                 Log.d("DataSource", "user information retrieved " + comment.getUser().toString());
@@ -456,6 +460,101 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    public void fetchFollowers(String idToken) {
+        DatabaseReference followersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idToken)
+                .child(FIREBASE_USERS_FOLLOWERS_FIELD)
+                .child(FIREBASE_USERS_USERS_LIST_FIELD);
+        followersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ExternalUser> followers = new ArrayList<>();
+                int totalFollowers = (int) snapshot.getChildrenCount();
+                final int[] followersLoaded = {0};
+                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
+                    ExternalUser follower = commentSnapshot.getValue(ExternalUser.class);
+                    if (follower != null) {
+                        fetchUserFromExternalUser(follower, new UserFetchFromExternalUserCallback(){
+                            @Override
+                            public void onUserFetched(ExternalUser externalUser) {
+                                followers.add(externalUser);
+                                followersLoaded[0]++;
+                                if(followersLoaded[0] == totalFollowers){
+                                    userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
+                                }
+                            }
+
+                            @Override
+                            public void onUserFetchFailed(ExternalUser externalUser) {
+                                followersLoaded[0]++;
+                                if (followersLoaded[0] == totalFollowers) {
+                                    // All user information retrieved (even if some failed), trigger callback
+                                    userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
+                                }
+                            }
+                        });
+                    } else {
+                        followersLoaded[0]++;
+                    }
+                }
+                userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFetchFollowersFromRemoteDatabase(error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void fetchFollowings(String idToken) {
+        DatabaseReference followingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idToken)
+                .child(FIREBASE_USERS_FOLLOWING_FIELD)
+                .child(FIREBASE_USERS_USERS_LIST_FIELD);
+        followingReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ExternalUser> followings = new ArrayList<>();
+                int totalFollowings = (int) snapshot.getChildrenCount();
+                final int[] followingsLoaded = {0};
+                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
+                    ExternalUser following = commentSnapshot.getValue(ExternalUser.class);
+                    if (following != null) {
+                        fetchUserFromExternalUser(following, new UserFetchFromExternalUserCallback(){
+                            @Override
+                            public void onUserFetched(ExternalUser externalUser) {
+                                followings.add(externalUser);
+                                followingsLoaded[0]++;
+                                if(followingsLoaded[0] == totalFollowings){
+                                    userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
+                                }
+                            }
+
+                            @Override
+                            public void onUserFetchFailed(ExternalUser externalUser) {
+                                followingsLoaded[0]++;
+                                if (followingsLoaded[0] == totalFollowings) {
+                                    userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
+                                }
+                            }
+                        });
+                    } else {
+                        followingsLoaded[0]++;
+                    }
+                }
+                userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFetchFollowingFromRemoteDatabase(error.getMessage());
+            }
+        });
+    }
+
+    @Override
     public void getUserPreferences(String idToken) {
         //todo da implementare
     }
@@ -515,10 +614,12 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
     */
 
-    private void fetchUserFromComment(Comment comment, UserFetchCallback callback){
+    private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){
         Log.d("DataSource", "start user retrieve");
 
-        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION).child(comment.getIdToken());
+        DatabaseReference customReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(comment.getIdToken());
         customReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -537,9 +638,36 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    public interface UserFetchCallback {
-        void onUserFetched(Comment comment);
+    private void fetchUserFromExternalUser(ExternalUser externalUser, UserFetchFromExternalUserCallback callback){
+        //todo manage errors
 
+        DatabaseReference userReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(externalUser.getIdToken());
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                externalUser.setUser(user);
+                callback.onUserFetched(externalUser);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                externalUser.setUser(null);
+                callback.onUserFetched(externalUser);
+            }
+        });
+    }
+
+
+    private interface UserFetchFromCommentCallback {
+        void onUserFetched(Comment comment);
         void onUserFetchFailed(Comment comment);
+    }
+
+    private interface UserFetchFromExternalUserCallback {
+        void onUserFetched(ExternalUser externalUser);
+        void onUserFetchFailed(ExternalUser externalUser);
     }
 }

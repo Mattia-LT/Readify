@@ -1,5 +1,8 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
+import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
+
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -153,5 +156,21 @@ public class UserDetailsFragment extends Fragment {
                 .load(avatarId)
                 .dontAnimate()
                 .into(binding.avatarImageView);
+
+        View.OnClickListener followClickListener = v -> {
+            NavDirections action = null;
+            if(v.getId() == binding.textviewFollowerCounter.getId() || v.getId() == binding.textviewFollowerLabel.getId() ){
+                action = UserDetailsFragmentDirections.actionUserDetailsFragmentToFollowListFragment(user.getIdToken(),user.getUsername(), DESTINATION_FRAGMENT_FOLLOWER);
+            } else if(v.getId() == binding.textviewFollowingCounter.getId() || v.getId() == binding.textviewFollowingLabel.getId()) {
+                action = UserDetailsFragmentDirections.actionUserDetailsFragmentToFollowListFragment(user.getIdToken(),user.getUsername(), DESTINATION_FRAGMENT_FOLLOWING);
+            }
+            if(action != null){
+                Navigation.findNavController(requireView()).navigate(action);
+            }
+        };
+        binding.textviewFollowerCounter.setOnClickListener(followClickListener);
+        binding.textviewFollowerLabel.setOnClickListener(followClickListener);
+        binding.textviewFollowingCounter.setOnClickListener(followClickListener);
+        binding.textviewFollowingLabel.setOnClickListener(followClickListener);
     }
 }

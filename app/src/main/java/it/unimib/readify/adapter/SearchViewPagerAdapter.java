@@ -7,8 +7,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import it.unimib.readify.ui.main.TabSearchBooksFragment;
 import it.unimib.readify.ui.main.TabSearchUsersFragment;
 
-public class ViewPagerAdapter extends FragmentStateAdapter {
-    public ViewPagerAdapter(@NonNull Fragment fragment) {
+public class SearchViewPagerAdapter extends FragmentStateAdapter {
+    public SearchViewPagerAdapter(@NonNull Fragment fragment) {
         super(fragment);
     }
 

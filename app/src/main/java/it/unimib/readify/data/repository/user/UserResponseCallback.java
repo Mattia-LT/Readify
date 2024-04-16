@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 
@@ -17,6 +18,10 @@ public interface UserResponseCallback {
     void onFailureFromRemoteDatabaseWork(String message);
     void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments);
     void onFailureFetchCommentsFromRemoteDatabase(String message);
+    void onSuccessFetchFollowersFromRemoteDatabase(List<ExternalUser> followerList);
+    void onFailureFetchFollowersFromRemoteDatabase(String message);
+    void onSuccessFetchFollowingFromRemoteDatabase(List<ExternalUser> followingList);
+    void onFailureFetchFollowingFromRemoteDatabase(String message);
     void onAddCommentResult(Comment comment);
     void onCreateCollectionResult(Collection collection);
     void onDeleteCollectionResult();

@@ -14,6 +14,7 @@ import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
@@ -28,6 +29,8 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<List<Result>> userSearchResultsLiveData;
     private final MutableLiveData<List<Result>> commentListLiveData;
     private final MutableLiveData<List<Result>> collectionListLiveData;
+    private final MutableLiveData<List<Result>> followerListLiveData;
+    private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
 
@@ -44,6 +47,8 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userSearchResultsLiveData = new MutableLiveData<>();
         this.commentListLiveData = new MutableLiveData<>();
         this.collectionListLiveData = new MutableLiveData<>();
+        this.followerListLiveData = new MutableLiveData<>();
+        this.followingListLiveData = new MutableLiveData<>();
         this.sourceUsernameError = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
@@ -105,6 +110,16 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public MutableLiveData<List<Result>> getCollectionListLiveData() {
         return collectionListLiveData;
+    }
+
+    @Override
+    public MutableLiveData<List<Result>> getFollowersListLiveData() {
+        return followerListLiveData;
+    }
+
+    @Override
+    public MutableLiveData<List<Result>> getFollowingListLiveData() {
+        return followingListLiveData;
     }
 
     @Override
@@ -197,6 +212,34 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void onSuccessFetchFollowersFromRemoteDatabase(List<ExternalUser> followerList) {
+        List<Result> followersResultList = new ArrayList<>();
+        for(ExternalUser follower : followerList){
+            followersResultList.add(new Result.ExternalUserSuccess(follower));
+        }
+        followerListLiveData.postValue(followersResultList);
+    }
+
+    @Override
+    public void onFailureFetchFollowersFromRemoteDatabase(String message) {
+        //TODO
+    }
+
+    @Override
+    public void onSuccessFetchFollowingFromRemoteDatabase(List<ExternalUser> followingList) {
+        List<Result> followingResultList = new ArrayList<>();
+        for(ExternalUser following : followingList){
+            followingResultList.add(new Result.ExternalUserSuccess(following));
+        }
+        followingListLiveData.postValue(followingResultList);
+    }
+
+    @Override
+    public void onFailureFetchFollowingFromRemoteDatabase(String message) {
+        //TODO
+    }
+
+    @Override
     public void addComment(String content, String bookId, String idToken){
         userDataRemoteDataSource.addComment(content,bookId,idToken);
     }
@@ -224,6 +267,16 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
         userDataRemoteDataSource.removeBookFromCollection(idToken, bookId, collectionId);
+    }
+
+    @Override
+    public void fetchFollowers(String idToken) {
+        userDataRemoteDataSource.fetchFollowers(idToken);
+    }
+
+    @Override
+    public void fetchFollowing(String idToken) {
+        userDataRemoteDataSource.fetchFollowings(idToken);
     }
 
     @Override

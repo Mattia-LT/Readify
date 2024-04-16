@@ -49,20 +49,6 @@ public class ExternalUser implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ExternalUser user1 = (ExternalUser) o;
-        return read == user1.read && Objects.equals(timestamp, user1.timestamp) && Objects.equals(idToken, user1.idToken) && Objects.equals(user, user1.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(read, timestamp, idToken, user);
-    }
-
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -100,6 +86,19 @@ public class ExternalUser implements Parcelable {
             return new ExternalUser[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExternalUser that = (ExternalUser) o;
+        return read == that.read && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(user, that.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(read, timestamp, idToken, user);
+    }
 
     @NonNull
     @Override

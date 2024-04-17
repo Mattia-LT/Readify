@@ -33,6 +33,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
+    private final MutableLiveData<Boolean> sourcePasswordError;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -51,12 +52,9 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.followingListLiveData = new MutableLiveData<>();
         this.sourceUsernameError = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
+        this.sourcePasswordError = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
-    }
-
-    public interface UpdateUserDataCallback {
-        void onPasswordChanged(Boolean result);
     }
 
     @Override
@@ -88,10 +86,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void updateUserData(User user, String newPassword) {
         userDataRemoteDataSource.updateUserData(user);
         if(newPassword != null) {
-            userAuthRemoteDataSource.changePassword(newPassword, callback);
+            userAuthRemoteDataSource.changePassword(newPassword);
         }
     }
 
@@ -138,6 +136,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         userDataRemoteDataSource.fetchCollections(idToken);
     }
 
+    @Override
     public MutableLiveData<String> getSourceUsernameError() {
         return sourceUsernameError;
     }
@@ -145,6 +144,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public MutableLiveData<String> getSourceEmailError() {
         return sourceEmailError;
+    }
+
+    @Override
+    public MutableLiveData<Boolean> getSourcePasswordError() {
+        return sourcePasswordError;
     }
 
     @Override
@@ -333,5 +337,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void onEmailAvailable(String result) {
         sourceEmailError.postValue(result);
+    }
+
+    @Override
+    public void onPasswordChanged(Boolean result) {
+        sourcePasswordError.postValue(result);
     }
 }

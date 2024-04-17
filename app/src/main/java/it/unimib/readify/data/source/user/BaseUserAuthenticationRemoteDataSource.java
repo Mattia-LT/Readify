@@ -13,7 +13,7 @@ public abstract class BaseUserAuthenticationRemoteDataSource {
 
     public abstract void signUp(String email, String password);
     public abstract void signIn(String email, String password);
-    public abstract void changePassword(String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback);
+    public abstract void changePassword(String newPassword);
     public abstract void signInWithGoogle(String idToken);
     public abstract User getLoggedUser();
     public abstract void logout();

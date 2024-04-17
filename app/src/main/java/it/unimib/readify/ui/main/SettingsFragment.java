@@ -1,9 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
-import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
-import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
-
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,7 +10,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
-import androidx.lifecycle.Observer;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,22 +18,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import it.unimib.readify.R;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.databinding.FragmentSettingsBinding;
-import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
-import it.unimib.readify.util.TestServiceLocator;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
@@ -53,6 +39,7 @@ public class SettingsFragment extends Fragment {
     private Observer<Result> userObserver;
     private Observer<String> usernameErrorObserver;
     private Observer<String> emailErrorObserver;
+    private Observer<Boolean> passwordErrorObserver;
     private String newPassword;
     private int imageResourceId;
 
@@ -83,6 +70,7 @@ public class SettingsFragment extends Fragment {
             }
         };
 
+        //todo sometimes observer triggers when input is empty (?)
         usernameErrorObserver = result -> {
             switch (result) {
                 case "available":
@@ -110,9 +98,6 @@ public class SettingsFragment extends Fragment {
                     fragmentSettingsBinding.settingsEmailErrorMessage.setText(R.string.email_already_taken);
                     fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
                     break;
-                case "identical":
-                    Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
-                    break;
                 case "error":
                     //todo use snack bar instead (to implement an action)?
                     Toast.makeText(requireContext(), "System: email error", Toast.LENGTH_SHORT).show();
@@ -120,7 +105,22 @@ public class SettingsFragment extends Fragment {
             }
         };
 
+        passwordErrorObserver = result -> {
+            Log.d("email changed", result.toString());
+            if(result) {
+                Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
+                fragmentSettingsBinding.textInputEditTextPassword.setText("");
+                fragmentSettingsBinding.textInputEditTextPasswordConfirm.setText("");
+            } else {
+                //todo use snack bar instead (to implement an action)?
+                Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
+            }
+        };
+
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+        testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
+        testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
+        testDatabaseViewModel.getSourcePasswordlError().observe(getViewLifecycleOwner(), passwordErrorObserver);
         loadMenu();
         fragmentSettingsBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,9 +139,17 @@ public class SettingsFragment extends Fragment {
             fragmentSettingsBinding.profileImageSelect.setImageResource(imageResourceId);
         }
 
-
         fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
             newPassword = null;
+            fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
+            fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
+            fragmentSettingsBinding.settingsEmailErrorMessage.setText("");
+            fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
+            fragmentSettingsBinding.settingsPasswordErrorMessage.setText("");
+            fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
+            fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText("");
+            fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
+
             if(fragmentSettingsBinding.textInputEditTextUsername.getText() != null
                     && fragmentSettingsBinding.textInputEditTextEmail.getText() != null
                     && fragmentSettingsBinding.textInputEditTextPassword.getText() != null
@@ -153,23 +161,10 @@ public class SettingsFragment extends Fragment {
                     if (isUsernameOk() & isEmailOk() & isPasswordOk()) {
                         //todo add loading screen
                         //todo deselect accepted field
+                        //todo setText("") when accepted or same value
                         //todo field value as placeholder?
                         //todo put result icon?
-                        testDatabaseViewModel.updateUserData(onSaveUser, newPassword, new TestDatabaseRepository.UpdateUserDataCallback() {
-                            @Override
-                            public void onPasswordChanged(Boolean result) {
-                                if(result) {
-                                    Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
-                                    fragmentSettingsBinding.textInputEditTextPassword.setText("");
-                                    fragmentSettingsBinding.textInputEditTextPasswordConfirm.setText("");
-                                } else {
-                                    //todo use snack bar instead (to implement an action)?
-                                    Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                        testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
-                        testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
+                        testDatabaseViewModel.updateUserData(onSaveUser, newPassword);
                     }
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
@@ -193,7 +188,7 @@ public class SettingsFragment extends Fragment {
 
     private boolean isUsernameOk() {
         if(fragmentSettingsBinding.textInputEditTextUsername.getText() != null) {
-            if (!fragmentSettingsBinding.textInputEditTextUsername.getText().toString().isEmpty()) {
+            if (!fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().isEmpty()) {
                 if (fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().length() > 20) {
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setText(R.string.error_username_length);
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
@@ -205,18 +200,13 @@ public class SettingsFragment extends Fragment {
                     fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                     return false;
                 } else if(fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim().equals(user.getUsername())) {
+                    onSaveUser.setUsername(fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim());
                     Toast.makeText(requireContext(), "This is already your username", Toast.LENGTH_SHORT).show();
-                    fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
-                    fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
                     return true;
                 }
                 onSaveUser.setUsername(fragmentSettingsBinding.textInputEditTextUsername.getText().toString().trim());
-                fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
-                fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
                 return true;
             }
-            fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
-            fragmentSettingsBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
             return true;
         }
         return false;
@@ -230,18 +220,13 @@ public class SettingsFragment extends Fragment {
                     fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
                     return false;
                 } else if(fragmentSettingsBinding.textInputEditTextEmail.getText().toString().trim().equals(user.getEmail())) {
+                    onSaveUser.setEmail(fragmentSettingsBinding.textInputEditTextEmail.getText().toString().trim());
                     Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
-                    fragmentSettingsBinding.settingsEmailErrorMessage.setText("");
-                    fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
                     return true;
                 }
                 onSaveUser.setEmail(fragmentSettingsBinding.textInputEditTextEmail.getText().toString().trim());
-                fragmentSettingsBinding.settingsEmailErrorMessage.setText("");
-                fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
                 return true;
             }
-            fragmentSettingsBinding.settingsEmailErrorMessage.setText("");
-            fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
             return true;
         }
         return false;
@@ -254,43 +239,27 @@ public class SettingsFragment extends Fragment {
                     && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
                 fragmentSettingsBinding.settingsPasswordErrorMessage.setText(R.string.field_not_filled_in);
                 fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
-                fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText("");
-                fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
                 return false;
             } else if(!fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
                     && fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
                 fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText(R.string.field_not_filled_in);
                 fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.VISIBLE);
-                fragmentSettingsBinding.settingsPasswordErrorMessage.setText("");
-                fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
                 return false;
             } else if(!fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
                     && !fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
                 if(fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim().length() < 6) {
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setText(R.string.error_password_length);
                     fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
-                    fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText("");
-                    fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
                     return false;
                 } else if(!fragmentSettingsBinding.textInputEditTextPasswordConfirm.getText().toString().trim()
                         .equals(fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim())) {
                     fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText(R.string.error_confirm_password_equal);
                     fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.VISIBLE);
-                    fragmentSettingsBinding.settingsPasswordErrorMessage.setText("");
-                    fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
                     return false;
                 }
                 newPassword = fragmentSettingsBinding.textInputEditTextPassword.getText().toString().trim();
-                fragmentSettingsBinding.settingsPasswordErrorMessage.setText("");
-                fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
-                fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText("");
-                fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
                 return true;
             }
-            fragmentSettingsBinding.settingsPasswordErrorMessage.setText("");
-            fragmentSettingsBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
-            fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setText("");
-            fragmentSettingsBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
             return true;
         }
         return false;

@@ -55,6 +55,7 @@ public class TestDatabaseViewModel extends ViewModel {
 
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
+    private final MutableLiveData<Boolean> sourcePasswordError;
     private boolean isUIRunning;
     private boolean isCollectionsChanged;
 
@@ -112,6 +113,7 @@ public class TestDatabaseViewModel extends ViewModel {
         });
         sourceUsernameError = testDatabaseRepository.getSourceUsernameError();
         sourceEmailError = testDatabaseRepository.getSourceEmailError();
+        sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
         isCollectionsChanged = true;
     }
 
@@ -241,8 +243,8 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.removeBookFromCollection(idToken, bookId, collectionId);
     }
 
-    public void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
-        testDatabaseRepository.updateUserData(user, newPassword, callback);
+    public void updateUserData(User user, String newPassword) {
+        testDatabaseRepository.updateUserData(user, newPassword);
     }
 
     public void fetchFollowers(String idToken){
@@ -273,5 +275,9 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public MutableLiveData<String> getSourceEmailError() {
         return sourceEmailError;
+    }
+
+    public MutableLiveData<Boolean> getSourcePasswordlError() {
+        return sourcePasswordError;
     }
 }

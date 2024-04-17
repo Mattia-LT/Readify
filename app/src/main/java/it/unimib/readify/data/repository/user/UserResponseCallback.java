@@ -32,4 +32,5 @@ public interface UserResponseCallback {
     void onSuccessLogout();
     void onUsernameAvailable(String result);
     void onEmailAvailable(String result);
+    void onPasswordChanged(Boolean result);
 }

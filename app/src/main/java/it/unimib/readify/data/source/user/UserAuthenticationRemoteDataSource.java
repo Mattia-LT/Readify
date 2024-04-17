@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.model.User;
 
 public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRemoteDataSource{
@@ -69,7 +68,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     }
 
     @Override
-    public void changePassword(String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback) {
+    public void changePassword(String newPassword) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         //todo substitute with if(?)
@@ -78,7 +77,7 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        callback.onPasswordChanged(task.isSuccessful());
+                        userResponseCallback.onPasswordChanged(task.isSuccessful());
                     }
                 });
     }

@@ -26,14 +26,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalUser;

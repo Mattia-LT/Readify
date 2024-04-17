@@ -13,7 +13,7 @@ public interface TestIDatabaseRepository {
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
-    void updateUserData(User user, String newPassword, TestDatabaseRepository.UpdateUserDataCallback callback);
+    void updateUserData(User user, String newPassword);
 
     void fetchComments(String bookId);
     void fetchCollections(String idToken);
@@ -34,4 +34,5 @@ public interface TestIDatabaseRepository {
     MutableLiveData<List<Result>> getFollowingListLiveData();
     MutableLiveData<String> getSourceUsernameError();
     MutableLiveData<String> getSourceEmailError();
+    MutableLiveData<Boolean> getSourcePasswordError();
 }

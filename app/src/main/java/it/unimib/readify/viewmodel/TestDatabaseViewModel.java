@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Result;

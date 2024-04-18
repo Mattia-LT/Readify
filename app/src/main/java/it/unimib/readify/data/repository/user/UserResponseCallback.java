@@ -27,6 +27,8 @@ public interface UserResponseCallback {
     void onDeleteCollectionResult();
     void onAddBookToCollectionResult(List<String> books);
     void onDeleteCommentResult();
+    void onUserFollowResult();
+    void onUserUnfollowResult();
     void onSuccessFetchCollectionsFromRemoteDatabase(List <Collection> collections);
     void onFailureFetchCollectionsFromRemoteDatabase(String message);
     void onSuccessLogout();

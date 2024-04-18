@@ -284,6 +284,18 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void followUser(String idTokenLoggedUser, String idTokenFollowedUser) {
+        userDataRemoteDataSource.followUser(idTokenLoggedUser, idTokenFollowedUser);
+        Log.d("REPO", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
+    }
+
+    @Override
+    public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser) {
+        userDataRemoteDataSource.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
+        Log.d("REPO", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
@@ -307,6 +319,16 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onDeleteCommentResult() {
+
+    }
+
+    @Override
+    public void onUserFollowResult() {
+
+    }
+
+    @Override
+    public void onUserUnfollowResult() {
 
     }
 

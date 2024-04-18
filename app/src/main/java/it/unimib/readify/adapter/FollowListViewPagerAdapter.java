@@ -1,5 +1,9 @@
 package it.unimib.readify.adapter;
 
+import static it.unimib.readify.util.Constants.BUNDLE_ID_TOKEN;
+
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -19,22 +23,23 @@ public class FollowListViewPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         Fragment fragment;
+        Bundle bundleArgs = new Bundle();
+        bundleArgs.putString(BUNDLE_ID_TOKEN, idToken);
         switch(position){
             case 0:
             default:
-                fragment = new TabFollowerListFragment(idToken);
+                fragment = new TabFollowerListFragment();
+                fragment.setArguments(bundleArgs);
                 return fragment;
             case 1:
-                fragment = new TabFollowingListFragment(idToken);
+                fragment = new TabFollowingListFragment();
+                fragment.setArguments(bundleArgs);
                 return fragment;
         }
     }
 
     @Override
     public int getItemCount() {
-        return 100;
+        return 2;
     }
 }
-
-// Instances of this class are fragments representing a single
-// object in the collection.

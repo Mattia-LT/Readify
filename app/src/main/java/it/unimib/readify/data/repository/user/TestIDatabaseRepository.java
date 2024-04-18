@@ -26,6 +26,8 @@ public interface TestIDatabaseRepository {
     void removeBookFromCollection(String idToken, String bookId, String collectionId);
     void fetchFollowers(String idToken);
     void fetchFollowing(String idToken);
+    void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
+    void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

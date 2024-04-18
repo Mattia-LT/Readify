@@ -34,6 +34,7 @@ import java.util.Set;
 
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.ExternalGroup;
 import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
@@ -548,6 +549,205 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 userResponseCallback.onFailureFetchFollowingFromRemoteDatabase(error.getMessage());
+            }
+        });
+    }
+
+
+    @Override
+    public void followUser(String idTokenLoggedUser, String idTokenFollowedUser) {
+        Log.d("datasource", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
+        //loggedUser references
+        DatabaseReference loggedUserFollowingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idTokenLoggedUser)
+                .child(FIREBASE_USERS_FOLLOWING_FIELD);
+
+        //followedUser references
+        DatabaseReference followedUserFollowersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idTokenFollowedUser)
+                .child(FIREBASE_USERS_FOLLOWERS_FIELD);
+
+        final int[] insertionsToDo = {2};
+        followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ExternalGroup newExternalGroup = new ExternalGroup();
+                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
+                if(externalGroup != null){
+                    int counter = externalGroup.getCounter();
+                    counter = counter + 1;
+
+                    ExternalUser newFollower = new ExternalUser();
+                    newFollower.setTimestamp(new Date().getTime());
+                    newFollower.setRead(false);
+                    newFollower.setIdToken(idTokenLoggedUser);
+
+                    List<ExternalUser> followersList = externalGroup.getUsers();
+                    if(followersList == null){
+                        followersList = new ArrayList<>();
+                    }
+                    followersList.add(newFollower);
+
+                    newExternalGroup.setUsers(followersList);
+                    newExternalGroup.setCounter(counter);
+                    followedUserFollowersReference.setValue(newExternalGroup);
+
+                    insertionsToDo[0] -= 1;
+                    if(insertionsToDo[0] == 0){
+                        //TODO passargli qualcosa
+                        userResponseCallback.onUserFollowResult();
+                        refreshLoggedUserData(idTokenLoggedUser);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
+
+
+        loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ExternalGroup newExternalGroup = new ExternalGroup();
+                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
+                if(externalGroup != null){
+                    int counter = externalGroup.getCounter();
+                    counter = counter + 1;
+
+                    ExternalUser newFollowing = new ExternalUser();
+                    newFollowing.setTimestamp(new Date().getTime());
+                    newFollowing.setIdToken(idTokenFollowedUser);
+
+                    List<ExternalUser> followingList = externalGroup.getUsers();
+                    if(followingList == null){
+                        followingList = new ArrayList<>();
+                    }
+                    followingList.add(newFollowing);
+
+                    newExternalGroup.setUsers(followingList);
+                    newExternalGroup.setCounter(counter);
+                    loggedUserFollowingReference.setValue(newExternalGroup);
+
+                    insertionsToDo[0] -= 1;
+                    if(insertionsToDo[0] == 0){
+                        //TODO passargli qualcosa
+                        userResponseCallback.onUserFollowResult();
+                        refreshLoggedUserData(idTokenLoggedUser);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
+
+    }
+
+    @Override
+    public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser) {
+        Log.d("datasource", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
+        //loggedUser references
+        DatabaseReference loggedUserFollowingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idTokenLoggedUser)
+                .child(FIREBASE_USERS_FOLLOWING_FIELD);
+
+        //followedUser references
+        DatabaseReference followedUserFollowersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .child(idTokenFollowedUser)
+                .child(FIREBASE_USERS_FOLLOWERS_FIELD);
+
+        final int[] deletionsToDo = {2};
+        Log.d("unfollow","done");
+        followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ExternalGroup newExternalGroup = new ExternalGroup();
+                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
+                if(externalGroup != null){
+                    int counter = externalGroup.getCounter();
+                    counter = counter - 1;
+
+                    List<ExternalUser> followersList = externalGroup.getUsers();
+                    if(followersList == null){
+                        followersList = new ArrayList<>();
+                    }
+                    followersList.removeIf(follower -> follower.getIdToken().equals(idTokenLoggedUser));
+                    newExternalGroup.setUsers(followersList);
+                    newExternalGroup.setCounter(counter);
+                    followedUserFollowersReference.setValue(newExternalGroup);
+
+                    deletionsToDo[0] -= 1;
+                    if(deletionsToDo[0] == 0){
+                        //TODO passargli qualcosa
+                        userResponseCallback.onUserUnfollowResult();
+                        refreshLoggedUserData(idTokenLoggedUser);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
+
+
+        loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ExternalGroup newExternalGroup = new ExternalGroup();
+                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
+                if(externalGroup != null){
+                    int counter = externalGroup.getCounter();
+                    counter = counter - 1;
+
+                    List<ExternalUser> followingList = externalGroup.getUsers();
+                    if(followingList == null){
+                        followingList = new ArrayList<>();
+                    }
+
+                    followingList.removeIf(following -> following.getIdToken().equals(idTokenFollowedUser));
+
+                    newExternalGroup.setUsers(followingList);
+                    newExternalGroup.setCounter(counter);
+                    loggedUserFollowingReference.setValue(newExternalGroup);
+
+                    deletionsToDo[0] -= 1;
+                    if(deletionsToDo[0] == 0){
+                        //TODO passargli qualcosa
+                        userResponseCallback.onUserUnfollowResult();
+                        refreshLoggedUserData(idTokenLoggedUser);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // TODO Handle errors
+            }
+        });
+    }
+
+
+
+    private void refreshLoggedUserData(String idToken){
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User existingUser = snapshot.getValue(User.class);
+                    if(existingUser != null){
+                        userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
+                    }
+                } else {
+                    //Todo manage error
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                //Todo manage error
             }
         });
     }

@@ -1,12 +1,15 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.BUNDLE_ID_TOKEN;
+
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +20,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,13 +35,11 @@ import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 public class TabFollowingListFragment extends Fragment {
 
     private FragmentTabFollowingListBinding fragmentTabFollowingListBinding;
-    private List<ExternalUser> searchResultsList;
     private TestDatabaseViewModel testDatabaseViewModel;
     private FollowListAdapter followListAdapter;
-    private final String idToken;
-    public TabFollowingListFragment(String idToken){
-        this.idToken = idToken;
-    }
+    private List<ExternalUser> followingList;
+    private String idToken;
+    public TabFollowingListFragment(){}
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -49,6 +51,9 @@ public class TabFollowingListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initViewModels();
+        if(getArguments() != null){
+            this.idToken = getArguments().getString(BUNDLE_ID_TOKEN);
+        }
         initObserver();
 
         RecyclerView recyclerView = fragmentTabFollowingListBinding.recyclerviewFollowingUsers;
@@ -63,30 +68,40 @@ public class TabFollowingListFragment extends Fragment {
 
             @Override
             public void onFollowButtonClick(ExternalUser user) {
-                //todo
+                //TODO testare bene per trovare eventuali errori
+                testDatabaseViewModel.followUser(idToken, user.getIdToken());
+                //testDatabaseViewModel.fetchFollowing(idToken);
+                Log.d("TabFollowerListFragment", "followButtonClick premuto con idtoken: " + idToken);
             }
 
             @Override
             public void onUnfollowButtonClick(ExternalUser user) {
-                //todo
+                //TODO testare bene per trovare eventuali errori
+                testDatabaseViewModel.unfollowUser(idToken, user.getIdToken());
+                //testDatabaseViewModel.fetchFollowing(idToken);
+                Log.d("TabFollowerListFragment", "UnfollowButtonClick premuto con idtoken: " + idToken);
             }
         });
         recyclerView.setAdapter(followListAdapter);
         recyclerView.setLayoutManager(layoutManager);
 
-        fragmentTabFollowingListBinding.edittextFollowingUsers.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (keyEvent != null && (actionId == KeyEvent.ACTION_DOWN || actionId == KeyEvent.KEYCODE_ENTER ||  actionId == EditorInfo.IME_ACTION_SEARCH || keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                fragmentTabFollowingListBinding.progressindicatorFollowingUsers.setVisibility(View.VISIBLE);
-                startSearch();
-                return true;
+        fragmentTabFollowingListBinding.edittextFollowingUsers.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //not needed
             }
-            return false;
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString();
+                search(text);
+            }
         });
-    }
-
-
-    private void startSearch(){
-        //todo
     }
 
 
@@ -96,12 +111,14 @@ public class TabFollowingListFragment extends Fragment {
     }
 
     private void initObserver(){
+        this.followingList = new ArrayList<>();
         final Observer<List<Result>> followingObserver = results -> {
             List<ExternalUser> followingList = results.stream()
                     .filter(result -> result instanceof Result.ExternalUserSuccess)
                     .map(result -> ((Result.ExternalUserSuccess) result).getData())
                     .collect(Collectors.toList());
             followListAdapter.submitList(followingList);
+            this.followingList = followingList;
         };
 
         final Observer<Result> loggedUserObserver = result -> {
@@ -117,5 +134,20 @@ public class TabFollowingListFragment extends Fragment {
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
-
+    private void search(String text) {
+        ArrayList<ExternalUser> filteredList = new ArrayList<>();
+        text = text.trim();
+        for (ExternalUser user : followingList) {
+            if (user.getUser().getUsername().toLowerCase().contains((text.toLowerCase()))) {
+                filteredList.add(user);
+            }
+        }
+        if (filteredList.isEmpty()) {
+            followListAdapter.submitList(filteredList);
+            //Todo cambiare con una texview dietro alla recycler view
+            Toast.makeText(requireActivity(), "No Data Found..", Toast.LENGTH_SHORT).show();
+        } else {
+            followListAdapter.submitList(filteredList);
+        }
+    }
 }

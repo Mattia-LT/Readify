@@ -83,6 +83,7 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
             binding.followImage.setOnClickListener(this);
             binding.followUsername.setOnClickListener(this);
             binding.followButton.setOnClickListener(this);
+            binding.unfollowButton.setOnClickListener(this);
         }
 
         public void bind(ExternalUser externalUser) {
@@ -121,18 +122,21 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
                 if(v.getId() == binding.followUsername.getId() || v.getId() == binding.followImage.getId()){
                     onItemClickListener.onProfileClick(user);
                 } else if(v.getId() == binding.followButton.getId()){
-                    //todo implement follow logic
+                    onItemClickListener.onFollowButtonClick(user);
                 } else if(v.getId() == binding.unfollowButton.getId()){
-                    //todo implement unfollow logic
+                    onItemClickListener.onUnfollowButtonClick(user);
                 }
             }
         }
 
         private boolean isFollowed(ExternalUser externalUser){
-            for(ExternalUser user : currentFollowing){
-                if(user.getIdToken().equals(externalUser.getIdToken())){
-                    return true;
+            if(currentFollowing != null){
+                for(ExternalUser user : currentFollowing){
+                    if(user.getIdToken().equals(externalUser.getIdToken())){
+                        return true;
+                    }
                 }
+                return false;
             }
             return false;
         }

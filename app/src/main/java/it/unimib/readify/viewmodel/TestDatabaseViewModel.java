@@ -280,4 +280,13 @@ public class TestDatabaseViewModel extends ViewModel {
     public MutableLiveData<Boolean> getSourcePasswordlError() {
         return sourcePasswordError;
     }
+
+    public void followUser(String idTokenLoggedUser, String idTokenFollowedUser){
+        testDatabaseRepository.followUser(idTokenLoggedUser, idTokenFollowedUser);
+        Log.d("ViewModel", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
+    }
+    public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser){
+        testDatabaseRepository.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
+        Log.d("ViewModel", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
+    }
 }

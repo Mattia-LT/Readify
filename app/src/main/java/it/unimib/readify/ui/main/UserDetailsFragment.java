@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentUserDetailsBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.ExternalGroup;
+import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
@@ -43,6 +46,8 @@ public class UserDetailsFragment extends Fragment {
     private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
+    private String userIdToken;
+    private String loggedUserIdToken;
 
     public UserDetailsFragment() {}
 
@@ -119,8 +124,25 @@ public class UserDetailsFragment extends Fragment {
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
+        final Observer<Result> loggedUserObserver = result -> {
+            if(result.isSuccess()){
+                User loggedUser = ((Result.UserSuccess) result).getData();
+                this.loggedUserIdToken = loggedUser.getIdToken();
+                if(isFollowed(loggedUser)){
+                    binding.followButton.setVisibility(View.GONE);
+                    binding.unfollowButton.setVisibility(View.VISIBLE);
+                } else {
+                    binding.unfollowButton.setVisibility(View.GONE);
+                    binding.followButton.setVisibility(View.VISIBLE);
+                }
+            } else {
+                //todo show error
+            }
+        };
+
         testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
         bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
     private void initRecyclerView(){
         collectionAdapter = new CollectionAdapter(collection -> {
@@ -134,11 +156,14 @@ public class UserDetailsFragment extends Fragment {
     private void fetchUserData(){
         User receivedUser = UserDetailsFragmentArgs.fromBundle(getArguments()).getUser();
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
+        this.userIdToken = receivedUser.getIdToken();
         requireActivity().setTitle(username);
         showUserInfo(receivedUser);
     }
 
     private void showUserInfo(User user){
+        binding.followButton.setOnClickListener(v -> testDatabaseViewModel.followUser(loggedUserIdToken, userIdToken));
+        binding.unfollowButton.setOnClickListener(v -> testDatabaseViewModel.unfollowUser(loggedUserIdToken, userIdToken));
         binding.recyclerviewUserCollections.setVisibility(View.GONE);
         testDatabaseViewModel.fetchCollections(user.getIdToken());
 
@@ -172,5 +197,17 @@ public class UserDetailsFragment extends Fragment {
         binding.textviewFollowerLabel.setOnClickListener(followClickListener);
         binding.textviewFollowingCounter.setOnClickListener(followClickListener);
         binding.textviewFollowingLabel.setOnClickListener(followClickListener);
+    }
+
+    private boolean isFollowed(User loggedUser){
+        ExternalGroup followingInstance = loggedUser.getFollowing();
+        if(followingInstance != null){
+            List<ExternalUser> loggedUserFollowingList = followingInstance.getUsers();
+            if(loggedUserFollowingList == null){
+                loggedUserFollowingList = new ArrayList<>();
+            }
+            return loggedUserFollowingList.stream().anyMatch(following -> following.getIdToken().equals(userIdToken));
+        }
+        return false;
     }
 }

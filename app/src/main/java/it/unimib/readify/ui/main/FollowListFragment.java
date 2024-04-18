@@ -27,6 +27,7 @@ public class FollowListFragment extends Fragment {
     private FragmentFollowListBinding fragmentFollowListBinding;
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
+    private FollowListViewPagerAdapter followListViewPagerAdapter;
 
     public FollowListFragment(){}
     public static FollowListFragment newInstance() {
@@ -56,7 +57,7 @@ public class FollowListFragment extends Fragment {
         tabLayout = fragmentFollowListBinding.tabLayoutFollow;
         viewPager = fragmentFollowListBinding.viewpager2Follow;
 
-        FollowListViewPagerAdapter followListViewPagerAdapter = new FollowListViewPagerAdapter(this, idToken);
+        followListViewPagerAdapter = new FollowListViewPagerAdapter(this, idToken);
         viewPager.setAdapter(followListViewPagerAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

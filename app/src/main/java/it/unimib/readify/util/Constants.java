@@ -92,4 +92,6 @@ public class Constants {
     public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
     public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
 
+    public static String BUNDLE_ID_TOKEN = "idToken";
+
 }

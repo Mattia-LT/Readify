@@ -36,9 +36,9 @@
 
     <dialog
         android:id="@+id/filter_bottomsheet"
-        android:name="it.unimib.readify.ui.main.FilterBottomSheet"
+        android:name="it.unimib.readify.ui.main.SearchBooksFilterBottomSheet"
         android:label="dialog_filter_bottomsheet"
-        tools:layout="@layout/bottom_sheet_search_filter">
+        tools:layout="@layout/bottom_sheet_search_books_filter">
     </dialog>
 
 

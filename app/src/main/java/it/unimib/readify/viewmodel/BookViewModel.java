@@ -27,6 +27,9 @@ public class BookViewModel extends ViewModel {
     private final IBookRepository bookRepository;
     private final int offset;
     private final int limit;
+
+    private MutableLiveData<List<String>> subjectListLiveData;
+    private MutableLiveData<String> sortModeLiveData;
     private MutableLiveData<List<Result>> suggestedCarouselLiveData;
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
@@ -81,5 +84,27 @@ public class BookViewModel extends ViewModel {
             collectionListLiveData = bookRepository.getFetchedCollectionsLiveData();
         }
         return collectionListLiveData;
+    }
+
+    public MutableLiveData<List<String>> getSubjectListLiveData(){
+        if(subjectListLiveData == null){
+            subjectListLiveData = new MutableLiveData<>();
+        }
+        return subjectListLiveData;
+    }
+
+    public MutableLiveData<String> getSortModeLiveData(){
+        if(sortModeLiveData == null){
+            sortModeLiveData = new MutableLiveData<>();
+        }
+        return sortModeLiveData;
+    }
+
+    public void setSortMode(String sortMode){
+        sortModeLiveData.postValue(sortMode);
+    }
+
+    public void setSubjectList(List<String> subjectList){
+        subjectListLiveData.postValue(subjectList);
     }
 }

@@ -18,6 +18,8 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -50,6 +52,12 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //This operation is needed when the device is in Horizontal mode
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        if (dialog != null) {
+            dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+
         initViewModels();
         initObservers();
         this.bookId = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBookId();

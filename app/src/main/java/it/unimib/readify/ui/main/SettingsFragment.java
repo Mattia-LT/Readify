@@ -70,8 +70,8 @@ public class SettingsFragment extends Fragment {
             }
         };
 
-        //todo sometimes observer triggers when input is empty (?)
         usernameErrorObserver = result -> {
+            //todo sometimes observer triggers when input is empty (?)
             switch (result) {
                 case "available":
                     Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();

@@ -141,6 +141,9 @@ public class BookDetailsFragment extends Fragment {
             }
         }
         description = description.trim();
+        if(description.isEmpty()){
+            description = getString(R.string.description_not_available);
+        }
         fragmentBookDetailsBinding.bookDescription.setText(description);
     }
 

@@ -87,7 +87,7 @@ public class Constants {
 
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
 
-    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]" };
+    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]", "Contains:" };
 
     public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
     public static int DESTINATION_FRAGMENT_FOLLOWING = 1;

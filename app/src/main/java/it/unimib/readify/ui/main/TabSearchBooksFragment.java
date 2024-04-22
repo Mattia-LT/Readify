@@ -28,7 +28,9 @@ import it.unimib.readify.adapter.BookSearchResultAdapter;
 import it.unimib.readify.databinding.FragmentTabSearchBooksBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class TabSearchBooksFragment extends Fragment{
@@ -37,9 +39,10 @@ public class TabSearchBooksFragment extends Fragment{
 
     private BookSearchResultAdapter searchResultsAdapter;
     private BookViewModel bookViewModel;
-
+    private TestDatabaseViewModel testDatabaseViewModel;
     private String sortMode;
     private String subjects;
+    private User loggedUser;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,8 +64,9 @@ public class TabSearchBooksFragment extends Fragment{
             }
 
             @Override
-            public void onAddToCollectionButtonPressed(int position) {
-                //todo implement collections logic (also edit adapter)
+            public void onAddToCollectionButtonPressed(OLWorkApiResponse book) {
+                NavDirections action = SearchFragmentDirections.actionSearchFragmentToAddToCollectionDialog(book.getKey(), loggedUser.getIdToken());
+                Navigation.findNavController(requireView()).navigate(action);
             }
         });
 
@@ -105,6 +109,10 @@ public class TabSearchBooksFragment extends Fragment{
         bookViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(BookViewModel.class);
+
+        testDatabaseViewModel = TestDatabaseViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
     }
 
     private void initObserver(){
@@ -129,8 +137,15 @@ public class TabSearchBooksFragment extends Fragment{
 
         final Observer<String> sortModeObserver = sortMode -> this.sortMode = sortMode;
 
+        final Observer<Result> userObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()){
+                loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
+            }
+        };
+
         bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
         bookViewModel.getSortModeLiveData().observe(getViewLifecycleOwner(), sortModeObserver);
         bookViewModel.getSubjectListLiveData().observe(getViewLifecycleOwner(), genreListObserver);
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
     }
 }

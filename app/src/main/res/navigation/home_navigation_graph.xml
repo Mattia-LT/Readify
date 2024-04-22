@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_searchFragment_to_filter_bottomsheet"
             app:destination="@id/filter_bottomsheet" />
+        <action
+            android:id="@+id/action_searchFragment_to_addToCollectionDialog"
+            app:destination="@id/addToCollectionDialog" />
 
 
     </fragment>

@@ -66,7 +66,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         initObservers();
         this.bookId = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBookId();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
-        testDatabaseViewModel.fetchCollections(idToken);
+        testDatabaseViewModel.fetchLoggedUserCollections(idToken);
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
         Button confirmButton = binding.buttonConfirmCollectionInsertion;
@@ -132,7 +132,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);
                 clearAddSection();
-                testDatabaseViewModel.fetchCollections(idToken);
+                testDatabaseViewModel.fetchLoggedUserCollections(idToken);
             }
         });
     }
@@ -157,6 +157,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     .collect(Collectors.toList());
             addToCollectionAdapter.submitList(collectionsResultList);
         };
-        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
+        testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
     }
 }

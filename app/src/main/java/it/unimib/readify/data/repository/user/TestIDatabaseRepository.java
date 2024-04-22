@@ -16,7 +16,8 @@ public interface TestIDatabaseRepository {
     void updateUserData(User user, String newPassword);
 
     void fetchComments(String bookId);
-    void fetchCollections(String idToken);
+    void fetchLoggedUserCollections(String idToken);
+    void fetchOtherUserCollections(String otherUserIdToken);
     void searchUsers(String query);
     void addComment(String content, String bookId, String idToken);
     void deleteComment(String bookId, Comment comment);
@@ -28,12 +29,15 @@ public interface TestIDatabaseRepository {
     void fetchFollowing(String idToken);
     void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
+    void fetchOtherUser(String otherUserIdToken);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
-    MutableLiveData<List<Result>> getCollectionListLiveData();
+    MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
+    MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();
     MutableLiveData<List<Result>> getFollowersListLiveData();
     MutableLiveData<List<Result>> getFollowingListLiveData();
+    MutableLiveData<Result> getOtherUserLiveData();
     MutableLiveData<String> getSourceUsernameError();
     MutableLiveData<String> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();

@@ -197,7 +197,7 @@ public class BookDetailsFragment extends Fragment {
             public void onCommentClick(Comment comment) {
                 if (comment != null && comment.getIdToken() != null) {
                     Log.d("Fragment", "Comment username:" + comment.getIdToken());
-                    NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser(),comment.getUser().getUsername());
+                    NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser().getIdToken(),comment.getUser().getUsername());
                     Navigation.findNavController(requireView()).navigate(action);
                 } else {
                     Log.d("Fragment", "Error - comment is null OR userId is null");

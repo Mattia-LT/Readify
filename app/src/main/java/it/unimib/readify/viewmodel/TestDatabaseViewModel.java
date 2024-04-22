@@ -48,16 +48,16 @@ public class TestDatabaseViewModel extends ViewModel {
      */
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
-    private MutableLiveData<List<Result>> collectionListLiveData;
+    private MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
+    private MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private MutableLiveData<List<Result>> followersListLiveData;
     private MutableLiveData<List<Result>> followingListLiveData;
+    private MutableLiveData<Result> otherUserLiveData;
 
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private boolean isUIRunning;
-    private boolean isCollectionsChanged;
-
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
@@ -113,7 +113,6 @@ public class TestDatabaseViewModel extends ViewModel {
         sourceUsernameError = testDatabaseRepository.getSourceUsernameError();
         sourceEmailError = testDatabaseRepository.getSourceEmailError();
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
-        isCollectionsChanged = true;
     }
 
     //new logic
@@ -138,14 +137,6 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void setUIRunning(boolean UIRunning) {
         isUIRunning = UIRunning;
-    }
-
-    public boolean isCollectionsChanged() {
-        return isCollectionsChanged;
-    }
-
-    public void setCollectionsChanged(boolean collectionsChanged) {
-        isCollectionsChanged = collectionsChanged;
     }
 
     /*
@@ -201,15 +192,26 @@ public class TestDatabaseViewModel extends ViewModel {
         return commentListLiveData;
     }
 
-    public MutableLiveData<List<Result>> getCollectionListLiveData(){
-        if(collectionListLiveData == null){
-            collectionListLiveData = testDatabaseRepository.getCollectionListLiveData();
+    public MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData(){
+        if(loggedUserCollectionListLiveData == null){
+            loggedUserCollectionListLiveData = testDatabaseRepository.getLoggedUserCollectionListLiveData();
         }
-        return collectionListLiveData;
+        return loggedUserCollectionListLiveData;
     }
 
-    public void fetchCollections(String idToken){
-        testDatabaseRepository.fetchCollections(idToken);
+    public void fetchLoggedUserCollections(String idToken){
+        testDatabaseRepository.fetchLoggedUserCollections(idToken);
+    }
+
+    public MutableLiveData<List<Result>> getOtherUserCollectionListLiveData(){
+        if(otherUserCollectionListLiveData == null){
+            otherUserCollectionListLiveData = testDatabaseRepository.getOtherUserCollectionListLiveData();
+        }
+        return otherUserCollectionListLiveData;
+    }
+
+    public void fetchOtherUserCollections(String otherUserIdToken){
+        testDatabaseRepository.fetchOtherUserCollections(otherUserIdToken);
     }
 
     public void createCollection(String idToken, String collectionName, boolean visible){
@@ -288,4 +290,16 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
         Log.d("ViewModel", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
     }
+
+    public MutableLiveData<Result> getOtherUserLiveData(){
+        if(otherUserLiveData == null){
+            otherUserLiveData = testDatabaseRepository.getOtherUserLiveData();
+        }
+        return otherUserLiveData;
+    }
+
+    public void fetchOtherUser(String otherUserIdToken){
+        testDatabaseRepository.fetchOtherUser(otherUserIdToken);
+    }
+
 }

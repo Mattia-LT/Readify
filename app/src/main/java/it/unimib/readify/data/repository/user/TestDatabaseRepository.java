@@ -15,7 +15,6 @@ import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalUser;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -28,9 +27,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultsLiveData;
     private final MutableLiveData<List<Result>> commentListLiveData;
-    private final MutableLiveData<List<Result>> collectionListLiveData;
+    private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
+    private final MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private final MutableLiveData<List<Result>> followerListLiveData;
     private final MutableLiveData<List<Result>> followingListLiveData;
+    private final MutableLiveData<Result> otherUserLiveData;
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
@@ -47,9 +48,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userMutableLiveData = new MutableLiveData<>();
         this.userSearchResultsLiveData = new MutableLiveData<>();
         this.commentListLiveData = new MutableLiveData<>();
-        this.collectionListLiveData = new MutableLiveData<>();
+        this.loggedUserCollectionListLiveData = new MutableLiveData<>();
+        this.otherUserCollectionListLiveData = new MutableLiveData<>();
         this.followerListLiveData = new MutableLiveData<>();
         this.followingListLiveData = new MutableLiveData<>();
+        this.otherUserLiveData = new MutableLiveData<>();
         this.sourceUsernameError = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
@@ -106,8 +109,13 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<List<Result>> getCollectionListLiveData() {
-        return collectionListLiveData;
+    public MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData() {
+        return loggedUserCollectionListLiveData;
+    }
+
+    @Override
+    public MutableLiveData<List<Result>> getOtherUserCollectionListLiveData() {
+        return otherUserCollectionListLiveData;
     }
 
     @Override
@@ -118,6 +126,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public MutableLiveData<List<Result>> getFollowingListLiveData() {
         return followingListLiveData;
+    }
+
+    @Override
+    public MutableLiveData<Result> getOtherUserLiveData() {
+        return otherUserLiveData;
     }
 
     @Override
@@ -132,8 +145,13 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void fetchCollections(String idToken) {
-        userDataRemoteDataSource.fetchCollections(idToken);
+    public void fetchLoggedUserCollections(String idToken) {
+        userDataRemoteDataSource.fetchLoggedUserCollections(idToken);
+    }
+
+    @Override
+    public void fetchOtherUserCollections(String otherUserIdToken) {
+        userDataRemoteDataSource.fetchOtherUserCollections(otherUserIdToken);
     }
 
     @Override
@@ -171,11 +189,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onSuccessFromRemoteDatabase(OLWorkApiResponse work) {
-
-    }
-
-    @Override
     public void onSuccessFromRemoteDatabase(List<User> searchResults) {
         List<Result> resultList = new ArrayList<>();
         for(User user : searchResults){
@@ -189,11 +202,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public void onFailureFromRemoteDatabaseUser(String message) {
         Result.Error result = new Result.Error(message);
         userMutableLiveData.postValue(result);
-    }
-
-    @Override
-    public void onFailureFromRemoteDatabaseWork(String message) {
-
     }
 
     @Override
@@ -296,6 +304,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void fetchOtherUser(String otherUserIdToken) {
+        userDataRemoteDataSource.fetchOtherUser(otherUserIdToken);
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
@@ -305,6 +318,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void onCreateCollectionResult(Collection collection) {
 
+    }
+
+    @Override
+    public void onFetchOtherUserResult(User otherUser) {
+        Result otherUserResult = new Result.UserSuccess(otherUser);
+        otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
@@ -333,16 +352,30 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onSuccessFetchCollectionsFromRemoteDatabase(List<Collection> collections) {
+    public void onSuccessFetchLoggedUserCollectionsFromRemoteDatabase(List<Collection> collections) {
         List<Result> collectionResultList = new ArrayList<>();
         for(Collection collection : collections){
             collectionResultList.add(new Result.CollectionSuccess(collection));
         }
-        collectionListLiveData.postValue(collectionResultList);
+        loggedUserCollectionListLiveData.postValue(collectionResultList);
     }
 
     @Override
-    public void onFailureFetchCollectionsFromRemoteDatabase(String message) {
+    public void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message) {
+
+    }
+
+    @Override
+    public void onSuccessFetchOtherUserCollectionsFromRemoteDatabase(List<Collection> collections) {
+        List<Result> collectionResultList = new ArrayList<>();
+        for(Collection collection : collections){
+            collectionResultList.add(new Result.CollectionSuccess(collection));
+        }
+        otherUserCollectionListLiveData.postValue(collectionResultList);
+    }
+
+    @Override
+    public void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message) {
 
     }
 

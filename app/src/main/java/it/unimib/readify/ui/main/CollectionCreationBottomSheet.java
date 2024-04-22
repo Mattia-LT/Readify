@@ -87,7 +87,7 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
             } else {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);
-                testDatabaseViewModel.fetchCollections(idToken);
+                testDatabaseViewModel.fetchLoggedUserCollections(idToken);
                 requireDialog().dismiss();
             }
         });

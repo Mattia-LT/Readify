@@ -104,7 +104,7 @@ public class ProfileFragment extends Fragment{
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
-                testDatabaseViewModel.fetchCollections(user.getIdToken());
+                testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
                 updateUI();
             }
         };
@@ -119,7 +119,7 @@ public class ProfileFragment extends Fragment{
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
-        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
+        testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
     }

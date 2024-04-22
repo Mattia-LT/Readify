@@ -58,7 +58,7 @@ public class TabSearchUsersFragment extends Fragment {
         userSearchResultAdapter = new UserSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new UserSearchResultAdapter.OnItemClickListener() {
             @Override
             public void onUserItemClick(User user) {
-                NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user, user.getUsername());
+                NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user.getIdToken(), user.getUsername());
                 Navigation.findNavController(requireView()).navigate(action);
             }
 

@@ -88,8 +88,8 @@
         android:label="{username}"
         tools:layout="@layout/fragment_user_details">
         <argument
-            android:name="user"
-            app:argType="it.unimib.readify.model.User" />
+            android:name="otherUserIdToken"
+            app:argType="string" />
         <argument
             android:name="username"
             app:argType="string"

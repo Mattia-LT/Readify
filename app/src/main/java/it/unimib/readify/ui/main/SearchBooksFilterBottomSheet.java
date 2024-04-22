@@ -1,5 +1,6 @@
 package it.unimib.readify.ui.main;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,9 +44,12 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
-        if (dialog != null) {
-            dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+        int deviceOrientation = getResources().getConfiguration().orientation;
+        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+            if (dialog != null) {
+                dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
         }
 
         initViewModels();

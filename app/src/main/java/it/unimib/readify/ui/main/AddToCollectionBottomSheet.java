@@ -2,6 +2,7 @@ package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -53,9 +54,12 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //This operation is needed when the device is in Horizontal mode
-        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
-        if (dialog != null) {
-            dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+        int deviceOrientation = getResources().getConfiguration().orientation;
+        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+            if (dialog != null) {
+                dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
         }
 
         initViewModels();

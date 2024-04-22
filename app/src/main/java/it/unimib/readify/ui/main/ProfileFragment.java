@@ -134,7 +134,8 @@ public class ProfileFragment extends Fragment{
    }
 
     public void loadMenu(){
-        SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu().findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
+        SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
+                .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -154,7 +155,7 @@ public class ProfileFragment extends Fragment{
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.action_notifications) {
-                    // TODO: Show notifications menu
+                    Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_notificationsFragment);
                 } else if (menuItem.getItemId() == R.id.action_settings) {
                     DrawerLayout drawerLayout = fragmentProfileBinding.drawLayout;
                     NavigationView navigationView = fragmentProfileBinding.navView;

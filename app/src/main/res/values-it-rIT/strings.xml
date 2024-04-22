@@ -60,7 +60,7 @@
     <string name="hint_search_author">Inserisci il nome dell\'autore</string>
     <string name="textview_search_filters_title">Filtri di ricerca e Ordinamento</string>
     <string name="textview_sort_by_label">Ordina per</string>
-    <string name="textview_alphabetical_order_label">Alfabetico</string>
+    <string name="textview_title_order_label">Titolo</string>
     <string name="textview_rating_order_label">Valutazione</string>
     <string name="textview_genre_filter_label">Genere</string>
     <string name="chip_genre_action">Azione</string>

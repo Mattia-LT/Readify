@@ -30,15 +30,18 @@
         <action
             android:id="@+id/action_searchFragment_to_filter_bottomsheet"
             app:destination="@id/filter_bottomsheet" />
+        <action
+            android:id="@+id/action_searchFragment_to_addToCollectionDialog"
+            app:destination="@id/addToCollectionDialog" />
 
 
     </fragment>
 
     <dialog
         android:id="@+id/filter_bottomsheet"
-        android:name="it.unimib.readify.ui.main.FilterBottomSheet"
+        android:name="it.unimib.readify.ui.main.SearchBooksFilterBottomSheet"
         android:label="dialog_filter_bottomsheet"
-        tools:layout="@layout/bottom_sheet_search_filter">
+        tools:layout="@layout/bottom_sheet_search_books_filter">
     </dialog>
 
 
@@ -87,8 +90,8 @@
         android:label="{username}"
         tools:layout="@layout/fragment_user_details">
         <argument
-            android:name="user"
-            app:argType="it.unimib.readify.model.User" />
+            android:name="otherUserIdToken"
+            app:argType="string" />
         <argument
             android:name="username"
             app:argType="string"

@@ -2,6 +2,7 @@ package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -15,6 +16,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -39,6 +42,14 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //This operation is needed when the device is in Horizontal mode
+        int deviceOrientation = getResources().getConfiguration().orientation;
+        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+            if (dialog != null) {
+                dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        }
         initViewModels();
         this.idToken = CollectionCreationBottomSheetArgs.fromBundle(getArguments()).getIdToken();
         binding.characterCounter.setText("0");
@@ -76,7 +87,7 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
             } else {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);
-                testDatabaseViewModel.fetchCollections(idToken);
+                testDatabaseViewModel.fetchLoggedUserCollections(idToken);
                 requireDialog().dismiss();
             }
         });

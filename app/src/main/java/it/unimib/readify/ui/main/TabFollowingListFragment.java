@@ -62,7 +62,7 @@ public class TabFollowingListFragment extends Fragment {
             @Override
             public void onProfileClick(ExternalUser externalUser) {
                 User selectedUser = externalUser.getUser();
-                NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser,selectedUser.getUsername());
+                NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
                 Navigation.findNavController(requireView()).navigate(action);
             }
 

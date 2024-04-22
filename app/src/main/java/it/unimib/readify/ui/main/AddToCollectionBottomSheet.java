@@ -2,6 +2,7 @@ package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -18,6 +19,8 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -50,11 +53,20 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //This operation is needed when the device is in Horizontal mode
+        int deviceOrientation = getResources().getConfiguration().orientation;
+        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+            if (dialog != null) {
+                dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        }
+
         initViewModels();
         initObservers();
         this.bookId = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBookId();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
-        testDatabaseViewModel.fetchCollections(idToken);
+        testDatabaseViewModel.fetchLoggedUserCollections(idToken);
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
         Button confirmButton = binding.buttonConfirmCollectionInsertion;
@@ -120,7 +132,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 testDatabaseViewModel.createCollection(idToken, collectionName, visible);
                 clearAddSection();
-                testDatabaseViewModel.fetchCollections(idToken);
+                testDatabaseViewModel.fetchLoggedUserCollections(idToken);
             }
         });
     }
@@ -145,6 +157,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     .collect(Collectors.toList());
             addToCollectionAdapter.submitList(collectionsResultList);
         };
-        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
+        testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
     }
 }

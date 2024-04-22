@@ -69,7 +69,7 @@
     <string name="hint_search_author">Enter author name</string>
     <string name="textview_search_filters_title">Sort and Search Filters</string>
     <string name="textview_sort_by_label">Sort by</string>
-    <string name="textview_alphabetical_order_label">Alphabetical</string>
+    <string name="textview_title_order_label">Title</string>
     <string name="textview_rating_order_label">Rating</string>
     <string name="textview_genre_filter_label">Genre</string>
     <string name="chip_genre_fantasy" translatable="false">Fantasy</string>

@@ -25,7 +25,7 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
 
     public interface OnItemClickListener {
         void onBookItemClick(OLWorkApiResponse book);
-        void onAddToCollectionButtonPressed(int position);
+        void onAddToCollectionButtonPressed(OLWorkApiResponse book);
     }
 
     private final OnItemClickListener onItemClickListener;
@@ -110,39 +110,12 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
             if (position != RecyclerView.NO_POSITION){
                 OLWorkApiResponse book = getItem(position);
                 if (v.getId() == R.id.imagebutton_add_icon) {
-                    // hai premuto il bottone per aggiungere alla raccolta
-                    //todo gestire aggiunta alla raccolta
-                    //setImageViewFavoriteNews(!newsList.get(getAdapterPosition()).isFavorite());
-                    //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
+                    onItemClickListener.onAddToCollectionButtonPressed(book);
                 } else {
                     //hai premuto qualcos'altro
                     onItemClickListener.onBookItemClick(book);
                 }
             }
-        }
-
-        private void setImageViewAddedBook(boolean isFavorite) {
-            /*
-            if (isFavorite) {
-                imageViewFavoriteNews.setImageDrawable(
-                        AppCompatResources.getDrawable(application,
-                                R.drawable.ic_baseline_favorite_24));
-                imageViewFavoriteNews.setColorFilter(
-                        ContextCompat.getColor(
-                                imageViewFavoriteNews.getContext(),
-                                R.color.red_500)
-                );
-            } else {
-                imageViewFavoriteNews.setImageDrawable(
-                        AppCompatResources.getDrawable(application,
-                                R.drawable.ic_baseline_favorite_border_24));
-                imageViewFavoriteNews.setColorFilter(
-                        ContextCompat.getColor(
-                                imageViewFavoriteNews.getContext(),
-                                R.color.black)
-                );
-            }
-            */
         }
     }
 }

@@ -17,8 +17,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,7 +34,6 @@ import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalGroup;
 import it.unimib.readify.model.ExternalUser;
-import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
@@ -164,35 +161,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    @Override
-    public void saveWorkData(OLWorkApiResponse work) {
-        /*
-        todo da implementare la corretta classe Comments + vedere se funziona +
-         la key corrisponde all'id del libro nel database giusto?
-        */
-        databaseReference.child(FIREBASE_WORKS_COLLECTION).child(work.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                databaseReference.child(FIREBASE_USERS_COLLECTION).child(work.getKey()).setValue(work.getComments())
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                userResponseCallback.onSuccessFromRemoteDatabase(work);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                userResponseCallback.onFailureFromRemoteDatabaseWork(e.getLocalizedMessage());
-                            }
-                        });
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-            }
-        });
-    }
 
     @Override
     public void getUser(String idToken) {
@@ -202,22 +170,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             }
             else {
                 userResponseCallback.onFailureFromRemoteDatabaseUser(task.getException().getLocalizedMessage());
-            }
-        });
-    }
-
-    @Override
-    public void getWork(String idBook) {
-        /*
-            todo mancano gli /
-             a logica non dovrebbe essere un problema
-         */
-        databaseReference.child(FIREBASE_WORKS_COLLECTION).child(idBook).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(OLWorkApiResponse.class));
-            }
-            else {
-                userResponseCallback.onFailureFromRemoteDatabaseWork(task.getException().getLocalizedMessage());
             }
         });
     }
@@ -382,7 +334,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 books.add(bookId);
                 booksReference.setValue(new ArrayList<>(books));
                 numberOfBooksReference.setValue(books.size());
-                fetchCollections(idToken);
+                fetchLoggedUserCollections(idToken);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -412,7 +364,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 }
                 booksReference.setValue(new ArrayList<>(books));
                 numberOfBooksReference.setValue(books.size());
-                fetchCollections(idToken);
+                fetchLoggedUserCollections(idToken);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -433,7 +385,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void fetchCollections(String idToken) {
+    public void fetchLoggedUserCollections(String idToken) {
         DatabaseReference collectionsReference = databaseReference
                 .child(FIREBASE_COLLECTIONS_COLLECTION)
                 .child(idToken);
@@ -448,12 +400,44 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                     }
                     collections.add(collection);
                 }
-                userResponseCallback.onSuccessFetchCollectionsFromRemoteDatabase(collections);
+                userResponseCallback.onSuccessFetchLoggedUserCollectionsFromRemoteDatabase(collections);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureFetchCollectionsFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFetchLoggedUserCollectionsFromRemoteDatabase(error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void fetchOtherUserCollections(String otherUserIdToken) {
+        DatabaseReference collectionsReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(otherUserIdToken);
+        collectionsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Collection> collections = new ArrayList<>();
+                for (DataSnapshot collectionSnapshot : snapshot.getChildren()) {
+                    Collection collection = collectionSnapshot.getValue(Collection.class);
+                    if(collection != null){
+                        if(collection.getBooks() == null){
+                            collection.setBooks(new ArrayList<>());
+                        }
+                        if(collection.isVisible()){
+                            collections.add(collection);
+                        }
+                    } else {
+                        //todo error
+                    }
+                }
+                userResponseCallback.onSuccessFetchOtherUserCollectionsFromRemoteDatabase(collections);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFetchOtherUserCollectionsFromRemoteDatabase(error.getMessage());
             }
         });
     }
@@ -597,6 +581,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         //TODO passargli qualcosa
                         userResponseCallback.onUserFollowResult();
                         refreshLoggedUserData(idTokenLoggedUser);
+                        fetchOtherUser(idTokenFollowedUser);
                     }
                 }
             }
@@ -635,6 +620,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         //TODO passargli qualcosa
                         userResponseCallback.onUserFollowResult();
                         refreshLoggedUserData(idTokenLoggedUser);
+                        fetchOtherUser(idTokenFollowedUser);
                     }
                 }
             }
@@ -684,6 +670,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         //TODO passargli qualcosa
                         userResponseCallback.onUserUnfollowResult();
                         refreshLoggedUserData(idTokenLoggedUser);
+                        fetchOtherUser(idTokenFollowedUser);
                     }
                 }
             }
@@ -719,6 +706,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         //TODO passargli qualcosa
                         userResponseCallback.onUserUnfollowResult();
                         refreshLoggedUserData(idTokenLoggedUser);
+                        fetchOtherUser(idTokenFollowedUser);
                     }
                 }
             }
@@ -729,6 +717,31 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
+    @Override
+    public void fetchOtherUser(String otherUserIdToken) {
+        databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(otherUserIdToken)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            User otherUser = snapshot.getValue(User.class);
+                            if(otherUser != null){
+                                userResponseCallback.onFetchOtherUserResult(otherUser);
+                            } else {
+                                //todo error
+                            }
+                        } else {
+                            //todo error
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //todo manage errors
+                    }
+                });
+    }
 
 
     private void refreshLoggedUserData(String idToken){

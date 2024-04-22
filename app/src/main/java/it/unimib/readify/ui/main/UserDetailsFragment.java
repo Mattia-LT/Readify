@@ -113,14 +113,13 @@ public class UserDetailsFragment extends Fragment {
         };
 
         final Observer<List<Result>> emptyCollectionsObserver = results -> {
-            binding.collectionsProgressBar.setVisibility(View.VISIBLE);
-            binding.recyclerviewUserCollections.setVisibility(View.GONE);
-            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
             List<Collection> collectionsResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
-                    .filter(Collection::isVisible)
                     .collect(Collectors.toList());
+            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
+            binding.collectionsProgressBar.setVisibility(View.VISIBLE);
+            binding.recyclerviewUserCollections.setVisibility(View.GONE);
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
@@ -140,9 +139,23 @@ public class UserDetailsFragment extends Fragment {
             }
         };
 
-        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
-        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+        final Observer<Result> otherUserObserver = otherUserResult -> {
+            if(otherUserResult.isSuccess()){
+                User receivedUser = ((Result.UserSuccess) otherUserResult).getData();
+                showUserInfo(receivedUser);
+            } else {
+                // todo manage errors
+            }
+
+        };
+
+
+        testDatabaseViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), emptyCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        testDatabaseViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
+
+        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+
     }
     private void initRecyclerView(){
         collectionAdapter = new CollectionAdapter(collection -> {
@@ -154,18 +167,17 @@ public class UserDetailsFragment extends Fragment {
         binding.recyclerviewUserCollections.setAdapter(collectionAdapter);
     }
     private void fetchUserData(){
-        User receivedUser = UserDetailsFragmentArgs.fromBundle(getArguments()).getUser();
+        this.userIdToken = UserDetailsFragmentArgs.fromBundle(getArguments()).getOtherUserIdToken();
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
-        this.userIdToken = receivedUser.getIdToken();
         requireActivity().setTitle(username);
-        showUserInfo(receivedUser);
+        testDatabaseViewModel.fetchOtherUser(userIdToken);
+        testDatabaseViewModel.fetchOtherUserCollections(userIdToken);
+
     }
 
     private void showUserInfo(User user){
         binding.followButton.setOnClickListener(v -> testDatabaseViewModel.followUser(loggedUserIdToken, userIdToken));
         binding.unfollowButton.setOnClickListener(v -> testDatabaseViewModel.unfollowUser(loggedUserIdToken, userIdToken));
-        binding.recyclerviewUserCollections.setVisibility(View.GONE);
-        testDatabaseViewModel.fetchCollections(user.getIdToken());
 
         binding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
         binding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));

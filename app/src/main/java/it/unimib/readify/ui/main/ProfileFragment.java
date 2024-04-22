@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -103,7 +104,7 @@ public class ProfileFragment extends Fragment{
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
-                testDatabaseViewModel.fetchCollections(user.getIdToken());
+                testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
                 updateUI();
             }
         };
@@ -118,7 +119,7 @@ public class ProfileFragment extends Fragment{
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
-        testDatabaseViewModel.getCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
+        testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
     }
@@ -136,6 +137,17 @@ public class ProfileFragment extends Fragment{
     public void loadMenu(){
         SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
                 .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+// Imposta lo stato dello SwitchCompat in base al tema corrente
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                switchButton.setChecked(true);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                switchButton.setChecked(false);
+                break;
+        }
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);

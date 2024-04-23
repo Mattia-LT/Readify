@@ -29,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
             />
 

@@ -16,6 +16,10 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void updateUserData(User user);
     public abstract void onUsernameAvailable(User user);
     public abstract void onEmailAvailable(User user);
+    public abstract void setGender(User user);
+    public abstract void setVisibility(User user);
+    public abstract void setRecommended(User user);
+    public abstract void setAvatar(User user);
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);
     public abstract void fetchComments(String bookId);

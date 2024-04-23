@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ public class User implements Parcelable {
 
     private String avatar;
     private String biography;
-    private List<Factor> recommended;
+    private HashMap<String, Integer> recommended = new HashMap<>();
     private String email;
     private String gender;
     private List<Social> socialLinks;
@@ -36,7 +37,7 @@ public class User implements Parcelable {
         this.gender = gender;
     }
 
-    public User(String avatar, String biography, List<Factor> recommended,
+    public User(String avatar, String biography, HashMap<String, Integer> recommended,
                 String email, String gender, List<Social> socialLinks, String username,
                 String visibility, ExternalGroup followers, ExternalGroup following,
                 String idToken) {
@@ -83,11 +84,11 @@ public class User implements Parcelable {
         this.biography = biography;
     }
 
-    public List<Factor> getRecommended() {
+    public HashMap<String, Integer> getRecommended() {
         return recommended;
     }
 
-    public void setRecommended(List<Factor> recommended) {
+    public void setRecommended(HashMap<String, Integer> recommended) {
         this.recommended = recommended;
     }
 
@@ -164,7 +165,7 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.avatar);
         dest.writeString(this.biography);
-        dest.writeTypedList(this.recommended);
+        dest.writeSerializable(this.recommended);
         dest.writeString(this.email);
         dest.writeString(this.gender);
         dest.writeTypedList(this.socialLinks);
@@ -178,7 +179,7 @@ public class User implements Parcelable {
     public void readFromParcel(Parcel source) {
         this.avatar = source.readString();
         this.biography = source.readString();
-        this.recommended = source.createTypedArrayList(Factor.CREATOR);
+        this.recommended = (HashMap<String, Integer>) source.readSerializable();
         this.email = source.readString();
         this.gender = source.readString();
         this.socialLinks = source.createTypedArrayList(Social.CREATOR);
@@ -192,7 +193,7 @@ public class User implements Parcelable {
     protected User(Parcel in) {
         this.avatar = in.readString();
         this.biography = in.readString();
-        this.recommended = in.createTypedArrayList(Factor.CREATOR);
+        this.recommended = (HashMap<String, Integer>) in.readSerializable();
         this.email = in.readString();
         this.gender = in.readString();
         this.socialLinks = in.createTypedArrayList(Social.CREATOR);

@@ -121,7 +121,9 @@ public class SettingsFragment extends Fragment {
         testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
         testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
         testDatabaseViewModel.getSourcePasswordlError().observe(getViewLifecycleOwner(), passwordErrorObserver);
+
         loadMenu();
+
         fragmentSettingsBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,6 +132,7 @@ public class SettingsFragment extends Fragment {
         });
 
         updateUIObserver();
+
         Bundle args = getArguments();
         if (args != null && args.containsKey("imageResourceId")) {
             imageResourceId = args.getInt("imageResourceId");

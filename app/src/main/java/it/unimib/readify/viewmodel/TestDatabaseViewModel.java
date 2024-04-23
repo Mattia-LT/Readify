@@ -248,6 +248,22 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.updateUserData(user, newPassword);
     }
 
+    public void setUserGender(User user) {
+        testDatabaseRepository.setUserGender(user);
+    }
+
+    public void setUserVisibility(User user) {
+        testDatabaseRepository.setUserVisibility(user);
+    }
+
+    public void setUserRecommended(User user) {
+        testDatabaseRepository.setUserRecommended(user);
+    }
+
+    public void setUserAvatar(User user) {
+        testDatabaseRepository.setUserAvatar(user);
+    }
+
     public void fetchFollowers(String idToken){
         testDatabaseRepository.fetchFollowers(idToken);
     }

@@ -14,6 +14,10 @@ public interface TestIDatabaseRepository {
     void signIn(String email, String password);
     void signUp(String email, String password);
     void updateUserData(User user, String newPassword);
+    void setUserGender(User user);
+    void setUserVisibility(User user);
+    void setUserRecommended(User user);
+    void setUserAvatar(User user);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);

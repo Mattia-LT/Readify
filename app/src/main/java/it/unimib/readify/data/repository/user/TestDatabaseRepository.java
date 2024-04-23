@@ -97,6 +97,24 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void setUserGender(User user) {
+        userDataRemoteDataSource.setGender(user);
+    }
+
+    @Override
+    public void setUserVisibility(User user) {
+        userDataRemoteDataSource.setVisibility(user);
+    }
+
+    public void setUserRecommended(User user) {
+        userDataRemoteDataSource.setRecommended(user);
+    }
+
+    public void setUserAvatar(User user) {
+        userDataRemoteDataSource.setAvatar(user);
+    }
+
+    @Override
     public void searchUsers(String query){
         Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);

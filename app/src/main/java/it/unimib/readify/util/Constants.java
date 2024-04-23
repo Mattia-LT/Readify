@@ -80,6 +80,10 @@ public class Constants {
     public static final String FIREBASE_USERS_FOLLOWING_FIELD = "following";
     //TODO magari rinominare o spostare numberOfFollowers come parametro dell'user stesso andando a eliminare external group
     public static final String FIREBASE_USERS_USERS_LIST_FIELD = "users";
+    public static final String FIREBASE_USERS_GENDER_FIELD = "gender";
+    public static final String FIREBASE_USERS_VISIBILITY_FIELD = "visibility";
+    public static final String FIREBASE_USERS_RECOMMENDED_FIELD = "recommended";
+    public static final String FIREBASE_USERS_AVATAR_FIELD = "avatar";
 
 
     public static final String TO_READ = "to_read";
@@ -93,5 +97,4 @@ public class Constants {
     public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
 
     public static String BUNDLE_ID_TOKEN = "idToken";
-
 }

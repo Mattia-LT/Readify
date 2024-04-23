@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -139,7 +140,7 @@ public class ProfileFragment extends Fragment{
                 .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
         int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-// Imposta lo stato dello SwitchCompat in base al tema corrente
+        // Imposta lo stato dello SwitchCompat in base al tema corrente
         switch (currentNightMode) {
             case Configuration.UI_MODE_NIGHT_YES:
                 switchButton.setChecked(true);
@@ -162,13 +163,27 @@ public class ProfileFragment extends Fragment{
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menu.clear();
                 menuInflater.inflate(R.menu.profile_appbar_menu, menu);
+
+                //todo sono fermo qui
+                //managing badge notifications itemMenu
+                final MenuItem menuItem = menu.findItem(R.id.action_notifications);
+                View actionView = menuItem.getActionView();
+                assert actionView != null;
+                TextView textCartItemCount = (TextView) actionView.findViewById(R.id.notification_appbar_profile_badge);
+                setupBadge(textCartItemCount);
+
+                //managing onClick itemMenu
+                actionView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_notificationsFragment);
+                    }
+                });
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.action_notifications) {
-                    Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_notificationsFragment);
-                } else if (menuItem.getItemId() == R.id.action_settings) {
+                if (menuItem.getItemId() == R.id.action_settings) {
                     DrawerLayout drawerLayout = fragmentProfileBinding.drawLayout;
                     NavigationView navigationView = fragmentProfileBinding.navView;
                     if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
@@ -201,7 +216,6 @@ public class ProfileFragment extends Fragment{
                             if (itemId == R.id.nav_switch) {
 
                             }
-
 
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;
@@ -274,6 +288,20 @@ public class ProfileFragment extends Fragment{
                     fragmentProfileBinding.textviewInstagram.setText(user.getSocialLinks().get(i).getLink());
                     fragmentProfileBinding.textviewInstagram.setVisibility(View.VISIBLE);
                     break;
+            }
+        }
+    }
+
+    private void setupBadge(TextView textCartItemCount) {
+        int mCartItemCount = Integer.parseInt(textCartItemCount.getText().toString());
+        if (mCartItemCount == 0) {
+            if (textCartItemCount.getVisibility() != View.GONE) {
+                textCartItemCount.setVisibility(View.GONE);
+            }
+        } else {
+            textCartItemCount.setText(String.valueOf(Math.min(mCartItemCount, 99)));
+            if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                textCartItemCount.setVisibility(View.VISIBLE);
             }
         }
     }

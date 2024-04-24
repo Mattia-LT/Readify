@@ -1,8 +1,9 @@
 package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
-import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_EMAILS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_NOTIFICATIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_AVATAR_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
@@ -30,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +40,7 @@ import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalGroup;
 import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
@@ -144,14 +147,14 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     @Override
     public void onEmailAvailable(User user) {
         DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
-        usersRef.orderByChild(FIREBASE_COLLECTIONS_EMAILS_FIELD).equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.orderByChild(FIREBASE_USERS_EMAILS_FIELD).equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     userResponseCallback.onEmailAvailable("notAvailable");
                 } else {
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                            .child(FIREBASE_COLLECTIONS_EMAILS_FIELD).setValue(user.getEmail())
+                            .child(FIREBASE_USERS_EMAILS_FIELD).setValue(user.getEmail())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                             .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                     userResponseCallback.onEmailAvailable("available");
@@ -254,6 +257,34 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void fetchNotifications(String idToken) {
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
+                .addValueEventListener (new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
+                            for (DataSnapshot notificationList: snapshot.getChildren()) {
+                                ArrayList<Notification> temp = new ArrayList<>();
+                                for (DataSnapshot notification: notificationList.getChildren()) {
+                                    Log.d("source", notification.toString());
+                                    temp.add(notification.getValue(Notification.class));
+                                }
+                                notifications.put(notificationList.getKey(), temp);
+                            }
+                            userResponseCallback.onSuccessFetchNotifications(notifications);
+                        } else {
+                            userResponseCallback.onFailureFetchNotifications("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
                     }
                 });
     }

@@ -32,6 +32,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -40,6 +42,7 @@ import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentProfileBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
@@ -52,6 +55,7 @@ public class ProfileFragment extends Fragment{
     private BookViewModel bookViewModel;
     private CollectionAdapter collectionAdapter;
     private User user;
+    private HashMap<String, ArrayList<Notification>> notifications;
     public ProfileFragment() {}
 
     public static ProfileFragment newInstance() {
@@ -107,6 +111,8 @@ public class ProfileFragment extends Fragment{
                 Log.e("USER OBSERVER","TRIGGERED");
                 testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
                 updateUI();
+
+                testDatabaseViewModel.fetchNotifications(user.getIdToken());
             }
         };
 
@@ -120,9 +126,18 @@ public class ProfileFragment extends Fragment{
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
+        final Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver = result -> {
+            notifications = result;
+            for (String type: notifications.keySet()) {
+                Log.d("profile hash", type + ": " + notifications.get(type));
+            }
+            //todo set notification value
+        };
+
         testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+        testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
    private void initRecyclerView(){

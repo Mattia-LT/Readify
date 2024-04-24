@@ -1,10 +1,13 @@
 package it.unimib.readify.data.repository.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 
 public interface UserResponseCallback {
@@ -35,4 +38,6 @@ public interface UserResponseCallback {
     void onUsernameAvailable(String result);
     void onEmailAvailable(String result);
     void onPasswordChanged(Boolean result);
+    void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
+    void onFailureFetchNotifications(String message);
 }

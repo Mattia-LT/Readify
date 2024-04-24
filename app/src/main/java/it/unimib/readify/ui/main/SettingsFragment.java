@@ -120,7 +120,7 @@ public class SettingsFragment extends Fragment {
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
         testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
         testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
-        testDatabaseViewModel.getSourcePasswordlError().observe(getViewLifecycleOwner(), passwordErrorObserver);
+        testDatabaseViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
 
         loadMenu();
 

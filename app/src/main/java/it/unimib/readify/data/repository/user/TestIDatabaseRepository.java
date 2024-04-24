@@ -2,9 +2,12 @@ package it.unimib.readify.data.repository.user;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 
@@ -18,6 +21,7 @@ public interface TestIDatabaseRepository {
     void setUserVisibility(User user);
     void setUserRecommended(User user);
     void setUserAvatar(User user);
+    void fetchNotifications(String idToken);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);
@@ -45,4 +49,5 @@ public interface TestIDatabaseRepository {
     MutableLiveData<String> getSourceUsernameError();
     MutableLiveData<String> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
+    MutableLiveData<HashMap<String, ArrayList<Notification>>> getNotifications();
 }

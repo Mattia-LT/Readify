@@ -6,10 +6,13 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 
@@ -57,6 +60,7 @@ public class TestDatabaseViewModel extends ViewModel {
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
+    private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private boolean isUIRunning;
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
@@ -113,6 +117,7 @@ public class TestDatabaseViewModel extends ViewModel {
         sourceUsernameError = testDatabaseRepository.getSourceUsernameError();
         sourceEmailError = testDatabaseRepository.getSourceEmailError();
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
+        notifications = testDatabaseRepository.getNotifications();
     }
 
     //new logic
@@ -264,6 +269,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.setUserAvatar(user);
     }
 
+    public void fetchNotifications(String idToken) {
+        testDatabaseRepository.fetchNotifications(idToken);
+    }
+
     public void fetchFollowers(String idToken){
         testDatabaseRepository.fetchFollowers(idToken);
     }
@@ -294,8 +303,12 @@ public class TestDatabaseViewModel extends ViewModel {
         return sourceEmailError;
     }
 
-    public MutableLiveData<Boolean> getSourcePasswordlError() {
+    public MutableLiveData<Boolean> getSourcePasswordError() {
         return sourcePasswordError;
+    }
+
+    public MutableLiveData<HashMap<String, ArrayList<Notification>>> getNotifications() {
+        return notifications;
     }
 
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser){
@@ -317,5 +330,4 @@ public class TestDatabaseViewModel extends ViewModel {
     public void fetchOtherUser(String otherUserIdToken){
         testDatabaseRepository.fetchOtherUser(otherUserIdToken);
     }
-
 }

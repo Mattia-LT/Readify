@@ -70,11 +70,12 @@ public class Constants {
     public static final String FIREBASE_REALTIME_DATABASE = "https://readify-9b50c-default-rtdb.europe-west1.firebasedatabase.app/";
     public static final String FIREBASE_WORKS_COLLECTION = "books";
     public static final String FIREBASE_COLLECTIONS_COLLECTION = "collections";
+    public static final String FIREBASE_NOTIFICATIONS_COLLECTION = "notifications";
 
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
     public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
-    public static final String FIREBASE_COLLECTIONS_EMAILS_FIELD = "email";
+    public static final String FIREBASE_USERS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
     public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
     public static final String FIREBASE_USERS_FOLLOWING_FIELD = "following";

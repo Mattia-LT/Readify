@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource;
@@ -15,6 +16,7 @@ import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -35,6 +37,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
+    private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -56,6 +59,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.sourceUsernameError = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
+        this.notifications = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -112,6 +116,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     public void setUserAvatar(User user) {
         userDataRemoteDataSource.setAvatar(user);
+    }
+
+    @Override
+    public void fetchNotifications(String idToken) {
+        userDataRemoteDataSource.fetchNotifications(idToken);
     }
 
     @Override
@@ -185,6 +194,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public MutableLiveData<Boolean> getSourcePasswordError() {
         return sourcePasswordError;
+    }
+
+    @Override
+    public MutableLiveData<HashMap<String, ArrayList<Notification>>> getNotifications() {
+        return notifications;
     }
 
     @Override
@@ -415,5 +429,15 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void onPasswordChanged(Boolean result) {
         sourcePasswordError.postValue(result);
+    }
+
+    @Override
+    public void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
+        this.notifications.postValue(notifications);
+    }
+
+    @Override
+    public void onFailureFetchNotifications(String message) {
+        Log.d("onFailureFetchNotifications", message);
     }
 }

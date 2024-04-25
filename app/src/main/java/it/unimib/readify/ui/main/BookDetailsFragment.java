@@ -87,6 +87,7 @@ public class BookDetailsFragment extends Fragment {
     private void showBookInfo() {
         receivedBook =  BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
         testDatabaseViewModel.fetchComments(receivedBook.getKey());
+        fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
         loadCover();
         loadAuthors();
         loadRating();
@@ -120,7 +121,6 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void loadAuthors(){
-        fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
         StringBuilder authors = new StringBuilder();
         if(receivedBook.getAuthorList() != null){
             for(OLAuthorApiResponse author : receivedBook.getAuthorList()){

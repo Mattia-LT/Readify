@@ -482,6 +482,4 @@ public class LoginFragment extends Fragment {
 
         testDatabaseViewModel.setUIRunning(false);
     }
-
-
 }

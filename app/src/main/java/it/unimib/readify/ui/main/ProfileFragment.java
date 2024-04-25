@@ -56,6 +56,9 @@ public class ProfileFragment extends Fragment{
     private CollectionAdapter collectionAdapter;
     private User user;
     private HashMap<String, ArrayList<Notification>> notifications;
+    Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
+    Observer<Result> loggedUserObserver;
+    Observer<List<Result>> fetchedCollectionsObserver;
     public ProfileFragment() {}
 
     public static ProfileFragment newInstance() {
@@ -80,7 +83,6 @@ public class ProfileFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         initViewModels();
         initObservers();
-        loadMenu();
         initRecyclerView();
         initCreateCollectionSection();
         initFollowersSection();
@@ -95,7 +97,8 @@ public class ProfileFragment extends Fragment{
     }
 
     private void initObservers() {
-        final Observer<List<Result>> fetchedCollectionsObserver = results -> {
+        //todo all observer (except loggedUser) triggers twice instead of 1 when page is reloaded
+        fetchedCollectionsObserver = results -> {
             List<Collection> collectionResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
@@ -105,13 +108,12 @@ public class ProfileFragment extends Fragment{
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
         };
 
-        final Observer<Result> loggedUserObserver = result -> {
+        loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
-                testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
                 updateUI();
-
+                testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
                 testDatabaseViewModel.fetchNotifications(user.getIdToken());
             }
         };
@@ -126,12 +128,10 @@ public class ProfileFragment extends Fragment{
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
-        final Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver = result -> {
+        fetchedNotificationsObserver = result -> {
+            Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
             notifications = result;
-            for (String type: notifications.keySet()) {
-                Log.d("profile hash", type + ": " + notifications.get(type));
-            }
-            //todo set notification value
+            loadMenu();
         };
 
         testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
@@ -179,13 +179,22 @@ public class ProfileFragment extends Fragment{
                 menu.clear();
                 menuInflater.inflate(R.menu.profile_appbar_menu, menu);
 
-                //todo sono fermo qui
                 //managing badge notifications itemMenu
                 final MenuItem menuItem = menu.findItem(R.id.action_notifications);
                 View actionView = menuItem.getActionView();
                 assert actionView != null;
-                TextView textCartItemCount = (TextView) actionView.findViewById(R.id.notification_appbar_profile_badge);
-                setupBadge(textCartItemCount);
+                TextView notificationsTextView = actionView.findViewById(R.id.notification_appbar_profile_badge);
+                //managing notification number
+                int notificationsNumber = 0;
+                for (String type: notifications.keySet()) {
+                    for (Notification notification: Objects.requireNonNull(notifications.get(type))) {
+                        if(!notification.isRead()) {
+                            notificationsNumber++;
+                        }
+                    }
+                }
+                notificationsTextView.setText(String.format("%s", notificationsNumber));
+                setupBadge(notificationsTextView);
 
                 //managing onClick itemMenu
                 actionView.setOnClickListener(new View.OnClickListener() {
@@ -307,17 +316,26 @@ public class ProfileFragment extends Fragment{
         }
     }
 
-    private void setupBadge(TextView textCartItemCount) {
-        int mCartItemCount = Integer.parseInt(textCartItemCount.getText().toString());
-        if (mCartItemCount == 0) {
-            if (textCartItemCount.getVisibility() != View.GONE) {
-                textCartItemCount.setVisibility(View.GONE);
+    private void setupBadge(TextView notificationsTextView) {
+        int notificationNumber = Integer.parseInt(notificationsTextView.getText().toString());
+        Log.d("badge", Integer.toString(notificationNumber));
+        if (notificationNumber == 0) {
+            if (notificationsTextView.getVisibility() != View.GONE) {
+                notificationsTextView.setVisibility(View.GONE);
             }
         } else {
-            textCartItemCount.setText(String.valueOf(Math.min(mCartItemCount, 99)));
-            if (textCartItemCount.getVisibility() != View.VISIBLE) {
-                textCartItemCount.setVisibility(View.VISIBLE);
+            notificationsTextView.setText(String.valueOf(Math.min(notificationNumber, 99)));
+            if (notificationsTextView.getVisibility() != View.VISIBLE) {
+                notificationsTextView.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        testDatabaseViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
+        bookViewModel.getCompleteCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
     }
 }

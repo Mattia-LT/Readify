@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.Chip
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="24dp"
+    style="@style/Widget.Material3.Chip.Filter"
+    android:clickable="false"
+    android:textColor="@color/black"
+    android:textSize="12sp"
+    app:chipBackgroundColor="@color/bg_chip_state_list"
+    app:chipCornerRadius="5dp"
+    app:chipEndPadding="0dp"
+    app:chipMinTouchTargetSize="0dp"
+    app:chipStartPadding="0dp"
+ />

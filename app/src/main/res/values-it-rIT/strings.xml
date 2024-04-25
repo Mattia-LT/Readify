@@ -63,9 +63,6 @@
     <string name="textview_title_order_label">Titolo</string>
     <string name="textview_rating_order_label">Valutazione</string>
     <string name="textview_genre_filter_label">Genere</string>
-    <string name="chip_genre_action">Azione</string>
-    <string name="chip_genre_science_fiction">Fantascientifico</string>
-    <string name="chip_genre_biography">Biografia</string>
     <string name="button_apply">Applica</string>
     <string name="content_description_book_cover">Copertina del libro</string>
     <string name="content_description_add_to_bookshelf">Bottone \"aggiungi alla libreria\"</string>
@@ -123,6 +120,28 @@
     <string name="imageview_avatar">Avatar dell\'utente</string>
     <string name="delete_collection_action">Elimina la collezione</string>
     <string name="rename_collection_action">Rinomina la collezione</string>
+    <string name="content_description_collection_visibility">Visibilità della collezione</string>
+    <string name="content_description_collection_thumbnail">Copertina della collezione</string>
+    <!-- chip genres -->
+    <string-array name="chip_genres">
+        <item name="chip_genre_action">Azione</item>
+        <item name="chip_genre_biography">Biografia</item>
+        <item name="chip_genre_classic">Classici</item>
+        <item name="chip_genre_comics">Fumetti</item>
+        <item name="chip_genre_drama">Tragedia</item>
+        <item name="chip_genre_fantasy">Fantasy</item>
+        <item name="chip_genre_historical">Storici</item>
+        <item name="chip_genre_horror">Horror</item>
+        <item name="chip_genre_humor">Umoristici</item>
+        <item name="chip_genre_mystery">Misteri</item>
+        <item name="chip_genre_poetry">Poesie</item>
+        <item name="chip_genre_romance">Romanzi</item>
+        <item name="chip_genre_sci_fi">Sci-fi</item>
+        <item name="chip_genre_shorts_stories">Racconti brevi</item>
+        <item name="chip_genre_sport">Sport</item>
+        <item name="chip_genre_thriller">Thriller</item>
+    </string-array>
+
 
     <!-- errors -->
     <string name="username_already_taken">Nome utente già in uso</string>

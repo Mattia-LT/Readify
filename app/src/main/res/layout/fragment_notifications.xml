@@ -10,10 +10,10 @@
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/notifications_newFollower_container"
+            android:id="@+id/notifications_newFollowers_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="10dp"
             android:paddingEnd="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
@@ -21,26 +21,47 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/notifications_newFollower_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/baseline_person_add_alt_1_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/notifications_newFollower_text_container"
+            <FrameLayout
+                android:id="@+id/notifications_newFollowers_icon_container"
+                style="?attr/actionButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                app:layout_constraintStart_toEndOf="@+id/notifications_newFollower_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/baseline_person_add_alt_1_24" />
+
+                <TextView
+                    android:id="@+id/notification_newFollowers_icon_badge"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="end|end|top"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/notifications_newFollowers_text_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/notifications_newFollowers_icon_container"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
-                    android:id="@+id/notifications_newFollower_text_title"
+                    android:id="@+id/notifications_newFollowers_text_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New followers"
@@ -49,18 +70,18 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/notifications_newFollower_text_message"
+                    android:id="@+id/notifications_newFollowers_text_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Newest follower..."
                     android:textSize="15sp"
                     android:layout_marginStart="2dp"
-                    app:layout_constraintTop_toBottomOf="@+id/notifications_newFollower_text_title"
+                    app:layout_constraintTop_toBottomOf="@+id/notifications_newFollowers_text_title"
                     app:layout_constraintStart_toStartOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
-                android:id="@+id/notifications_newFollower_button"
+                android:id="@+id/notifications_newFollowers_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/baseline_arrow_forward_ios_24"
@@ -70,37 +91,58 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/notifications_recommended_container"
+            android:id="@+id/notifications_recommendedBooks_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="10dp"
             android:paddingEnd="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notifications_newFollower_container">
+            app:layout_constraintTop_toBottomOf="@+id/notifications_newFollowers_container">
 
-            <ImageView
-                android:id="@+id/notifications_recommended_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_baseline_book_filled_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/notifications_recommended_text_container"
+            <FrameLayout
+                android:id="@+id/notifications_recommendedBooks_icon_container"
+                style="?attr/actionButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                app:layout_constraintStart_toEndOf="@+id/notifications_recommended_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_baseline_book_filled_24" />
+
+                <TextView
+                    android:id="@+id/notification_recommendedBooks_icon_badge"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="end|end|top"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/notifications_recommendedBooks_text_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/notifications_recommendedBooks_icon_container"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
-                    android:id="@+id/notifications_recommended_text_title"
+                    android:id="@+id/notifications_recommendedBooks_text_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Recommended books"
@@ -109,18 +151,18 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/notifications_recommended_text_message"
+                    android:id="@+id/notifications_recommendedBooks_text_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Newest book shared from friends..."
                     android:textSize="15sp"
                     android:layout_marginStart="2dp"
-                    app:layout_constraintTop_toBottomOf="@+id/notifications_recommended_text_title"
+                    app:layout_constraintTop_toBottomOf="@+id/notifications_recommendedBooks_text_title"
                     app:layout_constraintStart_toStartOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
-                android:id="@+id/notifications_recommended_button"
+                android:id="@+id/notifications_recommendedBooks_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/baseline_arrow_forward_ios_24"
@@ -133,29 +175,50 @@
             android:id="@+id/notifications_sharedProfiles_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="10dp"
             android:paddingEnd="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notifications_recommended_container">
+            app:layout_constraintTop_toBottomOf="@+id/notifications_recommendedBooks_container">
 
-            <ImageView
-                android:id="@+id/notifications_sharedProfiles_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/baseline_waving_hand_24"
+            <FrameLayout
+                android:id="@+id/notifications_sharedProfiles_icon_container"
+                style="?attr/actionButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/baseline_waving_hand_24" />
+
+                <TextView
+                    android:id="@+id/notification_sharedProfiles_icon_badge"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="end|end|top"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/notifications_sharedProfiles_text_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                app:layout_constraintStart_toEndOf="@+id/notifications_sharedProfiles_icon"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/notifications_sharedProfiles_icon_container"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
@@ -193,7 +256,7 @@
             android:id="@+id/notifications_system_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="10dp"
             android:paddingEnd="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
@@ -201,21 +264,42 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/notifications_sharedProfiles_container">
 
-            <ImageView
-                android:id="@+id/notifications_system_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/baseline_construction_24"
+            <FrameLayout
+                android:id="@+id/notifications_system_icon_container"
+                style="?attr/actionButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/baseline_construction_24" />
+
+                <TextView
+                    android:id="@+id/notification_system_icon_badge"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="end|end|top"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/notifications_system_text_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                app:layout_constraintStart_toEndOf="@+id/notifications_system_icon"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/notifications_system_icon_container"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
@@ -253,7 +337,7 @@
             android:id="@+id/notifications_statistics_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="10dp"
             android:paddingEnd="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
@@ -261,21 +345,42 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/notifications_system_container">
 
-            <ImageView
-                android:id="@+id/notifications_statistics_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/baseline_analytics_24"
+            <FrameLayout
+                android:id="@+id/notifications_statistics_icon_container"
+                style="?attr/actionButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/baseline_analytics_24" />
+
+                <TextView
+                    android:id="@+id/notification_statistics_icon_badge"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="end|end|top"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/notifications_statistics_text_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                app:layout_constraintStart_toEndOf="@+id/notifications_statistics_icon"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toEndOf="@+id/notifications_statistics_icon_container"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 

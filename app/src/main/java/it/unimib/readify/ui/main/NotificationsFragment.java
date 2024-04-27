@@ -3,25 +3,39 @@ package it.unimib.readify.ui.main;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentNotificationsBinding;
+import it.unimib.readify.model.Notification;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class NotificationsFragment extends Fragment {
 
     private FragmentNotificationsBinding fragmentNotificationsBinding;
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private HashMap<String, ArrayList<Notification>> notifications;
+    Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
 
     public NotificationsFragment() {}
 
@@ -46,6 +60,8 @@ public class NotificationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         loadMenu();
+        initViewModels();
+        initObservers();
         navigateToNotificationPage();
     }
 
@@ -64,11 +80,11 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void navigateToNotificationPage() {
-        fragmentNotificationsBinding.notificationsNewFollowerContainer.setOnClickListener(v -> {
+        fragmentNotificationsBinding.notificationsNewFollowersContainer.setOnClickListener(v -> {
             NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(0);
             Navigation.findNavController(requireView()).navigate(action);
         });
-        fragmentNotificationsBinding.notificationsRecommendedContainer.setOnClickListener(v -> {
+        fragmentNotificationsBinding.notificationsRecommendedBooksContainer.setOnClickListener(v -> {
             NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(1);
             Navigation.findNavController(requireView()).navigate(action);
         });
@@ -84,5 +100,75 @@ public class NotificationsFragment extends Fragment {
             NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(4);
             Navigation.findNavController(requireView()).navigate(action);
         });
+    }
+
+    public void initViewModels() {
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
+    }
+
+    public void initObservers() {
+        /*
+            todo in case user is going to open the app by tapping a notification,
+             it probably needs to add userObserver (because method fetchNotifications needs user idToken)
+         */
+        fetchedNotificationsObserver = result -> {
+            notifications = result;
+            Log.d("notifications", notifications.toString());
+            updateUI();
+        };
+
+        testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+    }
+
+    public void updateUI() {
+        for (String key: notifications.keySet()) {
+            int notificationsToRead = 0;
+            for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
+                if(!notification.isRead())
+                    notificationsToRead++;
+            }
+            switch (key) {
+                case "newFollowers":
+                    fragmentNotificationsBinding.notificationNewFollowersIconBadge.setText(String.format("%s", notificationsToRead));
+                    break;
+                case "recommendedBooks":
+                    fragmentNotificationsBinding.notificationRecommendedBooksIconBadge.setText(String.format("%s", notificationsToRead));
+                    break;
+                case "sharedProfiles":
+                    fragmentNotificationsBinding.notificationSharedProfilesIconBadge.setText(String.format("%s", notificationsToRead));
+                    break;
+                case "system":
+                    fragmentNotificationsBinding.notificationSystemIconBadge.setText(String.format("%s", notificationsToRead));
+                    break;
+                case "statistics":
+                    fragmentNotificationsBinding.notificationStatisticsIconBadge.setText(String.format("%s", notificationsToRead));
+                    break;
+            }
+        }
+        setupBadge(fragmentNotificationsBinding.notificationNewFollowersIconBadge);
+        setupBadge(fragmentNotificationsBinding.notificationRecommendedBooksIconBadge);
+        setupBadge(fragmentNotificationsBinding.notificationSharedProfilesIconBadge);
+        setupBadge(fragmentNotificationsBinding.notificationSystemIconBadge);
+        setupBadge(fragmentNotificationsBinding.notificationStatisticsIconBadge);
+    }
+
+    private void setupBadge(TextView notificationsTextView) {
+        int notificationNumber;
+        if(notificationsTextView.getText().toString().isEmpty()) {
+            notificationNumber = 0;
+        } else {
+            notificationNumber = Integer.parseInt(notificationsTextView.getText().toString());
+        }
+        if (notificationNumber == 0) {
+            if (notificationsTextView.getVisibility() != View.GONE) {
+                notificationsTextView.setVisibility(View.GONE);
+            }
+        } else {
+            notificationsTextView.setText(String.valueOf(Math.min(notificationNumber, 99)));
+            if (notificationsTextView.getVisibility() != View.VISIBLE) {
+                notificationsTextView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

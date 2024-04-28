@@ -40,10 +40,9 @@ public class HomeFragment extends Fragment {
     private BookCarouselAdapter suggestedBooksAdapter;
     private BookCarouselAdapter recentBooksAdapter;
     private FragmentHomeBinding fragmentHomeBinding;
-
     private BookViewModel bookViewModel;
-
     private TestDatabaseViewModel testDatabaseViewModel;
+    private User user;
 
     public HomeFragment() {}
 
@@ -195,14 +194,16 @@ public class HomeFragment extends Fragment {
         Observer<Result> loggedUserObserver = result -> {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
-                User user = ((Result.UserSuccess) result).getData();
-                String welcomeMessage = getString(R.string.placeholder_home_welcome)
-                        .concat(" ")
-                        .concat(user.getUsername())
-                        .concat(" ")
-                        .concat("\uD83D\uDC4B")
-                        ;
-                fragmentHomeBinding.textviewHomeTitle.setText(welcomeMessage);
+                user = ((Result.UserSuccess) result).getData();
+                if(user.getUsername() != null) {
+                    String welcomeMessage = getString(R.string.placeholder_home_welcome)
+                            .concat(" ")
+                            .concat(user.getUsername())
+                            .concat(" ")
+                            .concat("\uD83D\uDC4B")
+                            ;
+                    fragmentHomeBinding.textviewHomeTitle.setText(welcomeMessage);
+                }
             }
         };
         //get user data from database

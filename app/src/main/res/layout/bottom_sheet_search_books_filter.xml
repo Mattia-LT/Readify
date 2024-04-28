@@ -117,56 +117,6 @@
             app:selectionRequired="false"
             app:singleSelection="false">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_genre_fantasy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                style="@style/Widget.Material3.Chip.Filter"
-                app:chipBackgroundColor="@color/bg_chip_state_list"
-                android:text="@string/chip_genre_fantasy"
-                />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_genre_action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:text="@string/chip_genre_action"
-                app:chipBackgroundColor="@color/bg_chip_state_list"
-                tools:checked="true"
-                />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_genre_biography"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                style="@style/Widget.Material3.Chip.Filter"
-                app:chipBackgroundColor="@color/bg_chip_state_list"
-                android:text="@string/chip_genre_biography"
-                />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_genre_science_fiction"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                app:chipBackgroundColor="@color/bg_chip_state_list"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:text="@string/chip_genre_science_fiction"
-                />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_genre_thriller"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                app:chipBackgroundColor="@color/bg_chip_state_list"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:text="@string/chip_genre_thriller"
-                />
 
         </com.google.android.material.chip.ChipGroup>
 

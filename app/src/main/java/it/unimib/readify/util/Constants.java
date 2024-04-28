@@ -98,4 +98,8 @@ public class Constants {
     public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
 
     public static String BUNDLE_ID_TOKEN = "idToken";
+
+    public static String RATING_SORT_SEARCH_MODE = "rating";
+    public static String TITLE_SORT_SEARCH_MODE = "title";
+
 }

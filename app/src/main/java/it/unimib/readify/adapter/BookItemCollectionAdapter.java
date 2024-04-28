@@ -1,97 +1,167 @@
 package it.unimib.readify.adapter;
 
-import android.app.Application;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
+import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.chip.Chip;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BookCollectionItemBinding;
+import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
+import it.unimib.readify.util.SubjectsUtil;
 
-public class BookItemCollectionAdapter extends
-        RecyclerView.Adapter<BookItemCollectionAdapter.ViewHolder>{
-
-    private List<OLWorkApiResponse> books;
-    private final OnItemClickListener onItemClickListener;
-    private final Application application;
-    private BookCollectionItemBinding bookCollectionItemBinding;
+public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, BookItemCollectionAdapter.BookItemCollectionViewHolder> {
 
     public interface OnItemClickListener {
         void onBookItemClick(OLWorkApiResponse book);
     }
 
-    public BookItemCollectionAdapter(OnItemClickListener onItemClickListener, Application application) {
-        this.onItemClickListener = onItemClickListener;
-        this.application = application;
-        books = new ArrayList<>();
-    }
+    private final OnItemClickListener onItemClickListener;
 
-    public void setBooks(List<OLWorkApiResponse> books) {
-        this.books = books;
-        notifyItemRangeChanged(0, this.books    .size());
+    public BookItemCollectionAdapter(OnItemClickListener onItemClickListener) {
+        super(new DiffUtil.ItemCallback<OLWorkApiResponse>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull OLWorkApiResponse oldItem, @NonNull OLWorkApiResponse newItem) {
+                return oldItem.getKey().equals(newItem.getKey());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull OLWorkApiResponse oldItem, @NonNull OLWorkApiResponse newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        bookCollectionItemBinding = BookCollectionItemBinding.inflate(LayoutInflater.from(application.getApplicationContext()));
-        return new ViewHolder(bookCollectionItemBinding.getRoot());
+    public BookItemCollectionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        BookCollectionItemBinding binding = BookCollectionItemBinding.inflate(inflater, parent, false);
+        return new BookItemCollectionAdapter.BookItemCollectionViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BookItemCollectionAdapter.ViewHolder holder, int position) {
-        holder.bind(books.get(position), position);
+    public void onBindViewHolder(@NonNull BookItemCollectionAdapter.BookItemCollectionViewHolder holder, int position) {
+        OLWorkApiResponse book = getItem(position);
+        holder.bind(book);
     }
 
-    @Override
-    public int getItemCount() {
-        if(books == null)
-            return 0;
-        return books.size();
-    }
+    public class BookItemCollectionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final BookCollectionItemBinding binding;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            itemView.setOnClickListener(this);
+        public BookItemCollectionViewHolder(@NonNull BookCollectionItemBinding binding){
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.bookCollectionContainer.setOnClickListener(this);
         }
 
-        public void bind(OLWorkApiResponse book, int position) {
-            //Thumbnail
-            if(book.getCovers() != null) {
-                for (Integer cover: book.getCovers()) {
-                    if(cover != -1) {
-                        RequestOptions requestOptions = new RequestOptions()
-                                .placeholder(R.drawable.loading_spinner)
-                                .error(R.drawable.image_not_available);
-                        Glide.with(application)
-                                .load("https://covers.openlibrary.org/b/id/"
-                                        + cover
-                                        + "-L.jpg")
-                                .apply(requestOptions)
-                                .into(bookCollectionItemBinding.collectionThumbnailImageview);
-                        break;
-                    }
-                }
-            }
-            //Title
-            bookCollectionItemBinding.collectionNameTextview.setText(book.getTitle());
+        public void bind(OLWorkApiResponse book) {
+            loadCover(book);
+            binding.textviewBookCollectionTitle.setText(book.getTitle());
+            loadAuthors(book);
+            //todo
+            loadSubjects(book);
+            loadRating(book);
         }
 
         @Override
         public void onClick(View v) {
-            onItemClickListener.onBookItemClick(books.get(getAdapterPosition()));
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                OLWorkApiResponse book = getItem(position);
+                onItemClickListener.onBookItemClick(book);
+            }
         }
+
+
+
+        private void loadCover(OLWorkApiResponse book){
+            if(book.getCovers() != null){
+                int pos = 0;
+                int cover = -1;
+                while (cover == -1 && pos < book.getCovers().size()) {
+                    cover = book.getCovers().get(pos);
+                    pos++;
+                }
+                if (cover == -1) {
+                    binding.bookCollectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
+                } else {
+                    RequestOptions requestOptions = new RequestOptions()
+                            .placeholder(R.drawable.loading_spinner)
+                            .error(R.drawable.image_not_available);
+
+                    Glide.with(this.itemView.getContext())
+                            .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
+                            .apply(requestOptions)
+                            .into(binding.bookCollectionThumbnailImageview);
+                }
+            } else {
+                binding.bookCollectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
+            }
+        }
+        private void loadAuthors(OLWorkApiResponse book){
+            StringBuilder authors = new StringBuilder();
+            if(book.getAuthorList() != null){
+                for(OLAuthorApiResponse author : book.getAuthorList()){
+                    authors.append(author.getName()).append("\n");
+                }
+            } else {
+                authors.append(this.itemView.getContext().getString(R.string.error_author_not_found));
+            }
+            binding.textviewBookCollectionAuthor.setText(authors.toString());
+        }
+        private void loadSubjects(OLWorkApiResponse book) {
+            if(book.getSubjects() != null){
+                binding.chipgroupBookCollectionGenres.removeAllViews();
+                SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(this.itemView.getContext());
+                String[] subjects = itemView.getResources().getStringArray(R.array.chip_genres);
+                for(String subject : book.getSubjects()){
+                    if(subjectsUtil.containSubject(subject)){
+                        Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.single_subject_chip_layout_small, binding.chipgroupBookCollectionGenres, false);
+                        int id = subjectsUtil.getChipId(subject);
+                        Log.d("ID", String.valueOf(id));
+                        Log.d("subject", subject);
+                        Log.d("SUBJECTS", Arrays.toString(subjects));
+                        chip.setText(subjects[id - 1]);
+                        chip.setClickable(false);
+                        binding.chipgroupBookCollectionGenres.addView(chip);
+                    }
+                }
+
+
+            }
+        }
+        private void loadRating(OLWorkApiResponse book) {
+            if(book.getRating() != null && book.getRating().getSummary().getAverage() != 0){
+                float rating = (float) book.getRating().getSummary().getAverage();
+                binding.ratingBarBookCollection.setRating(rating);
+                String ratingString = String.format("%s", rating).substring(0,3);
+                binding.ratingBarLabelBookCollection.setText(ratingString);
+            } else {
+                binding.ratingBarBookCollection.setRating(0);
+                binding.ratingBarLabelBookCollection.setText(R.string.rating_not_available);
+            }
+        }
+
+
+
     }
 }

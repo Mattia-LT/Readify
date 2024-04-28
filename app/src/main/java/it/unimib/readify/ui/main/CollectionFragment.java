@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -61,11 +61,11 @@ public class CollectionFragment extends Fragment {
                 book -> {
                     NavDirections action = CollectionFragmentDirections.actionCollectionFragmentToBookDetailsFragment(book);
                     Navigation.findNavController(requireView()).navigate(action);
-                }, requireActivity().getApplication());
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
+                });
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
-        bookItemCollectionAdapter.setBooks(collection.getWorks());
+        bookItemCollectionAdapter.submitList(collection.getWorks());
 
         //Managing data from Profile Fragment
         String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
@@ -79,18 +79,18 @@ public class CollectionFragment extends Fragment {
         else
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
         //Set number of books in the collection
+        String booksNumber;
         if (collection.getBooks() != null) {
-            String booksNumber = collection.getNumberOfBooks() + " ";
+            booksNumber = collection.getNumberOfBooks() + " ";
             if (collection.getNumberOfBooks() == 1){
                 booksNumber += getResources().getString(R.string.book);
             } else {
                 booksNumber += getResources().getString(R.string.books);
             }
-            collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
         } else {
-            String booksNumber = getResources().getString(R.string.empty_collection);
-            collectionProfileBinding.collectionFragmentBooksNumber.setText(booksNumber);
+            booksNumber = getResources().getString(R.string.empty_collection);
         }
+        collectionProfileBinding.collectionFragmentNumberOfBooks.setText(booksNumber);
     }
 
     private void loadMenu(){

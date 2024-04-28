@@ -52,7 +52,7 @@ dependencies {
 
 
     implementation("com.google.android.material:material:1.11.0")
-    implementation("com.google.android.gms:play-services-base:18.3.0")
+    implementation("com.google.android.gms:play-services-base:18.4.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
@@ -77,9 +77,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
-
-    //ce l'aveva il prof (?)
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
 
     // libreria per le imageview rotonde
     implementation("de.hdodenhof:circleimageview:3.1.0")

@@ -72,11 +72,6 @@
     <string name="textview_title_order_label">Title</string>
     <string name="textview_rating_order_label">Rating</string>
     <string name="textview_genre_filter_label">Genre</string>
-    <string name="chip_genre_fantasy" translatable="false">Fantasy</string>
-    <string name="chip_genre_action">Action</string>
-    <string name="chip_genre_thriller" translatable="false">Thriller</string>
-    <string name="chip_genre_science_fiction">Science Fiction</string>
-    <string name="chip_genre_biography">Biography</string>
     <string name="button_apply">Apply</string>
     <string name="button_reset" translatable="false">Reset</string>
     <string name="content_description_book_cover">Cover of the book</string>
@@ -136,6 +131,49 @@
     <string name="imageview_avatar">Avatar of the user</string>
     <string name="delete_collection_action">Delete the collection</string>
     <string name="rename_collection_action">Rename the collection</string>
+    <string name="content_description_collection_visibility">Visibility of the collection</string>
+    <string name="content_description_collection_thumbnail">Thumbnail of the collection</string>
+
+    <!-- chip genres -->
+    <string-array name="chip_genres">
+        <item name="chip_genre_action">Action</item>
+        <item name="chip_genre_biography">Biography</item>
+        <item name="chip_genre_classic">Classic</item>
+        <item name="chip_genre_comics">Comics</item>
+        <item name="chip_genre_drama">Drama</item>
+        <item name="chip_genre_fantasy">Fantasy</item>
+        <item name="chip_genre_historical">Historical</item>
+        <item name="chip_genre_horror">Horror</item>
+        <item name="chip_genre_humor">Humor</item>
+        <item name="chip_genre_mystery">Mystery</item>
+        <item name="chip_genre_poetry">Poetry</item>
+        <item name="chip_genre_romance">Romance</item>
+        <item name="chip_genre_sci_fi">Sci-fi</item>
+        <item name="chip_genre_shorts_stories">Short stories</item>
+        <item name="chip_genre_sport">Sport</item>
+        <item name="chip_genre_thriller">Thriller</item>
+    </string-array>
+
+    <string-array name="chip_genres_values" translatable="false">
+        <item name="chip_id_action">1</item>
+        <item name="chip_id_biography">2</item>
+        <item name="chip_id_classic">3</item>
+        <item name="chip_id_comics">4</item>
+        <item name="chip_id_drama">5</item>
+        <item name="chip_id_fantasy">6</item>
+        <item name="chip_id_historical">7</item>
+        <item name="chip_id_horror">8</item>
+        <item name="chip_id_humor">9</item>
+        <item name="chip_id_mystery">10</item>
+        <item name="chip_id_poetry">11</item>
+        <item name="chip_id_romance">12</item>
+        <item name="chip_id_sci_fi">13</item>
+        <item name="chip_id_shorts_stories">14</item>
+        <item name="chip_id_sport">15</item>
+        <item name="chip_id_thriller">16</item>
+    </string-array>
+
+
 
     <!-- errors -->
     <string name="username_already_taken">Username already taken</string>

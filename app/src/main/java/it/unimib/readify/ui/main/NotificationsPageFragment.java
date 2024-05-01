@@ -3,7 +3,6 @@ package it.unimib.readify.ui.main;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,34 +92,62 @@ public class NotificationsPageFragment extends Fragment {
              it probably needs to add userObserver (because method fetchNotifications needs user idToken)
          */
         fetchedNotificationsObserver = result -> {
-            //todo verify order notifications based on timestamp
-            //todo change string format to print 4-digits years (commentAdapter)
             notifications = result;
             for (String key: notifications.keySet()) {
                 Objects.requireNonNull(notifications.get(key)).sort(Collections.reverseOrder());
-                Log.d("notifications sort", Objects.requireNonNull(notifications.get(key)).toString());
             }
             updateUI();
         };
-
         testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
     public void updateUI() {
         if(notifications.get(receivedContent) != null) {
-            ArrayList<Notification> notificationsToRead = new ArrayList<>();
-            for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
-                if(!notification.isRead())
-                    notificationsToRead.add(notification);
+            if(Objects.requireNonNull(notifications.get(receivedContent)).isEmpty()) {
+                fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
+                fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
+            } else {
+                ArrayList<Notification> notificationsToRead = new ArrayList<>();
+                for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
+                    if(!notification.isRead())
+                        notificationsToRead.add(notification);
+                }
+                if(!notificationsToRead.isEmpty()) {
+                    notificationsAdapter.submitList(notificationsToRead);
+                } else {
+                    fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
+                }
+                if(notificationsToRead.size() < Objects.requireNonNull(notifications.get(receivedContent)).size()) {
+                    fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.VISIBLE);
+                    setViewAllNotifications();
+                }
+                if(fragmentNotificationsPageBinding.notificationsPageNoNotifications.getVisibility() == View.VISIBLE
+                    && fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.getVisibility() == View.VISIBLE) {
+                    fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.VISIBLE);
+                } else {
+                    fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.GONE);
+                }
             }
-            notificationsAdapter.submitList(notificationsToRead);
+        } else {
+            fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
+            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
         }
     }
 
-    private void initRecyclerView(){
+    public void initRecyclerView(){
         notificationsAdapter = new NotificationsAdapter();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setLayoutManager(layoutManager);
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setAdapter(notificationsAdapter);
+    }
+
+    public void setViewAllNotifications() {
+        fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
+            if(notifications.get(receivedContent) != null) {
+                notificationsAdapter.submitList(notifications.get(receivedContent));
+            }
+            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
+            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(null);
+        });
     }
 }

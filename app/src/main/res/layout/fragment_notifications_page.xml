@@ -9,23 +9,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/notificationsPage_noNotifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No new notifications yet"
+            android:textSize="25sp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
+
+        <View
+            android:id="@+id/notificationsPage_separator"
+            android:layout_width="350dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/notificationsPage_noNotifications"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/notificationsPage_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/notificationsPage_separator" />
 
         <!-- visibility should be gone when recyclerView is showing every notification in Database -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/notificationsPage_showAllText_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/notificationsPage_recyclerView"
-            android:visibility="visible">
+            android:visibility="gone">
             <TextView
                 android:id="@+id/notificationsPage_showAllText"
                 android:layout_width="wrap_content"

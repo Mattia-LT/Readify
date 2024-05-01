@@ -1,8 +1,6 @@
 package it.unimib.readify.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,9 +8,11 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import it.unimib.readify.databinding.BookCollectionItemBinding;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import it.unimib.readify.databinding.NotificationItemBinding;
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Notification;
 
 public class NotificationsAdapter extends ListAdapter<Notification, NotificationsAdapter.NotificationsViewHolder> {
@@ -27,12 +27,12 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         super(new DiffUtil.ItemCallback<Notification>() {
             @Override
             public boolean areItemsTheSame(@NonNull Notification oldItem, @NonNull Notification newItem) {
-                return false;
+                return oldItem.getTimestamp() == newItem.getTimestamp();
             }
 
             @Override
             public boolean areContentsTheSame(@NonNull Notification oldItem, @NonNull Notification newItem) {
-                return false;
+                return oldItem.equals(newItem);
             }
         });
     }
@@ -40,6 +40,7 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
     @NonNull
     @Override
     public NotificationsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //todo switch for layout in case of implementation of different types of notifications (from newFollowers)
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         NotificationItemBinding binding = NotificationItemBinding.inflate(inflater, parent, false);
         return new NotificationsViewHolder(binding);
@@ -61,7 +62,15 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         }
 
         public void bind(Notification notification) {
-            binding.notificationDate.setText(String.format("%tD", notification.getTimestamp()));
+            Locale locale = Locale.getDefault();
+            if (locale.getLanguage().startsWith("it")) {
+                locale = new Locale("it", "IT");
+            }
+            Date timestamp = new Date(notification.getTimestamp());
+            String pattern = "dd/MM/yyyy";
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
+            String formattedDate = dateFormat.format(timestamp);
+            binding.notificationDate.setText(formattedDate);
         }
     }
 }

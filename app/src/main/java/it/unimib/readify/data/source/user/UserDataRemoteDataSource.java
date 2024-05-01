@@ -274,8 +274,11 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                 for (DataSnapshot notification: notificationList.getChildren()) {
                                     String idToken = notification.child("idToken").getValue(String.class);
                                     boolean isRead = Boolean.TRUE.equals(notification.child("isRead").getValue(Boolean.class));
-                                    long timeStamp = notification.child("timestamp").getValue(Long.class);
-                                    temp.add(new Notification(idToken, isRead, timeStamp));
+                                    Object timestampObject = notification.child("timestamp").getValue();
+                                    if(timestampObject != null) {
+                                        long timeStamp = (long) timestampObject;
+                                        temp.add(new Notification(idToken, isRead, timeStamp));
+                                    }
                                 }
                                 notifications.put(notificationList.getKey(), temp);
                             }

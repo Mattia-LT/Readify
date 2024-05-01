@@ -255,7 +255,7 @@
         tools:layout="@layout/fragment_notifications_page">
         <argument
             android:name="content"
-            app:argType="integer" />
+            app:argType="string" />
     </fragment>
 
     <include app:graph="@navigation/login_navigation_graph" />

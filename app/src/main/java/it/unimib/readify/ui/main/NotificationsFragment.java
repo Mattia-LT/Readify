@@ -79,28 +79,7 @@ public class NotificationsFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
     }
 
-    private void navigateToNotificationPage() {
-        fragmentNotificationsBinding.notificationsNewFollowersContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(0);
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-        fragmentNotificationsBinding.notificationsRecommendedBooksContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(1);
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-        fragmentNotificationsBinding.notificationsSharedProfilesContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(2);
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-        fragmentNotificationsBinding.notificationsSystemContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(3);
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-        fragmentNotificationsBinding.notificationsStatisticsContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(4);
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-    }
+
 
     public void initViewModels() {
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
@@ -119,6 +98,29 @@ public class NotificationsFragment extends Fragment {
         };
 
         testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+    }
+
+    private void navigateToNotificationPage() {
+        fragmentNotificationsBinding.notificationsNewFollowersContainer.setOnClickListener(v -> {
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("newFollowers");
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+        fragmentNotificationsBinding.notificationsRecommendedBooksContainer.setOnClickListener(v -> {
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("recommendedBooks");
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+        fragmentNotificationsBinding.notificationsSharedProfilesContainer.setOnClickListener(v -> {
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("sharedProfiles");
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+        fragmentNotificationsBinding.notificationsSystemContainer.setOnClickListener(v -> {
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("system");
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+        fragmentNotificationsBinding.notificationsStatisticsContainer.setOnClickListener(v -> {
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("statistics");
+            Navigation.findNavController(requireView()).navigate(action);
+        });
     }
 
     public void updateUI() {

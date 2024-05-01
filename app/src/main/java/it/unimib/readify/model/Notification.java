@@ -3,7 +3,7 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Notification implements Parcelable {
+public class Notification implements Parcelable, Comparable<Notification> {
 
     private String idToken;
     private boolean isRead;
@@ -85,5 +85,10 @@ public class Notification implements Parcelable {
                 ", isRead=" + isRead +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Notification o) {
+        return Long.compare(this.getTimestamp(), o.getTimestamp());
     }
 }

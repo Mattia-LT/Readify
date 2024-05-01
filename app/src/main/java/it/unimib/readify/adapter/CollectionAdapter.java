@@ -72,6 +72,7 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
         }
 
         public void bind(Collection collection) {
+            //set cover
             if(collection != null && collection.getWorks() != null){
                 boolean isThumbnailAvailable = false;
                 if(collection.getWorks().isEmpty() && collection.getNumberOfBooks() == 0) {

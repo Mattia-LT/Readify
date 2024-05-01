@@ -20,6 +20,9 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setVisibility(User user);
     public abstract void setRecommended(User user);
     public abstract void setAvatar(User user);
+    public abstract void setFollowers(User user);
+    public abstract void setFollowing(User user);
+    public abstract void setSocialLinks(User user);
     public abstract void fetchNotifications(String idToken);
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);

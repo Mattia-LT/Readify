@@ -85,6 +85,7 @@ public class Constants {
     public static final String FIREBASE_USERS_VISIBILITY_FIELD = "visibility";
     public static final String FIREBASE_USERS_RECOMMENDED_FIELD = "recommended";
     public static final String FIREBASE_USERS_AVATAR_FIELD = "avatar";
+    public static final String FIREBASE_USERS_SOCIAL_LINKS_FIELD = "socialLinks";
 
 
     public static final String TO_READ = "to_read";

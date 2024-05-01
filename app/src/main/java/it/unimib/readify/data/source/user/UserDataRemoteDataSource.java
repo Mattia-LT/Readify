@@ -12,6 +12,7 @@ import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWERS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWING_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_GENDER_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_RECOMMENDED_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_SOCIAL_LINKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERS_LIST_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_VISIBILITY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
@@ -247,6 +248,75 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         if (snapshot.exists()) {
                             databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                                     .child(FIREBASE_USERS_AVATAR_FIELD).setValue(user.getAvatar())
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                        } else {
+                            //todo manage typo
+                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void setFollowers(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                                    .child(FIREBASE_USERS_FOLLOWERS_FIELD).setValue(user.getFollowers())
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                        } else {
+                            //todo manage typo
+                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void setFollowing(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                                    .child(FIREBASE_USERS_FOLLOWING_FIELD).setValue(user.getFollowing())
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                        } else {
+                            //todo manage typo
+                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void setSocialLinks(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                                    .child(FIREBASE_USERS_SOCIAL_LINKS_FIELD).setValue(user.getSocialLinks())
                                     .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                                     .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                         } else {

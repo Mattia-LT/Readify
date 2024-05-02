@@ -256,6 +256,10 @@
         <argument
             android:name="content"
             app:argType="string" />
+
+        <action
+            android:id="@+id/action_notificationsPageFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
     </fragment>
 
     <include app:graph="@navigation/login_navigation_graph" />

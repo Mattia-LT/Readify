@@ -381,7 +381,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (String idToken: usersTokens) {
-                    Log.d("source single token", idToken);
                     for (DataSnapshot datasnapshot: snapshot.getChildren()) {
                         User user = datasnapshot.getValue(User.class);
                         if(user != null && idToken.equals(user.getIdToken())) {
@@ -389,8 +388,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                 for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
                                     if(user.getIdToken().equals(notification.getIdToken())
                                             && key.equals("newFollowers")) {
-                                        Log.d("data single token", user.getUsername());
-                                        Log.d("data single token", user.getAvatar());
                                         notification.setUsername(user.getUsername());
                                         notification.setAvatar(user.getAvatar());
                                     }

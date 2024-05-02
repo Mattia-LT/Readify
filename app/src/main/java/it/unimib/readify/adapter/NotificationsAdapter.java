@@ -1,6 +1,8 @@
 package it.unimib.readify.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -20,7 +22,15 @@ import it.unimib.readify.model.Notification;
 
 public class NotificationsAdapter extends ListAdapter<Notification, NotificationsAdapter.NotificationsViewHolder> {
 
-    public NotificationsAdapter() {
+    private final OnItemClickListener onItemClickListener;
+
+    public interface OnItemClickListener {
+        void onNotificationItemClick(Notification notification);
+        void onFollowUser(String externalUserIdToken);
+        void onUnfollowUser(String externalUserIdToken);
+    }
+
+    public NotificationsAdapter(OnItemClickListener onItemClickListener) {
         /*
             makes sense to use DiffUtil.ItemCallback because, everytime the user opens NotificationPageFragment,
              he is going to modify interested notification instances; it will always return false,
@@ -38,6 +48,7 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
                 return oldItem.equals(newItem);
             }
         });
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -55,13 +66,14 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         holder.bind(notification);
     }
 
-    public static class NotificationsViewHolder extends RecyclerView.ViewHolder {
+    public class NotificationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final NotificationItemBinding binding;
 
         public NotificationsViewHolder(@NonNull NotificationItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            binding.getRoot().setOnClickListener(this);
         }
 
         public void bind(Notification notification) {
@@ -88,6 +100,35 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
             SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
             String formattedDate = dateFormat.format(timestamp);
             binding.notificationDate.setText(formattedDate);
+            //button
+            /*
+                todo right now, each time the user presses on the button, it refreshes the page,
+                 closing the "show all section" (in case it was open)
+             */
+            if(notification.isFollowedByUser()) {
+                binding.notificationButton.setText("Followed");
+                binding.notificationButton.setOnClickListener(v -> {
+                    onItemClickListener.onUnfollowUser(notification.getIdToken());
+                    binding.notificationButton.setOnClickListener(null);
+                });
+            } else {
+                binding.notificationButton.setText("Follow");
+                binding.notificationButton.setOnClickListener(v -> {
+                    onItemClickListener.onFollowUser(notification.getIdToken());
+                    binding.notificationButton.setOnClickListener(null);
+                });
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("notification page", "aww");
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Notification notification = getItem(position);
+                Log.d("notification page", notification.toString());
+                onItemClickListener.onNotificationItemClick(notification);
+            }
         }
     }
 }

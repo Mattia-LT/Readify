@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,16 +27,26 @@ import java.util.Objects;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.NotificationsAdapter;
 import it.unimib.readify.databinding.FragmentNotificationsPageBinding;
+import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.Notification;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class NotificationsPageFragment extends Fragment {
+
+    /*
+        todo assure to initialize correct UI elements for each type of notificationList
+         (in case there are going to be multiple types)
+     */
     private FragmentNotificationsPageBinding fragmentNotificationsPageBinding;
     private String receivedContent;
     private TestDatabaseViewModel testDatabaseViewModel;
     private HashMap<String, ArrayList<Notification>> notifications;
-    Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
+    private User user;
+    private Observer<Result> loggedUserObserver;
+    private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private NotificationsAdapter notificationsAdapter;
 
     public NotificationsPageFragment() {}
@@ -91,13 +103,46 @@ public class NotificationsPageFragment extends Fragment {
             todo in case user is going to open the app by tapping a notification,
              it probably needs to add userObserver (because method fetchNotifications needs user idToken)
          */
+
+        /*
+            @run is used to manage completeFetchNotifications method invocation:
+             instead of creating another LiveData variable (to memorize complete notifications),
+             system updates the same LiveData (@Notifications in VM); @run interrupt an infinite loop
+             of method invocation
+         */
+        final boolean[] run = {true};
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                this.user = ((Result.UserSuccess) result).getData();
+                run[0] = true;
+                testDatabaseViewModel.fetchNotifications(user.getIdToken());
+            }
+        };
+
         fetchedNotificationsObserver = result -> {
             notifications = result;
+            //sort by date
             for (String key: notifications.keySet()) {
                 Objects.requireNonNull(notifications.get(key)).sort(Collections.reverseOrder());
             }
-            updateUI();
+            //set followedByUser
+            for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
+                for (ExternalUser following: user.getFollowing().getUsers()) {
+                    if(notification.getIdToken().equals(following.getIdToken())) {
+                        notification.setFollowedByUser(true);
+                    }
+                }
+            }
+            //complete fetch
+            if(run[0]) {
+                run[0] = false;
+                testDatabaseViewModel.completeFetchNotifications(result);
+            }
+            if(checkFetchingNotifications()) {
+                updateUI();
+            }
         };
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
@@ -135,7 +180,22 @@ public class NotificationsPageFragment extends Fragment {
     }
 
     public void initRecyclerView(){
-        notificationsAdapter = new NotificationsAdapter();
+        notificationsAdapter = new NotificationsAdapter(new NotificationsAdapter.OnItemClickListener() {
+            @Override
+            public void onNotificationItemClick(Notification notification) {
+                NavDirections action = NotificationsPageFragmentDirections
+                        .actionNotificationsPageFragmentToUserDetailsFragment(notification.getIdToken(), notification.getUsername());
+                Navigation.findNavController(requireView()).navigate(action);
+            }
+            @Override
+            public void onFollowUser(String externalUserIdToken) {
+                testDatabaseViewModel.followUser(user.getIdToken(), externalUserIdToken);
+            }
+            @Override
+            public void onUnfollowUser(String externalUserIdToken) {
+                testDatabaseViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
+            }
+        });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setLayoutManager(layoutManager);
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setAdapter(notificationsAdapter);
@@ -149,5 +209,28 @@ public class NotificationsPageFragment extends Fragment {
             fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
             fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(null);
         });
+    }
+
+    public boolean checkFetchingNotifications() {
+        boolean fetchIsCompleted = true;
+        switch (receivedContent) {
+            case "newFollowers":
+                for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
+                    if(notification.getUsername() == null || notification.getAvatar() == null) {
+                        fetchIsCompleted = false;
+                        break;
+                    }
+                }
+                break;
+            case "recommendedBooks":
+                break;
+            case "sharedProfiles":
+                break;
+            case "system":
+                break;
+            case "statistics":
+                break;
+        }
+        return fetchIsCompleted;
     }
 }

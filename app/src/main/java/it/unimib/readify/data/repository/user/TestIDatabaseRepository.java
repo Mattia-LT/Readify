@@ -22,6 +22,7 @@ public interface TestIDatabaseRepository {
     void setUserRecommended(User user);
     void setUserAvatar(User user);
     void fetchNotifications(String idToken);
+    void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);
@@ -49,5 +50,5 @@ public interface TestIDatabaseRepository {
     MutableLiveData<String> getSourceUsernameError();
     MutableLiveData<String> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
-    MutableLiveData<HashMap<String, ArrayList<Notification>>> getNotifications();
+    MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
 }

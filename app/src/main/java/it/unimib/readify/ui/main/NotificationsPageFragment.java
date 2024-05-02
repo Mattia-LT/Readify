@@ -109,7 +109,7 @@ public class NotificationsPageFragment extends Fragment {
             } else {
                 ArrayList<Notification> notificationsToRead = new ArrayList<>();
                 for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
-                    if(!notification.isRead())
+                    if(notification.isRead())
                         notificationsToRead.add(notification);
                 }
                 if(!notificationsToRead.isEmpty()) {

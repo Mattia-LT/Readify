@@ -1,8 +1,12 @@
 package it.unimib.readify.data.source.user;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import it.unimib.readify.data.repository.user.UserResponseCallback;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 
 public abstract class BaseUserDataRemoteDataSource {
@@ -24,6 +28,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setFollowing(User user);
     public abstract void setSocialLinks(User user);
     public abstract void fetchNotifications(String idToken);
+    public abstract void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);
     public abstract void fetchComments(String bookId);

@@ -37,7 +37,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
-    private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
+    private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
 
     public static TestIDatabaseRepository getInstance(Application application) {
         return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
@@ -59,7 +59,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.sourceUsernameError = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
-        this.notifications = new MutableLiveData<>();
+        this.fetchedNotifications = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -121,6 +121,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void fetchNotifications(String idToken) {
         userDataRemoteDataSource.fetchNotifications(idToken);
+    }
+
+    @Override
+    public void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications) {
+        userDataRemoteDataSource.completeNotificationsFetch(notifications);
     }
 
     @Override
@@ -197,8 +202,8 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<HashMap<String, ArrayList<Notification>>> getNotifications() {
-        return notifications;
+    public MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications() {
+        return fetchedNotifications;
     }
 
     @Override
@@ -433,11 +438,21 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
-        this.notifications.postValue(notifications);
+        this.fetchedNotifications.postValue(notifications);
     }
 
     @Override
     public void onFailureFetchNotifications(String message) {
         Log.d("onFailureFetchNotifications", message);
+    }
+
+    @Override
+    public void onSuccessCompleteFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
+        fetchedNotifications.postValue(notifications);
+    }
+
+    @Override
+    public void onFailureCompleteFetchNotifications(String message) {
+        Log.d("onFailureCompleteFetchNotification", message);
     }
 }

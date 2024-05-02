@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import it.unimib.readify.model.Collection;
@@ -365,13 +366,57 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
+    //this approach is very efficient IF there aren't many users and usersTokens to match
+    public void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications) {
+        List<String> usersTokens = new ArrayList<>();
+        for (String key: notifications.keySet()) {
+            for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
+                if(!usersTokens.contains(notification.getIdToken())) {
+                    usersTokens.add(notification.getIdToken());
+                }
+            }
+        }
+        databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (String idToken: usersTokens) {
+                    Log.d("source single token", idToken);
+                    for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                        User user = datasnapshot.getValue(User.class);
+                        if(user != null && idToken.equals(user.getIdToken())) {
+                            for (String key: notifications.keySet()) {
+                                for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
+                                    if(user.getIdToken().equals(notification.getIdToken())
+                                            && key.equals("newFollowers")) {
+                                        Log.d("data single token", user.getUsername());
+                                        Log.d("data single token", user.getAvatar());
+                                        notification.setUsername(user.getUsername());
+                                        notification.setAvatar(user.getAvatar());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                userResponseCallback.onSuccessCompleteFetchNotifications(notifications);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureCompleteFetchNotifications("completeNotificationsFetch error");
+            }
+        });
+    }
+
+    @Override
     public void getUser(String idToken) {
         databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
                 userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));
             }
             else {
-                userResponseCallback.onFailureFromRemoteDatabaseUser(task.getException().getLocalizedMessage());
+                userResponseCallback.onFailureFromRemoteDatabaseUser(Objects.requireNonNull(task.getException()).getLocalizedMessage());
             }
         });
     }

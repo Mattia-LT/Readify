@@ -8,10 +8,13 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import it.unimib.readify.R;
 import it.unimib.readify.databinding.NotificationItemBinding;
 import it.unimib.readify.model.Notification;
 
@@ -62,6 +65,20 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         }
 
         public void bind(Notification notification) {
+            //username
+            binding.notificationTitle.setText(notification.getUsername());
+            //icon
+            int avatarId;
+            try {
+                avatarId = R.drawable.class.getDeclaredField(notification.getAvatar().toLowerCase()).getInt(null);
+            } catch (Exception e) {
+                avatarId = R.drawable.ic_baseline_profile_24;
+            }
+            Glide.with(this.itemView.getContext())
+                    .load(avatarId)
+                    .dontAnimate()
+                    .into(binding.notificationIcon);
+            //date
             Locale locale = Locale.getDefault();
             if (locale.getLanguage().startsWith("it")) {
                 locale = new Locale("it", "IT");

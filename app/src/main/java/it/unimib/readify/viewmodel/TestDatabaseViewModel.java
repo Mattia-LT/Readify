@@ -117,7 +117,7 @@ public class TestDatabaseViewModel extends ViewModel {
         sourceUsernameError = testDatabaseRepository.getSourceUsernameError();
         sourceEmailError = testDatabaseRepository.getSourceEmailError();
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
-        notifications = testDatabaseRepository.getNotifications();
+        notifications = testDatabaseRepository.getFetchedNotifications();
     }
 
     //new logic
@@ -271,6 +271,10 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void fetchNotifications(String idToken) {
         testDatabaseRepository.fetchNotifications(idToken);
+    }
+
+    public void completeFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
+        testDatabaseRepository.completeNotificationsFetch(notifications);
     }
 
     public void fetchFollowers(String idToken){

@@ -21,7 +21,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import it.unimib.readify.R;
@@ -127,7 +126,7 @@ public class NotificationsFragment extends Fragment {
         for (String key: notifications.keySet()) {
             int notificationsToRead = 0;
             for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
-                if(!notification.isRead())
+                if(notification.isRead())
                     notificationsToRead++;
             }
             switch (key) {

@@ -40,4 +40,6 @@ public interface UserResponseCallback {
     void onPasswordChanged(Boolean result);
     void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
     void onFailureFetchNotifications(String message);
+    void onSuccessCompleteFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
+    void onFailureCompleteFetchNotifications(String message);
 }

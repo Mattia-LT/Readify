@@ -108,12 +108,20 @@ public class ProfileFragment extends Fragment{
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
         };
 
+        /*
+            @run is used to manage completeFetchNotifications method invocation:
+             instead of creating another LiveData variable (to memorize complete notifications),
+             system updates the same LiveData (@Notifications in VM); @run interrupt an infinite loop
+             of method invocation
+         */
+        final boolean[] run = {true};
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
                 updateUI();
                 testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
+                run[0] = true;
                 testDatabaseViewModel.fetchNotifications(user.getIdToken());
             }
         };
@@ -131,6 +139,10 @@ public class ProfileFragment extends Fragment{
         fetchedNotificationsObserver = result -> {
             Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
             notifications = result;
+            if(run[0]) {
+                run[0] = false;
+                testDatabaseViewModel.completeFetchNotifications(result);
+            }
             loadMenu();
         };
 
@@ -188,7 +200,7 @@ public class ProfileFragment extends Fragment{
                 int notificationsNumber = 0;
                 for (String type: notifications.keySet()) {
                     for (Notification notification: Objects.requireNonNull(notifications.get(type))) {
-                        if(!notification.isRead()) {
+                        if(notification.isRead()) {
                             notificationsNumber++;
                         }
                     }

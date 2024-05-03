@@ -126,7 +126,7 @@ public class NotificationsFragment extends Fragment {
         for (String key: notifications.keySet()) {
             int notificationsToRead = 0;
             for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
-                if(notification.isRead())
+                if(!notification.isRead())
                     notificationsToRead++;
             }
             switch (key) {

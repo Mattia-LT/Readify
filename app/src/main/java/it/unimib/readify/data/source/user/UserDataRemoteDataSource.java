@@ -333,6 +333,10 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 });
     }
 
+    /*
+        remember that firebase cuts the start "is" from a boolean variable
+            es. isRead -> read
+     */
     @Override
     public void fetchNotifications(String idToken) {
         databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
@@ -345,7 +349,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                 ArrayList<Notification> temp = new ArrayList<>();
                                 for (DataSnapshot notification: notificationList.getChildren()) {
                                     String idToken = notification.child("idToken").getValue(String.class);
-                                    boolean isRead = Boolean.TRUE.equals(notification.child("isRead").getValue(Boolean.class));
+                                    boolean isRead = Boolean.TRUE.equals(notification.child("read").getValue(Boolean.class));
                                     Object timestampObject = notification.child("timestamp").getValue();
                                     if(timestampObject != null) {
                                         long timeStamp = (long) timestampObject;
@@ -405,6 +409,36 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 userResponseCallback.onFailureCompleteFetchNotifications("completeNotificationsFetch error");
             }
         });
+    }
+
+    @Override
+    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken).child(content)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()) {
+                            ArrayList<Notification> tempList = new ArrayList<>();
+                            for (Notification notification: Objects.requireNonNull(notifications.get(content))) {
+                                notification.setRead(true);
+                                Notification temp = new Notification(notification);
+                                temp.setUsername(null);
+                                temp.setAvatar(null);
+                                temp.setFollowedByUser(false);
+                                tempList.add(temp);
+                            }
+                            databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
+                                    .child(content).setValue(tempList)
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFetchNotifications(notifications))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureFetchNotifications(e.getLocalizedMessage()));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     @Override

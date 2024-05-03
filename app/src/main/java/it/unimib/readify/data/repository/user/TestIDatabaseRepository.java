@@ -23,6 +23,7 @@ public interface TestIDatabaseRepository {
     void setUserAvatar(User user);
     void fetchNotifications(String idToken);
     void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
+    void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);

@@ -29,6 +29,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setSocialLinks(User user);
     public abstract void fetchNotifications(String idToken);
     public abstract void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
+    public abstract void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);
     public abstract void fetchComments(String bookId);

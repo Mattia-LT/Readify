@@ -284,6 +284,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.completeNotificationsFetch(notifications);
     }
 
+    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
+        testDatabaseRepository.setNotificationsList(idToken, content, notifications);
+    }
+
     public void fetchFollowers(String idToken){
         testDatabaseRepository.fetchFollowers(idToken);
     }

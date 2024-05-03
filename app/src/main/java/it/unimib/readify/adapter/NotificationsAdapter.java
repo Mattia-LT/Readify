@@ -106,7 +106,7 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
                  closing the "show all section" (in case it was open)
              */
             if(notification.isFollowedByUser()) {
-                binding.notificationButton.setText("Followed");
+                binding.notificationButton.setText("Unfollow");
                 binding.notificationButton.setOnClickListener(v -> {
                     onItemClickListener.onUnfollowUser(notification.getIdToken());
                     binding.notificationButton.setOnClickListener(null);

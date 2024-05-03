@@ -78,6 +78,13 @@ public class NotificationsPageFragment extends Fragment {
         initObservers();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //todo remove field followedByUser from notifications
+        testDatabaseViewModel.setNotificationsList(user.getIdToken(), receivedContent, notifications);
+    }
+
     private void loadMenu(){
         //Set up the toolbar and remove all icons
         MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
@@ -154,8 +161,9 @@ public class NotificationsPageFragment extends Fragment {
             } else {
                 ArrayList<Notification> notificationsToRead = new ArrayList<>();
                 for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
-                    if(notification.isRead())
+                    if(!notification.isRead()) {
                         notificationsToRead.add(notification);
+                    }
                 }
                 if(!notificationsToRead.isEmpty()) {
                     notificationsAdapter.submitList(notificationsToRead);

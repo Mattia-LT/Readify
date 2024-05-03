@@ -139,7 +139,7 @@ public class ProfileFragment extends Fragment{
         };
 
         fetchedNotificationsObserver = result -> {
-            //Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
+            Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
             notifications = result;
             loadMenu();
         };
@@ -200,7 +200,7 @@ public class ProfileFragment extends Fragment{
                 int notificationsNumber = 0;
                 for (String type: notifications.keySet()) {
                     for (Notification notification: Objects.requireNonNull(notifications.get(type))) {
-                        if(notification.isRead()) {
+                        if(!notification.isRead()) {
                             notificationsNumber++;
                         }
                     }

@@ -13,24 +13,33 @@ public class Notification implements Parcelable, Comparable<Notification> {
     private String username;
     private String avatar;
     private boolean followedByUser;
-    private boolean read;
+    private boolean isRead;
     private long timestamp;
 
     public Notification() {}
 
-    public Notification(String idToken, boolean read, long timestamp) {
+    public Notification(String idToken, boolean isRead, long timestamp) {
         this.idToken = idToken;
-        this.read = read;
+        this.isRead = isRead;
         this.timestamp = timestamp;
     }
 
-    public Notification(String idToken, String username, String avatar, boolean followedByUser, boolean read, long timestamp) {
+    public Notification(String idToken, String username, String avatar, boolean followedByUser, boolean isRead, long timestamp) {
         this.idToken = idToken;
         this.username = username;
         this.avatar = avatar;
         this.followedByUser = followedByUser;
-        this.read = read;
+        this.isRead = isRead;
         this.timestamp = timestamp;
+    }
+
+    public Notification(Notification notification) {
+        this.idToken = notification.getIdToken();
+        this.username = notification.getUsername();
+        this.avatar = notification.getAvatar();
+        this.followedByUser = notification.isFollowedByUser();
+        this.isRead = notification.isRead();
+        this.timestamp = notification.getTimestamp();
     }
 
     public String getIdToken() {
@@ -66,11 +75,11 @@ public class Notification implements Parcelable, Comparable<Notification> {
     }
 
     public boolean isRead() {
-        return !read;
+        return isRead;
     }
 
     public void setRead(boolean read) {
-        this.read = read;
+        this.isRead = read;
     }
 
     public long getTimestamp() {
@@ -89,7 +98,7 @@ public class Notification implements Parcelable, Comparable<Notification> {
                 ", username='" + username + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", isFollowedByUser=" + followedByUser +
-                ", isRead=" + read +
+                ", isRead=" + isRead +
                 ", timestamp=" + timestamp +
                 '}';
     }
@@ -110,7 +119,7 @@ public class Notification implements Parcelable, Comparable<Notification> {
         dest.writeString(this.username);
         dest.writeString(this.avatar);
         dest.writeByte(this.followedByUser ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.read ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isRead ? (byte) 1 : (byte) 0);
         dest.writeLong(this.timestamp);
     }
 
@@ -119,7 +128,7 @@ public class Notification implements Parcelable, Comparable<Notification> {
         this.username = source.readString();
         this.avatar = source.readString();
         this.followedByUser = source.readByte() != 0;
-        this.read = source.readByte() != 0;
+        this.isRead = source.readByte() != 0;
         this.timestamp = source.readLong();
     }
 
@@ -128,7 +137,7 @@ public class Notification implements Parcelable, Comparable<Notification> {
         this.username = in.readString();
         this.avatar = in.readString();
         this.followedByUser = in.readByte() != 0;
-        this.read = in.readByte() != 0;
+        this.isRead = in.readByte() != 0;
         this.timestamp = in.readLong();
     }
 
@@ -149,11 +158,11 @@ public class Notification implements Parcelable, Comparable<Notification> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Notification that = (Notification) o;
-        return followedByUser == that.followedByUser && read == that.read && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(username, that.username) && Objects.equals(avatar, that.avatar);
+        return followedByUser == that.followedByUser && isRead == that.isRead && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(username, that.username) && Objects.equals(avatar, that.avatar);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idToken, username, avatar, followedByUser, read, timestamp);
+        return Objects.hash(idToken, username, avatar, followedByUser, isRead, timestamp);
     }
 }

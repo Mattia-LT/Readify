@@ -129,6 +129,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
+        userDataRemoteDataSource.setNotificationsList(idToken, content, notifications);
+    }
+
+    @Override
     public void searchUsers(String query){
         Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);

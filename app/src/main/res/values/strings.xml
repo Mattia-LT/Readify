@@ -133,6 +133,10 @@
     <string name="rename_collection_action">Rename the collection</string>
     <string name="content_description_collection_visibility">Visibility of the collection</string>
     <string name="content_description_collection_thumbnail">Thumbnail of the collection</string>
+    <string name="delete_collection_confirm_message">Are you sure you want to delete the following collection</string>
+    <string name="rename_collection_confirm_message">Type the new name of the collection</string>
+    <string name="confirm_action">Confirm</string>
+    <string name="cancel_action">Cancel</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

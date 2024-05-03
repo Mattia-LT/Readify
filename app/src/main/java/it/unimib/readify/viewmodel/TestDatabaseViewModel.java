@@ -1,7 +1,10 @@
 package it.unimib.readify.viewmodel;
 
+import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
+
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -11,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
@@ -61,6 +65,9 @@ public class TestDatabaseViewModel extends ViewModel {
     private final MutableLiveData<String> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
+    private MutableLiveData<Boolean> isCollectionNameValid;
+    private MutableLiveData<Boolean> isCollectionNameUnique;
+    private MutableLiveData<String> newCollectionName;
     private boolean isUIRunning;
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
@@ -334,4 +341,77 @@ public class TestDatabaseViewModel extends ViewModel {
     public void fetchOtherUser(String otherUserIdToken){
         testDatabaseRepository.fetchOtherUser(otherUserIdToken);
     }
+
+
+    //Rename collection section
+    public void setNewCollectionName(String name) {
+        if(newCollectionName == null){
+            newCollectionName = new MutableLiveData<>();
+        }
+        newCollectionName.setValue(name);
+    }
+
+    public LiveData<String> getCollectionName(){
+        if(newCollectionName == null){
+            newCollectionName = new MutableLiveData<>();
+        }
+        return newCollectionName;
+    }
+
+    public LiveData<Boolean> isNameValid() {
+        if(isCollectionNameValid == null){
+            isCollectionNameValid = new MutableLiveData<>();
+        }
+        return isCollectionNameValid;
+    }
+
+    public LiveData<Boolean> isNameUnique() {
+        if(isCollectionNameUnique == null){
+            isCollectionNameUnique = new MutableLiveData<>();
+        }
+        return isCollectionNameUnique;
+    }
+
+    public void validateCollectionName() {
+        String collectionName = newCollectionName.getValue();
+
+        if (collectionName != null && !collectionName.isEmpty() && isValidCollectionFormat(collectionName)) {
+            isCollectionNameValid.setValue(true);
+            if(checkUniqueCollectionName(collectionName)){
+                isCollectionNameUnique.setValue(true);
+            } else {
+                isCollectionNameUnique.setValue(false);
+            }
+        } else {
+            isCollectionNameValid.setValue(false);
+        }
+    }
+
+    private boolean isValidCollectionFormat(String name) {
+        //todo aggiungere ulteriori controlli in caso
+        return name.length() <= COLLECTION_NAME_CHARACTERS_LIMIT &&
+                !name.isEmpty() &&
+                name.length() > 4;
+    }
+
+    private boolean checkUniqueCollectionName(String name) {
+        List<Result> collections = loggedUserCollectionListLiveData.getValue();
+        if (collections != null) {
+            for (Result collectionResult : collections) {
+                Collection collection = ((Result.CollectionSuccess) collectionResult).getData();
+                if (collection.getName().equalsIgnoreCase(name)) {
+                    return false; // Name already exists
+                }
+            }
+        }return true; // Name is unique
+    }
+
+
+    public void renameCollection(String loggedUserIdToken, String collectionId) {
+        testDatabaseRepository.renameCollection(loggedUserIdToken, collectionId, newCollectionName.getValue());
+        this.isCollectionNameValid = new MutableLiveData<>();
+        this.isCollectionNameUnique = new MutableLiveData<>();
+    }
+    //End of Rename collection section
+
 }

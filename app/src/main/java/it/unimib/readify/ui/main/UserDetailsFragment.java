@@ -159,7 +159,7 @@ public class UserDetailsFragment extends Fragment {
     }
     private void initRecyclerView(){
         collectionAdapter = new CollectionAdapter(collection -> {
-            NavDirections action = UserDetailsFragmentDirections.actionUserDetailsFragmentToCollectionFragment(collection, collection.getName());
+            NavDirections action = UserDetailsFragmentDirections.actionUserDetailsFragmentToCollectionFragment(collection, collection.getName(), userIdToken);
             Navigation.findNavController(requireView()).navigate(action);
         });
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);

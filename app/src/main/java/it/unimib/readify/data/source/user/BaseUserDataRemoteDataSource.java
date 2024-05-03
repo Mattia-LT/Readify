@@ -45,6 +45,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
     public abstract void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
     public abstract void fetchOtherUser(String otherUserIdToken);
+    public abstract void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName);
 
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);

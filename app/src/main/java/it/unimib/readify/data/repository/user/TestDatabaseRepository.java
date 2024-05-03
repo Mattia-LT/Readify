@@ -346,6 +346,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName) {
+        userDataRemoteDataSource.renameCollection(loggedUserIdToken, collectionId, newCollectionName);
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error

@@ -39,6 +39,7 @@ public interface TestIDatabaseRepository {
     void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void fetchOtherUser(String otherUserIdToken);
+    void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

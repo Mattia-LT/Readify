@@ -1,6 +1,7 @@
 package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_NOTIFICATIONS_COLLECTION;
@@ -984,6 +985,23 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                     public void onCancelled(@NonNull DatabaseError error) {
                         //todo manage errors
                     }
+                });
+    }
+
+    @Override
+    public void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName) {
+        DatabaseReference collectionNameReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(loggedUserIdToken)
+                .child(collectionId)
+                .child(FIREBASE_COLLECTIONS_NAME_FIELD);
+
+        collectionNameReference.setValue(newCollectionName)
+                .addOnSuccessListener(aVoid -> {
+                    //todo create success
+                })
+                .addOnFailureListener(e -> {
+                    //todo create fail
                 });
     }
 

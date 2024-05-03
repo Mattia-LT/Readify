@@ -91,9 +91,9 @@ public class SubjectsUtil {
     }
 
     public int getChipId(String apiValue) {
-        Log.e("ENTRY api value", apiValue);
+        //Log.e("ENTRY api value", apiValue);
         for (Map.Entry<Integer, String> entry : subjectsApiValueMap.entrySet()) {
-            Log.e("ENTRY GET VALUE", entry.getValue());
+            //Log.e("ENTRY GET VALUE", entry.getValue());
             if (entry.getValue().equalsIgnoreCase(apiValue)) {
                 return entry.getKey();
             }

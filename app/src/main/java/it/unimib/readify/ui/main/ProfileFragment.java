@@ -51,14 +51,18 @@ import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
+
     private TestDatabaseViewModel testDatabaseViewModel;
     private BookViewModel bookViewModel;
+
     private CollectionAdapter collectionAdapter;
-    private User user;
+    private User loggedUser;
+    private List<Collection> collectionsList;
+
     private HashMap<String, ArrayList<Notification>> notifications;
-    Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
-    Observer<Result> loggedUserObserver;
-    Observer<List<Result>> fetchedCollectionsObserver;
+    private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
+    private Observer<Result> loggedUserObserver;
+    private Observer<List<Result>> fetchedCollectionsObserver;
     public ProfileFragment() {}
 
     public static ProfileFragment newInstance() {
@@ -98,23 +102,28 @@ public class ProfileFragment extends Fragment{
 
     private void initObservers() {
         //todo all observer (except loggedUser) triggers twice instead of 1 when page is reloaded
+        this.collectionsList = new ArrayList<>();
+
         fetchedCollectionsObserver = results -> {
-            List<Collection> collectionResultList = results.stream()
+            this.collectionsList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
             Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
-            collectionAdapter.submitList(collectionResultList);
+            collectionAdapter.submitList(collectionsList);
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
+            fragmentProfileBinding.recyclerviewCollections.setVisibility(View.VISIBLE);
         };
 
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
-                this.user = ((Result.UserSuccess) result).getData();
+                this.loggedUser = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
                 updateUI();
-                testDatabaseViewModel.fetchLoggedUserCollections(user.getIdToken());
-                testDatabaseViewModel.fetchNotifications(user.getIdToken());
+                fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
+                fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
+                testDatabaseViewModel.fetchLoggedUserCollections(loggedUser.getIdToken());
+                testDatabaseViewModel.fetchNotifications(loggedUser.getIdToken());
             }
         };
 
@@ -125,11 +134,12 @@ public class ProfileFragment extends Fragment{
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
+            this.collectionsList = collectionsResultList;
             bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
         fetchedNotificationsObserver = result -> {
-            Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
+            //Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
             notifications = result;
             loadMenu();
         };
@@ -142,9 +152,11 @@ public class ProfileFragment extends Fragment{
 
    private void initRecyclerView(){
        collectionAdapter = new CollectionAdapter(collection -> {
-                   NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName());
-                   Navigation.findNavController(requireView()).navigate(action);
-               });
+           if(collection != null){
+               NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCollectionFragment(collection, collection.getName(), loggedUser.getIdToken());
+               Navigation.findNavController(requireView()).navigate(action);
+           }
+       });
        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
        fragmentProfileBinding.recyclerviewCollections.setLayoutManager(layoutManager);
        fragmentProfileBinding.recyclerviewCollections.setAdapter(collectionAdapter);
@@ -254,7 +266,7 @@ public class ProfileFragment extends Fragment{
 
     private void initCreateCollectionSection() {
         fragmentProfileBinding.createCollection.setOnClickListener(v -> {
-            NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCreateCollectionDialog(user.getIdToken());
+            NavDirections action = ProfileFragmentDirections.actionProfileFragmentToCreateCollectionDialog(loggedUser.getIdToken());
             Navigation.findNavController(requireView()).navigate(action);
         });
     }
@@ -262,9 +274,9 @@ public class ProfileFragment extends Fragment{
         View.OnClickListener followClickListener = v -> {
             NavDirections action = null;
             if(v.getId() == fragmentProfileBinding.textviewFollowerCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowerLabel.getId() ){
-                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWER);
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(loggedUser.getIdToken(), loggedUser.getUsername(), DESTINATION_FRAGMENT_FOLLOWER);
             } else if(v.getId() == fragmentProfileBinding.textviewFollowingCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowingLabel.getId()) {
-                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(user.getIdToken(),user.getUsername(),DESTINATION_FRAGMENT_FOLLOWING);
+                action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(loggedUser.getIdToken(), loggedUser.getUsername(), DESTINATION_FRAGMENT_FOLLOWING);
             }
             if(action != null){
                 Navigation.findNavController(requireView()).navigate(action);
@@ -280,7 +292,7 @@ public class ProfileFragment extends Fragment{
     public void updateUI() {
         int avatarId;
         try {
-            avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+            avatarId = R.drawable.class.getDeclaredField(loggedUser.getAvatar().toLowerCase()).getInt(null);
         } catch (Exception e) {
             avatarId = R.drawable.ic_baseline_profile_24;
         }
@@ -289,27 +301,27 @@ public class ProfileFragment extends Fragment{
                 .dontAnimate()
                 .into(fragmentProfileBinding.avatarImageView);
 
-        fragmentProfileBinding.textviewUsername.setText(user.getUsername());
-        fragmentProfileBinding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
-        fragmentProfileBinding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
+        fragmentProfileBinding.textviewUsername.setText(loggedUser.getUsername());
+        fragmentProfileBinding.textviewFollowerCounter.setText(String.valueOf(loggedUser.getFollowers().getCounter()));
+        fragmentProfileBinding.textviewFollowingCounter.setText(String.valueOf(loggedUser.getFollowing().getCounter()));
 
-        fragmentProfileBinding.textviewUserBiography.setText(user.getBiography());
+        fragmentProfileBinding.textviewUserBiography.setText(loggedUser.getBiography());
 
         fragmentProfileBinding.textviewFacebook.setVisibility(View.GONE);
         fragmentProfileBinding.textviewTwitter.setVisibility(View.GONE);
         fragmentProfileBinding.textviewInstagram.setVisibility(View.GONE);
-        for (int i = 0; i < user.getSocialLinks().size(); i++) {
-            switch (user.getSocialLinks().get(i).getSocialPlatform()) {
+        for (int i = 0; i < loggedUser.getSocialLinks().size(); i++) {
+            switch (loggedUser.getSocialLinks().get(i).getSocialPlatform()) {
                 case "facebook":
-                    fragmentProfileBinding.textviewFacebook.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewFacebook.setText(loggedUser.getSocialLinks().get(i).getLink());
                     fragmentProfileBinding.textviewFacebook.setVisibility(View.VISIBLE);
                     break;
                 case "twitter":
-                    fragmentProfileBinding.textviewTwitter.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewTwitter.setText(loggedUser.getSocialLinks().get(i).getLink());
                     fragmentProfileBinding.textviewTwitter.setVisibility(View.VISIBLE);
                     break;
                 case "instagram":
-                    fragmentProfileBinding.textviewInstagram.setText(user.getSocialLinks().get(i).getLink());
+                    fragmentProfileBinding.textviewInstagram.setText(loggedUser.getSocialLinks().get(i).getLink());
                     fragmentProfileBinding.textviewInstagram.setVisibility(View.VISIBLE);
                     break;
             }
@@ -318,7 +330,7 @@ public class ProfileFragment extends Fragment{
 
     private void setupBadge(TextView notificationsTextView) {
         int notificationNumber = Integer.parseInt(notificationsTextView.getText().toString());
-        Log.d("badge", Integer.toString(notificationNumber));
+        //Log.d("badge", Integer.toString(notificationNumber));
         if (notificationNumber == 0) {
             if (notificationsTextView.getVisibility() != View.GONE) {
                 notificationsTextView.setVisibility(View.GONE);

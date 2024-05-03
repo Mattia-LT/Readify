@@ -1,41 +1,64 @@
 package it.unimib.readify.ui.main;
 
+import static android.graphics.Typeface.BOLD_ITALIC;
+import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
+
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.Result;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class CollectionFragment extends Fragment {
 
     private FragmentCollectionBinding collectionProfileBinding;
-    private BookItemCollectionAdapter bookItemCollectionAdapter;
     private TestDatabaseViewModel testDatabaseViewModel;
     private Collection collection;
+    private String loggedUserIdToken;
+    private String collectionOwnerIdToken;
+    private AlertDialog renameDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,12 +75,175 @@ public class CollectionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadMenu();
         initViewModels();
+        initObservers();
+        loadMenu();
 
+        collectionOwnerIdToken = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionOwnerIdToken();
         collection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
+        String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
 
-        bookItemCollectionAdapter = new BookItemCollectionAdapter(
+        initRecyclerView();
+
+        //Managing data from Profile Fragment
+        requireActivity().setTitle(collectionName);
+
+        showCollectionData();
+
+    }
+
+    private void initViewModels(){
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
+    }
+
+    private void initObservers() {
+        final Observer<Result> loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                this.loggedUserIdToken = ((Result.UserSuccess) result).getData().getIdToken();
+                Log.e("USER OBSERVER","TRIGGERED");
+            }
+        };
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+    }
+
+    private void loadMenu(){
+        // Set up the toolbar and remove all icons
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+                if(loggedUserIdToken.equals(collectionOwnerIdToken)){
+                    menuInflater.inflate(R.menu.collection_appbar_menu, menu);
+                    //todo caricare il menu solo se le collezioni sono dell'utente loggato
+                }
+                int colorWhite = getResources().getColor(R.color.white, null);
+                // Enable the back button
+                Drawable backButton = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
+                if (backButton != null) {
+                    backButton.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
+                }
+                toolbar.setNavigationIcon(backButton);
+                toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+
+            }
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_collection_settings) {
+                    SubMenu collectionSettingsSubMenu = menuItem.getSubMenu();
+                    if (collectionSettingsSubMenu != null) {
+                        MenuItem renameCollectionItem = collectionSettingsSubMenu.findItem(R.id.action_rename_collection);
+                        renameCollectionItem.setOnMenuItemClickListener(item -> {
+                            loadRenameCollectionDialog();
+                            return false;
+                        });
+                    }
+                } else if(menuItem.getItemId() == R.id.action_delete_collection){
+                    loadDeleteCollectionDialog();
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    private void loadRenameCollectionDialog() {
+        View renameDialogLayout = getLayoutInflater().inflate(R.layout.dialog_rename_collection, null);
+
+        TextInputLayout textInputLayout = renameDialogLayout.findViewById(R.id.rename_textinputlayout_dialog);
+        EditText renameEditText = textInputLayout.getEditText();
+
+        //isValid -> name's length OK and contain only permitted characters
+        testDatabaseViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
+            if (!isValid){
+                if (renameEditText != null) {
+                    //TODO metti un file R.string
+                    Log.e("isNameValid","false");
+                    renameEditText.setError("Invalid collection name");
+                    renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+        });
+
+        testDatabaseViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
+            if (isUnique) {
+                Log.e("isNameUnique","true");
+                if (renameEditText != null) {
+                    renameEditText.setError(null);
+                }
+                renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+            } else {
+                if (renameEditText != null) {
+                    //TODO metti un file R.string
+                    Log.e("isNameUnique","false");
+                    renameEditText.setError("Collection name already exists");
+                    renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+        });
+
+        String originalMessage = requireContext().getString(R.string.rename_collection_confirm_message);
+
+        TextView characterCounterRename = renameDialogLayout.findViewById(R.id.character_counter_rename);
+        TextView characterLimitRename = renameDialogLayout.findViewById(R.id.character_limit_rename);
+        characterCounterRename.setText("0");
+        characterLimitRename.setText(String.valueOf(COLLECTION_NAME_CHARACTERS_LIMIT));
+        if (renameEditText != null) {
+            renameEditText.setFilters(new InputFilter[]{
+                    new InputFilter.LengthFilter(COLLECTION_NAME_CHARACTERS_LIMIT)
+            });
+            renameEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    // Not needed for this implementation
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    testDatabaseViewModel.setNewCollectionName(s.toString());
+                    testDatabaseViewModel.validateCollectionName();
+                    int currentLength = s.length();
+                    characterCounterRename.setText(String.valueOf(currentLength));
+                }
+            });
+        }
+
+        AlertDialog.Builder renameDialogBuilder = new AlertDialog.Builder(requireContext());
+        renameDialogBuilder
+                .setTitle(R.string.rename_collection_action)
+                .setMessage(originalMessage)
+                .setView(renameDialogLayout)
+                .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
+                    if (renameEditText != null) {
+                        testDatabaseViewModel.getCollectionName().observe(getViewLifecycleOwner(), new Observer<String>(){
+                            @Override
+                            public void onChanged(String newCollectionName) {
+                                collectionProfileBinding.collectionFragmentCollectionName.setText(newCollectionName);
+                                AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                                //update top appbar title
+                                if (activity.getSupportActionBar() != null) {
+                                    activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+                                    activity.getSupportActionBar().setTitle(newCollectionName);
+                                }
+                                testDatabaseViewModel.getCollectionName().removeObserver(this);
+                            }
+                        });
+                        testDatabaseViewModel.renameCollection(loggedUserIdToken,collection.getCollectionId());
+                    }
+                })
+                .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
+        renameDialog = renameDialogBuilder.create();
+        renameDialog.show();
+        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+    }
+
+    private void initRecyclerView() {
+        BookItemCollectionAdapter bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 book -> {
                     NavDirections action = CollectionFragmentDirections.actionCollectionFragmentToBookDetailsFragment(book);
                     Navigation.findNavController(requireView()).navigate(action);
@@ -66,18 +252,17 @@ public class CollectionFragment extends Fragment {
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
         bookItemCollectionAdapter.submitList(collection.getWorks());
+    }
 
-        //Managing data from Profile Fragment
-        String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
-        requireActivity().setTitle(collectionName);
-
+    private void showCollectionData() {
         //Set collection name
         collectionProfileBinding.collectionFragmentCollectionName.setText(collection.getName());
         //Set collection visibility icon
-        if (collection.isVisible())
+        if (collection.isVisible()){
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_visibility_24);
-        else
+        } else{
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
+        }
         //Set number of books in the collection
         String booksNumber;
         if (collection.getBooks() != null) {
@@ -93,38 +278,34 @@ public class CollectionFragment extends Fragment {
         collectionProfileBinding.collectionFragmentNumberOfBooks.setText(booksNumber);
     }
 
-    private void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menu.clear();
-                menuInflater.inflate(R.menu.collection_appbar_menu, menu);
-                //todo caricare il menu solo se le collezioni sono dell'utente loggato
-                int colorWhite = getResources().getColor(R.color.white, null);
+    private void loadDeleteCollectionDialog(){
+        String originalMessage = requireContext().getString(R.string.delete_collection_confirm_message)
+                .concat(": ")
+                .concat(collection.getName())
+                .concat(" ?");
 
-                // Enable the back button
-                Drawable backButton = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-                if (backButton != null) {
-                    backButton.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
-                }
-                toolbar.setNavigationIcon(backButton);
-                toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+        SpannableStringBuilder formattedMessage = getFormattedMessage(originalMessage);
 
-            }
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.action_collection_settings) {
-                    // TODO: Apri impostazioni collection o un menu
-                }
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+        MaterialAlertDialogBuilder deleteDialogBuilder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.delete_collection_action)
+                .setMessage(formattedMessage)
+                .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
+                    testDatabaseViewModel.deleteCollection(loggedUserIdToken, collection.getCollectionId());
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                })
+                .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
+
+        deleteDialogBuilder.show();
     }
 
-    private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+    @NonNull
+    private SpannableStringBuilder getFormattedMessage(String originalMessage) {
+        SpannableStringBuilder formattedMessage = new SpannableStringBuilder(originalMessage);
+        StyleSpan boldStyleSpan = new StyleSpan(BOLD_ITALIC);
+        ForegroundColorSpan redForegroundColorSpan = new ForegroundColorSpan(Color.RED);
+        formattedMessage.setSpan(boldStyleSpan, originalMessage.indexOf(":") + 1, originalMessage.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        formattedMessage.setSpan(redForegroundColorSpan, originalMessage.indexOf(":") + 1, originalMessage.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return formattedMessage;
     }
+
 }

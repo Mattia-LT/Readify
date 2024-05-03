@@ -122,6 +122,11 @@
     <string name="rename_collection_action">Rinomina la collezione</string>
     <string name="content_description_collection_visibility">Visibilità della collezione</string>
     <string name="content_description_collection_thumbnail">Copertina della collezione</string>
+    <string name="delete_collection_confirm_message">Sei sicuro di voler eliminare la seguente collezione</string>
+    <string name="rename_collection_confirm_message">Scrivi il nuovo nome della collezione</string>
+    <string name="confirm_action">Conferma</string>
+    <string name="cancel_action">Annulla</string>
+
     <!-- chip genres -->
     <string-array name="chip_genres">
         <item name="chip_genre_action">Azione</item>

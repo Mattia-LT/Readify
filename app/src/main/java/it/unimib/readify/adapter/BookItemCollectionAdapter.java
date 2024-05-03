@@ -128,6 +128,7 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
             }
             binding.textviewBookCollectionAuthor.setText(authors.toString());
         }
+
         private void loadSubjects(OLWorkApiResponse book) {
             if(book.getSubjects() != null){
                 binding.chipgroupBookCollectionGenres.removeAllViews();

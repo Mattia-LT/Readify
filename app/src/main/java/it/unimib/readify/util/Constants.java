@@ -5,21 +5,21 @@ public class Constants {
     //TODO Eventuali costanti da usare nella progettazione andranno qui. esempio:
 
     // Constants for SharedPreferences
-    public static final String SHARED_PREFERENCES_FILE_NAME = "it.unimib.worldnews.preferences";
+    public static final String SHARED_PREFERENCES_FILE_NAME = "it.unimib.readify.preferences";
     public static final String SHARED_PREFERENCES_COUNTRY_OF_INTEREST = "country_of_interest";
     public static final String SHARED_PREFERENCES_TOPICS_OF_INTEREST = "topics_of_interest";
     public static final String SHARED_PREFERENCES_FIRST_LOADING = "first_loading";
 
 
     // Constants for EncryptedSharedPreferences
-    public static final String ENCRYPTED_SHARED_PREFERENCES_FILE_NAME = "it.unimib.worldnews.encrypted_preferences";
+    public static final String ENCRYPTED_SHARED_PREFERENCES_FILE_NAME = "it.unimib.readify.encrypted_preferences";
     public static final String EMAIL_ADDRESS = "email_address";
     public static final String PASSWORD = "password";
     public static final String ID_TOKEN = "google_token";
 
 
     // Constants for encrypted files
-    public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.worldnews.encrypted_file.txt";
+    public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.readify.encrypted_file.txt";
 
 
     // Constants for API
@@ -75,6 +75,8 @@ public class Constants {
     public static final String FIREBASE_USERS_USERNAME_FIELD = "username";
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
     public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
+    public static final String FIREBASE_COLLECTIONS_NAME_FIELD = "name";
+
     public static final String FIREBASE_USERS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
     public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
@@ -93,7 +95,7 @@ public class Constants {
 
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 15;
 
-    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]", "Contains:" };
+    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]", "[Source]", "Contains:" };
 
     public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
     public static int DESTINATION_FRAGMENT_FOLLOWING = 1;

@@ -119,6 +119,9 @@
         <argument
             android:name="collectionName"
             app:argType="string"/>
+        <argument
+            android:name="collectionOwnerIdToken"
+            app:argType="string"/>
         <action
             android:id="@+id/action_collectionFragment_to_profileFragment"
             app:destination="@id/profileFragment"/>

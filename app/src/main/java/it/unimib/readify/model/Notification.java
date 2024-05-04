@@ -9,6 +9,11 @@ import java.util.Objects;
 
 public class Notification implements Parcelable, Comparable<Notification> {
 
+    /*
+        implementing only "newFollowers" notifications, a notificationIdToken is not needed:
+         there's already @idToken, which is unique and multiple notifications from same token shouldn't exist
+     */
+
     private String idToken;
     private String username;
     private String avatar;

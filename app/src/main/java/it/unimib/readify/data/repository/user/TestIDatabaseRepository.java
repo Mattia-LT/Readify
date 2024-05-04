@@ -21,9 +21,12 @@ public interface TestIDatabaseRepository {
     void setUserVisibility(User user);
     void setUserRecommended(User user);
     void setUserAvatar(User user);
+    void setUserFollowing(User user);
+    void setUserFollowers(User user);
     void fetchNotifications(String idToken);
     void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
     void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
+    void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);

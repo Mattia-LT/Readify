@@ -276,6 +276,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.setUserAvatar(user);
     }
 
+    public void setUserFollowing(User user) {testDatabaseRepository.setUserFollowing(user);}
+
+    public void setUserFollowers(User user) {testDatabaseRepository.setUserFollowers(user);}
+
     public void fetchNotifications(String idToken) {
         testDatabaseRepository.fetchNotifications(idToken);
     }
@@ -286,6 +290,10 @@ public class TestDatabaseViewModel extends ViewModel {
 
     public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
         testDatabaseRepository.setNotificationsList(idToken, content, notifications);
+    }
+
+    public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
+        testDatabaseRepository.addNotification(receivingIdToken, content, loggedUserIdToken);
     }
 
     public void fetchFollowers(String idToken){

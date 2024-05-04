@@ -119,6 +119,16 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void setUserFollowing(User user) {
+        userDataRemoteDataSource.setFollowing(user);
+    }
+
+    @Override
+    public void setUserFollowers(User user) {
+        userDataRemoteDataSource.setFollowers(user);
+    }
+
+    @Override
     public void fetchNotifications(String idToken) {
         userDataRemoteDataSource.fetchNotifications(idToken);
     }
@@ -130,7 +140,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
-        userDataRemoteDataSource.setNotificationsList(idToken, content, notifications);
+        userDataRemoteDataSource.setViewedNotificationsListToRead(idToken, content, notifications);
+    }
+
+    @Override
+    public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
+        userDataRemoteDataSource.addNotification(receivingIdToken, content, loggedUserIdToken);
     }
 
     @Override

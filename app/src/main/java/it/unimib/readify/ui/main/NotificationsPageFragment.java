@@ -117,12 +117,28 @@ public class NotificationsPageFragment extends Fragment {
              system updates the same LiveData (@Notifications in VM); @run interrupt an infinite loop
              of method invocation
          */
-        final boolean[] run = {true};
+        final boolean[] run = {true, true};
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 run[0] = true;
                 testDatabaseViewModel.fetchNotifications(user.getIdToken());
+                /*
+                //
+                if(run[1]) {
+                    //like this, no new notifications will be added after the first time
+                    run[1] = false;
+                    for (ExternalUser externalUser: user.getFollowing().getUsers()) {
+                        if(!externalUser.isRead()) {
+                            //send notification
+                            //set externalUser read to true in database (run[1] should be useful)
+                            testDatabaseViewModel.addNotification(externalUser.getIdToken(), "newFollowers", user.getIdToken());
+                            externalUser.setRead(true);
+                        }
+                    }
+                    testDatabaseViewModel.setUserFollowing(user);
+                }
+                */
             }
         };
 

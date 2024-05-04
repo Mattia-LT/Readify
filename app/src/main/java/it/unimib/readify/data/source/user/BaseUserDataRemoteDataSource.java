@@ -29,7 +29,11 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setSocialLinks(User user);
     public abstract void fetchNotifications(String idToken);
     public abstract void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
-    public abstract void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
+    /*
+        setViewedNotificationsListToRead is a disgusting name;
+         it sets a List of Notifications' "read" field to true
+     */
+    public abstract void setViewedNotificationsListToRead(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);
     public abstract void fetchComments(String bookId);
@@ -51,4 +55,15 @@ public abstract class BaseUserDataRemoteDataSource {
     //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
     public abstract void getUserPreferences(String idToken);
     public abstract void saveUserPreferences(String message, String idToken);
+
+    //substitute of followUser / unfollowUser
+    /*
+    public abstract void addFollowing(String loggedUserIdToken, String externalUserIdToken);
+    public abstract void addFollower(String externalUserIdToken, String loggedUserIdToken);
+    public abstract void removeFollowing(String loggedUserIdToken, String externalUserIdToken);
+    public abstract void removeFollower(String externalUserIdToken, String loggedUserIdToken);
+
+     */
+    public abstract void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
+    public abstract void removeNotification(String targetIdToken, String content, String loggedUserIdToken);
 }

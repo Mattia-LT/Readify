@@ -412,7 +412,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
+    public void setViewedNotificationsListToRead(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
         databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken).child(content)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -436,7 +436,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        //todo manage errors
                     }
                 });
     }
@@ -1069,6 +1069,39 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     @Override
     public void saveUserPreferences(String message, String idToken) {
         //todo da implementare
+    }
+
+    @Override
+    public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken).child(content)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
+                ArrayList<Notification> notificationsList = new ArrayList<>();
+                if(snapshot.exists()) {
+                    for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                        Notification notification = datasnapshot.getValue(Notification.class);
+                        notificationsList.add(notification);
+                    }
+                }
+                notificationsList.add(new Notification(loggedUserIdToken, false, new Date().getTime()));
+                databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
+                        .child(content).setValue(notificationsList)
+                        .addOnSuccessListener(aVoid -> Log.d("addNotification", "success"))
+                        .addOnFailureListener(e -> Log.d("addNotification", Objects.requireNonNull(e.getLocalizedMessage())));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
+
     }
 
    /*

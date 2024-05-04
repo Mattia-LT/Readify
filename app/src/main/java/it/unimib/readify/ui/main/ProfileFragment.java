@@ -59,7 +59,7 @@ public class ProfileFragment extends Fragment{
     private User loggedUser;
     private List<Collection> collectionsList;
 
-    private HashMap<String, ArrayList<Notification>> notifications;
+    private HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
     private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private Observer<Result> loggedUserObserver;
     private Observer<List<Result>> fetchedCollectionsObserver;
@@ -90,6 +90,7 @@ public class ProfileFragment extends Fragment{
         initRecyclerView();
         initCreateCollectionSection();
         initFollowersSection();
+        loadMenu();
     }
 
     private void initViewModels() {

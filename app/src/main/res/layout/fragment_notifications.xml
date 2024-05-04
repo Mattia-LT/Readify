@@ -48,7 +48,8 @@
                     android:gravity="center"
                     android:padding="3dp"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone" />
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -129,7 +130,8 @@
                     android:gravity="center"
                     android:padding="3dp"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -210,7 +212,8 @@
                     android:gravity="center"
                     android:padding="3dp"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -291,7 +294,8 @@
                     android:gravity="center"
                     android:padding="3dp"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -372,7 +376,8 @@
                     android:gravity="center"
                     android:padding="3dp"
                     android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

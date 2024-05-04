@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +83,7 @@ public class NotificationsPageFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         //todo remove field followedByUser from notifications
+        Log.d("set notifications read", "read");
         testDatabaseViewModel.setNotificationsList(user.getIdToken(), receivedContent, notifications);
     }
 
@@ -123,22 +125,18 @@ public class NotificationsPageFragment extends Fragment {
                 this.user = ((Result.UserSuccess) result).getData();
                 run[0] = true;
                 testDatabaseViewModel.fetchNotifications(user.getIdToken());
-                /*
-                //
-                if(run[1]) {
-                    //like this, no new notifications will be added after the first time
-                    run[1] = false;
+                //send notifications
+                Log.d("check following", user.getFollowing().toString());
+                if(checkSendingNotifications()) {
+                    Log.d("checkSendingNotifications", "send");
                     for (ExternalUser externalUser: user.getFollowing().getUsers()) {
                         if(!externalUser.isRead()) {
-                            //send notification
-                            //set externalUser read to true in database (run[1] should be useful)
                             testDatabaseViewModel.addNotification(externalUser.getIdToken(), "newFollowers", user.getIdToken());
                             externalUser.setRead(true);
                         }
                     }
                     testDatabaseViewModel.setUserFollowing(user);
                 }
-                */
             }
         };
 
@@ -150,10 +148,14 @@ public class NotificationsPageFragment extends Fragment {
             }
             //set followedByUser
             for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
-                for (ExternalUser following: user.getFollowing().getUsers()) {
-                    if(notification.getIdToken().equals(following.getIdToken())) {
-                        notification.setFollowedByUser(true);
+                if(user.getFollowing().getUsers() != null && !user.getFollowing().getUsers().isEmpty()) {
+                    for (ExternalUser following: user.getFollowing().getUsers()) {
+                        if(notification.getIdToken().equals(following.getIdToken())) {
+                            notification.setFollowedByUser(true);
+                        }
                     }
+                } else {
+                    notification.setFollowedByUser(false);
                 }
             }
             //complete fetch
@@ -171,6 +173,7 @@ public class NotificationsPageFragment extends Fragment {
 
     public void updateUI() {
         if(notifications.get(receivedContent) != null) {
+            Log.d("page notifications", notifications.toString());
             if(Objects.requireNonNull(notifications.get(receivedContent)).isEmpty()) {
                 fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
                 fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
@@ -182,6 +185,7 @@ public class NotificationsPageFragment extends Fragment {
                     }
                 }
                 if(!notificationsToRead.isEmpty()) {
+                    fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.GONE);
                     notificationsAdapter.submitList(notificationsToRead);
                 } else {
                     fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
@@ -198,6 +202,7 @@ public class NotificationsPageFragment extends Fragment {
                 }
             }
         } else {
+            Log.d("notifications null", "null");
             fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
             fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
         }
@@ -213,6 +218,7 @@ public class NotificationsPageFragment extends Fragment {
             }
             @Override
             public void onFollowUser(String externalUserIdToken) {
+                //todo "show all" should not popping up
                 testDatabaseViewModel.followUser(user.getIdToken(), externalUserIdToken);
             }
             @Override
@@ -226,6 +232,11 @@ public class NotificationsPageFragment extends Fragment {
     }
 
     public void setViewAllNotifications() {
+        /*
+            when there's no new notification
+            todo when the user follow / unfollow another user, the fragment not refreshes itself;
+             in addition, it appears the text "View all"
+         */
         fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
             if(notifications.get(receivedContent) != null) {
                 notificationsAdapter.submitList(notifications.get(receivedContent));
@@ -256,5 +267,18 @@ public class NotificationsPageFragment extends Fragment {
                 break;
         }
         return fetchIsCompleted;
+    }
+
+    public boolean checkSendingNotifications() {
+        boolean sendNotifications = false;
+        if(user.getFollowing().getUsers() != null) {
+            for (ExternalUser externalUser: user.getFollowing().getUsers()) {
+                if(!externalUser.isRead()) {
+                    sendNotifications = true;
+                    break;
+                }
+            }
+        }
+        return sendNotifications;
     }
 }

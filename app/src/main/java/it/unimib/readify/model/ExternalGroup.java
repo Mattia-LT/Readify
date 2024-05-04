@@ -71,7 +71,7 @@ public class ExternalGroup implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return "Followers{" +
+        return "ExternalGroup{" +
                 "counter=" + counter +
                 ", users=" + users +
                 '}';

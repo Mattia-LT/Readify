@@ -360,7 +360,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             }
                             userResponseCallback.onSuccessFetchNotifications(notifications);
                         } else {
-                            userResponseCallback.onFailureFetchNotifications("User doesn't exist yet");
+                            userResponseCallback.onFailureFetchNotifications("There is no notifications");
                         }
                     }
                     @Override
@@ -1073,7 +1073,8 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken).child(content)
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
+                .child(content).child(loggedUserIdToken)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

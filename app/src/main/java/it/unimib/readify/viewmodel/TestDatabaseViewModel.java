@@ -296,6 +296,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.addNotification(receivingIdToken, content, loggedUserIdToken);
     }
 
+    public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
+        testDatabaseRepository.removeNotification(targetIdToken, content, loggedUserIdToken);
+    }
+
     public void fetchFollowers(String idToken){
         testDatabaseRepository.fetchFollowers(idToken);
     }

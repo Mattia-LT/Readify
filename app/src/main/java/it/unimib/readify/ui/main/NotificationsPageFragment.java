@@ -126,7 +126,6 @@ public class NotificationsPageFragment extends Fragment {
                 run[0] = true;
                 testDatabaseViewModel.fetchNotifications(user.getIdToken());
                 //send notifications
-                Log.d("check following", user.getFollowing().toString());
                 if(checkSendingNotifications()) {
                     Log.d("checkSendingNotifications", "send");
                     for (ExternalUser externalUser: user.getFollowing().getUsers()) {
@@ -142,29 +141,34 @@ public class NotificationsPageFragment extends Fragment {
 
         fetchedNotificationsObserver = result -> {
             notifications = result;
-            //sort by date
-            for (String key: notifications.keySet()) {
-                Objects.requireNonNull(notifications.get(key)).sort(Collections.reverseOrder());
-            }
-            //set followedByUser
-            for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
-                if(user.getFollowing().getUsers() != null && !user.getFollowing().getUsers().isEmpty()) {
-                    for (ExternalUser following: user.getFollowing().getUsers()) {
-                        if(notification.getIdToken().equals(following.getIdToken())) {
-                            notification.setFollowedByUser(true);
+            if(notifications != null) {
+                Log.d("notifications check2", Objects.requireNonNull(notifications.toString()));
+                //sort by date
+                for (String key: notifications.keySet()) {
+                    Objects.requireNonNull(notifications.get(key)).sort(Collections.reverseOrder());
+                }
+                if(notifications.get("newFollowers") != null) {
+                    //set followedByUser
+                    for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
+                        if(user.getFollowing().getUsers() != null && !user.getFollowing().getUsers().isEmpty()) {
+                            for (ExternalUser following: user.getFollowing().getUsers()) {
+                                if(notification.getIdToken().equals(following.getIdToken())) {
+                                    notification.setFollowedByUser(true);
+                                }
+                            }
+                        } else {
+                            notification.setFollowedByUser(false);
                         }
                     }
-                } else {
-                    notification.setFollowedByUser(false);
+                    //complete fetch
+                    if(run[0]) {
+                        run[0] = false;
+                        testDatabaseViewModel.completeFetchNotifications(result);
+                    }
+                    if(checkFetchingNotifications()) {
+                        updateUI();
+                    }
                 }
-            }
-            //complete fetch
-            if(run[0]) {
-                run[0] = false;
-                testDatabaseViewModel.completeFetchNotifications(result);
-            }
-            if(checkFetchingNotifications()) {
-                updateUI();
             }
         };
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
@@ -224,6 +228,8 @@ public class NotificationsPageFragment extends Fragment {
             @Override
             public void onUnfollowUser(String externalUserIdToken) {
                 testDatabaseViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
+                //if unfollow has been confirmed
+                testDatabaseViewModel.removeNotification(externalUserIdToken, "newFollowers", user.getIdToken());
             }
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());

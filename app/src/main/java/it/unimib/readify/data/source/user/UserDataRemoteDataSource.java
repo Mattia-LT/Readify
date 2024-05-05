@@ -343,8 +343,8 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .addValueEventListener (new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
                         if (snapshot.exists()) {
-                            HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
                             for (DataSnapshot notificationList: snapshot.getChildren()) {
                                 ArrayList<Notification> temp = new ArrayList<>();
                                 for (DataSnapshot notification: notificationList.getChildren()) {
@@ -358,10 +358,8 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                 }
                                 notifications.put(notificationList.getKey(), temp);
                             }
-                            userResponseCallback.onSuccessFetchNotifications(notifications);
-                        } else {
-                            userResponseCallback.onFailureFetchNotifications("There is no notifications");
                         }
+                        userResponseCallback.onSuccessFetchNotifications(notifications);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -1095,14 +1093,47 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("addNotification", error.toString());
             }
         });
     }
 
+    /*
+        1. remove only newFollowers notifications
+        2. remove every notification with loggedUserIdToken as idToken
+     */
     @Override
     public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
+        if(content.equals("newFollowers")) {
+            databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken).child(content)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()) {
+                            ArrayList<Notification> newFollowersNotifications = new ArrayList<>();
+                            for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                                Notification notification = datasnapshot.getValue(Notification.class);
+                                if(notification != null && !notification.getIdToken().equals(loggedUserIdToken)) {
+                                    newFollowersNotifications.add(notification);
+                                }
+                            }
+                            databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken)
+                                    .child(content).setValue(newFollowersNotifications)
+                                    .addOnSuccessListener(aVoid -> Log.d("removeNotification", "success"))
+                                    .addOnFailureListener(e -> Log.d("removeNotification", Objects.requireNonNull(e.getLocalizedMessage())));
+                        } else {
+                            Log.d("removeNotification", "no newFollowers notifications detected");
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.d("removeNotification", error.toString());
+                    }
+                });
+        } else {
+            Log.d("removeNotification", "incorrect content input");
+        }
     }
 
    /*

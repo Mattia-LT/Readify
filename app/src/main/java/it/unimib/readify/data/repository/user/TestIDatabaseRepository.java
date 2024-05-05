@@ -27,6 +27,7 @@ public interface TestIDatabaseRepository {
     void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
     void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
     void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
+    void removeNotification(String targetIdToken, String content, String loggedUserIdToken);
 
     void fetchComments(String bookId);
     void fetchLoggedUserCollections(String idToken);

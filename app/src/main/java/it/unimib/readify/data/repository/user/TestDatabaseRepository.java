@@ -149,6 +149,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
+        userDataRemoteDataSource.removeNotification(targetIdToken, content, loggedUserIdToken);
+    }
+
+    @Override
     public void searchUsers(String query){
         Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);

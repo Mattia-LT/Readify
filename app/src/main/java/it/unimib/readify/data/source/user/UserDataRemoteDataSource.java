@@ -102,6 +102,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                     //Availability Checks
                                     //Username
                                     if(!user.getUsername().equals(existingUser.getUsername())) {
+                                        Log.d("TAGaaaa", user.getUsername().toString());
                                         onUsernameAvailable(user);
                                     }
                                     //Email
@@ -124,13 +125,16 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void onUsernameAvailable(User user) {
+        Log.d("TAGd", user.getUsername().toString());
         DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
         usersRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("TAGb", user.getUsername().toString());
                 if (dataSnapshot.exists()) {
                     userResponseCallback.onUsernameAvailable("notAvailable");
                 } else {
+                    Log.d("TAGc", user.getUsername().toString());
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                             .child(FIREBASE_USERS_USERNAME_FIELD).setValue(user.getUsername())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))

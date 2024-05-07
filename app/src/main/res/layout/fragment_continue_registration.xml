@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:text="Scegli il tuo username"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -61,9 +61,10 @@
             android:layout_height="wrap_content"
             android:textColor="#FF0000"
             android:textSize="20sp"
-            android:visibility="gone"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintStart_toStartOf="@+id/text_input_edit_text_choose_username"
+            app:layout_constraintTop_toBottomOf="@+id/text_input_edit_text_choose_username" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -71,7 +72,7 @@
         android:id="@+id/textview_gender_selection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:text="Scegli la tua identità di genere"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -83,7 +84,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="10dp"
         android:layout_marginEnd="240dp"
         android:padding="13dp"
         android:background="@drawable/custom_textbox_bl"
@@ -92,11 +93,23 @@
         app:layout_constraintTop_toBottomOf="@+id/textview_gender_selection" />
 
     <TextView
+        android:id="@+id/continue_registration_gender_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="20sp"
+        android:layout_marginEnd="50dp"
+        android:paddingTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/spinner_gender"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_gender"
+        />
+
+    <TextView
         android:id="@+id/textview_choose_genre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"
         android:text="Scegli i generi dei libri che ti potrebbero interessare"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -114,147 +127,26 @@
         app:layout_constraintTop_toBottomOf="@id/textview_choose_genre"
         app:selectionRequired="false"
         app:singleSelection="false">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_fantasy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            style="@style/Widget.Material3.Chip.Filter"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            android:text="Fantasy"
-            />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_love_stories"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Storie d'amore"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_thriller"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            style="@style/Widget.Material3.Chip.Filter"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            android:text="Thriller"
-            />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_horror"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Horror"
-            />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_cooking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Cucina"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Storia"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_psychology"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Psicologia"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_scifi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Sci-Fi"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_mental_health"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Salute Mentale"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_classic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Classici"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_humor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Comici"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_comedy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Commedie"
-            />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_childrens"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Per Bambini"
-            />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_genre_contemporary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            app:chipBackgroundColor="@color/bg_chip_state_list"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:text="Contemporanei"
-            />
-
-
     </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/continue_registration_chip_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="20sp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="50dp"
+        app:layout_constraintStart_toStartOf="@+id/chipgroup_genre_filter"
+        app:layout_constraintTop_toBottomOf="@+id/chipgroup_genre_filter"
+        />
+
     <Button
         android:id="@+id/confirm_preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Conferma le mie preferenze"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:backgroundTint="?attr/colorPrimaryVariant"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

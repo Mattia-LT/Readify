@@ -16,7 +16,9 @@ public interface TestIDatabaseRepository {
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
-    void updateUserData(User user, String newPassword);
+    void changeUserPassword(String newPassword);
+    void setUserUsername(User user);
+    void setUserEmail(String newEmail);
     void setUserGender(User user);
     void setUserVisibility(User user);
     void setUserRecommended(User user);
@@ -54,7 +56,7 @@ public interface TestIDatabaseRepository {
     MutableLiveData<List<Result>> getFollowingListLiveData();
     MutableLiveData<Result> getOtherUserLiveData();
     MutableLiveData<String> getSourceUsernameError();
-    MutableLiveData<String> getSourceEmailError();
+    MutableLiveData<Boolean> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
 }

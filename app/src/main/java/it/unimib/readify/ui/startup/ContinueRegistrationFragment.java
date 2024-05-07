@@ -92,7 +92,10 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
             {
                 onSaveUser.setUsername(username);
                 onSaveUser.setGender(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItem().toString());
-                testDatabaseViewModel.updateUserData(onSaveUser, null);
+
+                //TODO CALL NEW METHODS
+                //testDatabaseViewModel.updateUserData(onSaveUser, null);
+
                 testDatabaseViewModel.setUserGender(onSaveUser);
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
             } else {

@@ -35,7 +35,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<Result> otherUserLiveData;
     private final MutableLiveData<String> sourceUsernameError;
-    private final MutableLiveData<String> sourceEmailError;
+    private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
 
@@ -93,11 +93,18 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void updateUserData(User user, String newPassword) {
-        userDataRemoteDataSource.updateUserData(user);
-        if(newPassword != null) {
-            userAuthRemoteDataSource.changePassword(newPassword);
-        }
+    public void changeUserPassword(String newPassword) {
+        userAuthRemoteDataSource.changePassword(newPassword);
+    }
+
+    @Override
+    public void setUserUsername(User user) {
+        userDataRemoteDataSource.setUsername(user);
+    }
+
+    @Override
+    public void setUserEmail(String newEmail) {
+        userAuthRemoteDataSource.changeEmail(newEmail);
     }
 
     @Override
@@ -217,7 +224,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<String> getSourceEmailError() {
+    public MutableLiveData<Boolean> getSourceEmailError() {
         return sourceEmailError;
     }
 
@@ -457,9 +464,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onEmailAvailable(String result) {
-        sourceEmailError.postValue(result);
-    }
+    public void onEmailChanged(Boolean result) {sourceEmailError.postValue(result);}
 
     @Override
     public void onPasswordChanged(Boolean result) {

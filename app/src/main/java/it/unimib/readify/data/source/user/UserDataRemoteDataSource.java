@@ -86,46 +86,10 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void updateUserData(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+    public void setUsername(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .orderByChild("username").equalTo(user.getUsername())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            User existingUser = snapshot.getValue(User.class);
-                            if(existingUser != null){
-                                if(existingUser.equals(user)) {
-                                    //return User without changes
-                                    userResponseCallback.onSuccessFromRemoteDatabase(user);
-                                } else {
-                                    //User has been updated
-                                    //Availability Checks
-                                    //Username
-                                    if(!user.getUsername().equals(existingUser.getUsername())) {
-                                        onUsernameAvailable(user);
-                                    }
-                                    //Email
-                                    if(!user.getEmail().equals(existingUser.getEmail())) {
-                                        onEmailAvailable(user);
-                                    }
-                                }
-                            }
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
-    }
-
-    @Override
-    public void onUsernameAvailable(User user) {
-        DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
-        usersRef.orderByChild("username").equalTo(user.getUsername()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -147,27 +111,29 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
+    //todo modify
     @Override
-    public void onEmailAvailable(User user) {
-        DatabaseReference usersRef = databaseReference.child(FIREBASE_USERS_COLLECTION);
-        usersRef.orderByChild(FIREBASE_USERS_EMAILS_FIELD).equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void setEmail(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION)
+                .orderByChild(FIREBASE_USERS_EMAILS_FIELD).equalTo(user.getEmail())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    userResponseCallback.onEmailAvailable("notAvailable");
+                    //userResponseCallback.onEmailAvailable("notAvailable");
                 } else {
                     databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                             .child(FIREBASE_USERS_EMAILS_FIELD).setValue(user.getEmail())
                             .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                             .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                    userResponseCallback.onEmailAvailable("available");
+                    //userResponseCallback.onEmailAvailable("available");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("verifyEmail Firebase error", databaseError.getMessage());
-                userResponseCallback.onEmailAvailable("error");
+                //userResponseCallback.onEmailAvailable("error");
             }
         });
     }

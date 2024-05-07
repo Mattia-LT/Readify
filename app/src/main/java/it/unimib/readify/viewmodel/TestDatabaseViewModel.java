@@ -62,7 +62,7 @@ public class TestDatabaseViewModel extends ViewModel {
     private MutableLiveData<Result> otherUserLiveData;
 
     private final MutableLiveData<String> sourceUsernameError;
-    private final MutableLiveData<String> sourceEmailError;
+    private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private MutableLiveData<Boolean> isCollectionNameValid;
@@ -256,8 +256,14 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.removeBookFromCollection(idToken, bookId, collectionId);
     }
 
-    public void updateUserData(User user, String newPassword) {
-        testDatabaseRepository.updateUserData(user, newPassword);
+    public void changeUserPassword(String newPassword) {testDatabaseRepository.changeUserPassword(newPassword);}
+
+    public void setUserUsername(User user) {
+        testDatabaseRepository.setUserUsername(user);
+    }
+
+    public void setUserEmail(String newEmail) {
+        testDatabaseRepository.setUserEmail(newEmail);
     }
 
     public void setUserGender(User user) {
@@ -326,7 +332,7 @@ public class TestDatabaseViewModel extends ViewModel {
         return sourceUsernameError;
     }
 
-    public MutableLiveData<String> getSourceEmailError() {
+    public MutableLiveData<Boolean> getSourceEmailError() {
         return sourceEmailError;
     }
 

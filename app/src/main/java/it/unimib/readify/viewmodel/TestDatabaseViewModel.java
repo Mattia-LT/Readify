@@ -278,6 +278,10 @@ public class TestDatabaseViewModel extends ViewModel {
         testDatabaseRepository.setUserRecommended(user);
     }
 
+    public void setUserBiography(User user) {
+        testDatabaseRepository.setUserBiography(user);
+    }
+
     public void setUserAvatar(User user) {
         testDatabaseRepository.setUserAvatar(user);
     }

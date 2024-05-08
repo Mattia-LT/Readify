@@ -23,6 +23,7 @@ public interface TestIDatabaseRepository {
     void setUserVisibility(User user);
     void setUserRecommended(User user);
     void setUserAvatar(User user);
+    void setUserBiography(User user);
     void setUserFollowing(User user);
     void setUserFollowers(User user);
     void fetchNotifications(String idToken);

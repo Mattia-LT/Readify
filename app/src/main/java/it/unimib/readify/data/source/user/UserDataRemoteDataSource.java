@@ -2,6 +2,7 @@ package it.unimib.readify.data.source.user;
 
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NAME_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_BIOGRAPHY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_NOTIFICATIONS_COLLECTION;
@@ -216,6 +217,29 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         if (snapshot.exists()) {
                             databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
                                     .child(FIREBASE_USERS_AVATAR_FIELD).setValue(user.getAvatar())
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+                        } else {
+                            //todo manage typo
+                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void setBiography(User user) {
+        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+                                    .child(FIREBASE_USERS_BIOGRAPHY_FIELD).setValue(user.getBiography())
                                     .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                                     .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                         } else {

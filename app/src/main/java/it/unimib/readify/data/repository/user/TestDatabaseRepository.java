@@ -126,6 +126,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void setUserBiography(User user) {
+        userDataRemoteDataSource.setBiography(user);
+    }
+
+    @Override
     public void setUserFollowing(User user) {
         userDataRemoteDataSource.setFollowing(user);
     }

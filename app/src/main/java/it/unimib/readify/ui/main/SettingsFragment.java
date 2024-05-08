@@ -179,7 +179,6 @@ public class SettingsFragment extends Fragment {
                     onChangeUsername();
                     onChangeEmail();
                     onChangePassword();
-
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
                 }

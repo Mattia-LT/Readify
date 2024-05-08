@@ -1,16 +1,12 @@
 package it.unimib.readify.ui.startup;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,11 +17,9 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentContinueRegistrationBinding;
@@ -34,10 +28,7 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import it.unimib.readify.model.User;
 import it.unimib.readify.util.SubjectsUtil;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class ContinueRegistrationFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
@@ -45,12 +36,9 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
     private TestDatabaseViewModel testDatabaseViewModel;
     private User user;
     private User onSaveUser;
-    private Observer<Result> userObserver;
     private Observer<String> usernameErrorObserver;
     private ChipGroup chipGroupGenre;
-    private ExternalGroup externalGroup;
-
-    Observer<Result> loggedUserObserver;
+    private Observer<Result> loggedUserObserver;
 
     public ContinueRegistrationFragment() {}
 
@@ -76,7 +64,7 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 onSaveUser = new User(user);
-                setConfirmPreferences(view);
+                setConfirmPreferences();
             }
         };
 
@@ -107,31 +95,28 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
 
         chipGroupGenre = fragmentContinueRegistrationBinding.chipgroupGenreFilter;
         loadSubjectsChips();
-
 }
 
-    public void setConfirmPreferences(View view) {
+    public void setConfirmPreferences() {
         fragmentContinueRegistrationBinding.confirmPreferences.setOnClickListener(v -> {
-            String username = fragmentContinueRegistrationBinding.textInputLayoutChooseUsername.getEditText().getText().toString();
+            String username = Objects.requireNonNull(fragmentContinueRegistrationBinding.textInputLayoutChooseUsername.getEditText()).getText().toString();
             int selectedChipNumber = getSelectedChipCount(chipGroupGenre);
             if(isUsernameOk() && (fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition() != 0) && (selectedChipNumber>2))
             {
                 onSaveUser.setUsername(username);
-                testDatabaseViewModel.updateUserData(onSaveUser, null);
+                testDatabaseViewModel.setUserUsername(onSaveUser);
                 onSaveUser.setGender(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItem().toString());
                 testDatabaseViewModel.setUserGender(onSaveUser);
                 onSaveUser.setRecommended(getSelectedGenres(chipGroupGenre));
                 testDatabaseViewModel.setUserRecommended(onSaveUser);
                 onSaveUser.setAvatar("avatar1");
                 testDatabaseViewModel.setUserAvatar(onSaveUser);
-                onSaveUser.setFollowers(externalGroup = new ExternalGroup(0, null));
-                onSaveUser.setFollowing(externalGroup = new ExternalGroup(0, null));
+                onSaveUser.setFollowers(new ExternalGroup(0, null));
+                onSaveUser.setFollowing(new ExternalGroup(0, null));
                 testDatabaseViewModel.setUserFollowers(onSaveUser);
                 testDatabaseViewModel.setUserFollowing(onSaveUser);
 
-
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
-
             } else {
                 if(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition()== 0){
                     fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage.setText(R.string.error_gender);
@@ -219,6 +204,4 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
         }
         return selectedGenresMap;
     }
-
-
 }

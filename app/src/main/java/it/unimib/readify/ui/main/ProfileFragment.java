@@ -242,17 +242,10 @@ public class ProfileFragment extends Fragment{
                                 testDatabaseViewModel.logout();
                                 //FirebaseAuth.getInstance().signOut();
                                 Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
+
+                                da fare dopo aver implementato il database locale ig
                                  */
                              }
-
-                            if (itemId == R.id.nav_visibility) {
-                                // Esegui le azioni per la voce del menu 'Visibility'
-                                // ...
-                            }
-
-                            if (itemId == R.id.nav_switch) {
-
-                            }
 
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;

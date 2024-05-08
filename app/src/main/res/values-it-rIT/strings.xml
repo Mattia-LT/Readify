@@ -157,4 +157,6 @@
     <string name="field_not_filled_in">Compila il campo</string>
     <string name="error_password_length">La lunghezza della password deve essere di 6 caratteri o più</string>
     <string name="error_confirm_password_equal">Conferma Password deve essere uguale al campo Password</string>
+    <string name ="error_gender"> Seleziona un identità di genere valida</string>
+    <string name = "error_not_enough_genre"> Seleziona almeno 3 argomenti di interesse</string>
 </resources>

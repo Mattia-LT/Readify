@@ -41,17 +41,18 @@ android {
 
 dependencies {
 
-    val navVersion ="2.7.7"
+    val navVersion = "2.7.7"
+    val roomVersion = "2.6.1"
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:$navVersion")
     implementation("androidx.navigation:navigation-ui:$navVersion")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
 
 
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.android.gms:play-services-base:18.4.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.code.gson:gson:2.10.1")
@@ -65,24 +66,21 @@ dependencies {
 
 
     // import firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
-    // TODO RIMUOVIMI PRIMA DI CONSEGNARE IL PROGETTO
-    // Add the dependencies for any other desired Firebase products
-    // https://firebase.google.com/docs/android/setup#available-libraries
 
     // AUTENTICAZIONE
     implementation("com.google.firebase:firebase-auth")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
-    implementation("com.google.android.gms:play-services-auth:21.1.0")
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
 
     // libreria per le imageview rotonde
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
 
     testImplementation("junit:junit:4.13.2")
 

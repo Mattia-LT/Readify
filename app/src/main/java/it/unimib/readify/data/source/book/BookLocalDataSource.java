@@ -2,11 +2,8 @@ package it.unimib.readify.data.source.book;
 
 import android.util.Log;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 import it.unimib.readify.data.database.BookDao;
 import it.unimib.readify.data.database.BookRoomDatabase;

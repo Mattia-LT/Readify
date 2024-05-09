@@ -106,4 +106,6 @@ public class Constants {
     public static String RATING_SORT_SEARCH_MODE = "rating";
     public static String TITLE_SORT_SEARCH_MODE = "title";
 
+    public static final int DATABASE_VERSION = 1;
+    public static final String BOOK_DATABASE_NAME = "book_db";
 }

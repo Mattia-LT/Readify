@@ -13,5 +13,7 @@ public interface BookResponseCallback {
     void onSuccessFetchBookFromRemote(OLWorkApiResponse workApiResponse);
     void onSuccessFetchBooksFromRemote(List<OLWorkApiResponse> workApiResponseList, String reference);
     void onSuccessFetchCollectionsFromRemote(List<Collection> collectionList);
+    void onSuccessFetchCollectionsFromLocal(List<Collection> collectionList);
+    void onSuccessInsertCollectionFromLocal(List<Collection> collectionList);
     void onFailureFromRemote(Exception exception);
 }

@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import it.unimib.readify.data.database.BookRoomDatabase;
 import it.unimib.readify.data.repository.book.BookRepository;
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestDatabaseRepository;
@@ -49,11 +50,17 @@ public class TestServiceLocator {
         return INSTANCE;
     }
 
+    public BookRoomDatabase getBookDao(Application application) {
+        return BookRoomDatabase.getDatabase(application);
+    }
+
     public <T> T getRepository(Class<T> repositoryClass) {
         Object repositoryInstance = repositories.get(repositoryClass);
         if(repositoryInstance == null) {
             synchronized (repositories) {
                 repositoryInstance = repositories.get(repositoryClass);
+                SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(application);
+                DataEncryptionUtil dataEncryptionUtil = new DataEncryptionUtil(application);
                 if(repositoryInstance == null) {
                     //creating TestDatabaseRepository instance
                     if(repositoryClass == TestIDatabaseRepository.class) {
@@ -62,7 +69,7 @@ public class TestServiceLocator {
                     }
                     //creating BookRepository instance
                     if(repositoryClass == IBookRepository.class) {
-                        repositoryInstance = BookRepository.getInstance(application);
+                        repositoryInstance = BookRepository.getInstance(application, getBookDao(application), sharedPreferencesUtil, dataEncryptionUtil);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
                 }

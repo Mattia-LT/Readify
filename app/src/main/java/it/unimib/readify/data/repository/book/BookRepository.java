@@ -7,16 +7,23 @@ import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unimib.readify.data.database.BookRoomDatabase;
+import it.unimib.readify.data.source.book.BaseBookLocalDataSource;
+import it.unimib.readify.data.source.book.BookLocalDataSource;
 import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
+import it.unimib.readify.util.DataEncryptionUtil;
+import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class BookRepository implements IBookRepository, BookResponseCallback {
 
@@ -26,15 +33,19 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private final MutableLiveData<List<Result>> recentBooksLiveData;
     private final MutableLiveData<List<Result>> trendingBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
+    private final BaseBookLocalDataSource bookLocalDataSource;
 
     private final MutableLiveData<List<Result>> fetchedCollectionsLiveData;
     private final MutableLiveData<List<Result>> singleCollectionLiveData;
 
-    public static BookRepository getInstance(Application application) {
-        return new BookRepository(new BookRemoteDataSource(application));
+    public static BookRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
+        return new BookRepository(
+                new BookRemoteDataSource(application),
+                new BookLocalDataSource(bookRoomDatabase, sharedPreferencesUtil, dataEncryptionUtil)
+        );
     }
 
-    public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource) {
+    public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource, BaseBookLocalDataSource bookLocalDataSource) {
         searchResultsLiveData = new MutableLiveData<>();
         workApiResponseLiveData = new MutableLiveData<>();
         suggestedBooksLiveData = new MutableLiveData<>();
@@ -44,6 +55,8 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         singleCollectionLiveData = new MutableLiveData<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
         this.bookRemoteDataSource.setResponseCallback(this);
+        this.bookLocalDataSource = bookLocalDataSource;
+        this.bookLocalDataSource.setResponseCallback(this);
     }
 
     @Override
@@ -122,7 +135,17 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         for(Collection collection : collectionList){
             resultList.add(new Result.CollectionSuccess(collection));
         }
-        fetchedCollectionsLiveData.setValue(resultList);
+        fetchedCollectionsLiveData.postValue(resultList);
+    }
+
+    @Override
+    public void onSuccessFetchCollectionsFromLocal(List<Collection> collectionList) {
+        Log.e("COLLEZIONI LOCALI FETCHATE", collectionList.toString());
+    }
+
+    @Override
+    public void onSuccessInsertCollectionFromLocal(List<Collection> collectionList) {
+
     }
 
     @Override

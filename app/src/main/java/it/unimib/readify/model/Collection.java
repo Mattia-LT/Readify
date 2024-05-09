@@ -4,25 +4,40 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import it.unimib.readify.util.CustomTypeConverter;
+
 
 // TODO: 09/12/2023 managing thumbnail
+@Entity(tableName = "collection")
 public class Collection implements Parcelable {
 
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "collection_id")
     private String collectionId;
     private String name;
     private boolean visible;
-    private List <String> books;
+    @TypeConverters(CustomTypeConverter.class)
+    private List<String> books;
+    @ColumnInfo(name = "number_of_books")
     private int numberOfBooks;
+    @TypeConverters(CustomTypeConverter.class)
     private List<OLWorkApiResponse> works = new ArrayList<>();
 
-    public Collection() {}
+    public Collection() {
+        collectionId = "";
+    }
 
-    public Collection(String collectionId, String name, boolean visible, List<String> books) {
+    public Collection(@NonNull String collectionId, String name, boolean visible, List<String> books) {
         this.collectionId = collectionId;
         this.name = name;
         this.visible = visible;
@@ -31,7 +46,7 @@ public class Collection implements Parcelable {
         this.numberOfBooks = 0;
     }
 
-    public Collection(String collectionId, String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
+    public Collection(@NonNull String collectionId, String name, boolean visible, List<String> books, List<OLWorkApiResponse> works) {
         this.collectionId = collectionId;
         this.name = name;
         this.visible = visible;
@@ -40,11 +55,12 @@ public class Collection implements Parcelable {
         this.numberOfBooks = works.size();
     }
 
+    @NonNull
     public String getCollectionId() {
         return collectionId;
     }
 
-    public void setCollectionId(String collectionId) {
+    public void setCollectionId(@NonNull String collectionId) {
         this.collectionId = collectionId;
     }
 
@@ -104,7 +120,7 @@ public class Collection implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
-        this.collectionId = source.readString();
+        this.collectionId = Objects.requireNonNull(source.readString());
         this.name = source.readString();
         this.visible = source.readByte() != 0;
         this.books = source.createStringArrayList();
@@ -113,7 +129,7 @@ public class Collection implements Parcelable {
     }
 
     protected Collection(Parcel in) {
-        this.collectionId = in.readString();
+        this.collectionId = Objects.requireNonNull(in.readString());
         this.name = in.readString();
         this.visible = in.readByte() != 0;
         this.books = in.createStringArrayList();

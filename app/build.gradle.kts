@@ -75,7 +75,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
+    //Non aggiornare questa depenency
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
 
     // libreria per le imageview rotonde
     implementation("de.hdodenhof:circleimageview:3.1.0")

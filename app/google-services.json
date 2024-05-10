@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "178486194736",
+    "firebase_url": "https://readify-9b50c-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "readify-9b50c",
     "storage_bucket": "readify-9b50c.appspot.com"
   },
@@ -13,6 +14,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "178486194736-aprouqalb3s4pmubqnoicmr8f7gkp9ua.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.unimib.readify",
+            "certificate_hash": "9aea3623919ba2fe158b4c801bf59a31d4ec86c0"
+          }
+        },
+        {
+          "client_id": "178486194736-lpaspm24di4oajtctblnnq0dcs2agme2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.unimib.readify",
+            "certificate_hash": "0e51b8290e0c196d416735000d4d684eb767fe4b"
+          }
+        },
         {
           "client_id": "178486194736-ngep0282v77v42r4e06m2jkp4pkselt2.apps.googleusercontent.com",
           "client_type": 1,

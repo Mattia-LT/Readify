@@ -16,6 +16,7 @@ public interface TestIDatabaseRepository {
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
+    void signInWithGoogle(String idToken);
     void changeUserPassword(String newPassword);
     void setUserUsername(User user);
     void setUserEmail(String newEmail);

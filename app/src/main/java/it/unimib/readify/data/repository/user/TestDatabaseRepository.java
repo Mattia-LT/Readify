@@ -93,6 +93,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public void signInWithGoogle(String idToken) {
+        userAuthRemoteDataSource.signInWithGoogle(idToken);
+    }
+
+    @Override
     public void changeUserPassword(String newPassword) {
         userAuthRemoteDataSource.changePassword(newPassword);
     }

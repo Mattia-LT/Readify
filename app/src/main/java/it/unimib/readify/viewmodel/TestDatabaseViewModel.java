@@ -440,4 +440,11 @@ public class TestDatabaseViewModel extends ViewModel {
     }
     //End of Rename collection section
 
+    public void signInWithGoogle(String idToken){
+        testDatabaseRepository.signInWithGoogle(idToken);
+        if(!isUIRunning) {
+            setUIRunning(true);
+        }
+    }
+
 }

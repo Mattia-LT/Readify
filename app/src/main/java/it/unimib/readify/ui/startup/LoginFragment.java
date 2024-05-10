@@ -6,11 +6,12 @@ import static it.unimib.readify.util.Constants.INVALID_USER_ERROR;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.BeginSignInResult;
-import com.google.android.gms.tasks.Task;
-
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
@@ -21,34 +22,25 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.GetSignInIntentRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
-import androidx.activity.result.ActivityResult;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding fragmentLoginBinding;
@@ -66,8 +58,6 @@ public class LoginFragment extends Fragment {
             }
     );
     private SignInClient signInClient;
-    private FirebaseAuth mAuth;
-
     public LoginFragment(){}
 
     public static LoginFragment newInstance() {
@@ -242,7 +232,12 @@ public class LoginFragment extends Fragment {
         observer = result -> {
             if(testDatabaseViewModel.isUIRunning()) {
                 if(result.isSuccess()) {
-                    navigateToHomeActivity();
+                    User user = ((Result.UserSuccess) result).getData();
+                    if(user.getUsername() == null){
+                        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
+                    } else {
+                        navigateToHomeActivity();
+                    }
                 } else {
                     Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
                 }
@@ -252,10 +247,10 @@ public class LoginFragment extends Fragment {
 
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
-            //String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
-            //String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
-            String email = "prova@gmail.com";
-            String password = "password";
+            String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
+            String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
+            //String email = "prova@gmail.com";
+            //String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 testDatabaseViewModel.setUserMutableLiveData(email, password, true);
             } else {
@@ -270,20 +265,14 @@ public class LoginFragment extends Fragment {
         });
 
         //login with google
-        /*
+
         fragmentLoginBinding.buttonGoogleLogin.setOnClickListener( v -> {
             signInWithGoogle();
         });
-         */
+
 
         // Configure Google Sign In
         signInClient = Identity.getSignInClient(requireContext());
-        mAuth = FirebaseAuth.getInstance();
-        // Display One-Tap Sign In if user isn't logged in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            oneTapSignIn();
-        }
     }
 
     @Override
@@ -297,26 +286,6 @@ public class LoginFragment extends Fragment {
                 testDatabaseViewModel.setUIRunning(false);
              is not going to be invoked again, causing (probably) the Observer to run when it shouldn't.
          */
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d("login fragment", "onStop");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("login fragment", "onPause");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("login fragment", "onResume");
     }
 
     @Override
@@ -411,31 +380,13 @@ public class LoginFragment extends Fragment {
             SignInCredential credential = signInClient.getSignInCredentialFromIntent(data);
             String idToken = credential.getGoogleIdToken();
             Log.d("handleSignInResult", "firebaseAuthWithGoogle:" + credential.getId());
-            firebaseAuthWithGoogle(idToken);
+            testDatabaseViewModel.signInWithGoogle(idToken);
         } catch (ApiException e) {
             // Google Sign In failed, update UI appropriately
             Log.w("handleSignInResult error", "Google sign in failed", e);
         }
     }
 
-    private void firebaseAuthWithGoogle(String idToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("onComplete", "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("onComplete error", "signInWithCredential:failure", task.getException());
-                            Snackbar.make(requireView(), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
 
     private void navigateToHomeActivity() {
         Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeActivity);

@@ -244,15 +244,11 @@ public class LoginFragment extends Fragment {
         });
 
         //registration
-        fragmentLoginBinding.buttonRegister.setOnClickListener( v -> {
-            navigateToRegisterFragment();
-        });
+        fragmentLoginBinding.buttonRegister.setOnClickListener( v -> navigateToRegisterFragment());
 
         //login with google
 
-        fragmentLoginBinding.buttonGoogleLogin.setOnClickListener( v -> {
-            signInWithGoogle();
-        });
+        fragmentLoginBinding.buttonGoogleLogin.setOnClickListener( v -> signInWithGoogle());
 
 
         // Configure Google Sign In

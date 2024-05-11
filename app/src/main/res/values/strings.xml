@@ -96,9 +96,7 @@
     <string name="error_login_user_message">An error occurred during login, please retry</string>
     <string name="error_login_password_message">An error occurred during login, check your password again</string>
     <string name="error_no_google_account_found_message">Error: no google account associated to this email</string>
-    <string name="books">books</string>
-    <string name="book">book</string>
-    <string name="empty_collection">no books in this collection</string>
+    <string name="empty_collection">There are no books in this collection</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="undo_changes">Undo Changes</string>
     <string name="users_section">Users</string>
@@ -191,7 +189,13 @@
     <string name="field_not_filled_in">Fill in the field</string>
     <string name="error_password_length">Password length must be 6 characters or higher</string>
     <string name="error_confirm_password_equal">Confirm Password must be equal to Password field</string>
-    <string name ="error_gender"> Select a valid gender identity</string>
-    <string name = "error_not_enough_genre">Select at least 3 topic of interest </string>
+    <string name="error_gender">Select a valid gender identity</string>
+    <string name="error_not_enough_genre">Select at least 3 topic of interest </string>
+
+    <!-- plurals -->
+    <plurals name="books">
+        <item quantity="one">%d book</item>
+        <item quantity="other">%d books</item>
+    </plurals>
 
 </resources>

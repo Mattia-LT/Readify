@@ -75,9 +75,7 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
         public void bind(Collection collection) {
             if (collection != null) {
                 binding.textviewCollectionName.setText(collection.getName());
-                String booksRead = String.valueOf(collection.getNumberOfBooks())
-                        .concat(" ")
-                        .concat(this.itemView.getContext().getString(R.string.books));
+                String booksRead = this.itemView.getResources().getQuantityString(R.plurals.books, collection.getNumberOfBooks(), collection.getNumberOfBooks());
                 binding.textviewNumberOfBooks.setText(booksRead);
                 List<String> books = collection.getBooks();
                 if (books != null) {

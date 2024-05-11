@@ -82,9 +82,7 @@
     <string name="textview_new_books">Nuovi libri</string>
     <string name="textview_loading">Caricamento…</string>
     <string name="rating_not_available">Valutazione non disponibile</string>
-    <string name="books">libri</string>
-    <string name="book">libro</string>
-    <string name="empty_collection">nessun libro in questa raccolta</string>
+    <string name="empty_collection">Nessun libro in questa raccolta</string>
     <string name="users_section">Utenti</string>
     <string name="books_section">Libri</string>
     <string name="unexpected_error">Si è verificato un errore inaspettato, perfavore riprova.</string>
@@ -160,6 +158,13 @@
     <string name="field_not_filled_in">Compila il campo</string>
     <string name="error_password_length">La lunghezza della password deve essere di 6 caratteri o più</string>
     <string name="error_confirm_password_equal">Conferma Password deve essere uguale al campo Password</string>
-    <string name ="error_gender"> Seleziona un identità di genere valida</string>
-    <string name = "error_not_enough_genre"> Seleziona almeno 3 argomenti di interesse</string>
+    <string name="error_gender"> Seleziona un identità di genere valida</string>
+    <string name="error_not_enough_genre"> Seleziona almeno 3 argomenti di interesse</string>
+
+    <!-- plurals -->
+    <plurals name="books">
+        <item quantity="one">%d libro</item>
+        <item quantity="other">%d libri</item>
+    </plurals>
+
 </resources>

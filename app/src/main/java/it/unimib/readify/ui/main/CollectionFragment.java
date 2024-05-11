@@ -251,12 +251,7 @@ public class CollectionFragment extends Fragment {
         //Set number of books in the collection
         String booksNumber;
         if (collection.getBooks() != null) {
-            booksNumber = collection.getNumberOfBooks() + " ";
-            if (collection.getNumberOfBooks() == 1){
-                booksNumber += getResources().getString(R.string.book);
-            } else {
-                booksNumber += getResources().getString(R.string.books);
-            }
+            booksNumber = getResources().getQuantityString(R.plurals.books, collection.getNumberOfBooks(), collection.getNumberOfBooks());
         } else {
             booksNumber = getResources().getString(R.string.empty_collection);
         }

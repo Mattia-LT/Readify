@@ -11,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,15 +20,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.GetSignInIntentRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -50,12 +44,7 @@ public class LoginFragment extends Fragment {
 
     private final ActivityResultLauncher<IntentSenderRequest> signInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartIntentSenderForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    handleSignInResult(result.getData());
-                }
-            }
+            result -> handleSignInResult(result.getData())
     );
     private SignInClient signInClient;
     public LoginFragment(){}
@@ -146,11 +135,6 @@ public class LoginFragment extends Fragment {
          Menu (which depends on Navigation Component) destroys the Start point (removing it from the Backstack);
          Navigation doesn't destroys the Start point;
      */
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d("login fragment", "onCreate");
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -163,7 +147,7 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("login fragment", "onViewCreated");
-        initRepositories();
+        initVieModels();
 
 
         /*
@@ -247,10 +231,10 @@ public class LoginFragment extends Fragment {
 
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
-            String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
-            String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
-            //String email = "prova@gmail.com";
-            //String password = "password";
+            //String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
+            //String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
+            String email = "prova@gmail.com";
+            String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 testDatabaseViewModel.setUserMutableLiveData(email, password, true);
             } else {
@@ -309,30 +293,14 @@ public class LoginFragment extends Fragment {
         testDatabaseViewModel.getUserMediatorLiveData().removeObserver(observer);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("login fragment", "onDestroy");
-    }
-
     private void signInWithGoogle() {
         GetSignInIntentRequest signInRequest = GetSignInIntentRequest.builder()
                 .setServerClientId(getString(R.string.default_web_client_id))
                 .build();
 
         signInClient.getSignInIntent(signInRequest)
-                .addOnSuccessListener(new OnSuccessListener<PendingIntent>() {
-                    @Override
-                    public void onSuccess(PendingIntent pendingIntent) {
-                        launchSignIn(pendingIntent);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("getSignInIntent error", "Google Sign-in failed", e);
-                    }
-                });
+                .addOnSuccessListener(this::launchSignIn)
+                .addOnFailureListener(e -> Log.e("getSignInIntent error", "Google Sign-in failed", e));
     }
 
     private void launchSignIn(PendingIntent pendingIntent) {
@@ -343,35 +311,6 @@ public class LoginFragment extends Fragment {
         } catch (Exception e) {
             Log.e("launchSignIn error", "Couldn't start Sign In: " + e.getLocalizedMessage());
         }
-    }
-
-    private void oneTapSignIn() {
-        // Configure One Tap UI
-        BeginSignInRequest oneTapRequest = BeginSignInRequest.builder()
-                .setGoogleIdTokenRequestOptions(
-                        BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                                .setSupported(true)
-                                .setServerClientId(getString(R.string.default_web_client_id))
-                                .setFilterByAuthorizedAccounts(true)
-                                .build()
-                )
-                .build();
-
-        // Display the One Tap UI
-        signInClient.beginSignIn(oneTapRequest)
-                .addOnSuccessListener(new OnSuccessListener<BeginSignInResult>() {
-                    @Override
-                    public void onSuccess(BeginSignInResult beginSignInResult) {
-                        launchSignIn(beginSignInResult.getPendingIntent());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // No saved credentials found. Launch the One Tap sign-up flow, or
-                        // do nothing and continue presenting the signed-out UI.
-                    }
-                });
     }
 
     private void handleSignInResult(Intent data) {
@@ -427,7 +366,7 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private void initRepositories(){
+    private void initVieModels(){
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 

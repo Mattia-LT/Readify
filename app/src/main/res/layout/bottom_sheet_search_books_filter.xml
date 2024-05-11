@@ -131,37 +131,29 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_apply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/button_reset"
+            app:layout_constraintTop_toBottomOf="@id/bottomsheet_divider_2"
+            app:layout_constraintHorizontal_weight="2"
             style="@style/Widget.Material3.Button"
             android:backgroundTint="?attr/colorPrimaryVariant"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="@string/button_apply"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/framelayout_reset"
-            app:layout_constraintTop_toBottomOf="@id/bottomsheet_divider_2" />
+            android:text="@string/button_apply" />
 
-        <FrameLayout
-            android:id="@+id/framelayout_reset"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_reset"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
             app:layout_constraintEnd_toStartOf="@id/button_apply"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/button_apply">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_reset"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnBackground"
-                android:text="@string/button_reset" />
-
-        </FrameLayout>
+            app:layout_constraintTop_toTopOf="@id/button_apply"
+            app:layout_constraintHorizontal_weight="2"
+            style="?attr/materialButtonOutlinedStyle"
+            android:textColor="?attr/colorOnBackground"
+            android:text="@string/button_reset" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,7 +5,6 @@ import static android.view.View.NO_ID;
 import static it.unimib.readify.util.Constants.RATING_SORT_SEARCH_MODE;
 import static it.unimib.readify.util.Constants.TITLE_SORT_SEARCH_MODE;
 
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,12 +51,9 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        int deviceOrientation = getResources().getConfiguration().orientation;
-        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
-            if (dialog != null) {
-                dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        if (dialog != null) {
+            dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
         }
 
         initViewModels();

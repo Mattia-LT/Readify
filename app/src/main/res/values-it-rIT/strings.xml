@@ -34,6 +34,8 @@
     <string name="navigation_bar_item_profile">Profilo</string>
     <string name="navigation_bar_item_saved">Salvati</string>
     <string name="navigation_bar_item_search">Cerca</string>
+    <string name="navigation_bar_label_image_selector">Seleziona l\'avatar</string>
+
     <string name="new_account">Non hai ancora un account?</string>
 
     <string name="pa_collections">Raccolte</string>

@@ -5,45 +5,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/login_navigation_graph"
     app:startDestination="@id/loginFragment" >
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="it.unimib.readify.ui.startup.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
+
         <action
             android:id="@+id/action_loginFragment_to_homeActivity"
             app:destination="@id/homeActivity" />
+
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+
         <action
             android:id="@+id/action_loginFragment_to_continueRegistrationFragment"
             app:destination="@id/continueRegistrationFragment" />
+
     </fragment>
+
     <activity
         android:id="@+id/homeActivity"
         android:name="it.unimib.readify.ui.main.HomeActivity"
         android:label="HomeActivity"
-        tools:layout="@layout/activity_home"
-        />
+        tools:layout="@layout/activity_home" />
+
     <fragment
         android:id="@+id/registerFragment"
         android:name="it.unimib.readify.ui.startup.RegisterFragment"
         android:label="RegisterFragment"
-        tools:layout="@layout/fragment_register">
+        tools:layout="@layout/fragment_register" >
+
         <action
             android:id="@+id/action_registerFragment_to_continueRegistrationFragment"
             app:destination="@id/continueRegistrationFragment" />
+
     </fragment>
+
     <fragment
         android:id="@+id/continueRegistrationFragment"
         android:name="it.unimib.readify.ui.startup.ContinueRegistrationFragment"
         android:label="ContinueRegistrationFragment"
-        tools:layout="@layout/fragment_continue_registration">
+        tools:layout="@layout/fragment_continue_registration" >
+
         <action
             android:id="@+id/action_continueRegistrationFragment_to_homeActivity"
             app:destination="@id/homeActivity" />
-    </fragment>
 
+    </fragment>
 
 </navigation>

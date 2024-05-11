@@ -35,6 +35,7 @@
     <string name="navigation_bar_item_saved">Salvati</string>
     <string name="navigation_bar_item_search">Cerca</string>
     <string name="navigation_bar_label_image_selector">Seleziona l\'avatar</string>
+    <string name="navigation_bar_label_notifications">Notifiche</string>
 
     <string name="new_account">Non hai ancora un account?</string>
 

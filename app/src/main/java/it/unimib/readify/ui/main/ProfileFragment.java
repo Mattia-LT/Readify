@@ -195,27 +195,25 @@ public class ProfileFragment extends Fragment{
                 //managing badge notifications itemMenu
                 final MenuItem menuItem = menu.findItem(R.id.action_notifications);
                 View actionView = menuItem.getActionView();
-                assert actionView != null;
-                TextView notificationsTextView = actionView.findViewById(R.id.notification_appbar_profile_badge);
-                //managing notification number
-                int notificationsNumber = 0;
-                for (String type: notifications.keySet()) {
-                    for (Notification notification: Objects.requireNonNull(notifications.get(type))) {
-                        if(!notification.isRead()) {
-                            notificationsNumber++;
+                if(actionView != null){
+                    TextView notificationsTextView = actionView.findViewById(R.id.notification_appbar_profile_badge);
+                    //managing notification number
+                    int notificationsNumber = 0;
+                    for (String type: notifications.keySet()) {
+                        for (Notification notification: Objects.requireNonNull(notifications.get(type))) {
+                            if(!notification.isRead()) {
+                                notificationsNumber++;
+                            }
                         }
                     }
+                    notificationsTextView.setText(String.format("%s", notificationsNumber));
+                    setupBadge(notificationsTextView);
+                    //managing onClick itemMenu
+                    actionView.setOnClickListener(v -> {
+                        NavDirections action = ProfileFragmentDirections.actionProfileFragmentToNotificationsFragment();
+                        Navigation.findNavController(requireView()).navigate(action);
+                    });
                 }
-                notificationsTextView.setText(String.format("%s", notificationsNumber));
-                setupBadge(notificationsTextView);
-
-                //managing onClick itemMenu
-                actionView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_notificationsFragment);
-                    }
-                });
             }
 
             @Override

@@ -4,8 +4,6 @@ import static android.graphics.Typeface.BOLD_ITALIC;
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -29,7 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -39,7 +36,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -108,8 +104,6 @@ public class CollectionFragment extends Fragment {
     }
 
     private void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
@@ -118,15 +112,6 @@ public class CollectionFragment extends Fragment {
                     menuInflater.inflate(R.menu.collection_appbar_menu, menu);
                     //todo caricare il menu solo se le collezioni sono dell'utente loggato
                 }
-                int colorWhite = getResources().getColor(R.color.white, null);
-                // Enable the back button
-                Drawable backButton = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-                if (backButton != null) {
-                    backButton.setColorFilter(colorWhite, PorterDuff.Mode.SRC_IN);
-                }
-                toolbar.setNavigationIcon(backButton);
-                toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
-
             }
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {

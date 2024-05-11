@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile_navigation_graph"
+    app:startDestination="@id/profileFragment" >
+
+    <fragment
+        android:id="@+id/profileImageSelectorFragment"
+        android:name="it.unimib.readify.ui.main.ProfileImageSelector"
+        android:label="@string/navigation_bar_label_image_selector"
+        tools:layout="@layout/fragment_profile_image_selector">
+
+        <action
+            android:id="@+id/action_profileImageSelectorFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="it.unimib.readify.ui.main.ProfileFragment"
+        android:label="@string/navigation_bar_item_profile"
+        tools:layout="@layout/fragment_profile" >
+
+        <action
+            android:id="@+id/action_profileFragment_to_collectionFragment"
+            app:destination="@id/collectionFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_searchFragment"
+            app:destination="@id/search_navigation_graph" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_createCollectionDialog"
+            app:destination="@id/createCollectionDialog" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="it.unimib.readify.ui.main.SettingsFragment"
+        android:label="@string/pa_settings"
+        tools:layout="@layout/fragment_settings">
+
+        <argument
+            android:name="imageResourceId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_profileImageSelectorFragment"
+            app:destination="@+id/profileImageSelectorFragment" />
+
+    </fragment>
+
+    <dialog
+        android:id="@+id/createCollectionDialog"
+        android:name="it.unimib.readify.ui.main.CollectionCreationBottomSheet"
+        android:label="create_collection_dialog"
+        tools:layout="@layout/bottom_sheet_collection_creation">
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+    </dialog>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="it.unimib.readify.ui.main.NotificationsFragment"
+        android:label="@string/navigation_bar_label_notifications"
+        tools:layout="@layout/fragment_notifications" >
+
+        <action
+            android:id="@+id/action_NotificationsFragment_to_NotificationPageFragment"
+            app:destination="@id/notificationsPageFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationsPageFragment"
+        android:name="it.unimib.readify.ui.main.NotificationsPageFragment"
+        tools:layout="@layout/fragment_notifications_page" >
+
+        <argument
+            android:name="content"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_notificationsPageFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="it.unimib.readify.ui.main.UserDetailsFragment"
+        android:label="{username}"
+        tools:layout="@layout/fragment_user_details" >
+
+        <argument
+            android:name="otherUserIdToken"
+            app:argType="string" />
+
+        <argument
+            android:name="username"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_userDetailsFragment_to_collectionFragment"
+            app:destination="@id/collectionFragment" />
+
+        <action
+            android:id="@+id/action_userDetailsFragment_to_searchFragment"
+            app:destination="@id/search_navigation_graph"/>
+
+        <action
+            android:id="@+id/action_userDetailsFragment_to_followListFragment"
+            app:destination="@id/followListFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectionFragment"
+        android:name="it.unimib.readify.ui.main.CollectionFragment"
+        android:label="{collectionName}"
+        tools:layout="@layout/fragment_collection" >
+
+        <argument
+            android:name="collectionData"
+            app:argType="it.unimib.readify.model.Collection" />
+
+        <argument
+            android:name="collectionName"
+            app:argType="string" />
+
+        <argument
+            android:name="collectionOwnerIdToken"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_collectionFragment_to_profileFragment"
+            app:destination="@id/profile_navigation_graph" />
+
+        <action
+            android:id="@+id/action_collectionFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookDetailsFragment"
+        android:name="it.unimib.readify.ui.main.BookDetailsFragment"
+        android:label="@string/book_details"
+        tools:layout="@layout/fragment_book_details" >
+
+        <argument
+            android:name="book"
+            app:argType="it.unimib.readify.model.OLWorkApiResponse" />
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_homeFragment"
+            app:destination="@id/home_navigation_graph"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_searchFragment"
+            app:destination="@id/search_navigation_graph"
+            app:popUpTo="@id/searchFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_collectionFragment"
+            app:destination="@id/collectionFragment"
+            app:popUpTo="@id/collectionFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment"
+            app:popUpTo="@id/userDetailsFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_addToCollectionDialog"
+            app:destination="@id/addToCollectionDialog" />
+
+    </fragment>
+
+    <dialog
+        android:id="@+id/addToCollectionDialog"
+        android:name="it.unimib.readify.ui.main.AddToCollectionBottomSheet"
+        android:label="add_to_collection_dialog"
+        tools:layout="@layout/bottom_sheet_add_to_collection">
+
+        <argument
+            android:name="bookId"
+            app:argType="string" />
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+    </dialog>
+
+    <fragment
+        android:id="@+id/followListFragment"
+        android:name="it.unimib.readify.ui.main.FollowListFragment"
+        android:label="{username}"
+        tools:layout="@layout/fragment_follow_list">
+
+        <argument
+            android:name="idToken"
+            app:argType="string" />
+
+        <argument
+            android:name="username"
+            app:argType="string" />
+
+        <argument
+            android:name="destination"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_followListFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+    </fragment>
+
+</navigation>

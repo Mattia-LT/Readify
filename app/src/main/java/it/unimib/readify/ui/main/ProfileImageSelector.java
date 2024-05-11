@@ -1,12 +1,9 @@
 package it.unimib.readify.ui.main;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -18,15 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
-
-import org.apache.commons.validator.routines.EmailValidator;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.ProfileImageSelectorAdapter;
 import it.unimib.readify.databinding.FragmentProfileImageSelectorBinding;
-import it.unimib.readify.databinding.FragmentSettingsBinding;
 
 public class ProfileImageSelector extends Fragment implements ProfileImageSelectorAdapter.OnImageClickListener {
 
@@ -53,7 +44,6 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        loadMenu();
         recyclerView = fragmentProfileImageSelectorBinding.recyclerviewProfileImage;
         layoutManager = new GridLayoutManager(requireContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
@@ -69,24 +59,5 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
         Toast.makeText(requireContext(), "Immagine selezionata: " + position, Toast.LENGTH_SHORT).show();
         NavDirections action = ProfileImageSelectorDirections.actionProfileImageSelectorFragmentToSettingsFragment(imageResourceId);
         Navigation.findNavController(requireView()).navigate(action);
-    }
-
-    public void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-
-        // Enable the back button
-        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-        int newColor = getResources().getColor(R.color.white, null);
-        if (coloredIcon != null) {
-            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
-        }
-        toolbar.setNavigationIcon(coloredIcon);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requireActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
     }
 }

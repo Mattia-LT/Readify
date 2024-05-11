@@ -1,12 +1,9 @@
 package it.unimib.readify.ui.main;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
@@ -18,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -130,9 +126,6 @@ public class SettingsFragment extends Fragment {
         testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
         testDatabaseViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
         testDatabaseViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
-
-        loadMenu();
-
         fragmentSettingsBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -262,25 +255,6 @@ public class SettingsFragment extends Fragment {
                 }
             }
         }
-    }
-
-    public void loadMenu(){
-        // Set up the toolbar and remove all icons
-        MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
-
-        // Enable the back button
-        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-        int newColor = getResources().getColor(R.color.white, null);
-        if (coloredIcon != null) {
-            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
-        }
-        toolbar.setNavigationIcon(coloredIcon);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requireActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
     }
 
     public void updateUI(int imageResourceId){

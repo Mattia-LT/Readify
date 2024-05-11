@@ -1,7 +1,6 @@
 package it.unimib.readify.ui.main;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,24 +85,6 @@ public class SearchFragment extends Fragment {
         });
 
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("search lifecycle", "onStart");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("search lifecycle", "onDestroyView");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("search lifecycle", "onDetach");
     }
 
 }

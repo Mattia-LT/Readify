@@ -19,6 +19,8 @@
     <string name="navigation_bar_item_saved">Saved</string>
     <string name="navigation_bar_item_search">Search</string>
     <string name="navigation_bar_label_image_selector">Select the avatar</string>
+    <string name="navigation_bar_label_notifications">Notifications</string>
+
     <string name="new_account">No account yet?</string>
 
     <!-- pa sta per personal area -->

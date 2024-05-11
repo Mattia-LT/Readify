@@ -1,7 +1,5 @@
 package it.unimib.readify.ui.main;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
@@ -91,15 +88,6 @@ public class NotificationsPageFragment extends Fragment {
         //Set up the toolbar and remove all icons
         MaterialToolbar toolbar = requireActivity().findViewById(R.id.top_appbar_home);
         toolbar.setTitle(receivedContent);
-
-        // Enable the back button
-        Drawable coloredIcon = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_arrow_back_24);
-        int newColor = getResources().getColor(R.color.white, null);
-        if (coloredIcon != null) {
-            coloredIcon.setColorFilter(newColor, PorterDuff.Mode.SRC_IN);
-        }
-        toolbar.setNavigationIcon(coloredIcon);
-        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
     }
 
     public void initViewModels() {

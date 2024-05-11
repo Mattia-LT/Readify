@@ -163,23 +163,6 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("home lifecycle", "onStart");
-    }
-
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("home lifecycle", "onDestroyView");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("home lifecycle", "onDestroy");
-    }
-
     private void initViewModels(){
         bookViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
@@ -200,8 +183,7 @@ public class HomeFragment extends Fragment {
                             .concat(" ")
                             .concat(user.getUsername())
                             .concat(" ")
-                            .concat("\uD83D\uDC4B")
-                            ;
+                            .concat("\uD83D\uDC4B");
                     fragmentHomeBinding.textviewHomeTitle.setText(welcomeMessage);
                 }
             }

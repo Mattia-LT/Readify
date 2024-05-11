@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/home_navigation_graph"
-    app:startDestination="@id/homeFragment" >
+    android:id="@+id/search_navigation_graph"
+    app:startDestination="@id/searchFragment" >
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="it.unimib.readify.ui.main.HomeFragment"
-        android:label="@string/navigation_bar_item_home"
-        tools:layout="@layout/fragment_home" >
+        android:id="@+id/searchFragment"
+        android:name="it.unimib.readify.ui.main.SearchFragment"
+        android:label="@string/navigation_bar_item_search"
+        tools:layout="@layout/fragment_search">
+
         <action
-            android:id="@+id/action_homeFragment_to_bookDetailsFragment"
+            android:id="@+id/action_searchFragment_to_bookDetailsFragment"
             app:destination="@id/bookDetailsFragment" />
+
+        <action
+            android:id="@+id/action_searchFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+
+        <action
+            android:id="@+id/action_searchFragment_to_filter_bottomsheet"
+            app:destination="@id/filter_bottomsheet" />
+
+        <action
+            android:id="@+id/action_searchFragment_to_addToCollectionDialog"
+            app:destination="@id/addToCollectionDialog" />
+
     </fragment>
+
+    <dialog
+        android:id="@+id/filter_bottomsheet"
+        android:name="it.unimib.readify.ui.main.SearchBooksFilterBottomSheet"
+        android:label="dialog_filter_bottomsheet"
+        tools:layout="@layout/bottom_sheet_search_books_filter" />
 
     <fragment
         android:id="@+id/bookDetailsFragment"
@@ -39,11 +60,15 @@
 
         <action
             android:id="@+id/action_bookDetailsFragment_to_collectionFragment"
-            app:destination="@id/collectionFragment" />
+            app:destination="@id/collectionFragment"
+            app:popUpTo="@id/collectionFragment"
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_bookDetailsFragment_to_userDetailsFragment"
-            app:destination="@id/userDetailsFragment" />
+            app:destination="@id/userDetailsFragment"
+            app:popUpTo="@id/userDetailsFragment"
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_bookDetailsFragment_to_addToCollectionDialog"
@@ -71,27 +96,29 @@
         android:id="@+id/userDetailsFragment"
         android:name="it.unimib.readify.ui.main.UserDetailsFragment"
         android:label="{username}"
-        tools:layout="@layout/fragment_user_details" >
+        tools:layout="@layout/fragment_user_details">
 
         <argument
             android:name="otherUserIdToken"
             app:argType="string" />
+
         <argument
             android:name="username"
             app:argType="string" />
 
         <action
             android:id="@+id/action_userDetailsFragment_to_collectionFragment"
-            app:destination="@id/collectionFragment" />
+            app:destination="@id/collectionFragment"/>
 
         <action
             android:id="@+id/action_userDetailsFragment_to_searchFragment"
-            app:destination="@id/search_navigation_graph" />
+            app:destination="@id/search_navigation_graph"/>
+
         <action
             android:id="@+id/action_userDetailsFragment_to_followListFragment"
             app:destination="@id/followListFragment" />
-    </fragment>
 
+    </fragment>
 
     <fragment
         android:id="@+id/collectionFragment"
@@ -113,11 +140,11 @@
 
         <action
             android:id="@+id/action_collectionFragment_to_profileFragment"
-            app:destination="@id/profile_navigation_graph"/>
+            app:destination="@id/profile_navigation_graph" />
 
         <action
             android:id="@+id/action_collectionFragment_to_bookDetailsFragment"
-            app:destination="@id/bookDetailsFragment"/>
+            app:destination="@id/bookDetailsFragment" />
 
     </fragment>
 
@@ -142,6 +169,7 @@
         <action
             android:id="@+id/action_followListFragment_to_userDetailsFragment"
             app:destination="@id/userDetailsFragment" />
+
     </fragment>
 
 </navigation>

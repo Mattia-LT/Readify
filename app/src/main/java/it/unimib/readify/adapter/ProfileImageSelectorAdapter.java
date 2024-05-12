@@ -39,7 +39,7 @@ public class ProfileImageSelectorAdapter extends RecyclerView.Adapter<ProfileIma
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int clickedPosition = holder.getAdapterPosition();
+                int clickedPosition = holder.getBindingAdapterPosition()        ;
                 if (onImageClickListener != null && clickedPosition != RecyclerView.NO_POSITION) {
                     onImageClickListener.onImageClick(clickedPosition);
                 }

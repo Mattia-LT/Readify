@@ -84,7 +84,7 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 OLWorkApiResponse book = getItem(position);
                 onItemClickListener.onBookItemClick(book);

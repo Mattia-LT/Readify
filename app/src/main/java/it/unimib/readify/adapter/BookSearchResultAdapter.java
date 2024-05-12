@@ -116,7 +116,7 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION){
                 OLWorkApiResponse book = getItem(position);
                 if (v.getId() == R.id.imagebutton_add_icon) {

@@ -77,6 +77,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     //Non aggiornare questa depenency
     implementation("com.google.android.gms:play-services-auth:21.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
     // libreria per le imageview rotonde
     implementation("de.hdodenhof:circleimageview:3.1.0")

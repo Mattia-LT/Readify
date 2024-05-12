@@ -144,7 +144,7 @@ public class BookCarouselAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             } else {
                 //hai premuto qualcos'altro
                 //controllo perchè a volte in circostanze strane potrebbe crashare, cosi si evita sicuramente
-                int position = Math.max(getAdapterPosition(), 0);
+                int position = Math.max(getBindingAdapterPosition(), 0);
                 onBookItemClickListener.onBookItemClick(bookList.get(position));
             }
         }

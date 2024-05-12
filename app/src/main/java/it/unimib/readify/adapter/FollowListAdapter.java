@@ -116,7 +116,7 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 ExternalUser user = getItem(position);
                 if(v.getId() == binding.followUsername.getId() || v.getId() == binding.followImage.getId()){

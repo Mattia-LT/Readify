@@ -112,7 +112,7 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                 //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
             } else {
                 //hai premuto qualcos'altro
-                onItemClickListener.onUserItemClick(userList.get(getAdapterPosition()));
+                onItemClickListener.onUserItemClick(userList.get(getBindingAdapterPosition()));
             }
         }
 

@@ -113,16 +113,17 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                 GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) binding.collectionContainer.getLayoutParams();
                 //convert 5dp in px depending on the user's device
                 float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, Resources.getSystem().getDisplayMetrics());
-                if(getAdapterPosition() % 2 == 0)
+                if(getBindingAdapterPosition() % 2 == 0){
                     layoutParams.rightMargin = (int) margin;
-                else
+                } else{
                     layoutParams.leftMargin = (int) margin;
+                }
             }
         }
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 onItemClickListener.onCollectionItemClick(getItem(position));
             }

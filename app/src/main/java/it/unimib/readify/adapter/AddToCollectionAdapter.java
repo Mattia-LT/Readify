@@ -60,7 +60,7 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
             super(binding.getRoot());
             this.binding = binding;
             binding.checkboxAddToCollection.addOnCheckedStateChangedListener((checkBox, state) -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     Collection selectedCollection = getItem(position);
                     if(checkBox.isChecked()){

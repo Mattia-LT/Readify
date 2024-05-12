@@ -123,7 +123,7 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         @Override
         public void onClick(View v) {
             Log.d("notification page", "aww");
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Notification notification = getItem(position);
                 Log.d("notification page", notification.toString());

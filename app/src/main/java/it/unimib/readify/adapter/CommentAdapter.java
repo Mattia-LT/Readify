@@ -134,7 +134,7 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Comment comment = getItem(position);
                 if(v.getId() == binding.deleteCommentButton.getId()){

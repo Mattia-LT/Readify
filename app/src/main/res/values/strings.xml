@@ -138,6 +138,7 @@
     <string name="rename_collection_confirm_message">Type the new name of the collection</string>
     <string name="confirm_action">Confirm</string>
     <string name="cancel_action">Cancel</string>
+    <string name="no_results_found">No results found.\nTry searching for something else!</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

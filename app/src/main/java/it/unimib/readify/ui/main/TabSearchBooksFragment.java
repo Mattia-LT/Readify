@@ -1,5 +1,6 @@
 package it.unimib.readify.ui.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -7,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
@@ -43,6 +46,7 @@ public class TabSearchBooksFragment extends Fragment{
     private String sortMode;
     private String subjects;
     private User loggedUser;
+    private boolean isLoading;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -74,6 +78,27 @@ public class TabSearchBooksFragment extends Fragment{
         recyclerViewSearchResults.setAdapter(searchResultsAdapter);
         recyclerViewSearchResults.setLayoutManager(layoutManager);
 
+        recyclerViewSearchResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager != null) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                    if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
+                        fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
+                        bookViewModel.loadMoreSearchResults();
+                        // Flag to prevent multiple load requests
+                        isLoading = true;
+                    }
+                }
+            }
+        });
+
+
+
         MaterialButton filterButton = fragmentTabSearchBooksBinding.buttonSearchFilter;
 
         filterButton.setOnClickListener( v -> {
@@ -85,6 +110,9 @@ public class TabSearchBooksFragment extends Fragment{
         fragmentTabSearchBooksBinding.edittextSearch.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (keyEvent != null && (actionId == KeyEvent.ACTION_DOWN || actionId == KeyEvent.KEYCODE_ENTER ||  actionId == EditorInfo.IME_ACTION_SEARCH || keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                 fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
+                fragmentTabSearchBooksBinding.noResultsFoundLayout.setVisibility(View.GONE);
+                InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
                 startSearch();
                 return true;
             }
@@ -117,12 +145,22 @@ public class TabSearchBooksFragment extends Fragment{
 
     private void initObserver(){
         final Observer<List<Result>> searchResultsListObserver = results -> {
+            ConstraintLayout noResultsFoundLayout = fragmentTabSearchBooksBinding.noResultsFoundLayout;
+            if(results.isEmpty()){
+                noResultsFoundLayout.setVisibility(View.VISIBLE);
+            } else {
+                noResultsFoundLayout.setVisibility(View.GONE);
+            }
+
             List<OLWorkApiResponse> searchResults = results.stream()
                     .filter(result -> result instanceof Result.WorkSuccess)
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
+
+
             searchResultsAdapter.submitList(searchResults);
             fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
+            isLoading = false;
         };
 
         final Observer<List<String>> genreListObserver = genreList -> {

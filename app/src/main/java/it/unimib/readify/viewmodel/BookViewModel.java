@@ -25,8 +25,12 @@ public class BookViewModel extends ViewModel {
             @collectionResultsLiveData has to be dynamic
      */
     private final IBookRepository bookRepository;
-    private final int offset;
-    private final int limit;
+    private final int ITEMS_PER_PAGE = 10;
+    private int currentPage = 0;
+    private String query;
+    private String sort;
+    private String subjects;
+
 
     private MutableLiveData<List<String>> subjectListLiveData;
     private MutableLiveData<String> sortModeLiveData;
@@ -38,8 +42,6 @@ public class BookViewModel extends ViewModel {
 
     public BookViewModel(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
-        this.offset = 0;
-        this.limit = 10;
     }
 
     public MutableLiveData<List<Result>> getSearchResultsLiveData(){
@@ -50,8 +52,19 @@ public class BookViewModel extends ViewModel {
     }
 
     public void searchBooks(String query, String sort, String subjects) {
-        bookRepository.searchBooks(query, sort, limit, offset, subjects);
+        currentPage = 0;
+        this.query = query;
+        this.sort = sort;
+        this.subjects = subjects;
+        bookRepository.searchBooks(query, sort, ITEMS_PER_PAGE, 0, subjects);
     }
+
+    // Method to load more items for pagination
+    public void loadMoreSearchResults() {
+        currentPage++; // Increment page number to load the next page
+        bookRepository.searchBooks(query, sort, ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE, subjects);
+    }
+
 
     public MutableLiveData<List<Result>> fetchBooks(List<String> idList, String reference) {
         switch (reference){

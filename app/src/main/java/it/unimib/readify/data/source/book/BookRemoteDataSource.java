@@ -1,7 +1,5 @@
 package it.unimib.readify.data.source.book;
 
-import static it.unimib.readify.util.Constants.SEARCH;
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -49,7 +47,47 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                                 idList.add(doc.getKey());
                             }
                         }
-                        getBooks(idList, SEARCH);
+
+                        List<OLWorkApiResponse> books = new ArrayList<>();
+                        int totalRequests = idList.size();
+                        final int[] completedRequests = {0};
+                        for(String id: idList){
+                            olApiService.fetchBook(id).enqueue(new Callback<OLWorkApiResponse>() {
+                                @Override
+                                public void onResponse(@NonNull Call<OLWorkApiResponse> call,
+                                                       @NonNull Response<OLWorkApiResponse> response) {
+                                    if(response.isSuccessful()){
+                                        OLWorkApiResponse book = response.body();
+                                        if(book != null){
+                                            checkBookData(book);
+                                            fetchAuthors(book);
+                                            fetchRatingForWork(book);
+                                            books.add(book);
+                                            completedRequests[0]++;
+                                            if(books.size() == idList.size() && completedRequests[0] == totalRequests){
+                                                responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                                            }
+                                        } else {
+                                            //todo gestire errore
+                                        }
+                                    } else {
+                                        //todo gestire errore
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
+                                    //todo gestire errori
+                                    completedRequests[0]++;
+                                    if(books.size() == idList.size() && completedRequests[0] == totalRequests){
+                                        responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                                    }
+                                }
+                            });
+                        }
+                        if(idList.isEmpty()){
+                            responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                        }
                     } else{
                         //todo errore
                     }

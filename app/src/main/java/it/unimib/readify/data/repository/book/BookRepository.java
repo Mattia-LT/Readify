@@ -2,7 +2,6 @@ package it.unimib.readify.data.repository.book;
 
 import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.RECENT;
-import static it.unimib.readify.util.Constants.SEARCH;
 import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
@@ -16,12 +15,12 @@ import java.util.List;
 
 import it.unimib.readify.data.database.BookRoomDatabase;
 import it.unimib.readify.data.source.book.BaseBookLocalDataSource;
+import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
 import it.unimib.readify.data.source.book.BookLocalDataSource;
 import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
 import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
@@ -37,6 +36,10 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     private final MutableLiveData<List<Result>> fetchedCollectionsLiveData;
     private final MutableLiveData<List<Result>> singleCollectionLiveData;
+
+    private boolean firstSearch = true;
+    private boolean searchLimitReached = false;
+    private int currentSearchLimit = 0;
 
     public static BookRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
         return new BookRepository(
@@ -61,13 +64,23 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     @Override
     public void searchBooks(String query, String sort, int limit, int offset, String genres) {
-        bookRemoteDataSource.searchBooks(query, sort, limit, offset, genres);
+        this.firstSearch = offset == 0;
+        if(firstSearch){
+            searchLimitReached = false;
+            bookRemoteDataSource.searchBooks(query, sort, limit, offset, genres);
+        } else if(!searchLimitReached){
+            if(offset + limit >= currentSearchLimit){
+                searchLimitReached = true;
+            }
+            bookRemoteDataSource.searchBooks(query, sort, limit, offset, genres);
+        } else {
+            searchResultsLiveData.postValue(searchResultsLiveData.getValue());
+        }
     }
 
     public MutableLiveData<List<Result>> getSearchResultsLiveData(){
         return searchResultsLiveData;
     }
-
 
 
     @Override
@@ -95,8 +108,22 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     }
 
     @Override
-    public void onSuccessSearchFromRemote(List<OLWorkApiResponse> searchApiResponse) {
-
+    public void onSuccessSearchFromRemote(List<OLWorkApiResponse> workApiResponseList, int totalNumber) {
+        List<Result> resultList = new ArrayList<>();
+        for(OLWorkApiResponse work : workApiResponseList) {
+            resultList.add(new Result.WorkSuccess(work));
+        }
+        List<Result> currentSearchResultList = new ArrayList<>();
+        if(firstSearch){
+            this.currentSearchLimit = totalNumber;
+            currentSearchResultList = resultList;
+        } else {
+            if (searchResultsLiveData.getValue() != null) {
+                currentSearchResultList.addAll(searchResultsLiveData.getValue());
+                currentSearchResultList.addAll(resultList);
+            }
+        }
+        searchResultsLiveData.postValue(currentSearchResultList);
     }
 
     @Override
@@ -119,9 +146,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 break;
             case SUGGESTED:
                 suggestedBooksLiveData.postValue(resultList);
-                break;
-            case SEARCH:
-                searchResultsLiveData.postValue(resultList);
                 break;
             case COLLECTION:
                 singleCollectionLiveData.postValue(resultList);

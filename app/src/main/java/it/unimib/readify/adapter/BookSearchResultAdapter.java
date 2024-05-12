@@ -1,5 +1,6 @@
 package it.unimib.readify.adapter;
 
+import static it.unimib.readify.util.Constants.DESCRIPTION_TRIM_OPTIONS;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
@@ -74,9 +75,18 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
 
         public void bind(OLWorkApiResponse book) {
             binding.textviewBookTitle.setText(book.getTitle());
-            binding.textviewBookDescription.setText(book.getDescription().getValue());
-            // todo gestire cambio icona quando aggiungo libro
-            // setImageViewFavoriteNews(newsList.get(getAdapterPosition()).isFavorite());
+            String description = book.getDescription().getValue();
+            for(String option : DESCRIPTION_TRIM_OPTIONS){
+                if(description.contains(option)){
+                    int position = description.indexOf(option);
+                    description = description.substring(0, position);
+                }
+            }
+            description = description.trim();
+            if(description.isEmpty()){
+                description = this.itemView.getContext().getString(R.string.description_not_available);
+            }
+            binding.textviewBookDescription.setText(description);
             if(book.getCovers() != null){
                 int cover = -1;
                 int pos = 0;

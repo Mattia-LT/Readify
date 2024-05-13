@@ -3,6 +3,8 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 public class OLRatingResponse implements Parcelable {
@@ -33,6 +35,7 @@ public class OLRatingResponse implements Parcelable {
         return Objects.hash(summary);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "OLRatingResponse{" +

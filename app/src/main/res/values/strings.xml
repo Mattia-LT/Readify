@@ -79,6 +79,16 @@
     <string name="button_reset" translatable="false">Reset</string>
     <string name="content_description_book_cover">Cover of the book</string>
     <string name="content_description_add_to_bookshelf">Button \"add to bookshelf\"</string>
+    <string name="content_description_light_mode">Light Mode icon</string>
+    <string name="content_description_dark_mode">Dark Mode icon</string>
+    <string name="content_description_arrow_notification">Open current notification section icon</string>
+    <string name="content_description_follower_notification">Follower notification icon</string>
+    <string name="content_description_recommended_notification">Recommended notification icon</string>
+    <string name="content_description_shared_profiles_notification">Shared profiles notification icon</string>
+    <string name="content_description_system_notification">System notification icon</string>
+    <string name="content_description_statistics_notification">Statistics notification icon</string>
+
+
     <string name="placeholder_error_message">An error occurred. Please, retry.</string>
     <string name="button_retry">Retry</string>
     <string name="content_description_filter_button">Filter Search Button</string>
@@ -139,6 +149,19 @@
     <string name="confirm_action">Confirm</string>
     <string name="cancel_action">Cancel</string>
     <string name="no_results_found">No results found.\nTry searching for something else!</string>
+    <string name="new_followers_notification_title">New followers</string>
+    <string name="recommended_books_notification_title">Recommended books</string>
+    <string name="shared_profiles_notification_title">Shared profiles</string>
+    <string name="system_notification_title">System</string>
+    <string name="statistics_notification_title">Statistics</string>
+    <string name="new_followers_notification_content">Newest followers…</string>
+    <string name="recommended_books_notification_content">Newest recommended books…</string>
+    <string name="shared_profiles_notification_content">Newest shared profiles…</string>
+    <string name="system_notification_content">Newest system notifications…</string>
+    <string name="statistics_notification_content">Check your progress…</string>
+    <string name="show_all_notifications">Show all</string>
+    <string name="no_notifications_found">No new notifications yet</string>
+
 
     <!-- chip genres -->
     <string-array name="chip_genres">

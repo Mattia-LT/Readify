@@ -3,6 +3,8 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 
 public class Social implements Parcelable {
     private String socialPlatform;
@@ -66,6 +68,7 @@ public class Social implements Parcelable {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "Social{" +

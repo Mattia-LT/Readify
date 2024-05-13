@@ -89,6 +89,7 @@ public class OLSearchApiResponse implements Parcelable {
         this.workList = workList;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "OLSearchApiResponse{" +

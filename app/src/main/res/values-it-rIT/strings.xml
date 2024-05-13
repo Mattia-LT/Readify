@@ -69,6 +69,29 @@
     <string name="button_apply">Applica</string>
     <string name="content_description_book_cover">Copertina del libro</string>
     <string name="content_description_add_to_bookshelf">Bottone \"aggiungi alla libreria\"</string>
+    <string name="content_description_light_mode">Icona modalità chiara</string>
+    <string name="content_description_dark_mode">Icona modalità scura</string>
+    <string name="content_description_arrow_notification">Icona per aprire la sezione di notifiche</string>
+    <string name="content_description_follower_notification">Icona di notifica dei seguaci</string>
+    <string name="content_description_recommended_notification">Icona di notifica dei consigliati</string>
+    <string name="content_description_shared_profiles_notification">Icona di notifica dei profili condivisi</string>
+    <string name="content_description_system_notification">Icona di notifica del sistema</string>
+    <string name="content_description_statistics_notification">Icona di notifica delle statistiche</string>
+    <string name="new_followers_notification_title">Nuovi seguaci</string>
+    <string name="recommended_books_notification_title">Libri consigliati</string>
+    <string name="shared_profiles_notification_title">Profili condivisi</string>
+    <string name="system_notification_title">Sistema</string>
+    <string name="statistics_notification_title">Statistiche</string>
+    <string name="new_followers_notification_content">Nuovi seguaci…</string>
+    <string name="recommended_books_notification_content">Nuovi libri consigliati…</string>
+    <string name="shared_profiles_notification_content">Nuovi profili condivisi…</string>
+    <string name="system_notification_content">Nuove notifiche di sistema…</string>
+    <string name="statistics_notification_content">Controlla i tuoi progressi</string>
+    <string name="show_all_notifications">Mostra tutto</string>
+    <string name="no_notifications_found">Nessuna nuova notifica</string>
+
+
+
     <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
     <string name="button_retry">Riprova</string>
     <string name="content_description_filter_button">Bottone per i filtri della ricerca</string>

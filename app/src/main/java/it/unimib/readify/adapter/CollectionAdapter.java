@@ -81,21 +81,23 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                     binding.collectionThumbnailImageview.setImageResource(R.drawable.loading_spinner);
                 } else {
                     for(OLWorkApiResponse work : collection.getWorks()) {
-                        int pos = 0;
-                        int cover = -1;
-                        while (cover == -1 && pos < work.getCovers().size()) {
-                            cover = work.getCovers().get(pos);
-                            pos++;
-                        } if (cover != -1) {
-                            RequestOptions requestOptions = new RequestOptions()
-                                    .placeholder(R.drawable.loading_spinner)
-                                    .error(R.drawable.image_not_available);
-                            Glide.with(this.itemView.getContext())
-                                    .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
-                                    .apply(requestOptions)
-                                    .into(binding.collectionThumbnailImageview);
-                            isThumbnailAvailable = true;
-                            break;
+                        if(work.getCovers() != null){
+                            int pos = 0;
+                            int cover = -1;
+                            while (cover == -1 && pos < work.getCovers().size()) {
+                                cover = work.getCovers().get(pos);
+                                pos++;
+                            } if (cover != -1) {
+                                RequestOptions requestOptions = new RequestOptions()
+                                        .placeholder(R.drawable.loading_spinner)
+                                        .error(R.drawable.image_not_available);
+                                Glide.with(this.itemView.getContext())
+                                        .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
+                                        .apply(requestOptions)
+                                        .into(binding.collectionThumbnailImageview);
+                                isThumbnailAvailable = true;
+                                break;
+                            }
                         }
                     }
                     if(!isThumbnailAvailable){

@@ -31,7 +31,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
     public void initLocalCollections(List<Collection> collectionsToInsert) {
         BookRoomDatabase.databaseWriteExecutor.execute(() -> {
             int collectionsDeleted = bookDao.deleteAllCollections();
-            if(collectionsDeleted > 0){
+            if(collectionsDeleted >= 0){
                 insertCollectionList(collectionsToInsert);
             }
         });

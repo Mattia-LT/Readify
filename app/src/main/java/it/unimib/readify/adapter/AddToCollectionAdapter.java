@@ -55,13 +55,14 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
     public class AddToCollectionViewHolder extends RecyclerView.ViewHolder{
 
         private final SelectCollectionItemBinding binding;
+        private boolean isCheckboxChanging = true;
 
         public AddToCollectionViewHolder(@NonNull SelectCollectionItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.checkboxAddToCollection.addOnCheckedStateChangedListener((checkBox, state) -> {
                 int position = getBindingAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
+                if (position != RecyclerView.NO_POSITION && isCheckboxChanging) {
                     Collection selectedCollection = getItem(position);
                     if(checkBox.isChecked()){
                         onCheckboxStatusChanged.onCollectionSelected(selectedCollection);
@@ -79,7 +80,9 @@ public class AddToCollectionAdapter extends ListAdapter<Collection, AddToCollect
                 binding.textviewNumberOfBooks.setText(booksRead);
                 List<String> books = collection.getBooks();
                 if (books != null) {
+                    isCheckboxChanging = false;
                     binding.checkboxAddToCollection.setChecked(books.contains(bookId));
+                    isCheckboxChanging = true;
                 }
             }
         }

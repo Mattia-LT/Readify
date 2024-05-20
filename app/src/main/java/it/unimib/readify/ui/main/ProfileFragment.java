@@ -46,6 +46,7 @@ import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -53,7 +54,7 @@ public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
 
     private TestDatabaseViewModel testDatabaseViewModel;
-    private BookViewModel bookViewModel;
+    private CollectionViewModel collectionViewModel;
 
     private CollectionAdapter collectionAdapter;
     private User loggedUser;
@@ -97,8 +98,8 @@ public class ProfileFragment extends Fragment{
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
-        bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(BookViewModel.class);
+        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(CollectionViewModel.class);
     }
 
     private void initObservers() {
@@ -111,6 +112,7 @@ public class ProfileFragment extends Fragment{
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
             Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
+            Log.e("COLLECTIONS OPENLIBRARY",collectionsList.toString());
             collectionAdapter.submitList(collectionsList);
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
             fragmentProfileBinding.recyclerviewCollections.setVisibility(View.VISIBLE);
@@ -123,20 +125,9 @@ public class ProfileFragment extends Fragment{
                 updateUI();
                 fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
-                testDatabaseViewModel.fetchLoggedUserCollections(loggedUser.getIdToken());
+                collectionViewModel.loadLoggedUserCollections();
                 testDatabaseViewModel.fetchNotifications(loggedUser.getIdToken());
             }
-        };
-
-        final Observer<List<Result>> emptyCollectionsObserver = results -> {
-            fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
-            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
-            List<Collection> collectionsResultList = results.stream()
-                    .filter(result -> result instanceof Result.CollectionSuccess)
-                    .map(result -> ((Result.CollectionSuccess) result).getData())
-                    .collect(Collectors.toList());
-            this.collectionsList = collectionsResultList;
-            bookViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
         fetchedNotificationsObserver = result -> {
@@ -144,10 +135,9 @@ public class ProfileFragment extends Fragment{
             notifications = result;
             loadMenu();
         };
-
-        testDatabaseViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),emptyCollectionsObserver);
+        //todo forse sistema
+        collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
         testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
@@ -236,13 +226,11 @@ public class ProfileFragment extends Fragment{
                                 Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_settingsFragment);
                             }
                             if(itemId == R.id.nav_logout){
-                                /*
-                                testDatabaseViewModel.logout();
+                                //todo shared pref e auth
+                                //testDatabaseViewModel.logout();
+                                collectionViewModel.emptyLocalDb();
                                 //FirebaseAuth.getInstance().signOut();
-                                Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_loginFragment);
-
-                                da fare dopo aver implementato il database locale ig
-                                 */
+                                //Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_loginFragment);
                              }
 
                             drawerLayout.closeDrawer(GravityCompat.END);
@@ -342,6 +330,7 @@ public class ProfileFragment extends Fragment{
         super.onDestroyView();
         testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         testDatabaseViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
-        bookViewModel.getCompleteCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
+        //todo sistema
+        //collectionViewModel.getCompleteCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
     }
 }

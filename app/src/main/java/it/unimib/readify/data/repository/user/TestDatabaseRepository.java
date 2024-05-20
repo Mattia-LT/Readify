@@ -29,8 +29,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<Result> userMutableLiveData;
     private final MutableLiveData<List<Result>> userSearchResultsLiveData;
     private final MutableLiveData<List<Result>> commentListLiveData;
-    private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
-    private final MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private final MutableLiveData<List<Result>> followerListLiveData;
     private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<Result> otherUserLiveData;
@@ -51,8 +49,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.userMutableLiveData = new MutableLiveData<>();
         this.userSearchResultsLiveData = new MutableLiveData<>();
         this.commentListLiveData = new MutableLiveData<>();
-        this.loggedUserCollectionListLiveData = new MutableLiveData<>();
-        this.otherUserCollectionListLiveData = new MutableLiveData<>();
         this.followerListLiveData = new MutableLiveData<>();
         this.followingListLiveData = new MutableLiveData<>();
         this.otherUserLiveData = new MutableLiveData<>();
@@ -183,16 +179,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData() {
-        return loggedUserCollectionListLiveData;
-    }
-
-    @Override
-    public MutableLiveData<List<Result>> getOtherUserCollectionListLiveData() {
-        return otherUserCollectionListLiveData;
-    }
-
-    @Override
     public MutableLiveData<List<Result>> getFollowersListLiveData() {
         return followerListLiveData;
     }
@@ -216,16 +202,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public void fetchComments(String bookId) {
         Log.d("Repository", "fetch comments : START");
         userDataRemoteDataSource.fetchComments(bookId);
-    }
-
-    @Override
-    public void fetchLoggedUserCollections(String idToken) {
-        userDataRemoteDataSource.fetchLoggedUserCollections(idToken);
-    }
-
-    @Override
-    public void fetchOtherUserCollections(String otherUserIdToken) {
-        userDataRemoteDataSource.fetchOtherUserCollections(otherUserIdToken);
     }
 
     @Override
@@ -341,26 +317,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void createCollection(String idToken, String collectionName, boolean visible) {
-        userDataRemoteDataSource.createCollection(idToken, collectionName, visible);
-    }
-
-    @Override
-    public void deleteCollection(String idToken, String collectionId) {
-        userDataRemoteDataSource.deleteCollection(idToken, collectionId);
-    }
-
-    @Override
-    public void addBookToCollection(String idToken, String bookId, String collectionId) {
-        userDataRemoteDataSource.addBookToCollection(idToken, bookId, collectionId);
-    }
-
-    @Override
-    public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
-        userDataRemoteDataSource.removeBookFromCollection(idToken, bookId, collectionId);
-    }
-
-    @Override
     public void fetchFollowers(String idToken) {
         userDataRemoteDataSource.fetchFollowers(idToken);
     }
@@ -388,11 +344,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName) {
-        userDataRemoteDataSource.renameCollection(loggedUserIdToken, collectionId, newCollectionName);
-    }
-
-    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
@@ -400,24 +351,9 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onCreateCollectionResult(Collection collection) {
-
-    }
-
-    @Override
     public void onFetchOtherUserResult(User otherUser) {
         Result otherUserResult = new Result.UserSuccess(otherUser);
         otherUserLiveData.postValue(otherUserResult);
-    }
-
-    @Override
-    public void onDeleteCollectionResult() {
-
-    }
-
-    @Override
-    public void onAddBookToCollectionResult(List<String> books) {                                                                                                                                                                   
-
     }
 
     @Override
@@ -432,34 +368,6 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onUserUnfollowResult() {
-
-    }
-
-    @Override
-    public void onSuccessFetchLoggedUserCollectionsFromRemoteDatabase(List<Collection> collections) {
-        List<Result> collectionResultList = new ArrayList<>();
-        for(Collection collection : collections){
-            collectionResultList.add(new Result.CollectionSuccess(collection));
-        }
-        loggedUserCollectionListLiveData.postValue(collectionResultList);
-    }
-
-    @Override
-    public void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message) {
-
-    }
-
-    @Override
-    public void onSuccessFetchOtherUserCollectionsFromRemoteDatabase(List<Collection> collections) {
-        List<Result> collectionResultList = new ArrayList<>();
-        for(Collection collection : collections){
-            collectionResultList.add(new Result.CollectionSuccess(collection));
-        }
-        otherUserCollectionListLiveData.postValue(collectionResultList);
-    }
-
-    @Override
-    public void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message) {
 
     }
 

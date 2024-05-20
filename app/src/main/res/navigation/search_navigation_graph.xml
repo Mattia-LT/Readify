@@ -83,8 +83,8 @@
         tools:layout="@layout/bottom_sheet_add_to_collection">
 
         <argument
-            android:name="bookId"
-            app:argType="string" />
+            android:name="book"
+            app:argType="it.unimib.readify.model.OLWorkApiResponse" />
 
         <argument
             android:name="idToken"

@@ -17,9 +17,6 @@ public interface BookDao {
     @Query("SELECT * FROM collection ORDER BY name ASC")
     List<Collection> getAllCollections();
 
-    //@Insert(onConflict = OnConflictStrategy.REPLACE)
-    //List<Long> insertCollectionList(List<Collection> collectionList);
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertCollection(Collection collection);
 
@@ -32,5 +29,6 @@ public interface BookDao {
     @Query("DELETE FROM collection")
     int deleteAllCollections();
 
-
+    @Query("SELECT * FROM collection WHERE collection_id = :collectionId LIMIT 1")
+    Collection getCollectionById(String collectionId);
 }

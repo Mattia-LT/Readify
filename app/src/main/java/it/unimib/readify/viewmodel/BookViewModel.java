@@ -38,7 +38,6 @@ public class BookViewModel extends ViewModel {
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
-    private MutableLiveData<List<Result>> collectionListLiveData;
 
     public BookViewModel(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -86,17 +85,6 @@ public class BookViewModel extends ViewModel {
             default:
                 return null;
         }
-    }
-
-    public void fetchWorksForCollections(List<Collection> collections){
-       bookRepository.fetchWorksForCollections(collections);
-    }
-
-    public MutableLiveData<List<Result>> getCompleteCollectionListLiveData(){
-        if(collectionListLiveData == null){
-            collectionListLiveData = bookRepository.getFetchedCollectionsLiveData();
-        }
-        return collectionListLiveData;
     }
 
     public MutableLiveData<List<String>> getSubjectListLiveData(){

@@ -69,7 +69,7 @@ public class TabSearchBooksFragment extends Fragment{
 
             @Override
             public void onAddToCollectionButtonPressed(OLWorkApiResponse book) {
-                NavDirections action = SearchFragmentDirections.actionSearchFragmentToAddToCollectionDialog(book.getKey(), loggedUser.getIdToken());
+                NavDirections action = SearchFragmentDirections.actionSearchFragmentToAddToCollectionDialog(book, loggedUser.getIdToken());
                 Navigation.findNavController(requireView()).navigate(action);
             }
         });

@@ -24,12 +24,13 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BottomSheetCollectionCreationBinding;
+import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     private BottomSheetCollectionCreationBinding binding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private CollectionViewModel collectionViewModel;
     private String idToken;
 
     @Nullable
@@ -86,16 +87,16 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
                 Snackbar.make(requireView(), getString(R.string.snack_bar_empty_collection_name), Snackbar.LENGTH_SHORT).show();
             } else {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
-                testDatabaseViewModel.createCollection(idToken, collectionName, visible);
-                testDatabaseViewModel.fetchLoggedUserCollections(idToken);
+                collectionViewModel.createCollection(idToken, collectionName, visible);
+                collectionViewModel.fetchLoggedUserCollections(idToken);
                 requireDialog().dismiss();
             }
         });
     }
 
     private void initViewModels() {
-        testDatabaseViewModel = TestDatabaseViewModelFactory
+        collectionViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+                .create(CollectionViewModel.class);
     }
 }

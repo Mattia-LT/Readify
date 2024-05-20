@@ -6,19 +6,14 @@ import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unimib.readify.data.database.BookRoomDatabase;
-import it.unimib.readify.data.source.book.BaseBookLocalDataSource;
 import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
-import it.unimib.readify.data.source.book.BookLocalDataSource;
 import it.unimib.readify.data.source.book.BookRemoteDataSource;
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.util.DataEncryptionUtil;
@@ -32,8 +27,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private final MutableLiveData<List<Result>> recentBooksLiveData;
     private final MutableLiveData<List<Result>> trendingBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
-    private final BaseBookLocalDataSource bookLocalDataSource;
-
     private final MutableLiveData<List<Result>> fetchedCollectionsLiveData;
     private final MutableLiveData<List<Result>> singleCollectionLiveData;
 
@@ -41,14 +34,12 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private boolean searchLimitReached = false;
     private int currentSearchLimit = 0;
 
-    public static BookRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
+    public static BookRepository getInstance(Application application, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
         return new BookRepository(
-                new BookRemoteDataSource(application),
-                new BookLocalDataSource(bookRoomDatabase, sharedPreferencesUtil, dataEncryptionUtil)
-        );
+                new BookRemoteDataSource(application));
     }
 
-    public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource, BaseBookLocalDataSource bookLocalDataSource) {
+    public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource) {
         searchResultsLiveData = new MutableLiveData<>();
         workApiResponseLiveData = new MutableLiveData<>();
         suggestedBooksLiveData = new MutableLiveData<>();
@@ -57,9 +48,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         fetchedCollectionsLiveData = new MutableLiveData<>();
         singleCollectionLiveData = new MutableLiveData<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
-        this.bookRemoteDataSource.setResponseCallback(this);
-        this.bookLocalDataSource = bookLocalDataSource;
-        this.bookLocalDataSource.setResponseCallback(this);
+        this.bookRemoteDataSource.setBookResponseCallback(this);
     }
 
     @Override
@@ -95,16 +84,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 return suggestedBooksLiveData;
         }
         return null;
-    }
-
-    @Override
-    public void fetchWorksForCollections(List<Collection> collections) {
-        bookRemoteDataSource.fetchWorksForCollections(collections);
-    }
-
-    @Override
-    public MutableLiveData<List<Result>> getFetchedCollectionsLiveData() {
-        return fetchedCollectionsLiveData;
     }
 
     @Override
@@ -154,25 +133,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     }
 
     @Override
-    public void onSuccessFetchCollectionsFromRemote(List<Collection> collectionList) {
-        List<Result> resultList = new ArrayList<>();
-        for(Collection collection : collectionList){
-            resultList.add(new Result.CollectionSuccess(collection));
-        }
-        fetchedCollectionsLiveData.postValue(resultList);
-    }
-
-    @Override
-    public void onSuccessFetchCollectionsFromLocal(List<Collection> collectionList) {
-        Log.e("COLLEZIONI LOCALI FETCHATE", collectionList.toString());
-    }
-
-    @Override
-    public void onSuccessInsertCollectionFromLocal(List<Collection> collectionList) {
-
-    }
-
-    @Override
     public void onFailureFromRemote(Exception exception) {
         List<Result> errorList = new ArrayList<>();
         //todo dividi vari errori in metodi diversi nel callback
@@ -182,9 +142,5 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         suggestedBooksLiveData.postValue(errorList);
         recentBooksLiveData.postValue(errorList);
         trendingBooksLiveData.postValue(errorList);
-    }
-
-    public MutableLiveData<List<Result>> getSingleCollectionLiveData() {
-        return singleCollectionLiveData;
     }
 }

@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 
 public interface IBookRepository {
@@ -12,7 +11,5 @@ public interface IBookRepository {
     void searchBooks(String query, String sort, int limit, int offset, String genres);
     MutableLiveData<List<Result>> getSearchResultsLiveData();
     MutableLiveData<List<Result>> getBooksByIdList(List<String> idList, String reference);
-    void fetchWorksForCollections(List<Collection> collections);
-    MutableLiveData<List<Result>> getFetchedCollectionsLiveData();
 
 }

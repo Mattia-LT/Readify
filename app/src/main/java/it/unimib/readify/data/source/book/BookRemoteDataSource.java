@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unimib.readify.R;
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLAuthorKeys;
 import it.unimib.readify.model.OLDescription;
@@ -65,7 +64,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                                             books.add(book);
                                             completedRequests[0]++;
                                             if(books.size() == idList.size() && completedRequests[0] == totalRequests){
-                                                responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                                                bookResponseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
                                             }
                                         } else {
                                             //todo gestire errore
@@ -80,13 +79,13 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                                     //todo gestire errori
                                     completedRequests[0]++;
                                     if(books.size() == idList.size() && completedRequests[0] == totalRequests){
-                                        responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                                        bookResponseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
                                     }
                                 }
                             });
                         }
                         if(idList.isEmpty()){
-                            responseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
+                            bookResponseCallback.onSuccessSearchFromRemote(books, searchApiResponse.getNumFound());
                         }
                     } else{
                         //todo errore
@@ -124,7 +123,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             books.add(book);
                             completedRequests[0]++;
                             if(books.size() == idList.size() && completedRequests[0] == totalRequests){
-                                responseCallback.onSuccessFetchBooksFromRemote(books, reference);
+                                bookResponseCallback.onSuccessFetchBooksFromRemote(books, reference);
                             }
                         } else {
                             //todo gestire errore
@@ -139,7 +138,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                     //todo gestire errori
                     completedRequests[0]++;
                     if(books.size() == idList.size() && completedRequests[0] == totalRequests){
-                        responseCallback.onSuccessFetchBooksFromRemote(books, reference);
+                        bookResponseCallback.onSuccessFetchBooksFromRemote(books, reference);
                     }
                 }
             });
@@ -217,77 +216,6 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
             }
         }
 
-    }
-
-    @Override
-    public void fetchWorksForCollections(List<Collection> collections){
-        if(collections != null){
-            int collectionsToFetch = collections.size();
-            final int[] collectionsFetched = {0};
-            for (Collection collection : collections) {
-                List<OLWorkApiResponse> fetchedWorks = new ArrayList<>();
-                if(collection.getBooks() == null){
-                    collection.setBooks(new ArrayList<>());
-                }
-                List<String> bookIdList = collection.getBooks();
-                if(bookIdList.isEmpty()){
-                    collectionsFetched[0]++;
-                    continue;
-                }
-                int booksToFetch = bookIdList.size();
-                final int[] booksFetched = {0};
-                for(String bookId : bookIdList){
-                    collection.setWorks(new ArrayList<>());
-                    olApiService.fetchBook(bookId).enqueue(new Callback<OLWorkApiResponse>() {
-                        @Override
-                        public void onResponse(@NonNull Call<OLWorkApiResponse> call, @NonNull Response<OLWorkApiResponse> response) {
-                            if(response.isSuccessful()){
-                                OLWorkApiResponse book = response.body();
-                                if(book != null){
-                                    checkBookData(book);
-                                    fetchAuthors(book);
-                                    fetchRatingForWork(book);
-                                    fetchedWorks.add(book);
-                                    booksFetched[0]++;
-                                    if(fetchedWorks.size() == bookIdList.size() && booksFetched[0] == booksToFetch){
-                                        collection.setWorks(fetchedWorks);
-                                        collectionsFetched[0]++;
-                                        if(collectionsFetched[0] == collectionsToFetch){
-                                            responseCallback.onSuccessFetchCollectionsFromRemote(collections);
-                                        }
-                                    }
-                                } else {
-                                    //todo gestire errore
-                                }
-                            } else {
-                                booksFetched[0]++;
-                                if(fetchedWorks.size() == bookIdList.size() && booksFetched[0] == booksToFetch){
-                                    collection.setWorks(fetchedWorks);
-                                    collectionsFetched[0]++;
-                                    if(collectionsFetched[0] == collectionsToFetch){
-                                        responseCallback.onSuccessFetchCollectionsFromRemote(collections);
-                                    }
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
-                            //todo gestire eventuali errori
-                            booksFetched[0]++;
-                            if(fetchedWorks.size() == bookIdList.size() && booksFetched[0] == booksToFetch){
-                                collection.setWorks(fetchedWorks);
-                                collectionsFetched[0]++;
-                                if(collectionsFetched[0] == collectionsToFetch){
-                                    responseCallback.onSuccessFetchCollectionsFromRemote(collections);
-                                }
-                            }
-                        }
-                    });
-                }
-
-            }
-        }
     }
 
 

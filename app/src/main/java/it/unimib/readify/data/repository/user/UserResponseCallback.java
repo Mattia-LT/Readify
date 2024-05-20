@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.Notification;
@@ -23,17 +22,10 @@ public interface UserResponseCallback {
     void onSuccessFetchFollowingFromRemoteDatabase(List<ExternalUser> followingList);
     void onFailureFetchFollowingFromRemoteDatabase(String message);
     void onAddCommentResult(Comment comment);
-    void onCreateCollectionResult(Collection collection);
     void onFetchOtherUserResult(User otherUser);
-    void onDeleteCollectionResult();
-    void onAddBookToCollectionResult(List<String> books);
     void onDeleteCommentResult();
     void onUserFollowResult();
     void onUserUnfollowResult();
-    void onSuccessFetchLoggedUserCollectionsFromRemoteDatabase(List <Collection> collections);
-    void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message);
-    void onSuccessFetchOtherUserCollectionsFromRemoteDatabase(List <Collection> collections);
-    void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message);
     void onSuccessLogout();
     void onUsernameAvailable(String result);
     void onEmailChanged(Boolean result);

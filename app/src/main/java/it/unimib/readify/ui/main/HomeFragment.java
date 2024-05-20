@@ -28,6 +28,7 @@ import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 import it.unimib.readify.viewmodel.BookViewModel;
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding fragmentHomeBinding;
     private BookViewModel bookViewModel;
     private TestDatabaseViewModel testDatabaseViewModel;
+    private CollectionViewModel collectionViewModel;
     private User user;
 
     public HomeFragment() {}
@@ -171,6 +173,10 @@ public class HomeFragment extends Fragment {
         testDatabaseViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
+
+        collectionViewModel = TestDatabaseViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(CollectionViewModel.class);
     }
 
     private void initObservers(){
@@ -178,6 +184,11 @@ public class HomeFragment extends Fragment {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
+                if(testDatabaseViewModel.isFirstLoading()){
+                    testDatabaseViewModel.setFirstLoading(false);
+                    collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
+                }
+
                 if(user.getUsername() != null) {
                     String welcomeMessage = getString(R.string.placeholder_home_welcome)
                             .concat(" ")

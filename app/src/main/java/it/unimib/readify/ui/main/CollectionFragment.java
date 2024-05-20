@@ -44,6 +44,7 @@ import it.unimib.readify.adapter.BookItemCollectionAdapter;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -51,6 +52,7 @@ public class CollectionFragment extends Fragment {
 
     private FragmentCollectionBinding collectionProfileBinding;
     private TestDatabaseViewModel testDatabaseViewModel;
+    private CollectionViewModel collectionViewModel;
     private Collection collection;
     private String loggedUserIdToken;
     private String collectionOwnerIdToken;
@@ -91,6 +93,9 @@ public class CollectionFragment extends Fragment {
     private void initViewModels(){
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
+
+        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(CollectionViewModel.class);
     }
 
     private void initObservers() {
@@ -139,7 +144,7 @@ public class CollectionFragment extends Fragment {
         EditText renameEditText = textInputLayout.getEditText();
 
         //isValid -> name's length OK and contain only permitted characters
-        testDatabaseViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
+        collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
             if (!isValid){
                 if (renameEditText != null) {
                     //TODO metti un file R.string
@@ -150,7 +155,7 @@ public class CollectionFragment extends Fragment {
             }
         });
 
-        testDatabaseViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
+        collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
             if (isUnique) {
                 Log.e("isNameUnique","true");
                 if (renameEditText != null) {
@@ -190,8 +195,8 @@ public class CollectionFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    testDatabaseViewModel.setNewCollectionName(s.toString());
-                    testDatabaseViewModel.validateCollectionName();
+                    collectionViewModel.setNewCollectionName(s.toString());
+                    collectionViewModel.validateCollectionName();
                     int currentLength = s.length();
                     characterCounterRename.setText(String.valueOf(currentLength));
                 }
@@ -205,7 +210,7 @@ public class CollectionFragment extends Fragment {
                 .setView(renameDialogLayout)
                 .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
                     if (renameEditText != null) {
-                        testDatabaseViewModel.getCollectionName().observe(getViewLifecycleOwner(), new Observer<String>(){
+                        collectionViewModel.getCollectionName().observe(getViewLifecycleOwner(), new Observer<String>(){
                             @Override
                             public void onChanged(String newCollectionName) {
                                 collectionProfileBinding.collectionFragmentCollectionName.setText(newCollectionName);
@@ -215,10 +220,10 @@ public class CollectionFragment extends Fragment {
                                     activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
                                     activity.getSupportActionBar().setTitle(newCollectionName);
                                 }
-                                testDatabaseViewModel.getCollectionName().removeObserver(this);
+                                collectionViewModel.getCollectionName().removeObserver(this);
                             }
                         });
-                        testDatabaseViewModel.renameCollection(loggedUserIdToken,collection.getCollectionId());
+                        collectionViewModel.renameCollection(loggedUserIdToken,collection.getCollectionId());
                     }
                 })
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
@@ -270,7 +275,7 @@ public class CollectionFragment extends Fragment {
                 .setTitle(R.string.delete_collection_action)
                 .setMessage(formattedMessage)
                 .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
-                    testDatabaseViewModel.deleteCollection(loggedUserIdToken, collection.getCollectionId());
+                    collectionViewModel.deleteCollection(loggedUserIdToken, collection);
                     requireActivity().getSupportFragmentManager().popBackStack();
                 })
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());

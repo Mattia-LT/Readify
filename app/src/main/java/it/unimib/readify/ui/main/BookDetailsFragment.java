@@ -89,7 +89,7 @@ public class BookDetailsFragment extends Fragment {
         loadRating();
         loadDescription();
         fragmentBookDetailsBinding.iconAdd.setOnClickListener(v -> {
-            NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook.getKey(), user.getIdToken());
+            NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook, user.getIdToken());
             Navigation.findNavController(requireView()).navigate(action);
         });
         loadComments();

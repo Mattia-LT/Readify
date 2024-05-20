@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import it.unimib.readify.data.database.BookRoomDatabase;
 import it.unimib.readify.data.repository.book.BookRepository;
 import it.unimib.readify.data.repository.book.IBookRepository;
+import it.unimib.readify.data.repository.collection.CollectionRepository;
+import it.unimib.readify.data.repository.collection.ICollectionRepository;
 import it.unimib.readify.data.repository.user.TestDatabaseRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
 import it.unimib.readify.data.service.OLApiService;
@@ -69,7 +71,11 @@ public class TestServiceLocator {
                     }
                     //creating BookRepository instance
                     if(repositoryClass == IBookRepository.class) {
-                        repositoryInstance = BookRepository.getInstance(application, getBookDao(application), sharedPreferencesUtil, dataEncryptionUtil);
+                        repositoryInstance = BookRepository.getInstance(application, sharedPreferencesUtil, dataEncryptionUtil);
+                        repositories.put(repositoryClass, repositoryInstance);
+                    }
+                    if(repositoryClass == ICollectionRepository.class) {
+                        repositoryInstance = CollectionRepository.getInstance(application, getBookDao(application), sharedPreferencesUtil, dataEncryptionUtil);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
                 }

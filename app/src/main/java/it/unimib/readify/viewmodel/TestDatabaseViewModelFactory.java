@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.data.repository.collection.ICollectionRepository;
+
 import it.unimib.readify.util.TestServiceLocator;
 
 /*
@@ -32,12 +34,15 @@ public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
     private final Map<Class<? extends ViewModel>, ViewModel> viewModels = new ConcurrentHashMap<>();
     private final TestIDatabaseRepository testIDatabaseRepository;
     private final IBookRepository iBookRepository;
+    private final ICollectionRepository iCollectionRepository;
 
     private TestDatabaseViewModelFactory(Application application) {
         this.testIDatabaseRepository = TestServiceLocator.getInstance(application)
                 .getRepository(TestIDatabaseRepository.class);
         this.iBookRepository = TestServiceLocator.getInstance(application)
                 .getRepository(IBookRepository.class);
+        this.iCollectionRepository = TestServiceLocator.getInstance(application)
+                .getRepository(ICollectionRepository.class);
     }
 
     public static TestDatabaseViewModelFactory getInstance(Application application) {
@@ -77,6 +82,10 @@ public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
         //creating BookViewModel instance
         if (modelClass.isAssignableFrom(BookViewModel.class)) {
             return (T) new BookViewModel(iBookRepository);
+        }
+        //creating CollectionViewModel instance
+        if(modelClass.isAssignableFrom(CollectionViewModel.class)){
+            return (T) new CollectionViewModel(iCollectionRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }

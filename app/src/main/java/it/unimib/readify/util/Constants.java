@@ -108,4 +108,9 @@ public class Constants {
 
     public static final int DATABASE_VERSION = 1;
     public static final String BOOK_DATABASE_NAME = "book_db";
+
+    public static final String LOGGED_USER = "logged_user";
+    public static final String OTHER_USER = "other_user";
+
+
 }

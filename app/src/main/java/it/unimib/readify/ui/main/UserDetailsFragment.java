@@ -33,6 +33,7 @@ import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
@@ -40,7 +41,7 @@ public class UserDetailsFragment extends Fragment {
 
     private FragmentUserDetailsBinding binding;
     private TestDatabaseViewModel testDatabaseViewModel;
-    private BookViewModel bookViewModel;
+    private CollectionViewModel collectionViewModel;
     private CollectionAdapter collectionAdapter;
     private String userIdToken;
     private String loggedUserIdToken;
@@ -77,8 +78,8 @@ public class UserDetailsFragment extends Fragment {
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
-        bookViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(BookViewModel.class);
+        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(CollectionViewModel.class);
     }
     private void initObservers() {
         final Observer<List<Result>> fetchedCollectionsObserver = results -> {
@@ -100,7 +101,8 @@ public class UserDetailsFragment extends Fragment {
             Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
             binding.collectionsProgressBar.setVisibility(View.VISIBLE);
             binding.recyclerviewUserCollections.setVisibility(View.GONE);
-            bookViewModel.fetchWorksForCollections(collectionsResultList);
+            //todo sistema
+            //collectionViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
         final Observer<Result> loggedUserObserver = result -> {
@@ -130,11 +132,11 @@ public class UserDetailsFragment extends Fragment {
         };
 
 
-        testDatabaseViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), emptyCollectionsObserver);
+        collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), emptyCollectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         testDatabaseViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
-
-        bookViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+        //todo siustema
+        //collectionViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
 
     }
     private void initRecyclerView(){
@@ -151,7 +153,7 @@ public class UserDetailsFragment extends Fragment {
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
         requireActivity().setTitle(username);
         testDatabaseViewModel.fetchOtherUser(userIdToken);
-        testDatabaseViewModel.fetchOtherUserCollections(userIdToken);
+        collectionViewModel.fetchOtherUserCollections(userIdToken);
 
     }
 

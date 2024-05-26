@@ -6,20 +6,18 @@ public class Constants {
 
     // Constants for SharedPreferences
     public static final String SHARED_PREFERENCES_FILE_NAME = "it.unimib.readify.preferences";
-    public static final String SHARED_PREFERENCES_COUNTRY_OF_INTEREST = "country_of_interest";
-    public static final String SHARED_PREFERENCES_TOPICS_OF_INTEREST = "topics_of_interest";
-    public static final String SHARED_PREFERENCES_FIRST_LOADING = "first_loading";
-
 
     // Constants for EncryptedSharedPreferences
     public static final String ENCRYPTED_SHARED_PREFERENCES_FILE_NAME = "it.unimib.readify.encrypted_preferences";
     public static final String EMAIL_ADDRESS = "email_address";
     public static final String PASSWORD = "password";
-    public static final String ID_TOKEN = "google_token";
-
+    public static final String LOGIN_ID_TOKEN = "id_token";
 
     // Constants for encrypted files
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.readify.encrypted_file.txt";
+
+    public static boolean NORMAL_LOGIN = false;
+    public static boolean GOOGLE_LOGIN = true;
 
 
     // Constants for API

@@ -1,5 +1,9 @@
 package it.unimib.readify.data.source.collection;
 
+import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
+import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
+
 import android.util.Log;
 
 import java.util.Iterator;
@@ -120,9 +124,8 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
             // It means that everything has been deleted
             if (collectionCounter == collectionsDeleted) {
-                //TODO shared pref
-                //sharedPreferencesUtil.deleteAll(SHARED_PREFERENCES_FILE_NAME);
-                //dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
+                sharedPreferencesUtil.deleteAll(SHARED_PREFERENCES_FILE_NAME);
+                dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
 
                 collectionResponseCallback.onSuccessDeleteAllCollectionsFromLocal();
             } else {

@@ -7,16 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.startup.WelcomeActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/top_appbar_welcome"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name"
-        />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view_login"
         android:name="androidx.navigation.fragment.NavHostFragment"

@@ -35,6 +35,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
+    private final MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
 
     public static TestIDatabaseRepository getInstance(Application application) {
@@ -56,6 +57,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
         this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
         this.fetchedNotifications = new MutableLiveData<>();
+        this.logoutResult = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -91,6 +93,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     @Override
     public void signInWithGoogle(String idToken) {
         userAuthRemoteDataSource.signInWithGoogle(idToken);
+    }
+
+    @Override
+    public void logout() {
+        userAuthRemoteDataSource.logout();
     }
 
     @Override
@@ -220,6 +227,11 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
+    public MutableLiveData<Boolean> getLogoutResult() {
+        return logoutResult;
+    }
+
+    @Override
     public MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications() {
         return fetchedNotifications;
     }
@@ -228,6 +240,7 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     public void onSuccessFromAuthentication(User user) {
         if (user != null) {
             userDataRemoteDataSource.saveUserData(user);
+            logoutResult.postValue(null);
         }
     }
 
@@ -373,7 +386,12 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
 
     @Override
     public void onSuccessLogout() {
+        logoutResult.postValue(true);
+    }
 
+    @Override
+    public void onFailureLogout() {
+        logoutResult.postValue(false);
     }
 
     @Override

@@ -58,9 +58,11 @@ public class TestDatabaseViewModel extends ViewModel {
     private final MutableLiveData<String> sourceUsernameError;
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
+    private MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private boolean isUIRunning;
     private boolean firstLoading = true;
+    private boolean continueRegistrationFirstLoading = true;
     public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
@@ -337,7 +339,22 @@ public class TestDatabaseViewModel extends ViewModel {
         this.firstLoading = firstLoading;
     }
 
+    public MutableLiveData<Boolean> getLogoutResult() {
+        if(logoutResult == null){
+            logoutResult = testDatabaseRepository.getLogoutResult();
+        }
+        return logoutResult;
+    }
+
     public void logout(){
-        //TODO IMPLEMENTA
+        testDatabaseRepository.logout();
+    }
+
+    public boolean isContinueRegistrationFirstLoading() {
+        return continueRegistrationFirstLoading;
+    }
+
+    public void setContinueRegistrationFirstLoading(boolean continueRegistrationFirstLoading) {
+        this.continueRegistrationFirstLoading = continueRegistrationFirstLoading;
     }
 }

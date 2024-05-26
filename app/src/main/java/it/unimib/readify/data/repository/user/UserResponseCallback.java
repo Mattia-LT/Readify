@@ -27,6 +27,7 @@ public interface UserResponseCallback {
     void onUserFollowResult();
     void onUserUnfollowResult();
     void onSuccessLogout();
+    void onFailureLogout();
     void onUsernameAvailable(String result);
     void onEmailChanged(Boolean result);
     void onPasswordChanged(Boolean result);

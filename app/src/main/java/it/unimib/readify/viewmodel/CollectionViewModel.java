@@ -21,7 +21,7 @@ public class CollectionViewModel extends ViewModel {
     private MutableLiveData<Boolean> isCollectionNameValid;
     private MutableLiveData<Boolean> isCollectionNameUnique;
     private MutableLiveData<String> newCollectionName;
-
+    private MutableLiveData<Boolean> deleteAllCollectionResult;
 
     public CollectionViewModel(ICollectionRepository collectionRepository) {
         this.collectionRepository = collectionRepository;
@@ -144,5 +144,12 @@ public class CollectionViewModel extends ViewModel {
 
     public void emptyLocalDb(){
         collectionRepository.emptyLocalDb();
+    }
+
+    public MutableLiveData<Boolean> getDeleteAllCollectionResult() {
+        if(deleteAllCollectionResult == null){
+            deleteAllCollectionResult = collectionRepository.getAllCollectionsDeletedResult();
+        }
+        return deleteAllCollectionResult;
     }
 }

@@ -2,6 +2,7 @@ package it.unimib.readify.ui.startup;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,6 +118,7 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
                 testDatabaseViewModel.setUserFollowing(onSaveUser);
 
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
+                requireActivity().finish();
             } else {
                 if(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition()== 0){
                     fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage.setText(R.string.error_gender);
@@ -203,5 +205,12 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
             selectedGenresMap = null;
         }
         return selectedGenresMap;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.e("ON DESTROY continue", "TRIGGERED");
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

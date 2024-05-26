@@ -28,6 +28,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     private final BaseCollectionLocalDataSource bookLocalDataSource;
     private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
     private final MutableLiveData<List<Result>> otherUserCollectionListLiveData;
+    private final MutableLiveData<Boolean> allCollectionsDeletedResult;
 
     public static CollectionRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
         return new CollectionRepository(
@@ -39,6 +40,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     public CollectionRepository(BaseCollectionRemoteDataSource collectionRemoteDataSource, BaseCollectionLocalDataSource bookLocalDataSource) {
         loggedUserCollectionListLiveData = new MutableLiveData<>();
         otherUserCollectionListLiveData = new MutableLiveData<>();
+        allCollectionsDeletedResult = new MutableLiveData<>();
         this.bookLocalDataSource = bookLocalDataSource;
         this.collectionRemoteDataSource = collectionRemoteDataSource;
         this.bookLocalDataSource.setResponseCallback(this);
@@ -103,14 +105,19 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     }
 
     @Override
+    public MutableLiveData<Boolean> getAllCollectionsDeletedResult() {
+        return allCollectionsDeletedResult;
+    }
+
+    @Override
     public void onSuccessFetchCompleteCollectionsFromRemote(List<Collection> collectionList, String reference) {
         List<Result> resultList = new ArrayList<>();
         for(Collection collection : collectionList){
             resultList.add(new Result.CollectionSuccess(collection));
         }
         if(reference.equals(LOGGED_USER)){
-            Log.e("repository","SONO NELLA REPOSITORY QUINDI NON HAI SCUSE");
             bookLocalDataSource.initLocalCollections(collectionList);
+            allCollectionsDeletedResult.postValue(null);
             loggedUserCollectionListLiveData.postValue(resultList);
         } else if(reference.equals(OTHER_USER)){
             otherUserCollectionListLiveData.postValue(resultList);
@@ -201,12 +208,13 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onSuccessDeleteAllCollectionsFromLocal() {
+        allCollectionsDeletedResult.postValue(true);
         Log.d("CollectionRepository", "Collections deletion succeeded");
-
     }
 
     @Override
     public void onFailureDeleteAllCollectionsFromLocal(String message) {
+        allCollectionsDeletedResult.postValue(false);
         Log.e("CollectionRepository", message);
     }
 

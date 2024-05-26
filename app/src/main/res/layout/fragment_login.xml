@@ -46,13 +46,15 @@
         app:errorTextColor="@color/white"
         app:errorIconTint="@color/white"
         android:textColorHint="@color/white"
-        app:errorEnabled="true">
+        app:shapeAppearanceOverlay="@style/RoundedEditText"
+        app:errorEnabled="true"
+        app:boxStrokeColor="@color/white"
+        app:boxStrokeWidth="3dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_textbox"
             android:drawableStart="@drawable/ic_baseline_email_24"
             android:drawableTint="@color/white"
             android:drawablePadding="20dp"
@@ -73,13 +75,15 @@
         android:textColorHint="@color/white"
         app:errorTextColor="@color/white"
         app:errorIconTint="@color/white"
-        app:errorEnabled="true">
+        app:shapeAppearanceOverlay="@style/RoundedEditText"
+        app:errorEnabled="true"
+        app:boxStrokeColor="@color/white"
+        app:boxStrokeWidth="3dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_textbox"
             android:drawableStart="@drawable/ic_baseline_vpn_key_24"
             android:drawablePadding="20dp"
             android:drawableTint="@color/white"

@@ -16,10 +16,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
-import it.unimib.readify.ui.startup.LoginFragment;
-
-//TODO --> POSSIBILMENTE DA RIVEDERE NEL CASO DOVESSIMO UTILIZZARLO. HO COPIATO IL FILE DEL PROF
-
 /**
  * Utility class to encrypt data using EncryptedSharedPreferences and EncryptedFile.
  * Doc can be read here: <a href="https://developer.android.com/topic/security/data">...</a>
@@ -138,21 +134,43 @@ public class DataEncryptionUtil {
         MasterKey mainKey = new MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build();
 
+        File file = new File(context.getFilesDir(), fileName);
+
         EncryptedFile encryptedFile = new EncryptedFile.Builder(context,
-                new File(context.getFilesDir(), fileName),
+                file,
                 mainKey,
                 EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build();
 
-        InputStream inputStream = encryptedFile.openFileInput();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int nextByte = inputStream.read();
-        while (nextByte != -1) {
-            byteArrayOutputStream.write(nextByte);
-            nextByte = inputStream.read();
-        }
+        if (file.exists()) {
+            InputStream inputStream = encryptedFile.openFileInput();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            int nextByte = inputStream.read();
+            while (nextByte != -1) {
+                byteArrayOutputStream.write(nextByte);
+                nextByte = inputStream.read();
+            }
 
-        byte[] plaintext = byteArrayOutputStream.toByteArray();
-        return new String(plaintext, StandardCharsets.UTF_8);
+            byte[] plaintext = byteArrayOutputStream.toByteArray();
+            return new String(plaintext, StandardCharsets.UTF_8);
+        }
+        return null;
+    }
+
+    /**
+     * Deletes data saved in files created with EncryptedSharedPreferences API
+     * and in normal text files where the information is encrypted.
+     * @param encryptedSharedPreferencesFileName The EncryptedSharedPreferences file name
+     *                                           where the information is saved.
+     * @param encryptedFileDataFileName The file name where the information is saved.
+     */
+    public void deleteAll(String encryptedSharedPreferencesFileName, String encryptedFileDataFileName) {
+        SharedPreferences sharedPref = context.getSharedPreferences(encryptedSharedPreferencesFileName,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.apply();
+
+        new File(context.getFilesDir(), encryptedFileDataFileName).delete();
     }
 }

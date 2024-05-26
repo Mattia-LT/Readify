@@ -146,6 +146,8 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                     firebaseAuth.removeAuthStateListener(this);
                     Log.d("USERAUTHREMOTE", "User logged out");
                     userResponseCallback.onSuccessLogout();
+                } else {
+                    userResponseCallback.onFailureLogout();
                 }
             }
         };

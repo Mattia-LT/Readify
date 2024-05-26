@@ -20,5 +20,6 @@ public interface ICollectionRepository {
     void emptyLocalDb();
     MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
     MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();
+    MutableLiveData<Boolean> getAllCollectionsDeletedResult();
 
 }

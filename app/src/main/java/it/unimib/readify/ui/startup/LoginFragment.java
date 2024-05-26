@@ -1,7 +1,12 @@
 package it.unimib.readify.ui.startup;
 
+import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
+import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
+import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.LOGIN_ID_TOKEN;
 import static it.unimib.readify.util.Constants.INVALID_CREDENTIALS_ERROR;
 import static it.unimib.readify.util.Constants.INVALID_USER_ERROR;
+import static it.unimib.readify.util.Constants.PASSWORD;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -29,18 +34,22 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding fragmentLoginBinding;
-
     private TestDatabaseViewModel testDatabaseViewModel;
-    private Observer<Result> observer;
+    private DataEncryptionUtil dataEncryptionUtil;
+    private Observer<Result> loggedUserObserver;
 
     private final ActivityResultLauncher<IntentSenderRequest> signInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartIntentSenderForResult(),
@@ -53,88 +62,11 @@ public class LoginFragment extends Fragment {
         return new LoginFragment();
     }
 
-    /*
-        Fragment's Life Cycles
-        There are lots of life cycles; here I put them in order of execution:
-         1)  onAttach()
-                It is called when the Fragment is first attached to its host Activity.
-                At this point, the Fragment has access to the Activity via the getActivity() method.
-         2)  onCreate()
-                It is called to do initial creation of a fragment
-                 (when the fragment doesn't exist).
-         3)  onCreateView()
-                It is called to have the fragment instantiate its view.
-         4)  onViewCreated()
-                It is called when the fragment view is completely created.
-                Now is the moment to initialize and use graphical and non-graphical components.
-         5)  onStart()
-                It is called when the user can see the Fragment.
-                Now is the moment to start animations.
-         6)  onResume()
-                It is called when the Fragment becomes active and ready for interaction.
-         7)  onPause()
-                It is called when the Fragment is about to be paused or replaced by another Fragment.
-                You can perform cleanup operations or save the user interface state here.
-         8)  onStop()
-                It is called when the Fragment is no longer visible to the user.
-                You can perform visibility-related cleaning operations in this method.
-         9)  onDestroyView()
-                It is called when the fragment's view is destroyed.
-         10) onDestroy()
-                It is called when the fragment is going to be completely destroyed and removed
-                 from Backstack; the fragment doesn't exist anymore.
-         11) onDetach()
-                It is called when the Fragment is removed from the host Activity.
-
-        Backstack
-        It is a data structure that keeps track of Activities or Fragments in an application
-         as they are added to and removed from the stack.
-        This stack is primarily used to handle backward navigation within the application.
-
-            Behavior
-            When an Activity or Fragment is started, it is usually added to the backstack.
-            Every time another Activity or Fragment is started, the previous one is pushed
-             onto the stack. In this way, the user can navigate backwards by pressing the Back
-             button on the device, and the application will take the user back to the
-             previous Activity or Fragment removed from the stack.
-            When the user presses the Back button, the current task or fragment is removed
-             from the top of the stack, and the first previous one starts from onStart() method;
-             that's specific detail is important for deciding where to initialize and deleting
-             the Observer.
-
-            When you should remove a container from Backstack
-            1) End of logical flow
-                If a container represents the end of a logical flow within your application.
-                This prevents the user from returning to a screen that makes no sense to repeat
-                 or offers no further action.
-            2) Save memory
-                If a container takes up a lot of memory and you no longer need
-                 to keep it on the stack.
-            3) Privacy and security
-                If a container contains sensitive information, it may need to be removed
-                 from the stack when the user exits the application or switches to another
-                 security-critical activity.
-                This prevents an attacker from accessing sensitive information
-                 by going back up the stack.
-            4) Customizing the user experience
-                It may be desirable to customize the user experience by removing specific containers
-                 from the stack to improve the fluidity of navigation
-                 or to adapt to specific user behaviors.
-
-        Navigation component behavior
-        When you use the navigation component in Android to navigate from a fragment to another activity,
-         the current fragment is simply removed from the navigation transaction and replaced
-         by the target activity.
-        The Fragment is not automatically destroyed unless explicitly removed via other operations,
-         such as removal from the Backstack.
-        //todo verify that removal from backstack destroys the container
-
-        Differences between Back button, Navigation Component and Menu
-        Having a Start point and a Destination point, both points being a container:
-         Back button destroys the Start point (removing it from the Backstack);
-         Menu (which depends on Navigation Component) destroys the Start point (removing it from the Backstack);
-         Navigation doesn't destroys the Start point;
-     */
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -147,7 +79,45 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("login fragment", "onViewCreated");
-        initVieModels();
+        initViewModels();
+
+        if(testDatabaseViewModel.isContinueRegistrationFirstLoading()){
+            try {
+                String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
+                String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
+                String savedIdToken = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN);
+                Log.d(""+savedEmail, ""+savedEmail);
+                Log.d(""+savedIdToken, ""+savedIdToken);
+                Log.d(""+savedPassword, ""+savedPassword);
+                if(savedEmail != null){
+                    loggedUserObserver = result -> {
+                        if(testDatabaseViewModel.isUIRunning()) {
+                            if(result.isSuccess()) {
+                                User user = ((Result.UserSuccess) result).getData();
+                                if(user.getUsername() == null){
+                                    testDatabaseViewModel.setContinueRegistrationFirstLoading(false);
+                                    Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
+                                    testDatabaseViewModel.setUIRunning(false);
+                                }
+                            }
+                        }
+                    };
+
+                    if(savedPassword != null){
+                        //login normale
+                        testDatabaseViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
+                        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                    } else {
+                        //login google
+                        testDatabaseViewModel.signInWithGoogle(savedIdToken);
+                        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                    }
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 
 
         /*
@@ -212,23 +182,6 @@ public class LoginFragment extends Fragment {
                      even when its container has been destroyed; this may have a negative impact on the memory.
                     Remember to delete it when its working is unnecessary.
         */
-        //login action
-        observer = result -> {
-            if(testDatabaseViewModel.isUIRunning()) {
-                if(result.isSuccess()) {
-                    User user = ((Result.UserSuccess) result).getData();
-                    if(user.getUsername() == null){
-                        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
-                    } else {
-                        navigateToHomeActivity();
-                    }
-                } else {
-                    Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
-
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
             //String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
@@ -237,6 +190,32 @@ public class LoginFragment extends Fragment {
             String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 testDatabaseViewModel.setUserMutableLiveData(email, password, true);
+                loggedUserObserver = result -> {
+                    if(testDatabaseViewModel.isUIRunning()) {
+                        if(result.isSuccess()) {
+                            User user = ((Result.UserSuccess) result).getData();
+                            Log.e("USER SAVED", user.toString());
+                            if(user.getEmail().equalsIgnoreCase(email)){
+                                saveNormalLoginData(email, password);
+                                if(user.getUsername() == null){
+                                    testDatabaseViewModel.setContinueRegistrationFirstLoading(false);
+                                    Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
+                                    testDatabaseViewModel.setUIRunning(false);
+                                } else {
+                                    Log.d("NAVIGAZIONE", "APERTO DA ELSE DI BUTTON LISTENER");
+                                    navigateToHomeActivity();
+                                    requireActivity().finish();
+                                    testDatabaseViewModel.setUIRunning(false);
+                                }
+                            }
+                        } else {
+                            Snackbar.make(requireView(), ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+
+                testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+
             } else {
                 //todo managing specific behavior when an error occurs
                 Snackbar.make(view, "error data insertion", Snackbar.LENGTH_SHORT).show();
@@ -266,6 +245,7 @@ public class LoginFragment extends Fragment {
                 testDatabaseViewModel.setUIRunning(false);
              is not going to be invoked again, causing (probably) the Observer to run when it shouldn't.
          */
+
     }
 
     @Override
@@ -286,7 +266,8 @@ public class LoginFragment extends Fragment {
             It would have been different if we initialized the Observer in onStart():
              like this, method removeObserver() can be put in its body.
          */
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(observer);
+        Log.e("ON DESTROY login", "TRIGGERED");
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 
     private void signInWithGoogle() {
@@ -315,7 +296,37 @@ public class LoginFragment extends Fragment {
             SignInCredential credential = signInClient.getSignInCredentialFromIntent(data);
             String idToken = credential.getGoogleIdToken();
             Log.d("handleSignInResult", "firebaseAuthWithGoogle:" + credential.getId());
-            testDatabaseViewModel.signInWithGoogle(idToken);
+            if(idToken != null){
+                testDatabaseViewModel.signInWithGoogle(idToken);
+                loggedUserObserver = result -> {
+                    if(testDatabaseViewModel.isUIRunning()) {
+                        if(result.isSuccess()) {
+                            User user = ((Result.UserSuccess) result).getData();
+                            Log.e("user72kkkkk",user.toString());
+                            Log.e("idtoken_problematico", idToken);
+                            Log.e("idtoken_FORSE", credential.getId());
+                            if(user.getEmail().equalsIgnoreCase(credential.getId())){
+                                Log.e("user73kkkkk",user.toString());
+                                saveGoogleLoginData(idToken);
+                                if(user.getUsername() == null){
+                                    Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
+                                    testDatabaseViewModel.setUIRunning(false);
+                                } else {
+                                    Log.d("NAVIGAZIONE", "APERTO DA ELSE DI GOOGLE BUTTON LISTENER");
+                                    navigateToHomeActivity();
+                                    requireActivity().finish();
+                                    testDatabaseViewModel.setUIRunning(false);
+                                }
+                            }
+                        } else {
+                            Snackbar.make(requireView(), ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+            }
+
+
         } catch (ApiException e) {
             // Google Sign In failed, update UI appropriately
             Log.w("handleSignInResult error", "Google sign in failed", e);
@@ -362,10 +373,43 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private void initVieModels(){
+    private void initViewModels(){
         testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(TestDatabaseViewModel.class);
 
         testDatabaseViewModel.setUIRunning(false);
+    }
+
+    private void saveNormalLoginData(String email, String password) {
+        try {
+            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
+                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS, email);
+            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
+                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD, password);
+            //normal login (not google)
+            if (password != null) {
+                dataEncryptionUtil.writeSecreteDataOnFile(ENCRYPTED_DATA_FILE_NAME,
+                        email.concat(":").concat(password));
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveGoogleLoginData(String loginIdToken){
+        try {
+            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
+                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN, loginIdToken);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("ON DESTROY login", "TRIGGERED");
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

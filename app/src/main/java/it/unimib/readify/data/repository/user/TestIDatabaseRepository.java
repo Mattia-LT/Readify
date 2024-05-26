@@ -17,6 +17,7 @@ public interface TestIDatabaseRepository {
     void signIn(String email, String password);
     void signUp(String email, String password);
     void signInWithGoogle(String idToken);
+    void logout();
     void changeUserPassword(String newPassword);
     void setUserUsername(User user);
     void setUserEmail(String newEmail);
@@ -50,5 +51,7 @@ public interface TestIDatabaseRepository {
     MutableLiveData<String> getSourceUsernameError();
     MutableLiveData<Boolean> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
+    MutableLiveData<Boolean> getLogoutResult();
+
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
 }

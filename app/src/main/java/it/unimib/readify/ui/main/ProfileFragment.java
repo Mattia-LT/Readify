@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,14 +47,13 @@ import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.BookViewModel;
+import it.unimib.readify.ui.startup.WelcomeActivity;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
-
     private TestDatabaseViewModel testDatabaseViewModel;
     private CollectionViewModel collectionViewModel;
 
@@ -63,6 +64,9 @@ public class ProfileFragment extends Fragment{
     private HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
     private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private Observer<Result> loggedUserObserver;
+    private Observer<Boolean> logoutResultObserver;
+    private Observer<Boolean> deleteAllCollectionsResultObserver;
+
     private Observer<List<Result>> fetchedCollectionsObserver;
     public ProfileFragment() {}
 
@@ -135,10 +139,36 @@ public class ProfileFragment extends Fragment{
             notifications = result;
             loadMenu();
         };
-        //todo forse sistema
+
+        logoutResultObserver = result -> {
+          if(result != null){
+              if(result){
+                  collectionViewModel.emptyLocalDb();
+              } else {
+                  Toast.makeText(requireContext(), "Logout error", Toast.LENGTH_SHORT).show();
+              }
+          }
+        };
+
+        deleteAllCollectionsResultObserver = result -> {
+            if(result != null){
+                if(result){
+                    testDatabaseViewModel.setFirstLoading(true);
+                    testDatabaseViewModel.setContinueRegistrationFirstLoading(true);
+                    Intent intent = new Intent(requireActivity(), WelcomeActivity.class);
+                    startActivity(intent);
+                    requireActivity().finish();
+                } else {
+                    Toast.makeText(requireContext(), "Local DB error", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
+        collectionViewModel.getDeleteAllCollectionResult().observe(getViewLifecycleOwner(),deleteAllCollectionsResultObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+        testDatabaseViewModel.getLogoutResult().observe(getViewLifecycleOwner(), logoutResultObserver);
     }
 
    private void initRecyclerView(){
@@ -227,10 +257,7 @@ public class ProfileFragment extends Fragment{
                             }
                             if(itemId == R.id.nav_logout){
                                 //todo shared pref e auth
-                                //testDatabaseViewModel.logout();
-                                collectionViewModel.emptyLocalDb();
-                                //FirebaseAuth.getInstance().signOut();
-                                //Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_loginFragment);
+                                testDatabaseViewModel.logout();
                              }
 
                             drawerLayout.closeDrawer(GravityCompat.END);

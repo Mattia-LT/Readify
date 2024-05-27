@@ -161,6 +161,10 @@
     <string name="statistics_notification_content">Check your progress…</string>
     <string name="show_all_notifications">Show all</string>
     <string name="no_notifications_found">No new notifications yet</string>
+    <string name="content_description_logo_startup">Application logo, loading…</string>
+    <string name="textview_select_avatar">Select your profile picture</string>
+    <string name="content_description_button_edit_profile">Button to confirm profile changes</string>
+
 
 
     <!-- chip genres -->

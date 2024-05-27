@@ -33,8 +33,8 @@ public class DataEncryptionUtil {
      * @param sharedPreferencesFileName the name of the SharedPreferences file where to write the data
      * @param key The key associated with the value
      * @param value The value to be written
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws GeneralSecurityException when a GeneralSecurityException occurs
+     * @throws IOException when a IOException occurs
      */
     public void writeSecretDataWithEncryptedSharedPreferences(String sharedPreferencesFileName,
                                                               String key, String value)
@@ -64,8 +64,8 @@ public class DataEncryptionUtil {
      * @param sharedPreferencesFileName the name of the SharedPreferences file where data are saved
      * @param key The key associated with the value to be read
      * @return The decrypted value
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws GeneralSecurityException when a GeneralSecurityException occurs
+     * @throws IOException when a IOException occurs
      */
     public String readSecretDataWithEncryptedSharedPreferences(String sharedPreferencesFileName,
                                                                String key)
@@ -90,8 +90,8 @@ public class DataEncryptionUtil {
      * Writes sensitive data in an encrypted file using EncryptedFile class.
      * @param fileName the name of the encrypted file file where to write the data
      * @param data The data to be written
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws GeneralSecurityException when a GeneralSecurityException occurs
+     * @throws IOException when a IOException occurs
      */
     public void writeSecreteDataOnFile(String fileName, String data)
             throws GeneralSecurityException, IOException {
@@ -123,8 +123,8 @@ public class DataEncryptionUtil {
     /**
      * Reads data from an encrypted file using EncryptedFile class.
      * @return the decrypted content of the file.
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws GeneralSecurityException when a GeneralSecurityException occurs
+     * @throws IOException when a IOException occurs
      */
     public String readSecretDataOnFile(String fileName)
             throws GeneralSecurityException, IOException {

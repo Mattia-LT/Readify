@@ -89,6 +89,10 @@
     <string name="statistics_notification_content">Controlla i tuoi progressi</string>
     <string name="show_all_notifications">Mostra tutto</string>
     <string name="no_notifications_found">Nessuna nuova notifica</string>
+    <string name="content_description_logo_startup">Logo dell\'applicazione, caricamento…</string>
+    <string name="textview_select_avatar">Seleziona l\'immagine profilo</string>
+    <string name="content_description_button_edit_profile">Bottone per confermare le modifiche al profilo</string>
+
 
 
 

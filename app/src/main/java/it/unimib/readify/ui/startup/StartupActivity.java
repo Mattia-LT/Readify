@@ -40,9 +40,9 @@ public class StartupActivity extends AppCompatActivity {
             String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
             String savedGoogleLoginIdToken = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN);
-            Log.d(""+savedEmail, ""+savedEmail);
-            Log.d(""+savedPassword, ""+savedPassword);
-            Log.d("idtoken_problematico", ""+savedGoogleLoginIdToken);
+            Log.d(String.valueOf(savedEmail), String.valueOf(savedEmail));
+            Log.d("loginToken", String.valueOf(savedGoogleLoginIdToken));
+            Log.d(String.valueOf(savedPassword), String.valueOf(savedPassword));
 
             loggedUserObserver = result -> {
                 if(testDatabaseViewModel.isUIRunning()) {

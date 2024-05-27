@@ -86,9 +86,9 @@ public class LoginFragment extends Fragment {
                 String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
                 String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
                 String savedIdToken = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN);
-                Log.d(""+savedEmail, ""+savedEmail);
-                Log.d(""+savedIdToken, ""+savedIdToken);
-                Log.d(""+savedPassword, ""+savedPassword);
+                Log.d(String.valueOf(savedEmail), String.valueOf(savedEmail));
+                Log.d(String.valueOf(savedIdToken), String.valueOf(savedIdToken));
+                Log.d(String.valueOf(savedPassword), String.valueOf(savedPassword));
                 if(savedEmail != null){
                     loggedUserObserver = result -> {
                         if(testDatabaseViewModel.isUIRunning()) {

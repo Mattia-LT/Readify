@@ -49,7 +49,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:$navVersion")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
 
     implementation("com.google.android.material:material:1.12.0")
@@ -62,25 +63,25 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Module for loading images
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
+    // Module for rounded image views
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    // import firebase BoM
+
+    // firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
-    // TODO: Add the dependencies for Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
+    // Analytics
     implementation("com.google.firebase:firebase-analytics")
-
-    // AUTENTICAZIONE
+    // Authentication
     implementation("com.google.firebase:firebase-auth")
+    // TODO - don't update. delete this comment before final commit
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
-    //Non aggiornare questa depenency
-    implementation("com.google.android.gms:play-services-auth:21.1.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-    // libreria per le imageview rotonde
-    implementation("de.hdodenhof:circleimageview:3.1.0")
 
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
 

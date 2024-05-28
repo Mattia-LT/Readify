@@ -4,7 +4,6 @@ import static android.view.View.NO_ID;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -35,22 +34,22 @@ public class SubjectsUtil {
     private void initSubjectsHashMap() {
         subjectsApiValueMap = new LinkedHashMap<>();
         String[] apiValues = new String[]{
-                "fiction_action_&_adventure",
+                "adventure",
                 "biography",
-                "classic_literature",
-                "comic_books_strips",
+                "classic",
+                "comic",
                 "drama",
-                "fiction_fantasy_general",
-                "fiction_historical_general",
-                "fiction_horror",
+                "fantasy",
+                "historical",
+                "horror",
                 "humor",
-                "fiction_mystery_&_detective_general",
+                "mystery",
                 "poetry",
-                "fiction_romance_general",
-                "fiction_science_fiction_general",
-                "fiction_short_stories_(single_author)",
+                "romance",
+                "science fiction",
+                "short stories",
                 "sports",
-                "fiction_thrillers_general"
+                "thriller"
         };
 
         Resources res = context.getResources();

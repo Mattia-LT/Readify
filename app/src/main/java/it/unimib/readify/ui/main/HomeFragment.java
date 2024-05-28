@@ -1,7 +1,6 @@
 package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.RECENT;
-import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.os.Bundle;
@@ -146,14 +145,6 @@ public class HomeFragment extends Fragment {
             fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
             trendingBooksAdapter.refreshList(workResultList);
         });
-        bookViewModel.fetchBooks(mockDataSuggested, SUGGESTED).observe(getViewLifecycleOwner(), resultList -> {
-            List<OLWorkApiResponse> workResultList = resultList.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarSuggested.setVisibility(View.GONE);
-            suggestedBooksAdapter.refreshList(workResultList);
-        });
 
         bookViewModel.fetchBooks(mockDataRecent, RECENT).observe(getViewLifecycleOwner(), resultList -> {
             List<OLWorkApiResponse> workResultList = resultList.stream()
@@ -180,6 +171,17 @@ public class HomeFragment extends Fragment {
     }
 
     private void initObservers(){
+        Observer<List<Result>> recommendedBooksObserver = results -> {
+            Log.d("recommended observer", "triggered");
+            List<OLWorkApiResponse> workResultList = results.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+            fragmentHomeBinding.progressbarSuggested.setVisibility(View.GONE);
+            suggestedBooksAdapter.refreshList(workResultList);
+        };
+
+
         Observer<Result> loggedUserObserver = result -> {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
@@ -187,6 +189,7 @@ public class HomeFragment extends Fragment {
                 if(testDatabaseViewModel.isFirstLoading()){
                     testDatabaseViewModel.setFirstLoading(false);
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
+                    bookViewModel.loadRecommendedBooks(user.getRecommended());
                 }
 
                 if(user.getUsername() != null) {
@@ -201,5 +204,6 @@ public class HomeFragment extends Fragment {
         };
         //get user data from database
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        bookViewModel.getRecommendedCarouselLiveData().observe(getViewLifecycleOwner(), recommendedBooksObserver);
     }
 }

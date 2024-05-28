@@ -21,5 +21,7 @@ public interface ICollectionRepository {
     MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
     MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();
     MutableLiveData<Boolean> getAllCollectionsDeletedResult();
+    MutableLiveData<Boolean> getAddToCollectionResult();
+    MutableLiveData<Boolean> getRemoveFromCollectionResult();
 
 }

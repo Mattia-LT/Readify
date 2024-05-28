@@ -186,7 +186,10 @@ public class ProfileFragment extends Fragment{
     public void loadMenu(){
         SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
                 .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
+
+        //controllo shared pref -> se null faccio questo
         int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        //altrimenti leggo shared pref
 
         // Imposta lo stato dello SwitchCompat in base al tema corrente
         switch (currentNightMode) {
@@ -200,8 +203,10 @@ public class ProfileFragment extends Fragment{
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                //aggiorno shared pref
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                //aggiorno shared pref
             }
         });
 

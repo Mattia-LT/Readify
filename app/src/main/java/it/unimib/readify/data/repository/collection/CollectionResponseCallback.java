@@ -18,6 +18,10 @@ public interface CollectionResponseCallback {
     void onSuccessAddBookToCollectionFromRemote(String collectionId, OLWorkApiResponse book);
     void onSuccessUpdateCollectionFromLocal();
     void onFailureUpdateCollectionFromLocal(String message);
+    void onSuccessAddBookToCollectionFromLocal();
+    void onSuccessRemoveBookFromCollectionFromLocal();
+    void onFailureAddBookToCollectionFromLocal(String message);
+    void onFailureRemoveBookFromCollectionFromLocal(String message);
     void onSuccessRemoveBookFromCollectionFromRemote(String collectionId, String bookId);
     void onFailureRemoveBookFromCollectionFromRemote(String message);
     void onFailureAddBookToCollectionFromRemote(String message);

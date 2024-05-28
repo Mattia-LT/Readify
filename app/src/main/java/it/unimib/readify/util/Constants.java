@@ -43,6 +43,7 @@ public class Constants {
     public static final String OL_SEARCH_LIMIT_PARAMETER = "limit";
     public static final String OL_SEARCH_OFFSET_PARAMETER = "offset";
     public static final String OL_SEARCH_SUBJECT_PARAMETER = "subject";
+    public static final String OL_SORT_RANDOM_DAILY = "random.daily";
 
 
     // Constants for recycler views
@@ -109,6 +110,9 @@ public class Constants {
 
     public static final String LOGGED_USER = "logged_user";
     public static final String OTHER_USER = "other_user";
+
+    public static final String OPERATION_ADD_TO_COLLECTION = "add_to_collection";
+    public static final String OPERATION_REMOVE_FROM_COLLECTION = "remove_from_collection";
 
 
 }

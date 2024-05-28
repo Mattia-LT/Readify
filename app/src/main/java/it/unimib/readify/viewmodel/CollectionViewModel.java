@@ -22,6 +22,9 @@ public class CollectionViewModel extends ViewModel {
     private MutableLiveData<Boolean> isCollectionNameUnique;
     private MutableLiveData<String> newCollectionName;
     private MutableLiveData<Boolean> deleteAllCollectionResult;
+    private MutableLiveData<Boolean> addToCollectionResult;
+    private MutableLiveData<Boolean> removeFromCollectionResult;
+
 
     public CollectionViewModel(ICollectionRepository collectionRepository) {
         this.collectionRepository = collectionRepository;
@@ -151,5 +154,19 @@ public class CollectionViewModel extends ViewModel {
             deleteAllCollectionResult = collectionRepository.getAllCollectionsDeletedResult();
         }
         return deleteAllCollectionResult;
+    }
+
+    public MutableLiveData<Boolean> getAddToCollectionResult() {
+        if(addToCollectionResult == null){
+            addToCollectionResult = collectionRepository.getAddToCollectionResult();
+        }
+        return addToCollectionResult;
+    }
+
+    public MutableLiveData<Boolean> getRemoveFromCollectionResult() {
+        if(removeFromCollectionResult == null){
+            removeFromCollectionResult = collectionRepository.getRemoveFromCollectionResult();
+        }
+        return removeFromCollectionResult;
     }
 }

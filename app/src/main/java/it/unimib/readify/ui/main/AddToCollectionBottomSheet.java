@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,16 +35,26 @@ import it.unimib.readify.databinding.BottomSheetAddToCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.util.SubjectsUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
     private BottomSheetAddToCollectionBinding binding;
     private CollectionViewModel collectionViewModel;
+    private TestDatabaseViewModel testDatabaseViewModel;
     private AddToCollectionAdapter addToCollectionAdapter;
     private OLWorkApiResponse book;
     private String idToken;
+    private User loggedUser;
+    private Observer<Boolean> addToCollectionResultObserver;
+    private Observer<Boolean> removeFromCollectionResultObserver;
+    private Observer<List<Result>> collectionsObserver;
+    private Observer<Result> loggedUserObserver;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater , @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,7 +78,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         initObservers();
         this.book = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBook();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
-        collectionViewModel.fetchLoggedUserCollections(idToken);
+        collectionViewModel.loadLoggedUserCollections();
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
         Button confirmButton = binding.buttonConfirmCollectionInsertion;
@@ -80,11 +91,13 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onCollectionSelected(Collection collection) {
                 collectionViewModel.addBookToCollection(idToken, book, collection.getCollectionId());
+                collectionViewModel.getAddToCollectionResult().observe(getViewLifecycleOwner(), addToCollectionResultObserver);
             }
 
             @Override
             public void onCollectionUnselected(Collection collection) {
                 collectionViewModel.removeBookFromCollection(idToken, book.getKey(), collection.getCollectionId());
+                collectionViewModel.getRemoveFromCollectionResult().observe(getViewLifecycleOwner(), removeFromCollectionResultObserver);
             }
         });
 
@@ -142,6 +155,10 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         collectionViewModel = TestDatabaseViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
+
+        testDatabaseViewModel = TestDatabaseViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
     }
     private void clearAddSection(){
         binding.buttonCreateNewCollection.setVisibility(View.VISIBLE);
@@ -151,7 +168,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         binding.editTextCreateCollection.setText("");
     }
     private void initObservers(){
-        Observer<List<Result>> collectionsObserver = results -> {
+        collectionsObserver = results -> {
             List<Collection> collectionsResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
@@ -159,5 +176,88 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             addToCollectionAdapter.submitList(collectionsResultList);
         };
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
+
+        addToCollectionResultObserver = result -> {
+            Log.e("ADDTOCOLLECTIONRESULT", "TRIGGERED + " + result);
+            if(result != null){
+                if(result){
+                    SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
+                    for(String subject : book.getSubjects()){
+                        subject = subject.toLowerCase();
+                        if(subjectsUtil.containSubject(subject)){
+                            Integer currentValue = loggedUser.getRecommended().get(subject);
+                            Log.d("Subject", subject);
+                            if(currentValue != null){
+                                Integer newValue = currentValue + 1;
+                                loggedUser.getRecommended().put(subject, newValue);
+                            } else {
+                                Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                                loggedUser.getRecommended().put(subject, 0);
+                            }
+                        }
+                    }
+                    testDatabaseViewModel.setUserRecommended(loggedUser);
+                    Log.d("fragment","aggiunto OK");
+                } else {
+                    //toast errore
+                    Log.d("fragment","aggiunto fail");
+                }
+                collectionViewModel.getAddToCollectionResult().removeObserver(addToCollectionResultObserver);
+            } else {
+                Log.d("fragment","aggiunto null");
+            }
+        };
+
+        removeFromCollectionResultObserver = result -> {
+            if(result != null){
+                if(result){
+                    SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
+                    for(String subject : book.getSubjects()){
+                        subject = subject.toLowerCase();
+                        if(subjectsUtil.containSubject(subject)){
+                            Integer currentValue = loggedUser.getRecommended().get(subject);
+                            Log.d("Subject", subject);
+                            if(currentValue != null){
+                                Integer newValue = currentValue - 1;
+                                loggedUser.getRecommended().put(subject, newValue);
+                            } else {
+                                Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                                loggedUser.getRecommended().put(subject, 0);
+                            }
+                        }
+                    }
+                    testDatabaseViewModel.setUserRecommended(loggedUser);
+                    Log.d("fragment","rimosso OK");
+                } else {
+                    //toast errore
+                    Log.d("fragment","rimosso fail");
+                }
+                //remove this observer
+                collectionViewModel.getRemoveFromCollectionResult().removeObserver(removeFromCollectionResultObserver);
+            } else {
+                Log.d("fragment","rimosso null");
+            }
+
+        };
+
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                loggedUser = ((Result.UserSuccess) result).getData();
+            }
+        };
+
+
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        collectionViewModel.getAddToCollectionResult().removeObserver(addToCollectionResultObserver);
+        collectionViewModel.getRemoveFromCollectionResult().removeObserver(removeFromCollectionResultObserver);
+        collectionViewModel.getLoggedUserCollectionListLiveData().removeObserver(collectionsObserver);
+        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

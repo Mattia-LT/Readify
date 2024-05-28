@@ -1,15 +1,14 @@
 package it.unimib.readify.viewmodel;
 
 import static it.unimib.readify.util.Constants.RECENT;
-import static it.unimib.readify.util.Constants.SUGGESTED;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
+import java.util.Map;
 
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.data.repository.book.IBookRepository;
 
@@ -34,7 +33,7 @@ public class BookViewModel extends ViewModel {
 
     private MutableLiveData<List<String>> subjectListLiveData;
     private MutableLiveData<String> sortModeLiveData;
-    private MutableLiveData<List<Result>> suggestedCarouselLiveData;
+    private MutableLiveData<List<Result>> recommendedCarouselLiveData;
     private MutableLiveData<List<Result>> trendingCarouselLiveData;
     private MutableLiveData<List<Result>> recentCarouselLiveData;
     private MutableLiveData<List<Result>> searchResultsLiveData;
@@ -67,11 +66,6 @@ public class BookViewModel extends ViewModel {
 
     public MutableLiveData<List<Result>> fetchBooks(List<String> idList, String reference) {
         switch (reference){
-            case SUGGESTED:
-                if(suggestedCarouselLiveData == null){
-                    suggestedCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
-                }
-                return suggestedCarouselLiveData;
             case TRENDING:
                 if(trendingCarouselLiveData == null){
                     trendingCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
@@ -108,4 +102,17 @@ public class BookViewModel extends ViewModel {
     public void setSubjectList(List<String> subjectList){
         subjectListLiveData.postValue(subjectList);
     }
+
+    public MutableLiveData<List<Result>> getRecommendedCarouselLiveData(){
+        if(recommendedCarouselLiveData == null){
+            recommendedCarouselLiveData = bookRepository.getRecommendedBooksLiveData();
+        }
+        return recommendedCarouselLiveData;
+    }
+
+    public void loadRecommendedBooks(Map<String, Integer> recommendedGenres){
+        bookRepository.loadRecommendedBooks(recommendedGenres);
+    }
+
+
 }

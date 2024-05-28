@@ -36,5 +36,12 @@ public interface OLApiService {
     @GET("{id}/ratings.json")
     Call<OLRatingResponse> fetchRating(@Path("id") String id);
 
+    @GET(OL_SEARCH_ENDPOINT)
+    Call<OLSearchApiResponse> fetchBookFromSubject(
+            @Query(OL_SEARCH_SUBJECT_PARAMETER) String subject,
+            @Query(OL_SEARCH_SORT_PARAMETER) String sort,
+            @Query(OL_SEARCH_LIMIT_PARAMETER) int limit
+    );
+
 
 }

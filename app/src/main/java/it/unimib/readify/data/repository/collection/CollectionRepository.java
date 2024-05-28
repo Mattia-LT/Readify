@@ -29,6 +29,9 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
     private final MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private final MutableLiveData<Boolean> allCollectionsDeletedResult;
+    private MutableLiveData<Boolean> addToCollectionResult;
+    private MutableLiveData<Boolean> removeFromCollectionResult;
+
 
     public static CollectionRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
         return new CollectionRepository(
@@ -41,6 +44,8 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
         loggedUserCollectionListLiveData = new MutableLiveData<>();
         otherUserCollectionListLiveData = new MutableLiveData<>();
         allCollectionsDeletedResult = new MutableLiveData<>();
+        addToCollectionResult = new MutableLiveData<>();
+        removeFromCollectionResult = new MutableLiveData<>();
         this.bookLocalDataSource = bookLocalDataSource;
         this.collectionRemoteDataSource = collectionRemoteDataSource;
         this.bookLocalDataSource.setResponseCallback(this);
@@ -76,11 +81,13 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void addBookToCollection(String idToken, OLWorkApiResponse book, String collectionId) {
+        addToCollectionResult.postValue(null);
         collectionRemoteDataSource.addBookToCollection(idToken, book, collectionId);
     }
 
     @Override
     public void removeBookFromCollection(String idToken, String bookId, String collectionId) {
+        removeFromCollectionResult.postValue(null);
         collectionRemoteDataSource.removeBookFromCollection(idToken, bookId, collectionId);
     }
 
@@ -107,6 +114,16 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     @Override
     public MutableLiveData<Boolean> getAllCollectionsDeletedResult() {
         return allCollectionsDeletedResult;
+    }
+
+    @Override
+    public MutableLiveData<Boolean> getAddToCollectionResult() {
+        return addToCollectionResult;
+    }
+
+    @Override
+    public MutableLiveData<Boolean> getRemoveFromCollectionResult() {
+        return removeFromCollectionResult;
     }
 
     @Override
@@ -187,6 +204,30 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     @Override
     public void onFailureUpdateCollectionFromLocal(String message) {
         Log.e("CollectionRepository", message);
+    }
+
+    @Override
+    public void onSuccessAddBookToCollectionFromLocal() {
+        Log.d("CollectionRepository", "Collection updated successfully");
+        addToCollectionResult.postValue(true);
+        bookLocalDataSource.getAllCollections();
+    }
+
+    @Override
+    public void onSuccessRemoveBookFromCollectionFromLocal() {
+        Log.d("CollectionRepository", "Collection updated successfully");
+        removeFromCollectionResult.postValue(true);
+        bookLocalDataSource.getAllCollections();
+    }
+
+    @Override
+    public void onFailureAddBookToCollectionFromLocal(String message) {
+        addToCollectionResult.postValue(false);
+    }
+
+    @Override
+    public void onFailureRemoveBookFromCollectionFromLocal(String message) {
+        removeFromCollectionResult.postValue(false);
     }
 
     @Override

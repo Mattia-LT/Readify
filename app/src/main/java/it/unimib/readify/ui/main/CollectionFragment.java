@@ -39,6 +39,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.List;
+
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
@@ -53,9 +55,10 @@ public class CollectionFragment extends Fragment {
     private FragmentCollectionBinding collectionProfileBinding;
     private TestDatabaseViewModel testDatabaseViewModel;
     private CollectionViewModel collectionViewModel;
-    private Collection collection;
+    private Collection currentCollection;
     private String loggedUserIdToken;
     private String collectionOwnerIdToken;
+    BookItemCollectionAdapter bookItemCollectionAdapter;
     private AlertDialog renameDialog;
 
     @Override
@@ -78,7 +81,7 @@ public class CollectionFragment extends Fragment {
         loadMenu();
 
         collectionOwnerIdToken = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionOwnerIdToken();
-        collection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
+        currentCollection = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionData();
         String collectionName = CollectionFragmentArgs.fromBundle(getArguments()).getCollectionName();
 
         initRecyclerView();
@@ -106,6 +109,24 @@ public class CollectionFragment extends Fragment {
             }
         };
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+
+        final Observer<List<Result>> collectionObserver = results -> {
+            //orElse is the defaultValue, it should never be called but this is a safety check
+            this.currentCollection = results.stream()
+                    .filter(result -> result instanceof Result.CollectionSuccess)
+                    .map(result -> (Result.CollectionSuccess) result)
+                    .map(Result.CollectionSuccess::getData)
+                    .filter(collection -> collection.getCollectionId().equalsIgnoreCase(currentCollection.getCollectionId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if(currentCollection != null){
+                bookItemCollectionAdapter.submitList(currentCollection.getWorks());
+                showCollectionData();
+            }
+        };
+
+        collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionObserver);
     }
 
     private void loadMenu(){
@@ -223,7 +244,7 @@ public class CollectionFragment extends Fragment {
                                 collectionViewModel.getCollectionName().removeObserver(this);
                             }
                         });
-                        collectionViewModel.renameCollection(loggedUserIdToken,collection.getCollectionId());
+                        collectionViewModel.renameCollection(loggedUserIdToken, currentCollection.getCollectionId());
                     }
                 })
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
@@ -233,7 +254,7 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        BookItemCollectionAdapter bookItemCollectionAdapter = new BookItemCollectionAdapter(
+        bookItemCollectionAdapter = new BookItemCollectionAdapter(
                 book -> {
                     NavDirections action = CollectionFragmentDirections.actionCollectionFragmentToBookDetailsFragment(book);
                     Navigation.findNavController(requireView()).navigate(action);
@@ -241,22 +262,22 @@ public class CollectionFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setLayoutManager(layoutManager);
         collectionProfileBinding.collectionFragmentBooksRecyclerView.setAdapter(bookItemCollectionAdapter);
-        bookItemCollectionAdapter.submitList(collection.getWorks());
+        bookItemCollectionAdapter.submitList(currentCollection.getWorks());
     }
 
     private void showCollectionData() {
         //Set collection name
-        collectionProfileBinding.collectionFragmentCollectionName.setText(collection.getName());
+        collectionProfileBinding.collectionFragmentCollectionName.setText(currentCollection.getName());
         //Set collection visibility icon
-        if (collection.isVisible()){
+        if (currentCollection.isVisible()){
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_visibility_24);
         } else{
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
         }
         //Set number of books in the collection
         String booksNumber;
-        if (collection.getBooks() != null) {
-            booksNumber = getResources().getQuantityString(R.plurals.books, collection.getNumberOfBooks(), collection.getNumberOfBooks());
+        if (currentCollection.getBooks() != null) {
+            booksNumber = getResources().getQuantityString(R.plurals.books, currentCollection.getNumberOfBooks(), currentCollection.getNumberOfBooks());
         } else {
             booksNumber = getResources().getString(R.string.empty_collection);
         }
@@ -266,7 +287,7 @@ public class CollectionFragment extends Fragment {
     private void loadDeleteCollectionDialog(){
         String originalMessage = requireContext().getString(R.string.delete_collection_confirm_message)
                 .concat(": ")
-                .concat(collection.getName())
+                .concat(currentCollection.getName())
                 .concat(" ?");
 
         SpannableStringBuilder formattedMessage = getFormattedMessage(originalMessage);
@@ -275,7 +296,7 @@ public class CollectionFragment extends Fragment {
                 .setTitle(R.string.delete_collection_action)
                 .setMessage(formattedMessage)
                 .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
-                    collectionViewModel.deleteCollection(loggedUserIdToken, collection);
+                    collectionViewModel.deleteCollection(loggedUserIdToken, currentCollection);
                     requireActivity().getSupportFragmentManager().popBackStack();
                 })
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());

@@ -17,7 +17,7 @@ public abstract class BaseCollectionLocalDataSource {
     public abstract void initLocalCollections(List<Collection> collectionList);
     public abstract void getAllCollections();
     public abstract void insertCollectionList(List<Collection> collectionList);
-    public abstract void updateCollection(Collection collection);
+    public abstract void updateCollection(Collection collection, String operation);
     public abstract void deleteCollection(Collection collection);
     public abstract void deleteAllCollections();
     public abstract void addBookToCollection(String collectionId, OLWorkApiResponse book);

@@ -2,6 +2,8 @@ package it.unimib.readify.data.source.collection;
 
 import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.OPERATION_ADD_TO_COLLECTION;
+import static it.unimib.readify.util.Constants.OPERATION_REMOVE_FROM_COLLECTION;
 import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
 
 import android.util.Log;
@@ -91,14 +93,24 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
     }
 
     @Override
-    public void updateCollection(Collection collectionToUpdate) {
+    public void updateCollection(Collection collectionToUpdate, String operation) {
         BookRoomDatabase.databaseWriteExecutor.execute(() -> {
             if(collectionToUpdate != null){
                 int result = bookDao.updateCollection(collectionToUpdate);
                 Log.d("Update result", String.valueOf(result));
                 collectionResponseCallback.onSuccessUpdateCollectionFromLocal();
+                if(operation.equalsIgnoreCase(OPERATION_ADD_TO_COLLECTION)){
+                    collectionResponseCallback.onSuccessAddBookToCollectionFromLocal();
+                } else if(operation.equalsIgnoreCase(OPERATION_REMOVE_FROM_COLLECTION)){
+                    collectionResponseCallback.onSuccessRemoveBookFromCollectionFromLocal();
+                }
             } else {
-                collectionResponseCallback.onFailureUpdateCollectionFromLocal("UPDATE COLLECTION ERROR");
+                //todo scrivi errori piu sensati
+                if(operation.equalsIgnoreCase(OPERATION_ADD_TO_COLLECTION)){
+                    collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
+                } else if(operation.equalsIgnoreCase(OPERATION_REMOVE_FROM_COLLECTION)){
+                    collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
+                }
             }
         });
 
@@ -151,7 +163,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             collectionToUpdate.setBooks(books);
             collectionToUpdate.setWorks(works);
 
-            updateCollection(collectionToUpdate);
+            updateCollection(collectionToUpdate, OPERATION_ADD_TO_COLLECTION);
         });
     }
 
@@ -175,7 +187,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             collectionToUpdate.setBooks(books);
             collectionToUpdate.setWorks(works);
 
-            updateCollection(collectionToUpdate);
+            updateCollection(collectionToUpdate, OPERATION_REMOVE_FROM_COLLECTION);
         });
     }
 }

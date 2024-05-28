@@ -110,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:layout_marginStart="20dp"
-        android:text="Scegli i generi dei libri che ti potrebbero interessare"
+        android:text="Scegli almeno 3 generi di libri che ti potrebbero interessare"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"

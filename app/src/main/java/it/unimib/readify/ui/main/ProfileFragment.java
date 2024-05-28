@@ -17,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +74,7 @@ public class ProfileFragment extends Fragment{
     private Observer<Result> loggedUserObserver;
     private Observer<Boolean> logoutResultObserver;
     private Observer<Boolean> deleteAllCollectionsResultObserver;
+    private boolean firstLoadSpinner;
 
     private Observer<List<Result>> fetchedCollectionsObserver;
     public ProfileFragment() {}
@@ -101,7 +105,7 @@ public class ProfileFragment extends Fragment{
         initRecyclerView();
         initCreateCollectionSection();
         initFollowersSection();
-        loadMenu();
+
     }
 
     private void initViewModels() {
@@ -137,6 +141,7 @@ public class ProfileFragment extends Fragment{
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
                 collectionViewModel.loadLoggedUserCollections();
                 testDatabaseViewModel.fetchNotifications(loggedUser.getIdToken());
+                loadMenu();
             }
         };
 
@@ -190,6 +195,7 @@ public class ProfileFragment extends Fragment{
    }
 
     public void loadMenu(){
+        firstLoadSpinner = true;
         SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
                 .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
 
@@ -214,6 +220,44 @@ public class ProfileFragment extends Fragment{
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME,
                         PREFERRED_THEME, LIGHT_MODE);
+            }
+        });
+
+        MenuItem spinnerItem = fragmentProfileBinding.navView.getMenu().findItem(R.id.nav_spinner);
+        Spinner spinner = (Spinner) spinnerItem.getActionView();
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.visibility, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+
+        String vis = loggedUser.getVisibility();
+        if(vis.equals("private")){
+            spinner.setSelection(1);
+        }
+        else{
+            spinner.setSelection(0);
+        }
+        //quello sopra va quello sotto no :D
+        int currentSelection = spinner.getSelectedItemPosition();
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(!firstLoadSpinner){
+                String selectedVisibility;
+                if (position == 0) {
+                    selectedVisibility = "public";
+                } else {
+                    selectedVisibility = "private";
+                }
+                loggedUser.setVisibility(selectedVisibility);
+                testDatabaseViewModel.setUserVisibility(loggedUser);
+            }
+                else{
+                    firstLoadSpinner = false;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 

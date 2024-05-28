@@ -116,6 +116,8 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
                 onSaveUser.setFollowing(new ExternalGroup(0, null));
                 testDatabaseViewModel.setUserFollowers(onSaveUser);
                 testDatabaseViewModel.setUserFollowing(onSaveUser);
+                onSaveUser.setVisibility("public");
+                testDatabaseViewModel.setUserVisibility(onSaveUser);
 
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
                 requireActivity().finish();

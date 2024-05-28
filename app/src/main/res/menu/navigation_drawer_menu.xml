@@ -20,6 +20,12 @@
         app:actionLayout="@layout/custom_switch"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/nav_spinner"
+        android:title="Visibilità Profilo"
+        app:actionViewClass="android.widget.Spinner"
+        app:showAsAction="always"/>
+
     <group>
         <item
             android:id="@+id/nav_logout"

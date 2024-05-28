@@ -1,7 +1,11 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DARK_MODE;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
+import static it.unimib.readify.util.Constants.LIGHT_MODE;
+import static it.unimib.readify.util.Constants.PREFERRED_THEME;
+import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -48,6 +52,7 @@ import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.ui.startup.WelcomeActivity;
+import it.unimib.readify.util.SharedPreferencesUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -60,7 +65,7 @@ public class ProfileFragment extends Fragment{
     private CollectionAdapter collectionAdapter;
     private User loggedUser;
     private List<Collection> collectionsList;
-
+    private SharedPreferencesUtil sharedPreferencesUtil;
     private HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
     private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private Observer<Result> loggedUserObserver;
@@ -90,6 +95,7 @@ public class ProfileFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d("profile lifecycle", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
         initViewModels();
         initObservers();
         initRecyclerView();
@@ -187,9 +193,7 @@ public class ProfileFragment extends Fragment{
         SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
                 .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
 
-        //controllo shared pref -> se null faccio questo
-        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        //altrimenti leggo shared pref
+        int currentNightMode = getSavedNightMode();
 
         // Imposta lo stato dello SwitchCompat in base al tema corrente
         switch (currentNightMode) {
@@ -200,13 +204,16 @@ public class ProfileFragment extends Fragment{
                 switchButton.setChecked(false);
                 break;
         }
+
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                //aggiorno shared pref
+                sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME,
+                        PREFERRED_THEME, DARK_MODE);
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                //aggiorno shared pref
+                sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME,
+                        PREFERRED_THEME, LIGHT_MODE);
             }
         });
 
@@ -274,6 +281,23 @@ public class ProfileFragment extends Fragment{
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    private int getSavedNightMode() {
+        int currentNightMode;
+        String preferred_theme = sharedPreferencesUtil.readStringData(SHARED_PREFERENCES_FILE_NAME, PREFERRED_THEME);
+        if(preferred_theme == null){
+            currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        } else {
+            if(preferred_theme.equals(DARK_MODE)){
+                currentNightMode = Configuration.UI_MODE_NIGHT_YES;
+            } else if(preferred_theme.equals(LIGHT_MODE)){
+                currentNightMode = Configuration.UI_MODE_NIGHT_NO;
+            } else {
+                currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            }
+        }
+        return currentNightMode;
     }
 
     private void initCreateCollectionSection() {

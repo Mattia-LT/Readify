@@ -16,8 +16,9 @@ public class Constants {
     // Constants for encrypted files
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.readify.encrypted_file.txt";
 
-    public static boolean NORMAL_LOGIN = false;
-    public static boolean GOOGLE_LOGIN = true;
+    public static String DARK_MODE = "dark_mode";
+    public static String LIGHT_MODE = "light_mode";
+    public static String PREFERRED_THEME = "preferred_theme";
 
 
     // Constants for API

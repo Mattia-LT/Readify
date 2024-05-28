@@ -1,8 +1,13 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.DARK_MODE;
+import static it.unimib.readify.util.Constants.LIGHT_MODE;
+import static it.unimib.readify.util.Constants.PREFERRED_THEME;
 import static it.unimib.readify.util.Constants.RECENT;
+import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.TRENDING;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
@@ -27,6 +33,7 @@ import it.unimib.readify.databinding.FragmentHomeBinding;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.SharedPreferencesUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -43,6 +50,7 @@ public class HomeFragment extends Fragment {
     private BookViewModel bookViewModel;
     private TestDatabaseViewModel testDatabaseViewModel;
     private CollectionViewModel collectionViewModel;
+    private SharedPreferencesUtil sharedPreferencesUtil;
     private User user;
 
     public HomeFragment() {}
@@ -68,6 +76,20 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("home fragment", "onViewCreated");
+        sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
+        //Load user preferences for theme
+        String preferredTheme = sharedPreferencesUtil.readStringData(SHARED_PREFERENCES_FILE_NAME, PREFERRED_THEME);
+        if(preferredTheme != null) {
+            int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            if (preferredTheme.equals(DARK_MODE) && currentTheme != Configuration.UI_MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else if (preferredTheme.equals(LIGHT_MODE) && currentTheme != Configuration.UI_MODE_NIGHT_NO) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        }
+
+
+
         initViewModels();
         initObservers();
 

@@ -41,6 +41,11 @@
         <action
             android:id="@+id/action_registerFragment_to_continueRegistrationFragment"
             app:destination="@id/continueRegistrationFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 

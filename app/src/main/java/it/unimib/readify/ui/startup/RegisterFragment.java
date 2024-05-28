@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -109,6 +110,12 @@ public class RegisterFragment extends Fragment{
                 //todo managing specific behavior when an error occurs
                 Snackbar.make(view, "error data insertion", Snackbar.LENGTH_SHORT).show();
             }
+        });
+
+
+        fragmentRegisterBinding.buttonBackToLogin.setOnClickListener(v -> {
+            NavDirections action = RegisterFragmentDirections.actionRegisterFragmentToLoginFragment();
+            Navigation.findNavController(requireView()).navigate(action);
         });
     }
 

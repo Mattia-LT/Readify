@@ -90,6 +90,7 @@
     <string name="content_description_logo_startup">Logo dell\'applicazione, caricamento…</string>
     <string name="textview_select_avatar">Seleziona l\'immagine profilo</string>
     <string name="content_description_button_edit_profile">Bottone per confermare le modifiche al profilo</string>
+    <string name="textview_already_registered">Hai già un account?</string>
 
 
 

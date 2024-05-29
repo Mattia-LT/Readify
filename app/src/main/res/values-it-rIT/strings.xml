@@ -154,6 +154,7 @@
     <string name="confirm_action">Conferma</string>
     <string name="cancel_action">Annulla</string>
     <string name="no_results_found">Nessun risultato trovato.\n Prova a cercare qualcos\'altro!</string>
+    <string name="change_collection_visibility_action">Visibilità</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

@@ -22,6 +22,7 @@ public abstract class BaseCollectionRemoteDataSource {
     public abstract void fetchLoggedUserCollections(String idToken);
     public abstract void fetchOtherUserCollections(String otherUserIdToken);
     public abstract void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName);
+    public abstract void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible);
 
 
 }

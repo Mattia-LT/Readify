@@ -22,6 +22,8 @@ public abstract class BaseCollectionLocalDataSource {
     public abstract void deleteAllCollections();
     public abstract void addBookToCollection(String collectionId, OLWorkApiResponse book);
     public abstract void removeBookFromCollection(String collectionId, String bookId);
+    public abstract void renameCollection(String collectionId, String newCollectionName);
+    public abstract void changeCollectionVisibility(String collectionId, boolean isCollectionVisible);
 
 
 }

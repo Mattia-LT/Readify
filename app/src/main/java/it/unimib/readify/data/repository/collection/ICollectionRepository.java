@@ -17,6 +17,7 @@ public interface ICollectionRepository {
     void addBookToCollection(String idToken, OLWorkApiResponse book, String collectionId);
     void removeBookFromCollection(String idToken, String bookId, String collectionId);
     void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName);
+    void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible);
     void emptyLocalDb();
     MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
     MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();

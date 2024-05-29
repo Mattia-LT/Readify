@@ -2,8 +2,6 @@ package it.unimib.readify.util;
 
 public class Constants {
 
-    //TODO Eventuali costanti da usare nella progettazione andranno qui. esempio:
-
     // Constants for SharedPreferences
     public static final String SHARED_PREFERENCES_FILE_NAME = "it.unimib.readify.preferences";
 
@@ -76,6 +74,8 @@ public class Constants {
     public static final String FIREBASE_WORKS_COMMENTS_FIELD = "comments";
     public static final String FIREBASE_COLLECTIONS_BOOKS_FIELD = "books";
     public static final String FIREBASE_COLLECTIONS_NAME_FIELD = "name";
+    public static final String FIREBASE_COLLECTIONS_VISIBILITY_FIELD = "visible";
+
 
     public static final String FIREBASE_USERS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
@@ -114,6 +114,9 @@ public class Constants {
 
     public static final String OPERATION_ADD_TO_COLLECTION = "add_to_collection";
     public static final String OPERATION_REMOVE_FROM_COLLECTION = "remove_from_collection";
+    public static final String OPERATION_RENAME_COLLECTION = "rename_collection";
+    public static final String OPERATION_CHANGE_COLLECTION_VISIBILITY = "change_collection_visibility";
+
 
 
 }

@@ -27,10 +27,17 @@ public interface CollectionResponseCallback {
     void onFailureAddBookToCollectionFromRemote(String message);
     void onSuccessDeleteAllCollectionsFromLocal();
     void onFailureDeleteAllCollectionsFromLocal(String message);
-
-
     void onSuccessFetchLoggedUserCollectionsFromRemoteDatabase(List <Collection> collections);
     void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message);
     void onSuccessFetchOtherUserCollectionsFromRemoteDatabase(List <Collection> collections);
     void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message);
+    void onSuccessChangeCollectionVisibilityFromRemote(String collectionId, boolean isCollectionVisible);
+    void onFailureChangeCollectionVisibilityFromRemote(String message);
+    void onSuccessRenameCollectionFromRemote(String collectionId, String newCollectionName);
+    void onFailureRenameCollectionFromRemote(String message);
+    void onSuccessChangeCollectionVisibilityFromLocal();
+    void onFailureChangeCollectionVisibilityFromLocal(String message);
+    void onSuccessRenameCollectionFromLocal();
+    void onFailureRenameCollectionFromLocal(String message);
+
 }

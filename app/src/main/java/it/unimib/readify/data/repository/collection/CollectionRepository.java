@@ -29,8 +29,8 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
     private final MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private final MutableLiveData<Boolean> allCollectionsDeletedResult;
-    private MutableLiveData<Boolean> addToCollectionResult;
-    private MutableLiveData<Boolean> removeFromCollectionResult;
+    private final MutableLiveData<Boolean> addToCollectionResult;
+    private final MutableLiveData<Boolean> removeFromCollectionResult;
 
 
     public static CollectionRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
@@ -94,6 +94,11 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     @Override
     public void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName) {
         collectionRemoteDataSource.renameCollection(loggedUserIdToken, collectionId, newCollectionName);
+    }
+
+    @Override
+    public void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible) {
+        collectionRemoteDataSource.changeCollectionVisibility(loggedUserIdToken,collectionId,isCollectionVisible);
     }
 
     @Override
@@ -266,7 +271,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message) {
-
+        //TODO
     }
 
     @Override
@@ -276,6 +281,46 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message) {
+        //TODO
+    }
 
+    @Override
+    public void onSuccessChangeCollectionVisibilityFromRemote(String collectionId, boolean isCollectionVisible) {
+        bookLocalDataSource.changeCollectionVisibility(collectionId, isCollectionVisible);
+    }
+
+    @Override
+    public void onFailureChangeCollectionVisibilityFromRemote(String message) {
+        Log.e("CollectionRepository", message);
+    }
+
+    @Override
+    public void onSuccessRenameCollectionFromRemote(String collectionId, String newCollectionName) {
+        bookLocalDataSource.renameCollection(collectionId, newCollectionName);
+    }
+
+    @Override
+    public void onFailureRenameCollectionFromRemote(String message) {
+        Log.e("CollectionRepository", message);
+    }
+
+    @Override
+    public void onSuccessChangeCollectionVisibilityFromLocal() {
+        bookLocalDataSource.getAllCollections();
+    }
+
+    @Override
+    public void onFailureChangeCollectionVisibilityFromLocal(String message) {
+        Log.e("CollectionRepository", message);
+    }
+
+    @Override
+    public void onSuccessRenameCollectionFromLocal() {
+        bookLocalDataSource.getAllCollections();
+    }
+
+    @Override
+    public void onFailureRenameCollectionFromLocal(String message) {
+        Log.e("CollectionRepository", message);
     }
 }

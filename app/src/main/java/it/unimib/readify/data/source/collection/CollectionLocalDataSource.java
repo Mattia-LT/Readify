@@ -3,7 +3,9 @@ package it.unimib.readify.data.source.collection;
 import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.OPERATION_ADD_TO_COLLECTION;
+import static it.unimib.readify.util.Constants.OPERATION_CHANGE_COLLECTION_VISIBILITY;
 import static it.unimib.readify.util.Constants.OPERATION_REMOVE_FROM_COLLECTION;
+import static it.unimib.readify.util.Constants.OPERATION_RENAME_COLLECTION;
 import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
 
 import android.util.Log;
@@ -99,17 +101,35 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
                 int result = bookDao.updateCollection(collectionToUpdate);
                 Log.d("Update result", String.valueOf(result));
                 collectionResponseCallback.onSuccessUpdateCollectionFromLocal();
-                if(operation.equalsIgnoreCase(OPERATION_ADD_TO_COLLECTION)){
-                    collectionResponseCallback.onSuccessAddBookToCollectionFromLocal();
-                } else if(operation.equalsIgnoreCase(OPERATION_REMOVE_FROM_COLLECTION)){
-                    collectionResponseCallback.onSuccessRemoveBookFromCollectionFromLocal();
+                switch (operation){
+                    case OPERATION_ADD_TO_COLLECTION:
+                        collectionResponseCallback.onSuccessAddBookToCollectionFromLocal();
+                        break;
+                    case OPERATION_REMOVE_FROM_COLLECTION:
+                        collectionResponseCallback.onSuccessRemoveBookFromCollectionFromLocal();
+                        break;
+                    case OPERATION_CHANGE_COLLECTION_VISIBILITY:
+                        collectionResponseCallback.onSuccessChangeCollectionVisibilityFromLocal();
+                        break;
+                    case OPERATION_RENAME_COLLECTION:
+                        collectionResponseCallback.onSuccessRenameCollectionFromLocal();
+                        break;
                 }
             } else {
-                //todo scrivi errori piu sensati
-                if(operation.equalsIgnoreCase(OPERATION_ADD_TO_COLLECTION)){
-                    collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
-                } else if(operation.equalsIgnoreCase(OPERATION_REMOVE_FROM_COLLECTION)){
-                    collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
+                //todo scrivi errori piu sensati e differenziali usando i file R.string
+                switch (operation){
+                    case OPERATION_ADD_TO_COLLECTION:
+                        collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
+                        break;
+                    case OPERATION_REMOVE_FROM_COLLECTION:
+                        collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
+                        break;
+                    case OPERATION_CHANGE_COLLECTION_VISIBILITY:
+                        collectionResponseCallback.onFailureChangeCollectionVisibilityFromLocal("UPDATE COLLECTION ERROR");
+                        break;
+                    case OPERATION_RENAME_COLLECTION:
+                        collectionResponseCallback.onFailureRenameCollectionFromLocal("UPDATE COLLECTION ERROR");
+                        break;
                 }
             }
         });
@@ -188,6 +208,24 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             collectionToUpdate.setWorks(works);
 
             updateCollection(collectionToUpdate, OPERATION_REMOVE_FROM_COLLECTION);
+        });
+    }
+
+    @Override
+    public void renameCollection(String collectionId, String newCollectionName) {
+        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+            collectionToUpdate.setName(newCollectionName);
+            updateCollection(collectionToUpdate, OPERATION_RENAME_COLLECTION);
+        });
+    }
+
+    @Override
+    public void changeCollectionVisibility(String collectionId, boolean isCollectionVisible) {
+        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+            collectionToUpdate.setVisible(isCollectionVisible);
+            updateCollection(collectionToUpdate, OPERATION_CHANGE_COLLECTION_VISIBILITY);
         });
     }
 }

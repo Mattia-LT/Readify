@@ -163,6 +163,7 @@
     <string name="textview_select_avatar">Select your profile picture</string>
     <string name="content_description_button_edit_profile">Button to confirm profile changes</string>
     <string name="textview_already_registered">Do you already have an account?</string>
+    <string name="change_collection_visibility_action">Visibility</string>
 
 
     <!-- chip genres -->

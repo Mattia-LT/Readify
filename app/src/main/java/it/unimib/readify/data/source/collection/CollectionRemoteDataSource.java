@@ -4,6 +4,7 @@ import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_BOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_VISIBILITY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 
 import android.app.Application;
@@ -243,13 +244,29 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
 
         collectionNameReference.setValue(newCollectionName)
                 .addOnSuccessListener(aVoid -> {
-                    //todo create success
+                    collectionResponseCallback.onSuccessRenameCollectionFromRemote(collectionId, newCollectionName);
                 })
                 .addOnFailureListener(e -> {
-                    //todo create fail
+                    collectionResponseCallback.onFailureRenameCollectionFromRemote(e.getLocalizedMessage());
                 });
     }
 
+    @Override
+    public void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible) {
+        DatabaseReference collectionVisibilityReference = databaseReference
+                .child(FIREBASE_COLLECTIONS_COLLECTION)
+                .child(loggedUserIdToken)
+                .child(collectionId)
+                .child(FIREBASE_COLLECTIONS_VISIBILITY_FIELD);
+
+        collectionVisibilityReference.setValue(isCollectionVisible)
+                .addOnSuccessListener(aVoid -> {
+                    collectionResponseCallback.onSuccessChangeCollectionVisibilityFromRemote(collectionId, isCollectionVisible);
+                })
+                .addOnFailureListener(e -> {
+                    collectionResponseCallback.onFailureChangeCollectionVisibilityFromRemote(e.getLocalizedMessage());
+                });
+    }
 
 
     public void fetchRatings(OLWorkApiResponse book, CountDownLatch ratingsLatch) {
@@ -338,10 +355,6 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     completeAuthorsLatch.countDown();
                 }
             });
-
-
-
-
 
         } else {
             //todo errore

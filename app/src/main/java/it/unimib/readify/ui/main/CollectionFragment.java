@@ -20,7 +20,10 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -136,7 +139,6 @@ public class CollectionFragment extends Fragment {
                 menu.clear();
                 if(loggedUserIdToken.equals(collectionOwnerIdToken)){
                     menuInflater.inflate(R.menu.collection_appbar_menu, menu);
-                    //todo caricare il menu solo se le collezioni sono dell'utente loggato
                 }
             }
             @Override
@@ -211,7 +213,7 @@ public class CollectionFragment extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                    // Not needed for this implementation
                 }
 
                 @Override
@@ -268,12 +270,7 @@ public class CollectionFragment extends Fragment {
     private void showCollectionData() {
         //Set collection name
         collectionProfileBinding.collectionFragmentCollectionName.setText(currentCollection.getName());
-        //Set collection visibility icon
-        if (currentCollection.isVisible()){
-            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_visibility_24);
-        } else{
-            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
-        }
+
         //Set number of books in the collection
         String booksNumber;
         if (currentCollection.getBooks() != null) {
@@ -282,6 +279,67 @@ public class CollectionFragment extends Fragment {
             booksNumber = getResources().getString(R.string.empty_collection);
         }
         collectionProfileBinding.collectionFragmentNumberOfBooks.setText(booksNumber);
+
+        //Set collection visibility icon
+        if (currentCollection.isVisible()){
+            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_visibility_24);
+        } else{
+            collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
+        }
+
+        // Show this section only if the collection is owned by the logged user
+        if(collectionOwnerIdToken.equalsIgnoreCase(loggedUserIdToken)){
+            collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setVisibility(View.GONE);
+            collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility.setVisibility(View.VISIBLE);
+            Spinner spinner = collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility;
+            // Create an ArrayAdapter using the string array and a default spinner layout.
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                    requireContext(),
+                    R.array.visibility,
+                    android.R.layout.simple_spinner_item
+            );
+            // Specify the layout to use when the list of choices appears.
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner.
+            spinner.setAdapter(adapter);
+
+            boolean isCollectionVisible = currentCollection.isVisible();
+            if(isCollectionVisible) {
+                spinner.setSelection(0);
+            } else {
+                spinner.setSelection(1);
+            }
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(position == 0){
+                        //case public
+                        if(! currentCollection.isVisible()){
+                            collectionViewModel.changeCollectionVisibility(loggedUserIdToken, currentCollection.getCollectionId(), true);
+                        }
+                    } else if(position == 1){
+                        //case private
+                        if(currentCollection.isVisible()){
+                            collectionViewModel.changeCollectionVisibility(loggedUserIdToken, currentCollection.getCollectionId(), false);
+                        }
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        } else {
+            collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setVisibility(View.VISIBLE);
+            collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility.setVisibility(View.GONE);
+            String[] visibility = getResources().getStringArray(R.array.visibility);
+            collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setText(
+                    currentCollection.isVisible() ? visibility[0] : visibility[1]
+            );
+
+        }
+
     }
 
     private void loadDeleteCollectionDialog(){

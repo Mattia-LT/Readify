@@ -169,4 +169,8 @@ public class CollectionViewModel extends ViewModel {
         }
         return removeFromCollectionResult;
     }
+
+    public void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible){
+        collectionRepository.changeCollectionVisibility(loggedUserIdToken, collectionId, isCollectionVisible);
+    }
 }

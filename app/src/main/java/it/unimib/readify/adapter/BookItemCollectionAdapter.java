@@ -4,7 +4,6 @@ import static it.unimib.readify.util.Constants.OL_COVERS_API_ID_PARAMETER;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.chip.Chip;
-
-import java.util.Arrays;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BookCollectionItemBinding;
@@ -138,9 +135,6 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                     if(subjectsUtil.containSubject(subject)){
                         Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.single_subject_chip_layout_small, binding.chipgroupBookCollectionGenres, false);
                         int id = subjectsUtil.getChipId(subject);
-                        Log.d("ID", String.valueOf(id));
-                        Log.d("subject", subject);
-                        Log.d("SUBJECTS", Arrays.toString(subjects));
                         chip.setText(subjects[id - 1]);
                         chip.setClickable(false);
                         binding.chipgroupBookCollectionGenres.addView(chip);

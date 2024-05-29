@@ -117,6 +117,8 @@ public class Constants {
     public static final String OPERATION_RENAME_COLLECTION = "rename_collection";
     public static final String OPERATION_CHANGE_COLLECTION_VISIBILITY = "change_collection_visibility";
 
+    public static final String USER_VISIBILITY_PUBLIC = "public";
+    public static final String USER_VISIBILITY_PRIVATE = "private";
 
 
 }

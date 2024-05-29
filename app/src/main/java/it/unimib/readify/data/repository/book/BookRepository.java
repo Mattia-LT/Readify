@@ -58,7 +58,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     @Override
     public void searchBooks(String query, String sort, int limit, int offset, String genres) {
         this.firstSearch = offset == 0;
-        Log.d("generi", genres);
+        Log.d("generi", String.valueOf(genres));
         if(firstSearch){
             searchLimitReached = false;
             bookRemoteDataSource.searchBooks(query, sort, limit, offset, genres);

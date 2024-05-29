@@ -6,6 +6,8 @@ import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
 import static it.unimib.readify.util.Constants.LIGHT_MODE;
 import static it.unimib.readify.util.Constants.PREFERRED_THEME;
 import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.USER_VISIBILITY_PRIVATE;
+import static it.unimib.readify.util.Constants.USER_VISIBILITY_PUBLIC;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -126,7 +128,7 @@ public class ProfileFragment extends Fragment{
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
             Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
-            Log.e("COLLECTIONS OPENLIBRARY",collectionsList.toString());
+            //Log.e("COLLECTIONS OPENLIBRARY",collectionsList.toString());
             collectionAdapter.submitList(collectionsList);
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
             fragmentProfileBinding.recyclerviewCollections.setVisibility(View.VISIBLE);
@@ -238,21 +240,19 @@ public class ProfileFragment extends Fragment{
             spinner.setSelection(0);
         }
         //quello sopra va quello sotto no :D
-        int currentSelection = spinner.getSelectedItemPosition();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!firstLoadSpinner){
-                String selectedVisibility;
-                if (position == 0) {
-                    selectedVisibility = "public";
-                } else {
-                    selectedVisibility = "private";
-                }
-                loggedUser.setVisibility(selectedVisibility);
-                testDatabaseViewModel.setUserVisibility(loggedUser);
-            }
-                else{
+                    String selectedVisibility;
+                    if (position == 0) {
+                        selectedVisibility = USER_VISIBILITY_PUBLIC;
+                    } else {
+                        selectedVisibility = USER_VISIBILITY_PRIVATE;
+                    }
+                    loggedUser.setVisibility(selectedVisibility);
+                    testDatabaseViewModel.setUserVisibility(loggedUser);
+                } else{
                     firstLoadSpinner = false;
                 }
             }

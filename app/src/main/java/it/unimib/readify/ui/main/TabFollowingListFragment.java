@@ -39,6 +39,7 @@ public class TabFollowingListFragment extends Fragment {
     private FollowListAdapter followListAdapter;
     private List<ExternalUser> followingList;
     private String idToken;
+    private String loggedUserIdToken;
     public TabFollowingListFragment(){}
     @Nullable
     @Override
@@ -62,8 +63,11 @@ public class TabFollowingListFragment extends Fragment {
             @Override
             public void onProfileClick(ExternalUser externalUser) {
                 User selectedUser = externalUser.getUser();
-                NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
-                Navigation.findNavController(requireView()).navigate(action);
+                if(!selectedUser.getIdToken().equals(loggedUserIdToken)){
+                    NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
+                    Navigation.findNavController(requireView()).navigate(action);
+                }
+
             }
 
             @Override
@@ -124,8 +128,9 @@ public class TabFollowingListFragment extends Fragment {
         final Observer<Result> loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 User user = ((Result.UserSuccess) result).getData();
+                loggedUserIdToken = user.getIdToken();
                 Log.e("USER OBSERVER","TRIGGERED");
-                followListAdapter.submitFollowings(user.getFollowing().getUsers());
+                followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
                 testDatabaseViewModel.fetchFollowing(idToken);
             }
         };

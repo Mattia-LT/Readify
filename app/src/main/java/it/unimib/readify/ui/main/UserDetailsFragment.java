@@ -2,6 +2,7 @@ package it.unimib.readify.ui.main;
 
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWER;
 import static it.unimib.readify.util.Constants.DESTINATION_FRAGMENT_FOLLOWING;
+import static it.unimib.readify.util.Constants.USER_VISIBILITY_PUBLIC;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
@@ -32,7 +34,6 @@ import it.unimib.readify.model.ExternalGroup;
 import it.unimib.readify.model.ExternalUser;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModel;
 import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
@@ -82,27 +83,20 @@ public class UserDetailsFragment extends Fragment {
                 .create(CollectionViewModel.class);
     }
     private void initObservers() {
-        final Observer<List<Result>> fetchedCollectionsObserver = results -> {
+        final Observer<List<Result>> collectionsObserver = results -> {
+            ConstraintLayout noCollectionsFoundLayout = binding.noCollectionsFoundLayout;
+            if(results.isEmpty()){
+                noCollectionsFoundLayout.setVisibility(View.VISIBLE);
+            } else {
+                noCollectionsFoundLayout.setVisibility(View.GONE);
+            }
             List<Collection> collectionResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
-            Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
             collectionAdapter.submitList(collectionResultList);
             binding.collectionsProgressBar.setVisibility(View.GONE);
             binding.recyclerviewUserCollections.setVisibility(View.VISIBLE);
-        };
-
-        final Observer<List<Result>> emptyCollectionsObserver = results -> {
-            List<Collection> collectionsResultList = results.stream()
-                    .filter(result -> result instanceof Result.CollectionSuccess)
-                    .map(result -> ((Result.CollectionSuccess) result).getData())
-                    .collect(Collectors.toList());
-            Log.e("EMPTY COLLECTION OBSERVER","TRIGGERED");
-            binding.collectionsProgressBar.setVisibility(View.VISIBLE);
-            binding.recyclerviewUserCollections.setVisibility(View.GONE);
-            //todo sistema
-            //collectionViewModel.fetchWorksForCollections(collectionsResultList);
         };
 
         final Observer<Result> loggedUserObserver = result -> {
@@ -124,21 +118,46 @@ public class UserDetailsFragment extends Fragment {
         final Observer<Result> otherUserObserver = otherUserResult -> {
             if(otherUserResult.isSuccess()){
                 User receivedUser = ((Result.UserSuccess) otherUserResult).getData();
-                showUserInfo(receivedUser);
+                showPublicUserInfo(receivedUser);
+                if(receivedUser.getVisibility().equalsIgnoreCase(USER_VISIBILITY_PUBLIC) || areUsersFriends(loggedUserIdToken, receivedUser)){
+                    binding.privateProfileSection.setVisibility(View.GONE);
+                    showPrivateUserInfo(receivedUser);
+                } else {
+                    binding.privateProfileSection.setVisibility(View.VISIBLE);
+                    binding.noCollectionsFoundLayout.setVisibility(View.GONE);
+                    hidePrivateUserInfo();
+                }
             } else {
                 // todo manage errors
             }
 
         };
 
-
-        collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), emptyCollectionsObserver);
+        collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionsObserver);
         testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         testDatabaseViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
-        //todo siustema
-        //collectionViewModel.getCompleteCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
-
     }
+
+    private boolean areUsersFriends(String loggedUserIdToken, User otherUser) {
+        if(loggedUserIdToken == null || otherUser == null) {
+            Log.e("UserDetailsFragment", "One of the users is null");
+            return false;
+        }
+
+        if(otherUser.getFollowing().getUsers() != null && otherUser.getFollowers().getUsers() != null){
+            boolean otherUserFollowsLoggedUser = otherUser.getFollowing().getUsers().stream()
+                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
+
+            boolean loggedUserFollowsOtherUser = otherUser.getFollowers().getUsers().stream()
+                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
+
+            return otherUserFollowsLoggedUser && loggedUserFollowsOtherUser;
+
+        }
+
+        return false;
+    }
+
     private void initRecyclerView(){
         collectionAdapter = new CollectionAdapter(collection -> {
             NavDirections action = UserDetailsFragmentDirections.actionUserDetailsFragmentToCollectionFragment(collection, collection.getName(), userIdToken);
@@ -153,28 +172,15 @@ public class UserDetailsFragment extends Fragment {
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
         requireActivity().setTitle(username);
         testDatabaseViewModel.fetchOtherUser(userIdToken);
-        collectionViewModel.fetchOtherUserCollections(userIdToken);
-
     }
 
-    private void showUserInfo(User user){
+    private void showPublicUserInfo(User user){
         binding.followButton.setOnClickListener(v -> testDatabaseViewModel.followUser(loggedUserIdToken, userIdToken));
         binding.unfollowButton.setOnClickListener(v -> testDatabaseViewModel.unfollowUser(loggedUserIdToken, userIdToken));
 
         binding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
         binding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
         binding.textviewUserUsername.setText(user.getUsername());
-        binding.textviewUserBiography.setText(user.getBiography());
-        int avatarId;
-        try {
-            avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
-        } catch (Exception e) {
-            avatarId = R.drawable.ic_baseline_profile_24;
-        }
-        Glide.with(requireActivity().getApplicationContext())
-                .load(avatarId)
-                .dontAnimate()
-                .into(binding.avatarImageView);
 
         View.OnClickListener followClickListener = v -> {
             NavDirections action = null;
@@ -187,10 +193,37 @@ public class UserDetailsFragment extends Fragment {
                 Navigation.findNavController(requireView()).navigate(action);
             }
         };
+
         binding.textviewFollowerCounter.setOnClickListener(followClickListener);
         binding.textviewFollowerLabel.setOnClickListener(followClickListener);
         binding.textviewFollowingCounter.setOnClickListener(followClickListener);
         binding.textviewFollowingLabel.setOnClickListener(followClickListener);
+
+        int avatarId;
+        try {
+            avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
+        } catch (Exception e) {
+            avatarId = R.drawable.ic_baseline_profile_24;
+        }
+        Glide.with(requireActivity().getApplicationContext())
+                .load(avatarId)
+                .dontAnimate()
+                .into(binding.avatarImageView);
+    }
+
+    private void showPrivateUserInfo(User user){
+        binding.textviewUserBiography.setVisibility(View.VISIBLE);
+        binding.textviewUserBiography.setText(user.getBiography());
+
+        binding.collectionsProgressBar.setVisibility(View.VISIBLE);
+        collectionViewModel.fetchOtherUserCollections(userIdToken);
+
+    }
+
+    private void hidePrivateUserInfo(){
+        binding.textviewUserBiography.setVisibility(View.INVISIBLE);
+        binding.collectionsProgressBar.setVisibility(View.GONE);
+        binding.recyclerviewUserCollections.setVisibility(View.GONE);
     }
 
     private boolean isFollowed(User loggedUser){

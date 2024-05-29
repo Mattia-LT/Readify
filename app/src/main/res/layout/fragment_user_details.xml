@@ -152,6 +152,7 @@
 
         <!-- collections -->
         <TextView
+            android:id="@+id/textview_collections_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pa_collections"
@@ -165,6 +166,72 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/no_collections_found_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/no_collections_found_imageview"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:importantForAccessibility="no"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/no_collections_found_icon"
+                />
+
+            <TextView
+                android:id="@+id/no_collections_found_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/no_collections_found_imageview"
+                android:text="@string/no_collections_found"
+                android:gravity="center"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/private_profile_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible" >
+
+            <ImageView
+                android:id="@+id/private_profile_imageview"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:importantForAccessibility="no"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/private_profile_icon"
+                />
+
+            <TextView
+                android:id="@+id/private_profile_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/private_profile_imageview"
+                android:text="@string/private_profile_message"
+                android:gravity="center"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_user_collections"

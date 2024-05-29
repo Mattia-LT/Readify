@@ -39,6 +39,7 @@ public class TabFollowerListFragment extends Fragment{
     private FollowListAdapter followListAdapter;
     private List<ExternalUser> followerList;
     private String idToken;
+    private String loggedUserIdToken;
 
     public TabFollowerListFragment(){}
 
@@ -63,14 +64,15 @@ public class TabFollowerListFragment extends Fragment{
             @Override
             public void onProfileClick(ExternalUser externalUser) {
                 User selectedUser = externalUser.getUser();
-                NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
-                Navigation.findNavController(requireView()).navigate(action);
+                if(!selectedUser.getIdToken().equals(loggedUserIdToken)){
+                    NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
+                    Navigation.findNavController(requireView()).navigate(action);
+                }
             }
 
             @Override
             public void onFollowButtonClick(ExternalUser user) {
                 testDatabaseViewModel.followUser(idToken, user.getIdToken());
-                //testDatabaseViewModel.fetchFollowing(idToken);
                 Log.d("TabFollowerListFragment", "followButtonClick premuto con idtoken: " + idToken);
             }
 
@@ -78,7 +80,6 @@ public class TabFollowerListFragment extends Fragment{
             public void onUnfollowButtonClick(ExternalUser user) {
                 //TODO testare bene per trovare eventuali errori
                 testDatabaseViewModel.unfollowUser(idToken, user.getIdToken());
-                //testDatabaseViewModel.fetchFollowing(idToken);
                 Log.d("TabFollowerListFragment", "UnfollowButtonClick premuto con idtoken: " + idToken);
             }
         });
@@ -125,7 +126,8 @@ public class TabFollowerListFragment extends Fragment{
             if(result.isSuccess()) {
                 User user = ((Result.UserSuccess) result).getData();
                 Log.e("USER OBSERVER","TRIGGERED");
-                followListAdapter.submitFollowings(user.getFollowing().getUsers());
+                loggedUserIdToken = user.getIdToken();
+                followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
                 testDatabaseViewModel.fetchFollowers(idToken);
             }
         };

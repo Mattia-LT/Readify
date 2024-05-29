@@ -155,6 +155,8 @@
     <string name="cancel_action">Annulla</string>
     <string name="no_results_found">Nessun risultato trovato.\n Prova a cercare qualcos\'altro!</string>
     <string name="change_collection_visibility_action">Visibilità</string>
+    <string name="no_collections_found">Nessuna collezione trovata.\nQuesto utente non ha nessuna collezione pubblica!</string>
+    <string name="private_profile_message">Questo utente ha il profilo privato.\nPer vedere le sue collezioni, dovete seguirvi a vicenda.</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

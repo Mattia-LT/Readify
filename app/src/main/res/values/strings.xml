@@ -164,7 +164,8 @@
     <string name="content_description_button_edit_profile">Button to confirm profile changes</string>
     <string name="textview_already_registered">Do you already have an account?</string>
     <string name="change_collection_visibility_action">Visibility</string>
-
+    <string name="no_collections_found">No collection found.\nThis user has no public collection!</string>
+    <string name="private_profile_message">This user has a private profile.\nTo see his collections, you must follow each other.</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

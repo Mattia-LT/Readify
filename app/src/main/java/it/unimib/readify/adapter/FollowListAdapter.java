@@ -22,6 +22,7 @@ import it.unimib.readify.model.ExternalUser;
 public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapter.FollowViewHolder> {
 
     private List<ExternalUser> currentFollowing;
+    private String loggedUserIdToken;
 
     public interface OnItemClickListener {
         void onProfileClick(ExternalUser user);
@@ -68,9 +69,10 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
         super.submitList(list);
     }
 
-    public void submitFollowings(List<ExternalUser> currentFollowing){
+    public void submitFollowings(List<ExternalUser> currentFollowing, String loggedUserIdToken){
         if(currentFollowing != null){
             this.currentFollowing = currentFollowing;
+            this.loggedUserIdToken = loggedUserIdToken;
         }
     }
 
@@ -99,8 +101,11 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
                         .load(avatarId)
                         .dontAnimate()
                         .into(binding.followImage);
-
-                if(isFollowed(externalUser)){
+                if(externalUser.getIdToken().equalsIgnoreCase(loggedUserIdToken)){
+                    //don't show follow button
+                    binding.unfollowButton.setVisibility(View.GONE);
+                    binding.followButton.setVisibility(View.GONE);
+                } else if(isFollowed(externalUser)){
                     //load unfollow button
                     binding.unfollowButton.setVisibility(View.VISIBLE);
                     binding.followButton.setVisibility(View.GONE);

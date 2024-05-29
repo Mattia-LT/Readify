@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import it.unimib.readify.data.database.BookRoomDatabase;
@@ -135,6 +136,10 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     public void onSuccessFetchCompleteCollectionsFromRemote(List<Collection> collectionList, String reference) {
         List<Result> resultList = new ArrayList<>();
         for(Collection collection : collectionList){
+            List<OLWorkApiResponse> works = collection.getWorks();
+            if(works != null){
+                works.sort(Comparator.comparing(OLWorkApiResponse::getTitle));
+            }
             resultList.add(new Result.CollectionSuccess(collection));
         }
         if(reference.equals(LOGGED_USER)){

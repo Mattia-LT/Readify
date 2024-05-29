@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -224,6 +225,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                         //todo error
                     }
                 }
+                collections.sort(Comparator.comparing(Collection::getName));
                 collectionResponseCallback.onSuccessFetchOtherUserCollectionsFromRemoteDatabase(collections);
             }
 

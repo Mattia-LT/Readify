@@ -38,6 +38,7 @@ public class TabSearchUsersFragment extends Fragment {
 
     private UserSearchResultAdapter userSearchResultAdapter;
     private List<User> searchResultsList;
+    private String loggedUserIdToken;
     private TestDatabaseViewModel testDatabaseViewModel;
 
     @Nullable
@@ -102,11 +103,23 @@ public class TabSearchUsersFragment extends Fragment {
 
     private void initObserver(){
         this.searchResultsList = new ArrayList<>();
+
+        final Observer<Result> loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                User loggedUser = ((Result.UserSuccess) result).getData();
+                Log.e("USER OBSERVER","TRIGGERED");
+                this.loggedUserIdToken = loggedUser.getIdToken();
+            }
+        };
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+
         final Observer<List<Result>> searchResultsListObserver = results -> {
             List<User> searchResults = results.stream()
                     .filter(result -> result instanceof Result.UserSuccess)
                     .map(result -> ((Result.UserSuccess) result).getData())
+                    .filter(user -> !user.getIdToken().equals(loggedUserIdToken))
                     .collect(Collectors.toList());
+
             searchResultsList = searchResults;
             userSearchResultAdapter.refreshList(searchResults);
             fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);

@@ -430,7 +430,8 @@ public class ProfileFragment extends Fragment{
         super.onDestroyView();
         testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         testDatabaseViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
-        //todo sistema
-        //collectionViewModel.getCompleteCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
+        testDatabaseViewModel.getLogoutResult().removeObserver(logoutResultObserver);
+        collectionViewModel.getLoggedUserCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
+        collectionViewModel.getDeleteAllCollectionResult().removeObserver(deleteAllCollectionsResultObserver);
     }
 }

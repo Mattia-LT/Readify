@@ -108,6 +108,11 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     }
 
     @Override
+    public void resetLogout() {
+        allCollectionsDeletedResult.postValue(null);
+    }
+
+    @Override
     public MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData() {
         return loggedUserCollectionListLiveData;
     }

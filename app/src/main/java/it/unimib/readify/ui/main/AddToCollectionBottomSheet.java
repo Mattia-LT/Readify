@@ -146,7 +146,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 boolean visible = binding.switchCollectionVisibility.isChecked();
                 collectionViewModel.createCollection(idToken, collectionName, visible);
                 clearAddSection();
-                collectionViewModel.fetchLoggedUserCollections(idToken);
+                collectionViewModel.loadLoggedUserCollections();
             }
         });
     }

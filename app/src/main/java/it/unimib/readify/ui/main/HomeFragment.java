@@ -210,6 +210,7 @@ public class HomeFragment extends Fragment {
                 user = ((Result.UserSuccess) result).getData();
                 if(testDatabaseViewModel.isFirstLoading()){
                     testDatabaseViewModel.setFirstLoading(false);
+                    collectionViewModel.resetLogout();
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
                     bookViewModel.loadRecommendedBooks(user.getRecommended());
                 }

@@ -173,4 +173,8 @@ public class CollectionViewModel extends ViewModel {
     public void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible){
         collectionRepository.changeCollectionVisibility(loggedUserIdToken, collectionId, isCollectionVisible);
     }
+
+    public void resetLogout(){
+        collectionRepository.resetLogout();
+    }
 }

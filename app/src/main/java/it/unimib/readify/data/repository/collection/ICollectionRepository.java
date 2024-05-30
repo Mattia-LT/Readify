@@ -19,6 +19,7 @@ public interface ICollectionRepository {
     void renameCollection(String loggedUserIdToken, String collectionId, String newCollectionName);
     void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible);
     void emptyLocalDb();
+    void resetLogout();
     MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
     MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();
     MutableLiveData<Boolean> getAllCollectionsDeletedResult();

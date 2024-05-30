@@ -43,13 +43,16 @@
         android:layout_marginRight="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_continue_username"
-        app:errorEnabled="true">
+        app:shapeAppearanceOverlay="@style/RoundedEditText"
+        app:errorEnabled="true"
+        app:boxStrokeColor="?attr/colorSecondary"
+        app:hintTextColor="?attr/colorSecondary"
+        app:boxStrokeWidth="3dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_choose_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_textbox_bl"
             android:drawableStart="@drawable/ic_baseline_profile_24"
             android:drawablePadding="20dp"
             android:hint="@string/username"

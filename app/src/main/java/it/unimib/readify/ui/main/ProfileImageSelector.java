@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -15,9 +16,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.ProfileImageSelectorAdapter;
 import it.unimib.readify.databinding.FragmentProfileImageSelectorBinding;
+import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.viewmodel.TestDatabaseViewModel;
+import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
 
 public class ProfileImageSelector extends Fragment implements ProfileImageSelectorAdapter.OnImageClickListener {
 
@@ -25,6 +32,9 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ProfileImageSelectorAdapter profileImageSelectorAdapter;
+    private TestDatabaseViewModel testDatabaseViewModel;
+    private Observer<Result> userObserver;
+    private User loggedUser;
 
     private int[] arr = {
             R.drawable.avatar1, R.drawable.avatar2, R.drawable.avatar3, R.drawable.avatar4, R.drawable.avatar5,
@@ -44,6 +54,20 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(TestDatabaseViewModel.class);
+
+        userObserver = result -> {
+            if(result.isSuccess()) {
+                loggedUser = ((Result.UserSuccess)result).getData();
+            } else {
+                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        };
+
+        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+
         recyclerView = fragmentProfileImageSelectorBinding.recyclerviewProfileImage;
         layoutManager = new GridLayoutManager(requireContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
@@ -56,8 +80,10 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
     @Override
     public void onImageClick(int position) {
         imageResourceId = arr[position];
+        loggedUser.setAvatar("avatar"+(position+1));
+        testDatabaseViewModel.setUserAvatar(loggedUser);
         Toast.makeText(requireContext(), "Immagine selezionata: " + position, Toast.LENGTH_SHORT).show();
-        NavDirections action = ProfileImageSelectorDirections.actionProfileImageSelectorFragmentToSettingsFragment(imageResourceId);
+        NavDirections action = ProfileImageSelectorDirections.actionProfileImageSelectorFragmentToSettingsFragment();
         Navigation.findNavController(requireView()).navigate(action);
     }
 }

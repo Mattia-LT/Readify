@@ -15,7 +15,10 @@
 
         <action
             android:id="@+id/action_profileImageSelectorFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/settingsFragment"
+            app:popUpToInclusive="true"
+            />
 
     </fragment>
 
@@ -60,10 +63,6 @@
         android:name="it.unimib.readify.ui.main.SettingsFragment"
         android:label="@string/pa_settings"
         tools:layout="@layout/fragment_settings">
-
-        <argument
-            android:name="imageResourceId"
-            app:argType="integer" />
 
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"

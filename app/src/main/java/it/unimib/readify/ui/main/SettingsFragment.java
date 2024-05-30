@@ -60,6 +60,7 @@ public class SettingsFragment extends Fragment {
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess)result).getData();
                 onSaveUser = new User(user);
+                updateUI();
             } else {
                 //todo navigate to login(?)
                 Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
@@ -132,17 +133,6 @@ public class SettingsFragment extends Fragment {
                 Navigation.findNavController(requireView()).navigate(R.id.action_settingsFragment_to_profileImageSelectorFragment);
             }
         });
-
-        updateUIObserver();
-
-        Bundle args = getArguments();
-        if (args != null && args.containsKey("imageResourceId")) {
-            imageResourceId = args.getInt("imageResourceId");
-            updateUI(imageResourceId);
-        } else {
-            imageResourceId = R.drawable.ic_baseline_profile_24;
-            fragmentSettingsBinding.profileImageSelect.setImageResource(imageResourceId);
-        }
 
         fragmentSettingsBinding.buttonConfirmEdit.setOnClickListener(v -> {
             fragmentSettingsBinding.settingsUsernameErrorMessage.setText("");
@@ -257,14 +247,7 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    public void updateUI(int imageResourceId){
-        Glide.with(requireActivity().getApplication())
-                .load(imageResourceId)
-                .dontAnimate()
-                .into(fragmentSettingsBinding.profileImageSelect);
-    }
-
-    public void updateUIObserver(){
+    public void updateUI(){
         int avatarId;
         if(user != null){
             try {

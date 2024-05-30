@@ -30,7 +30,7 @@ import it.unimib.readify.R;
 import it.unimib.readify.databinding.BottomSheetSearchBooksFilterBinding;
 import it.unimib.readify.util.SubjectsUtil;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
 
@@ -115,7 +115,7 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void initViewModels(){
-        bookViewModel = TestDatabaseViewModelFactory
+        bookViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(BookViewModel.class);
     }

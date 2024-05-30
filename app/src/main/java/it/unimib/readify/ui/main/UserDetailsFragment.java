@@ -30,18 +30,18 @@ import it.unimib.readify.R;
 import it.unimib.readify.adapter.CollectionAdapter;
 import it.unimib.readify.databinding.FragmentUserDetailsBinding;
 import it.unimib.readify.model.Collection;
-import it.unimib.readify.model.ExternalGroup;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowGroup;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class UserDetailsFragment extends Fragment {
 
     private FragmentUserDetailsBinding binding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private CollectionAdapter collectionAdapter;
     private String userIdToken;
@@ -76,10 +76,10 @@ public class UserDetailsFragment extends Fragment {
 
     private void initViewModels(){
         //initializing viewModels
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
-        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+        collectionViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }
     private void initObservers() {
@@ -134,8 +134,8 @@ public class UserDetailsFragment extends Fragment {
         };
 
         collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionsObserver);
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        testDatabaseViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
     }
 
     private boolean areUsersFriends(String loggedUserIdToken, User otherUser) {
@@ -171,12 +171,12 @@ public class UserDetailsFragment extends Fragment {
         this.userIdToken = UserDetailsFragmentArgs.fromBundle(getArguments()).getOtherUserIdToken();
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
         requireActivity().setTitle(username);
-        testDatabaseViewModel.fetchOtherUser(userIdToken);
+        userViewModel.fetchOtherUser(userIdToken);
     }
 
     private void showPublicUserInfo(User user){
-        binding.followButton.setOnClickListener(v -> testDatabaseViewModel.followUser(loggedUserIdToken, userIdToken));
-        binding.unfollowButton.setOnClickListener(v -> testDatabaseViewModel.unfollowUser(loggedUserIdToken, userIdToken));
+        binding.followButton.setOnClickListener(v -> userViewModel.followUser(loggedUserIdToken, userIdToken));
+        binding.unfollowButton.setOnClickListener(v -> userViewModel.unfollowUser(loggedUserIdToken, userIdToken));
 
         binding.textviewFollowerCounter.setText(String.valueOf(user.getFollowers().getCounter()));
         binding.textviewFollowingCounter.setText(String.valueOf(user.getFollowing().getCounter()));
@@ -227,9 +227,9 @@ public class UserDetailsFragment extends Fragment {
     }
 
     private boolean isFollowed(User loggedUser){
-        ExternalGroup followingInstance = loggedUser.getFollowing();
+        FollowGroup followingInstance = loggedUser.getFollowing();
         if(followingInstance != null){
-            List<ExternalUser> loggedUserFollowingList = followingInstance.getUsers();
+            List<FollowUser> loggedUserFollowingList = followingInstance.getUsers();
             if(loggedUserFollowingList == null){
                 loggedUserFollowingList = new ArrayList<>();
             }

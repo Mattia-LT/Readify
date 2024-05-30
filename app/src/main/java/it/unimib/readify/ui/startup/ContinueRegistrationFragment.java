@@ -24,17 +24,17 @@ import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentContinueRegistrationBinding;
-import it.unimib.readify.model.ExternalGroup;
+import it.unimib.readify.model.FollowGroup;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.util.SubjectsUtil;
 
 public class ContinueRegistrationFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
     private FragmentContinueRegistrationBinding fragmentContinueRegistrationBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private User user;
     private User onSaveUser;
     private Observer<String> usernameErrorObserver;
@@ -57,8 +57,8 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
 
         loggedUserObserver = result -> {
@@ -86,8 +86,8 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
                     break;
             }
         };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        testDatabaseViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(), R.array.gender, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -105,19 +105,19 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
             if(isUsernameOk() && (fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition() != 0) && (selectedChipNumber>2))
             {
                 onSaveUser.setUsername(username);
-                testDatabaseViewModel.setUserUsername(onSaveUser);
+                userViewModel.setUserUsername(onSaveUser);
                 onSaveUser.setGender(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItem().toString());
-                testDatabaseViewModel.setUserGender(onSaveUser);
+                userViewModel.setUserGender(onSaveUser);
                 onSaveUser.setRecommended(getSelectedGenres(chipGroupGenre));
-                testDatabaseViewModel.setUserRecommended(onSaveUser);
+                userViewModel.setUserRecommended(onSaveUser);
                 onSaveUser.setAvatar("avatar1");
-                testDatabaseViewModel.setUserAvatar(onSaveUser);
-                onSaveUser.setFollowers(new ExternalGroup(0, null));
-                onSaveUser.setFollowing(new ExternalGroup(0, null));
-                testDatabaseViewModel.setUserFollowers(onSaveUser);
-                testDatabaseViewModel.setUserFollowing(onSaveUser);
+                userViewModel.setUserAvatar(onSaveUser);
+                onSaveUser.setFollowers(new FollowGroup(0, null));
+                onSaveUser.setFollowing(new FollowGroup(0, null));
+                userViewModel.setUserFollowers(onSaveUser);
+                userViewModel.setUserFollowing(onSaveUser);
                 onSaveUser.setVisibility("public");
-                testDatabaseViewModel.setUserVisibility(onSaveUser);
+                userViewModel.setUserVisibility(onSaveUser);
 
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
                 requireActivity().finish();
@@ -213,6 +213,6 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
     public void onDestroyView() {
         super.onDestroyView();
         Log.e("ON DESTROY continue", "TRIGGERED");
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

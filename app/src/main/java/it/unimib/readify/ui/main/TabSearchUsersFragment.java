@@ -29,8 +29,8 @@ import it.unimib.readify.adapter.UserSearchResultAdapter;
 import it.unimib.readify.databinding.FragmentTabSearchUsersBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class TabSearchUsersFragment extends Fragment {
 
@@ -39,7 +39,7 @@ public class TabSearchUsersFragment extends Fragment {
     private UserSearchResultAdapter userSearchResultAdapter;
     private List<User> searchResultsList;
     private String loggedUserIdToken;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
 
     @Nullable
     @Override
@@ -92,13 +92,13 @@ public class TabSearchUsersFragment extends Fragment {
             Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
         } else {
             Log.d("UserSearchFragment", "Query: " + query);
-            testDatabaseViewModel.searchUsers(query);
+            userViewModel.searchUsers(query);
         }
     }
 
     private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
 
     private void initObserver(){
@@ -111,7 +111,7 @@ public class TabSearchUsersFragment extends Fragment {
                 this.loggedUserIdToken = loggedUser.getIdToken();
             }
         };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
         final Observer<List<Result>> searchResultsListObserver = results -> {
             List<User> searchResults = results.stream()
@@ -124,6 +124,6 @@ public class TabSearchUsersFragment extends Fragment {
             userSearchResultAdapter.refreshList(searchResults);
             fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);
         };
-        testDatabaseViewModel.getUserSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
+        userViewModel.getUserSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
     }
 }

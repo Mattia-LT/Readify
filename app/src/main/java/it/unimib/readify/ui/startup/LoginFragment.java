@@ -42,12 +42,12 @@ import it.unimib.readify.databinding.FragmentLoginBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.DataEncryptionUtil;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding fragmentLoginBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private DataEncryptionUtil dataEncryptionUtil;
     private Observer<Result> loggedUserObserver;
 
@@ -81,7 +81,7 @@ public class LoginFragment extends Fragment {
         Log.d("login fragment", "onViewCreated");
         initViewModels();
 
-        if(testDatabaseViewModel.isContinueRegistrationFirstLoading()){
+        if(userViewModel.isContinueRegistrationFirstLoading()){
             try {
                 String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
                 String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
@@ -91,13 +91,13 @@ public class LoginFragment extends Fragment {
                 Log.d(String.valueOf(savedPassword), String.valueOf(savedPassword));
                 if(savedEmail != null){
                     loggedUserObserver = result -> {
-                        if(testDatabaseViewModel.isUIRunning()) {
+                        if(userViewModel.isUIRunning()) {
                             if(result.isSuccess()) {
                                 User user = ((Result.UserSuccess) result).getData();
                                 if(user.getUsername() == null){
-                                    testDatabaseViewModel.setContinueRegistrationFirstLoading(false);
+                                    userViewModel.setContinueRegistrationFirstLoading(false);
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
-                                    testDatabaseViewModel.setUIRunning(false);
+                                    userViewModel.setUIRunning(false);
                                 }
                             }
                         }
@@ -105,12 +105,12 @@ public class LoginFragment extends Fragment {
 
                     if(savedPassword != null){
                         //login normale
-                        testDatabaseViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
-                        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                        userViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
+                        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
                     } else {
                         //login google
-                        testDatabaseViewModel.signInWithGoogle(savedIdToken);
-                        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                        userViewModel.signInWithGoogle(savedIdToken);
+                        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
                     }
                 }
             } catch (GeneralSecurityException | IOException e) {
@@ -189,23 +189,23 @@ public class LoginFragment extends Fragment {
             String email = "prova@gmail.com";
             String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
-                testDatabaseViewModel.setUserMutableLiveData(email, password, true);
+                userViewModel.setUserMutableLiveData(email, password, true);
                 loggedUserObserver = result -> {
-                    if(testDatabaseViewModel.isUIRunning()) {
+                    if(userViewModel.isUIRunning()) {
                         if(result.isSuccess()) {
                             User user = ((Result.UserSuccess) result).getData();
                             Log.e("USER SAVED", user.toString());
                             if(user.getEmail().equalsIgnoreCase(email)){
                                 saveNormalLoginData(email, password);
                                 if(user.getUsername() == null){
-                                    testDatabaseViewModel.setContinueRegistrationFirstLoading(false);
+                                    userViewModel.setContinueRegistrationFirstLoading(false);
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
-                                    testDatabaseViewModel.setUIRunning(false);
+                                    userViewModel.setUIRunning(false);
                                 } else {
                                     Log.d("NAVIGAZIONE", "APERTO DA ELSE DI BUTTON LISTENER");
                                     navigateToHomeActivity();
                                     requireActivity().finish();
-                                    testDatabaseViewModel.setUIRunning(false);
+                                    userViewModel.setUIRunning(false);
                                 }
                             }
                         } else {
@@ -214,7 +214,7 @@ public class LoginFragment extends Fragment {
                     }
                 };
 
-                testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
             } else {
                 //todo managing specific behavior when an error occurs
@@ -242,7 +242,7 @@ public class LoginFragment extends Fragment {
             todo setUIRunning
             when MediatorLiveData is modified in other containers, and the user return to login,
              the instruction
-                testDatabaseViewModel.setUIRunning(false);
+                userViewModel.setUIRunning(false);
              is not going to be invoked again, causing (probably) the Observer to run when it shouldn't.
          */
 
@@ -267,7 +267,7 @@ public class LoginFragment extends Fragment {
              like this, method removeObserver() can be put in its body.
          */
         Log.e("ON DESTROY login", "TRIGGERED");
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 
     private void signInWithGoogle() {
@@ -297,9 +297,9 @@ public class LoginFragment extends Fragment {
             String idToken = credential.getGoogleIdToken();
             Log.d("handleSignInResult", "firebaseAuthWithGoogle:" + credential.getId());
             if(idToken != null){
-                testDatabaseViewModel.signInWithGoogle(idToken);
+                userViewModel.signInWithGoogle(idToken);
                 loggedUserObserver = result -> {
-                    if(testDatabaseViewModel.isUIRunning()) {
+                    if(userViewModel.isUIRunning()) {
                         if(result.isSuccess()) {
                             User user = ((Result.UserSuccess) result).getData();
                             Log.e("user72kkkkk",user.toString());
@@ -310,12 +310,12 @@ public class LoginFragment extends Fragment {
                                 saveGoogleLoginData(idToken);
                                 if(user.getUsername() == null){
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
-                                    testDatabaseViewModel.setUIRunning(false);
+                                    userViewModel.setUIRunning(false);
                                 } else {
                                     Log.d("NAVIGAZIONE", "APERTO DA ELSE DI GOOGLE BUTTON LISTENER");
                                     navigateToHomeActivity();
                                     requireActivity().finish();
-                                    testDatabaseViewModel.setUIRunning(false);
+                                    userViewModel.setUIRunning(false);
                                 }
                             }
                         } else {
@@ -323,7 +323,7 @@ public class LoginFragment extends Fragment {
                         }
                     }
                 };
-                testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+                userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
             }
 
 
@@ -374,10 +374,10 @@ public class LoginFragment extends Fragment {
     }
 
     private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
-        testDatabaseViewModel.setUIRunning(false);
+        userViewModel.setUIRunning(false);
     }
 
     private void saveNormalLoginData(String email, String password) {
@@ -410,6 +410,6 @@ public class LoginFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.e("ON DESTROY login", "TRIGGERED");
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

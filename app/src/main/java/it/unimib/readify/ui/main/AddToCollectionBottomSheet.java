@@ -38,14 +38,14 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SubjectsUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
     private BottomSheetAddToCollectionBinding binding;
     private CollectionViewModel collectionViewModel;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private AddToCollectionAdapter addToCollectionAdapter;
     private OLWorkApiResponse book;
     private String idToken;
@@ -152,13 +152,13 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void initViewModels(){
-        collectionViewModel = TestDatabaseViewModelFactory
+        collectionViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
 
-        testDatabaseViewModel = TestDatabaseViewModelFactory
+        userViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+                .create(UserViewModel.class);
     }
     private void clearAddSection(){
         binding.buttonCreateNewCollection.setVisibility(View.VISIBLE);
@@ -196,7 +196,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                             }
                         }
                     }
-                    testDatabaseViewModel.setUserRecommended(loggedUser);
+                    userViewModel.setUserRecommended(loggedUser);
                     Log.d("fragment","aggiunto OK");
                 } else {
                     //toast errore
@@ -226,7 +226,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                             }
                         }
                     }
-                    testDatabaseViewModel.setUserRecommended(loggedUser);
+                    userViewModel.setUserRecommended(loggedUser);
                     Log.d("fragment","rimosso OK");
                 } else {
                     //toast errore
@@ -247,7 +247,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         };
 
 
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
     }
 
@@ -258,6 +258,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         collectionViewModel.getAddToCollectionResult().removeObserver(addToCollectionResultObserver);
         collectionViewModel.getRemoveFromCollectionResult().removeObserver(removeFromCollectionResultObserver);
         collectionViewModel.getLoggedUserCollectionListLiveData().removeObserver(collectionsObserver);
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

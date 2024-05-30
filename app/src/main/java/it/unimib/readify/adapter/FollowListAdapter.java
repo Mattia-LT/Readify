@@ -17,30 +17,30 @@ import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FollowItemBinding;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowUser;
 
-public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapter.FollowViewHolder> {
+public class FollowListAdapter extends ListAdapter<FollowUser, FollowListAdapter.FollowViewHolder> {
 
-    private List<ExternalUser> currentFollowing;
+    private List<FollowUser> currentFollowing;
     private String loggedUserIdToken;
 
     public interface OnItemClickListener {
-        void onProfileClick(ExternalUser user);
-        void onFollowButtonClick(ExternalUser user);
-        void onUnfollowButtonClick(ExternalUser user);
+        void onProfileClick(FollowUser user);
+        void onFollowButtonClick(FollowUser user);
+        void onUnfollowButtonClick(FollowUser user);
     }
 
     private final OnItemClickListener onItemClickListener;
 
     public FollowListAdapter(OnItemClickListener onItemClickListener) {
-        super(new DiffUtil.ItemCallback<ExternalUser>() {
+        super(new DiffUtil.ItemCallback<FollowUser>() {
             @Override
-            public boolean areItemsTheSame(@NonNull ExternalUser oldItem, @NonNull ExternalUser newItem) {
+            public boolean areItemsTheSame(@NonNull FollowUser oldItem, @NonNull FollowUser newItem) {
                 return oldItem.getIdToken().equals(newItem.getIdToken());
             }
 
             @Override
-            public boolean areContentsTheSame(@NonNull ExternalUser oldItem, @NonNull ExternalUser newItem) {
+            public boolean areContentsTheSame(@NonNull FollowUser oldItem, @NonNull FollowUser newItem) {
                 return oldItem.equals(newItem);
             }
         });
@@ -57,19 +57,19 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
 
     @Override
     public void onBindViewHolder(@NonNull FollowViewHolder holder, int position) {
-        ExternalUser user = getItem(position);
+        FollowUser user = getItem(position);
         holder.bind(user);
     }
 
     @Override
-    public void submitList(@Nullable List<ExternalUser> list) {
+    public void submitList(@Nullable List<FollowUser> list) {
         if (list != null) {
-            list.sort(Comparator.comparing(ExternalUser::getTimestamp));
+            list.sort(Comparator.comparing(FollowUser::getTimestamp));
         }
         super.submitList(list);
     }
 
-    public void submitFollowings(List<ExternalUser> currentFollowing, String loggedUserIdToken){
+    public void submitFollowings(List<FollowUser> currentFollowing, String loggedUserIdToken){
         if(currentFollowing != null){
             this.currentFollowing = currentFollowing;
             this.loggedUserIdToken = loggedUserIdToken;
@@ -88,12 +88,12 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
             binding.unfollowButton.setOnClickListener(this);
         }
 
-        public void bind(ExternalUser externalUser) {
-            if (externalUser != null) {
-                binding.followUsername.setText(externalUser.getUser().getUsername());
+        public void bind(FollowUser followUser) {
+            if (followUser != null) {
+                binding.followUsername.setText(followUser.getUser().getUsername());
                 int avatarId;
                 try {
-                    avatarId = R.drawable.class.getDeclaredField(externalUser.getUser().getAvatar().toLowerCase()).getInt(null);
+                    avatarId = R.drawable.class.getDeclaredField(followUser.getUser().getAvatar().toLowerCase()).getInt(null);
                 } catch (Exception e) {
                     avatarId = R.drawable.ic_baseline_profile_24;
                 }
@@ -101,11 +101,11 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
                         .load(avatarId)
                         .dontAnimate()
                         .into(binding.followImage);
-                if(externalUser.getIdToken().equalsIgnoreCase(loggedUserIdToken)){
+                if(followUser.getIdToken().equalsIgnoreCase(loggedUserIdToken)){
                     //don't show follow button
                     binding.unfollowButton.setVisibility(View.GONE);
                     binding.followButton.setVisibility(View.GONE);
-                } else if(isFollowed(externalUser)){
+                } else if(isFollowed(followUser)){
                     //load unfollow button
                     binding.unfollowButton.setVisibility(View.VISIBLE);
                     binding.followButton.setVisibility(View.GONE);
@@ -123,7 +123,7 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
         public void onClick(View v) {
             int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                ExternalUser user = getItem(position);
+                FollowUser user = getItem(position);
                 if(v.getId() == binding.followUsername.getId() || v.getId() == binding.followImage.getId()){
                     onItemClickListener.onProfileClick(user);
                 } else if(v.getId() == binding.followButton.getId()){
@@ -134,10 +134,10 @@ public class FollowListAdapter extends ListAdapter<ExternalUser, FollowListAdapt
             }
         }
 
-        private boolean isFollowed(ExternalUser externalUser){
+        private boolean isFollowed(FollowUser followUser){
             if(currentFollowing != null){
-                for(ExternalUser user : currentFollowing){
-                    if(user.getIdToken().equals(externalUser.getIdToken())){
+                for(FollowUser user : currentFollowing){
+                    if(user.getIdToken().equals(followUser.getIdToken())){
                         return true;
                     }
                 }

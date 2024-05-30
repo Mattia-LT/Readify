@@ -33,8 +33,8 @@ import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.viewmodel.BookViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class TabSearchBooksFragment extends Fragment{
 
@@ -42,7 +42,7 @@ public class TabSearchBooksFragment extends Fragment{
 
     private BookSearchResultAdapter searchResultsAdapter;
     private BookViewModel bookViewModel;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private String sortMode;
     private String subjects;
     private User loggedUser;
@@ -134,13 +134,13 @@ public class TabSearchBooksFragment extends Fragment{
     }
 
     private void initViewModels(){
-        bookViewModel = TestDatabaseViewModelFactory
+        bookViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(BookViewModel.class);
 
-        testDatabaseViewModel = TestDatabaseViewModelFactory
+        userViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+                .create(UserViewModel.class);
     }
 
     private void initObserver(){
@@ -184,6 +184,6 @@ public class TabSearchBooksFragment extends Fragment{
         bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
         bookViewModel.getSortModeLiveData().observe(getViewLifecycleOwner(), sortModeObserver);
         bookViewModel.getSubjectListLiveData().observe(getViewLifecycleOwner(), genreListObserver);
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
     }
 }

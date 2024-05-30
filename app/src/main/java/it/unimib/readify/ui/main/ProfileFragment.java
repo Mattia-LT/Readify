@@ -59,12 +59,12 @@ import it.unimib.readify.model.User;
 import it.unimib.readify.ui.startup.WelcomeActivity;
 import it.unimib.readify.util.SharedPreferencesUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
 
     private CollectionAdapter collectionAdapter;
@@ -111,10 +111,10 @@ public class ProfileFragment extends Fragment{
     }
 
     private void initViewModels() {
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
-        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+        collectionViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }
 
@@ -142,7 +142,7 @@ public class ProfileFragment extends Fragment{
                 fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
                 collectionViewModel.loadLoggedUserCollections();
-                testDatabaseViewModel.fetchNotifications(loggedUser.getIdToken());
+                userViewModel.fetchNotifications(loggedUser.getIdToken());
                 loadMenu();
             }
         };
@@ -166,8 +166,8 @@ public class ProfileFragment extends Fragment{
         deleteAllCollectionsResultObserver = result -> {
             if(result != null){
                 if(result){
-                    testDatabaseViewModel.setFirstLoading(true);
-                    testDatabaseViewModel.setContinueRegistrationFirstLoading(true);
+                    userViewModel.setFirstLoading(true);
+                    userViewModel.setContinueRegistrationFirstLoading(true);
                     Intent intent = new Intent(requireActivity(), WelcomeActivity.class);
                     startActivity(intent);
                     requireActivity().finish();
@@ -179,9 +179,9 @@ public class ProfileFragment extends Fragment{
 
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), fetchedCollectionsObserver);
         collectionViewModel.getDeleteAllCollectionResult().observe(getViewLifecycleOwner(),deleteAllCollectionsResultObserver);
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
-        testDatabaseViewModel.getLogoutResult().observe(getViewLifecycleOwner(), logoutResultObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+        userViewModel.getLogoutResult().observe(getViewLifecycleOwner(), logoutResultObserver);
     }
 
    private void initRecyclerView(){
@@ -251,7 +251,7 @@ public class ProfileFragment extends Fragment{
                         selectedVisibility = USER_VISIBILITY_PRIVATE;
                     }
                     loggedUser.setVisibility(selectedVisibility);
-                    testDatabaseViewModel.setUserVisibility(loggedUser);
+                    userViewModel.setUserVisibility(loggedUser);
                 } else{
                     firstLoadSpinner = false;
                 }
@@ -308,12 +308,12 @@ public class ProfileFragment extends Fragment{
                         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                             int itemId = menuItem.getItemId();
 
-                            if (itemId == R.id.nav_settings) {
-                                Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_settingsFragment);
+                            if (itemId == R.id.nav_edit_profile) {
+                                Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_editProfileFragment);
                             }
                             if(itemId == R.id.nav_logout){
                                 //todo shared pref e auth
-                                testDatabaseViewModel.logout();
+                                userViewModel.logout();
                              }
 
                             drawerLayout.closeDrawer(GravityCompat.END);
@@ -428,9 +428,9 @@ public class ProfileFragment extends Fragment{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
-        testDatabaseViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
-        testDatabaseViewModel.getLogoutResult().removeObserver(logoutResultObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
+        userViewModel.getLogoutResult().removeObserver(logoutResultObserver);
         collectionViewModel.getLoggedUserCollectionListLiveData().removeObserver(fetchedCollectionsObserver);
         collectionViewModel.getDeleteAllCollectionResult().removeObserver(deleteAllCollectionsResultObserver);
     }

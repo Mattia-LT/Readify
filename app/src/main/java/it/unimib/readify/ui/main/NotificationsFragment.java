@@ -20,13 +20,13 @@ import java.util.Objects;
 
 import it.unimib.readify.databinding.FragmentNotificationsBinding;
 import it.unimib.readify.model.Notification;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class NotificationsFragment extends Fragment {
 
     private FragmentNotificationsBinding fragmentNotificationsBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private HashMap<String, ArrayList<Notification>> notifications;
     Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
 
@@ -59,8 +59,8 @@ public class NotificationsFragment extends Fragment {
 
 
     public void initViewModels() {
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
 
     public void initObservers() {
@@ -74,7 +74,7 @@ public class NotificationsFragment extends Fragment {
             updateUI();
         };
 
-        testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+        userViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
     private void navigateToNotificationPage() {

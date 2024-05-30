@@ -21,21 +21,21 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.ui.main.HomeActivity;
 import it.unimib.readify.util.DataEncryptionUtil;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class StartupActivity extends AppCompatActivity {
 
     private DataEncryptionUtil dataEncryptionUtil;
     private Observer<Result> loggedUserObserver;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startup_loading);
         dataEncryptionUtil = new DataEncryptionUtil(this.getApplication());
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(this.getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(this.getApplication())
+                .create(UserViewModel.class);
         try {
             String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
@@ -45,7 +45,7 @@ public class StartupActivity extends AppCompatActivity {
             Log.d(String.valueOf(savedPassword), String.valueOf(savedPassword));
 
             loggedUserObserver = result -> {
-                if(testDatabaseViewModel.isUIRunning()) {
+                if(userViewModel.isUIRunning()) {
                     if(result.isSuccess()) {
                         User user = ((Result.UserSuccess) result).getData();
                         Intent intent;
@@ -64,14 +64,14 @@ public class StartupActivity extends AppCompatActivity {
             if(savedEmail != null){
                 if(savedPassword != null){
                     //login normale
-                    testDatabaseViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
-                    testDatabaseViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
+                    userViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
+                    userViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
                 }
             } else if(savedGoogleLoginIdToken != null){
                 //login google
                 Log.d("dovrebbe entrare qui", "please");
-                testDatabaseViewModel.signInWithGoogle(savedGoogleLoginIdToken);
-                testDatabaseViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
+                userViewModel.signInWithGoogle(savedGoogleLoginIdToken);
+                userViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
 
             } else {
                 showStartupLayout();
@@ -86,7 +86,7 @@ public class StartupActivity extends AppCompatActivity {
         super.onDestroy();
         Log.e("ON DESTROY STARTUP", "TRIGGERED");
         if(loggedUserObserver != null){
-            testDatabaseViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+            userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         }
     }
 

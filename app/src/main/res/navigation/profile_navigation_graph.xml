@@ -14,9 +14,9 @@
         tools:layout="@layout/fragment_profile_image_selector">
 
         <action
-            android:id="@+id/action_profileImageSelectorFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment"
-            app:popUpTo="@id/settingsFragment"
+            android:id="@+id/action_profileImageSelectorFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment"
+            app:popUpTo="@id/editProfileFragment"
             app:popUpToInclusive="true"
             />
 
@@ -33,8 +33,8 @@
             app:destination="@id/collectionFragment" />
 
         <action
-            android:id="@+id/action_profileFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
 
         <action
             android:id="@+id/action_profileFragment_to_searchFragment"
@@ -59,17 +59,17 @@
     </fragment>
 
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="it.unimib.readify.ui.main.SettingsFragment"
-        android:label="@string/pa_settings"
-        tools:layout="@layout/fragment_settings">
+        android:id="@+id/editProfileFragment"
+        android:name="it.unimib.readify.ui.main.EditProfileFragment"
+        android:label="@string/pa_edit_profile"
+        tools:layout="@layout/fragment_edit_profile">
 
         <action
-            android:id="@+id/action_settingsFragment_to_profileFragment"
+            android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
 
         <action
-            android:id="@+id/action_settingsFragment_to_profileImageSelectorFragment"
+            android:id="@+id/action_editProfileFragment_to_profileImageSelectorFragment"
             app:destination="@+id/profileImageSelectorFragment" />
 
     </fragment>

@@ -18,20 +18,20 @@ import it.unimib.readify.util.CustomTypeConverter;
 
 @Database(entities = {Collection.class}, version = DATABASE_VERSION)
 @TypeConverters({CustomTypeConverter.class})
-public abstract class BookRoomDatabase extends RoomDatabase {
-    public abstract BookDao bookDao();
+public abstract class CollectionRoomDatabase extends RoomDatabase {
+    public abstract CollectionDao bookDao();
 
-    private static volatile BookRoomDatabase INSTANCE;
+    private static volatile CollectionRoomDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    public static BookRoomDatabase getDatabase(final Context context) {
+    public static CollectionRoomDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            synchronized (BookRoomDatabase.class) {
+            synchronized (CollectionRoomDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            BookRoomDatabase.class, BOOK_DATABASE_NAME).build();
+                            CollectionRoomDatabase.class, BOOK_DATABASE_NAME).build();
                 }
             }
         }

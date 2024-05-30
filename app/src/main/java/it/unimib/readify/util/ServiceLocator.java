@@ -8,20 +8,20 @@ import com.google.gson.GsonBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import it.unimib.readify.data.database.BookRoomDatabase;
+import it.unimib.readify.data.database.CollectionRoomDatabase;
 import it.unimib.readify.data.repository.book.BookRepository;
 import it.unimib.readify.data.repository.book.IBookRepository;
 import it.unimib.readify.data.repository.collection.CollectionRepository;
 import it.unimib.readify.data.repository.collection.ICollectionRepository;
-import it.unimib.readify.data.repository.user.TestDatabaseRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.data.repository.user.UserRepository;
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.service.OLApiService;
 import it.unimib.readify.model.OLDescription;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /*
-    TestServiceLocator is a Singleton class which maps every Repository class
+    ServiceLocator is a Singleton class which maps every Repository class
      with its "repositories" attribute, allowing only one instantiation per Repository class.
     This make every Repository class having the same behavior as a Singleton class,
      even though it doesn't implement its classic structure.
@@ -31,29 +31,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
      (each time the data the UI based its appearance changes)
      and 2) an automatic check of data changing during some particular actions (asynchronous actions)
  */
-public class TestServiceLocator {
+public class ServiceLocator {
 
-    private static volatile TestServiceLocator INSTANCE = null;
+    private static volatile ServiceLocator INSTANCE = null;
     private final Map<Class<?>, Object> repositories = new ConcurrentHashMap<>();
     private final Application application;
 
-    private TestServiceLocator(Application application) {
+    private ServiceLocator(Application application) {
         this.application = application;
     }
 
-    public static TestServiceLocator getInstance(Application application) {
+    public static ServiceLocator getInstance(Application application) {
         if (INSTANCE == null) {
-            synchronized(TestServiceLocator.class) {
+            synchronized(ServiceLocator.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TestServiceLocator(application);
+                    INSTANCE = new ServiceLocator(application);
                 }
             }
         }
         return INSTANCE;
     }
 
-    public BookRoomDatabase getBookDao(Application application) {
-        return BookRoomDatabase.getDatabase(application);
+    public CollectionRoomDatabase getBookDao(Application application) {
+        return CollectionRoomDatabase.getDatabase(application);
     }
 
     public <T> T getRepository(Class<T> repositoryClass) {
@@ -64,9 +64,9 @@ public class TestServiceLocator {
                 SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(application);
                 DataEncryptionUtil dataEncryptionUtil = new DataEncryptionUtil(application);
                 if(repositoryInstance == null) {
-                    //creating TestDatabaseRepository instance
-                    if(repositoryClass == TestIDatabaseRepository.class) {
-                        repositoryInstance = TestDatabaseRepository.getInstance(application);
+                    //creating UserRepository instance
+                    if(repositoryClass == IUserRepository.class) {
+                        repositoryInstance = UserRepository.getInstance(application);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
                     //creating BookRepository instance

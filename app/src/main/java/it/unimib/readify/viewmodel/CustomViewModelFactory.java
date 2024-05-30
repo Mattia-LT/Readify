@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import it.unimib.readify.data.repository.book.IBookRepository;
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.data.repository.collection.ICollectionRepository;
 
-import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.util.ServiceLocator;
 
 /*
-    TestDatabaseViewModelFactory is a Singleton class which maps every ViewModel class
+    CustomViewModelFactory is a Singleton class which maps every ViewModel class
      with its "viewModels" attribute, allowing only one instantiation per ViewModel class.
     This make every ViewModel class having the same behavior as a Singleton class,
      even though it doesn't implement its classic structure.
@@ -26,30 +26,30 @@ import it.unimib.readify.util.TestServiceLocator;
      (each time the data the UI based its appearance changes)
      and 2) an automatic check of data changing during some particular actions (asynchronous actions)
 
-     EDITED: TestDatabaseViewModelFactory now manages the creation of every ViewModel Class
+     EDITED: CustomViewModelFactory now manages the creation of every ViewModel Class
  */
-public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
+public class CustomViewModelFactory implements ViewModelProvider.Factory {
 
-    private static volatile TestDatabaseViewModelFactory INSTANCE = null;
+    private static volatile CustomViewModelFactory INSTANCE = null;
     private final Map<Class<? extends ViewModel>, ViewModel> viewModels = new ConcurrentHashMap<>();
-    private final TestIDatabaseRepository testIDatabaseRepository;
+    private final IUserRepository IUserRepository;
     private final IBookRepository iBookRepository;
     private final ICollectionRepository iCollectionRepository;
 
-    private TestDatabaseViewModelFactory(Application application) {
-        this.testIDatabaseRepository = TestServiceLocator.getInstance(application)
-                .getRepository(TestIDatabaseRepository.class);
-        this.iBookRepository = TestServiceLocator.getInstance(application)
+    private CustomViewModelFactory(Application application) {
+        this.IUserRepository = ServiceLocator.getInstance(application)
+                .getRepository(IUserRepository.class);
+        this.iBookRepository = ServiceLocator.getInstance(application)
                 .getRepository(IBookRepository.class);
-        this.iCollectionRepository = TestServiceLocator.getInstance(application)
+        this.iCollectionRepository = ServiceLocator.getInstance(application)
                 .getRepository(ICollectionRepository.class);
     }
 
-    public static TestDatabaseViewModelFactory getInstance(Application application) {
+    public static CustomViewModelFactory getInstance(Application application) {
         if (INSTANCE == null) {
-            synchronized (TestDatabaseViewModelFactory.class) {
+            synchronized (CustomViewModelFactory.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TestDatabaseViewModelFactory(application);
+                    INSTANCE = new CustomViewModelFactory(application);
                 }
             }
         }
@@ -75,9 +75,9 @@ public class TestDatabaseViewModelFactory implements ViewModelProvider.Factory {
 
     @SuppressWarnings("unchecked")
     private <T extends ViewModel> T createViewModel(Class<T> modelClass) {
-        //creating TestDatabaseViewModel instance
-        if (modelClass.isAssignableFrom(TestDatabaseViewModel.class)) {
-            return (T) new TestDatabaseViewModel(testIDatabaseRepository);
+        //creating UserViewModel instance
+        if (modelClass.isAssignableFrom(UserViewModel.class)) {
+            return (T) new UserViewModel(IUserRepository);
         }
         //creating BookViewModel instance
         if (modelClass.isAssignableFrom(BookViewModel.class)) {

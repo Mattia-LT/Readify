@@ -35,8 +35,8 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.BookViewModel;
 
 public class HomeFragment extends Fragment {
@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
     private BookCarouselAdapter recentBooksAdapter;
     private FragmentHomeBinding fragmentHomeBinding;
     private BookViewModel bookViewModel;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private SharedPreferencesUtil sharedPreferencesUtil;
     private User user;
@@ -179,15 +179,15 @@ public class HomeFragment extends Fragment {
     }
 
     private void initViewModels(){
-        bookViewModel = TestDatabaseViewModelFactory
+        bookViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(BookViewModel.class);
 
-        testDatabaseViewModel = TestDatabaseViewModelFactory
+        userViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+                .create(UserViewModel.class);
 
-        collectionViewModel = TestDatabaseViewModelFactory
+        collectionViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }
@@ -208,8 +208,8 @@ public class HomeFragment extends Fragment {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
-                if(testDatabaseViewModel.isFirstLoading()){
-                    testDatabaseViewModel.setFirstLoading(false);
+                if(userViewModel.isFirstLoading()){
+                    userViewModel.setFirstLoading(false);
                     collectionViewModel.resetLogout();
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
                     bookViewModel.loadRecommendedBooks(user.getRecommended());
@@ -226,7 +226,7 @@ public class HomeFragment extends Fragment {
             }
         };
         //get user data from database
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getRecommendedCarouselLiveData().observe(getViewLifecycleOwner(), recommendedBooksObserver);
     }
 }

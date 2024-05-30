@@ -26,18 +26,18 @@ import java.util.stream.Collectors;
 
 import it.unimib.readify.adapter.FollowListAdapter;
 import it.unimib.readify.databinding.FragmentTabFollowingListBinding;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class TabFollowingListFragment extends Fragment {
 
     private FragmentTabFollowingListBinding fragmentTabFollowingListBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private FollowListAdapter followListAdapter;
-    private List<ExternalUser> followingList;
+    private List<FollowUser> followingList;
     private String idToken;
     private String loggedUserIdToken;
     public TabFollowingListFragment(){}
@@ -61,8 +61,8 @@ public class TabFollowingListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         followListAdapter = new FollowListAdapter(new FollowListAdapter.OnItemClickListener() {
             @Override
-            public void onProfileClick(ExternalUser externalUser) {
-                User selectedUser = externalUser.getUser();
+            public void onProfileClick(FollowUser followUser) {
+                User selectedUser = followUser.getUser();
                 if(!selectedUser.getIdToken().equals(loggedUserIdToken)){
                     NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
                     Navigation.findNavController(requireView()).navigate(action);
@@ -71,18 +71,18 @@ public class TabFollowingListFragment extends Fragment {
             }
 
             @Override
-            public void onFollowButtonClick(ExternalUser user) {
+            public void onFollowButtonClick(FollowUser user) {
                 //TODO testare bene per trovare eventuali errori
-                testDatabaseViewModel.followUser(idToken, user.getIdToken());
-                //testDatabaseViewModel.fetchFollowing(idToken);
+                userViewModel.followUser(idToken, user.getIdToken());
+                //userViewModel.fetchFollowing(idToken);
                 Log.d("TabFollowerListFragment", "followButtonClick premuto con idtoken: " + idToken);
             }
 
             @Override
-            public void onUnfollowButtonClick(ExternalUser user) {
+            public void onUnfollowButtonClick(FollowUser user) {
                 //TODO testare bene per trovare eventuali errori
-                testDatabaseViewModel.unfollowUser(idToken, user.getIdToken());
-                //testDatabaseViewModel.fetchFollowing(idToken);
+                userViewModel.unfollowUser(idToken, user.getIdToken());
+                //userViewModel.fetchFollowing(idToken);
                 Log.d("TabFollowerListFragment", "UnfollowButtonClick premuto con idtoken: " + idToken);
             }
         });
@@ -110,16 +110,16 @@ public class TabFollowingListFragment extends Fragment {
 
 
     private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
 
     private void initObserver(){
         this.followingList = new ArrayList<>();
         final Observer<List<Result>> followingObserver = results -> {
-            List<ExternalUser> followingList = results.stream()
-                    .filter(result -> result instanceof Result.ExternalUserSuccess)
-                    .map(result -> ((Result.ExternalUserSuccess) result).getData())
+            List<FollowUser> followingList = results.stream()
+                    .filter(result -> result instanceof Result.FollowUserSuccess)
+                    .map(result -> ((Result.FollowUserSuccess) result).getData())
                     .collect(Collectors.toList());
             followListAdapter.submitList(followingList);
             this.followingList = followingList;
@@ -131,18 +131,18 @@ public class TabFollowingListFragment extends Fragment {
                 loggedUserIdToken = user.getIdToken();
                 Log.e("USER OBSERVER","TRIGGERED");
                 followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
-                testDatabaseViewModel.fetchFollowing(idToken);
+                userViewModel.fetchFollowing(idToken);
             }
         };
 
-        testDatabaseViewModel.getFollowingListLiveData().observe(getViewLifecycleOwner(), followingObserver);
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getFollowingListLiveData().observe(getViewLifecycleOwner(), followingObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
     private void search(String text) {
-        ArrayList<ExternalUser> filteredList = new ArrayList<>();
+        ArrayList<FollowUser> filteredList = new ArrayList<>();
         text = text.trim();
-        for (ExternalUser user : followingList) {
+        for (FollowUser user : followingList) {
             if (user.getUser().getUsername().toLowerCase().contains((text.toLowerCase()))) {
                 filteredList.add(user);
             }

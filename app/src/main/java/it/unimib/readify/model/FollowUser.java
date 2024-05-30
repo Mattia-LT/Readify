@@ -8,13 +8,13 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 
-public class ExternalUser implements Parcelable {
+public class FollowUser implements Parcelable {
     private boolean read;
     private long timestamp;
     private String idToken;
     private User user;
 
-    public ExternalUser() {}
+    public FollowUser() {}
 
     public boolean isRead() {
         return read;
@@ -68,22 +68,22 @@ public class ExternalUser implements Parcelable {
         this.user = source.readParcelable(User.class.getClassLoader());
     }
 
-    protected ExternalUser(Parcel in) {
+    protected FollowUser(Parcel in) {
         this.read = in.readByte() != 0;
         this.timestamp = in.readLong();
         this.idToken = in.readString();
         this.user = in.readParcelable(User.class.getClassLoader());
     }
 
-    public static final Creator<ExternalUser> CREATOR = new Creator<ExternalUser>() {
+    public static final Creator<FollowUser> CREATOR = new Creator<FollowUser>() {
         @Override
-        public ExternalUser createFromParcel(Parcel source) {
-            return new ExternalUser(source);
+        public FollowUser createFromParcel(Parcel source) {
+            return new FollowUser(source);
         }
 
         @Override
-        public ExternalUser[] newArray(int size) {
-            return new ExternalUser[size];
+        public FollowUser[] newArray(int size) {
+            return new FollowUser[size];
         }
     };
 
@@ -91,7 +91,7 @@ public class ExternalUser implements Parcelable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExternalUser that = (ExternalUser) o;
+        FollowUser that = (FollowUser) o;
         return read == that.read && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(user, that.user);
     }
 
@@ -103,7 +103,7 @@ public class ExternalUser implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return "ExternalUser{" +
+        return "FollowUser{" +
                 "read=" + read +
                 ", timestamp='" + timestamp + '\'' +
                 ", idToken='" + idToken + '\'' +

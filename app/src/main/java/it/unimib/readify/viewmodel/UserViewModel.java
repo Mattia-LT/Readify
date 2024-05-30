@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import it.unimib.readify.data.repository.user.TestIDatabaseRepository;
+import it.unimib.readify.data.repository.user.IUserRepository;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 
-public class TestDatabaseViewModel extends ViewModel {
-    private final TestIDatabaseRepository testDatabaseRepository;
+public class UserViewModel extends ViewModel {
+    private final IUserRepository testDatabaseRepository;
     /*
         With this configuration
          (having two LiveData variables that memorizes data, repositoryData and copiedData),
@@ -63,7 +63,7 @@ public class TestDatabaseViewModel extends ViewModel {
     private boolean isUIRunning;
     private boolean firstLoading = true;
     private boolean continueRegistrationFirstLoading = true;
-    public TestDatabaseViewModel(TestIDatabaseRepository testDatabaseRepository) {
+    public UserViewModel(IUserRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
             With the coming MutableLiveData initialization, repositoryData(1) (ViewModel)

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import it.unimib.readify.data.database.BookRoomDatabase;
+import it.unimib.readify.data.database.CollectionRoomDatabase;
 import it.unimib.readify.data.source.collection.BaseCollectionLocalDataSource;
 import it.unimib.readify.data.source.collection.BaseCollectionRemoteDataSource;
 import it.unimib.readify.data.source.collection.CollectionLocalDataSource;
@@ -34,10 +34,10 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     private final MutableLiveData<Boolean> removeFromCollectionResult;
 
 
-    public static CollectionRepository getInstance(Application application, BookRoomDatabase bookRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
+    public static CollectionRepository getInstance(Application application, CollectionRoomDatabase collectionRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
         return new CollectionRepository(
                 new CollectionRemoteDataSource(application),
-                new CollectionLocalDataSource(bookRoomDatabase, sharedPreferencesUtil, dataEncryptionUtil)
+                new CollectionLocalDataSource(collectionRoomDatabase, sharedPreferencesUtil, dataEncryptionUtil)
         );
     }
 

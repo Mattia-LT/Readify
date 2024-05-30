@@ -25,8 +25,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.BottomSheetCollectionCreationBinding;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     private BottomSheetCollectionCreationBinding binding;
@@ -95,7 +94,7 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void initViewModels() {
-        collectionViewModel = TestDatabaseViewModelFactory
+        collectionViewModel = CustomViewModelFactory
                 .getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }

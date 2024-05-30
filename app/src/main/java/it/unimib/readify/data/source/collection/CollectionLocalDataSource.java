@@ -14,31 +14,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import it.unimib.readify.data.database.BookDao;
-import it.unimib.readify.data.database.BookRoomDatabase;
+import it.unimib.readify.data.database.CollectionDao;
+import it.unimib.readify.data.database.CollectionRoomDatabase;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
-    private final BookDao bookDao;
+    private final CollectionDao collectionDao;
     private final SharedPreferencesUtil sharedPreferencesUtil;
     private final DataEncryptionUtil dataEncryptionUtil;
 
-    public CollectionLocalDataSource(BookRoomDatabase bookRoomDatabase,
+    public CollectionLocalDataSource(CollectionRoomDatabase collectionRoomDatabase,
                                      SharedPreferencesUtil sharedPreferencesUtil,
                                      DataEncryptionUtil dataEncryptionUtil
     ) {
-        this.bookDao = bookRoomDatabase.bookDao();
+        this.collectionDao = collectionRoomDatabase.bookDao();
         this.sharedPreferencesUtil = sharedPreferencesUtil;
         this.dataEncryptionUtil = dataEncryptionUtil;
     }
 
     @Override
     public void initLocalCollections(List<Collection> collectionsToInsert) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            int collectionsDeleted = bookDao.deleteAllCollections();
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            int collectionsDeleted = collectionDao.deleteAllCollections();
             if(collectionsDeleted >= 0){
                 insertCollectionList(collectionsToInsert);
             }
@@ -47,18 +47,18 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void getAllCollections() {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             List<Collection> collectionList;
-            collectionList = bookDao.getAllCollections();
+            collectionList = collectionDao.getAllCollections();
             collectionResponseCallback.onSuccessFetchCollectionsFromLocal(collectionList);
         });
     }
 
     @Override
     public void insertCollectionList(List<Collection> collectionsToInsert) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
 
-            List<Collection> localCollections = bookDao.getAllCollections();
+            List<Collection> localCollections = collectionDao.getAllCollections();
 
             if(collectionsToInsert != null){
                 for(Collection collection : collectionsToInsert){
@@ -71,7 +71,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             }
 
             //todo gestisci errore se id = -1
-            //bookDao.insertCollectionList(localCollections);
+            //collectionDao.insertCollectionList(localCollections);
             //Log.e("OUTPUT LONG LIST", collectionsInsertedIds.toString());
 
             // sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME, LAST_UPDATE, String.valueOf(System.currentTimeMillis()));
@@ -83,11 +83,11 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     private Long insertCollection(Collection collectionToInsert) {
         AtomicLong id = new AtomicLong(-1);
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             if(collectionToInsert != null){
-                List<Collection> localCollections = bookDao.getAllCollections();
+                List<Collection> localCollections = collectionDao.getAllCollections();
                 if(! localCollections.contains(collectionToInsert)) {
-                    id.set(bookDao.insertCollection(collectionToInsert));
+                    id.set(collectionDao.insertCollection(collectionToInsert));
                 }
             }
         });
@@ -96,9 +96,9 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void updateCollection(Collection collectionToUpdate, String operation) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             if(collectionToUpdate != null){
-                int result = bookDao.updateCollection(collectionToUpdate);
+                int result = collectionDao.updateCollection(collectionToUpdate);
                 Log.d("Update result", String.valueOf(result));
                 collectionResponseCallback.onSuccessUpdateCollectionFromLocal();
                 switch (operation){
@@ -138,9 +138,9 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void deleteCollection(Collection collectionToDelete) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             if(collectionToDelete != null){
-                bookDao.deleteCollection(collectionToDelete);
+                collectionDao.deleteCollection(collectionToDelete);
                 collectionResponseCallback.onSuccessDeleteCollectionFromLocal(collectionToDelete);
             } else {
                 collectionResponseCallback.onFailureDeleteCollectionFromLocal("DELETE COLLECTION ERROR");
@@ -150,9 +150,9 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void deleteAllCollections() {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            int collectionCounter = bookDao.getAllCollections().size();
-            int collectionsDeleted = bookDao.deleteAllCollections();
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            int collectionCounter = collectionDao.getAllCollections().size();
+            int collectionsDeleted = collectionDao.deleteAllCollections();
 
             // It means that everything has been deleted
             if (collectionCounter == collectionsDeleted) {
@@ -169,8 +169,8 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void addBookToCollection(String collectionId, OLWorkApiResponse book) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = collectionDao.getCollectionById(collectionId);
             int numberOfBooks = collectionToUpdate.getNumberOfBooks();
             Log.d("numberOfBooks", String.valueOf(numberOfBooks));
             numberOfBooks++;
@@ -189,8 +189,8 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void removeBookFromCollection(String collectionId, String bookId) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = collectionDao.getCollectionById(collectionId);
             int numberOfBooks = collectionToUpdate.getNumberOfBooks() - 1;
             List<String> books = collectionToUpdate.getBooks();
             books.remove(bookId);
@@ -213,8 +213,8 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void renameCollection(String collectionId, String newCollectionName) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = collectionDao.getCollectionById(collectionId);
             collectionToUpdate.setName(newCollectionName);
             updateCollection(collectionToUpdate, OPERATION_RENAME_COLLECTION);
         });
@@ -222,8 +222,8 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     @Override
     public void changeCollectionVisibility(String collectionId, boolean isCollectionVisible) {
-        BookRoomDatabase.databaseWriteExecutor.execute(() -> {
-            Collection collectionToUpdate = bookDao.getCollectionById(collectionId);
+        CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
+            Collection collectionToUpdate = collectionDao.getCollectionById(collectionId);
             collectionToUpdate.setVisible(isCollectionVisible);
             updateCollection(collectionToUpdate, OPERATION_CHANGE_COLLECTION_VISIBILITY);
         });

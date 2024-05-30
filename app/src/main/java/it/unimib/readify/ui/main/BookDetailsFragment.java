@@ -43,15 +43,15 @@ import it.unimib.readify.model.OLAuthorApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class BookDetailsFragment extends Fragment {
 
     private FragmentBookDetailsBinding fragmentBookDetailsBinding;
     private CommentAdapter commentAdapter;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private OLWorkApiResponse receivedBook;
     private User user;
     public BookDetailsFragment() {
@@ -82,7 +82,7 @@ public class BookDetailsFragment extends Fragment {
 
     private void showBookInfo() {
         receivedBook =  BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
-        testDatabaseViewModel.fetchComments(receivedBook.getKey());
+        userViewModel.fetchComments(receivedBook.getKey());
         fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
         loadCover();
         loadAuthors();
@@ -97,8 +97,8 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
 
     private void loadRating(){
@@ -203,7 +203,7 @@ public class BookDetailsFragment extends Fragment {
 
             @Override
             public void onCommentDelete(Comment comment) {
-                testDatabaseViewModel.deleteComment(receivedBook.getKey(), comment);
+                userViewModel.deleteComment(receivedBook.getKey(), comment);
                 List<Comment> newCommentsList = new ArrayList<>(commentAdapter.getCurrentList());
                 newCommentsList.remove(comment);
                 commentAdapter.submitList(newCommentsList);
@@ -227,11 +227,11 @@ public class BookDetailsFragment extends Fragment {
             } else {
                 String bookId = receivedBook.getKey();
                 String idToken = user.getIdToken();
-                testDatabaseViewModel.addComment(commentContent, bookId, idToken);
+                userViewModel.addComment(commentContent, bookId, idToken);
                 editText.getText().clear();
                 InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
-                testDatabaseViewModel.fetchComments(bookId);
+                userViewModel.fetchComments(bookId);
             }
         };
 
@@ -246,7 +246,7 @@ public class BookDetailsFragment extends Fragment {
                     .collect(Collectors.toList());
             commentAdapter.submitList(commentResultList);
         };
-        testDatabaseViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
+        userViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
         final Observer<Result> loggedUserObserver = result -> {
             Log.d("BookDetails fragment", "user changed");
@@ -256,6 +256,6 @@ public class BookDetailsFragment extends Fragment {
             }
         };
         //get user data from database
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 }

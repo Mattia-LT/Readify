@@ -13,15 +13,14 @@ import it.unimib.readify.data.source.user.BaseUserAuthenticationRemoteDataSource
 import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
 import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
-import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Comment;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
-public class TestDatabaseRepository implements TestIDatabaseRepository, UserResponseCallback {
+public class UserRepository implements IUserRepository, UserResponseCallback {
 
     private final BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
     private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
@@ -38,13 +37,13 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     private final MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
 
-    public static TestIDatabaseRepository getInstance(Application application) {
-        return new TestDatabaseRepository(new UserAuthenticationRemoteDataSource(),
+    public static IUserRepository getInstance(Application application) {
+        return new UserRepository(new UserAuthenticationRemoteDataSource(),
                 new UserDataRemoteDataSource(new SharedPreferencesUtil(application)));
     }
 
-    private TestDatabaseRepository(BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource,
-                                  BaseUserDataRemoteDataSource userDataRemoteDataSource) {
+    private UserRepository(BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource,
+                           BaseUserDataRemoteDataSource userDataRemoteDataSource) {
         this.userAuthRemoteDataSource = userAuthRemoteDataSource;
         this.userDataRemoteDataSource = userDataRemoteDataSource;
         this.userMutableLiveData = new MutableLiveData<>();
@@ -292,10 +291,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onSuccessFetchFollowersFromRemoteDatabase(List<ExternalUser> followerList) {
+    public void onSuccessFetchFollowersFromRemoteDatabase(List<FollowUser> followerList) {
         List<Result> followersResultList = new ArrayList<>();
-        for(ExternalUser follower : followerList){
-            followersResultList.add(new Result.ExternalUserSuccess(follower));
+        for(FollowUser follower : followerList){
+            followersResultList.add(new Result.FollowUserSuccess(follower));
         }
         followerListLiveData.postValue(followersResultList);
     }
@@ -306,10 +305,10 @@ public class TestDatabaseRepository implements TestIDatabaseRepository, UserResp
     }
 
     @Override
-    public void onSuccessFetchFollowingFromRemoteDatabase(List<ExternalUser> followingList) {
+    public void onSuccessFetchFollowingFromRemoteDatabase(List<FollowUser> followingList) {
         List<Result> followingResultList = new ArrayList<>();
-        for(ExternalUser following : followingList){
-            followingResultList.add(new Result.ExternalUserSuccess(following));
+        for(FollowUser following : followingList){
+            followingResultList.add(new Result.FollowUserSuccess(following));
         }
         followingListLiveData.postValue(followingResultList);
     }

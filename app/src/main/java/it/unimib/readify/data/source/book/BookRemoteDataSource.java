@@ -23,7 +23,7 @@ import it.unimib.readify.model.OLRatingResponse;
 import it.unimib.readify.model.OLSearchApiResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.data.service.OLApiService;
-import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.util.ServiceLocator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +34,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
     private final Application application;
 
     public BookRemoteDataSource(Application application){
-        this.olApiService = TestServiceLocator.getInstance(application).getOLApiService();
+        this.olApiService = ServiceLocator.getInstance(application).getOLApiService();
         this.application = application;
     }
 

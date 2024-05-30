@@ -37,7 +37,7 @@ import it.unimib.readify.model.OLDescription;
 import it.unimib.readify.model.OLDocs;
 import it.unimib.readify.model.OLRatingResponse;
 import it.unimib.readify.model.OLWorkApiResponse;
-import it.unimib.readify.util.TestServiceLocator;
+import it.unimib.readify.util.ServiceLocator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,7 +49,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
 
     public CollectionRemoteDataSource(Application application) {
         this.application = application;
-        this.olApiService = TestServiceLocator.getInstance(application).getOLApiService();
+        this.olApiService = ServiceLocator.getInstance(application).getOLApiService();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);
         databaseReference = firebaseDatabase.getReference();
     }

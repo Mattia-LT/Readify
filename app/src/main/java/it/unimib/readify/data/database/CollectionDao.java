@@ -12,7 +12,7 @@ import java.util.List;
 import it.unimib.readify.model.Collection;
 
 @Dao
-public interface BookDao {
+public interface CollectionDao {
 
     @Query("SELECT * FROM collection ORDER BY name ASC")
     List<Collection> getAllCollections();

@@ -23,8 +23,8 @@ import it.unimib.readify.adapter.ProfileImageSelectorAdapter;
 import it.unimib.readify.databinding.FragmentProfileImageSelectorBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class ProfileImageSelector extends Fragment implements ProfileImageSelectorAdapter.OnImageClickListener {
 
@@ -32,7 +32,7 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ProfileImageSelectorAdapter profileImageSelectorAdapter;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private Observer<Result> userObserver;
     private User loggedUser;
 
@@ -55,8 +55,8 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
         userObserver = result -> {
             if(result.isSuccess()) {
@@ -66,7 +66,7 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
             }
         };
 
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
 
         recyclerView = fragmentProfileImageSelectorBinding.recyclerviewProfileImage;
         layoutManager = new GridLayoutManager(requireContext(), 2);
@@ -81,9 +81,9 @@ public class ProfileImageSelector extends Fragment implements ProfileImageSelect
     public void onImageClick(int position) {
         imageResourceId = arr[position];
         loggedUser.setAvatar("avatar"+(position+1));
-        testDatabaseViewModel.setUserAvatar(loggedUser);
+        userViewModel.setUserAvatar(loggedUser);
         Toast.makeText(requireContext(), "Immagine selezionata: " + position, Toast.LENGTH_SHORT).show();
-        NavDirections action = ProfileImageSelectorDirections.actionProfileImageSelectorFragmentToSettingsFragment();
+        NavDirections action = ProfileImageSelectorDirections.actionProfileImageSelectorFragmentToEditProfileFragment();
         Navigation.findNavController(requireView()).navigate(action);
     }
 }

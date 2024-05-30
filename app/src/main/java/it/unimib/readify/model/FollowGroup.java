@@ -7,13 +7,13 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-public class ExternalGroup implements Parcelable {
+public class FollowGroup implements Parcelable {
     private int counter;
-    private List<ExternalUser> users;
+    private List<FollowUser> users;
 
-    public ExternalGroup() {}
+    public FollowGroup() {}
 
-    public ExternalGroup(int counter, List<ExternalUser> users) {
+    public FollowGroup(int counter, List<FollowUser> users) {
         this.counter = counter;
         this.users = users;
     }
@@ -26,11 +26,11 @@ public class ExternalGroup implements Parcelable {
         this.counter = counter;
     }
 
-    public List<ExternalUser> getUsers() {
+    public List<FollowUser> getUsers() {
         return users;
     }
 
-    public void setUsers(List<ExternalUser> users) {
+    public void setUsers(List<FollowUser> users) {
         this.users = users;
     }
 
@@ -48,30 +48,30 @@ public class ExternalGroup implements Parcelable {
 
     public void readFromParcel(Parcel source) {
         this.counter = source.readInt();
-        this.users = source.createTypedArrayList(ExternalUser.CREATOR);
+        this.users = source.createTypedArrayList(FollowUser.CREATOR);
     }
 
-    protected ExternalGroup(Parcel in) {
+    protected FollowGroup(Parcel in) {
         this.counter = in.readInt();
-        this.users = in.createTypedArrayList(ExternalUser.CREATOR);
+        this.users = in.createTypedArrayList(FollowUser.CREATOR);
     }
 
-    public static final Creator<ExternalGroup> CREATOR = new Creator<ExternalGroup>() {
+    public static final Creator<FollowGroup> CREATOR = new Creator<FollowGroup>() {
         @Override
-        public ExternalGroup createFromParcel(Parcel source) {
-            return new ExternalGroup(source);
+        public FollowGroup createFromParcel(Parcel source) {
+            return new FollowGroup(source);
         }
 
         @Override
-        public ExternalGroup[] newArray(int size) {
-            return new ExternalGroup[size];
+        public FollowGroup[] newArray(int size) {
+            return new FollowGroup[size];
         }
     };
 
     @NonNull
     @Override
     public String toString() {
-        return "ExternalGroup{" +
+        return "FollowGroup{" +
                 "counter=" + counter +
                 ", users=" + users +
                 '}';

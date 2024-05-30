@@ -5,13 +5,9 @@
 
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_settings"
+            android:id="@+id/nav_edit_profile"
             android:icon="@drawable/ic_baseline_settings"
-            android:title="Settings"/>
-        <item
-            android:id="@+id/nav_visibility"
-            android:icon="@drawable/ic_baseline_lock_open_24"
-            android:title="Privacy"/>
+            android:title="@string/pa_edit_profile"/>
     </group>
 
     <item

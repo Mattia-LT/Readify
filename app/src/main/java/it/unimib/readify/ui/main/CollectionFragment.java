@@ -50,13 +50,13 @@ import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.viewmodel.CollectionViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class CollectionFragment extends Fragment {
 
     private FragmentCollectionBinding collectionProfileBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private Collection currentCollection;
     private String loggedUserIdToken;
@@ -97,10 +97,10 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initViewModels(){
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
 
-        collectionViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
+        collectionViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }
 
@@ -111,7 +111,7 @@ public class CollectionFragment extends Fragment {
                 Log.e("USER OBSERVER","TRIGGERED");
             }
         };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
         final Observer<List<Result>> collectionObserver = results -> {
             //orElse is the defaultValue, it should never be called but this is a safety check

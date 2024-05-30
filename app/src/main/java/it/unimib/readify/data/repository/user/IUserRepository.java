@@ -11,7 +11,7 @@ import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 
-public interface TestIDatabaseRepository {
+public interface IUserRepository {
 
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);

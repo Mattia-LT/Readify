@@ -25,12 +25,12 @@ import java.util.Objects;
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.NotificationsAdapter;
 import it.unimib.readify.databinding.FragmentNotificationsPageBinding;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class NotificationsPageFragment extends Fragment {
 
@@ -40,7 +40,7 @@ public class NotificationsPageFragment extends Fragment {
      */
     private FragmentNotificationsPageBinding fragmentNotificationsPageBinding;
     private String receivedContent;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private HashMap<String, ArrayList<Notification>> notifications;
     private User user;
     private Observer<Result> loggedUserObserver;
@@ -81,7 +81,7 @@ public class NotificationsPageFragment extends Fragment {
         super.onDestroyView();
         //todo remove field followedByUser from notifications
         Log.d("set notifications read", "read");
-        testDatabaseViewModel.setNotificationsList(user.getIdToken(), receivedContent, notifications);
+        userViewModel.setNotificationsList(user.getIdToken(), receivedContent, notifications);
     }
 
     private void loadMenu(){
@@ -91,8 +91,8 @@ public class NotificationsPageFragment extends Fragment {
     }
 
     public void initViewModels() {
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
 
     public void initObservers() {
@@ -112,17 +112,17 @@ public class NotificationsPageFragment extends Fragment {
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
                 run[0] = true;
-                testDatabaseViewModel.fetchNotifications(user.getIdToken());
+                userViewModel.fetchNotifications(user.getIdToken());
                 //send notifications
                 if(checkSendingNotifications()) {
                     Log.d("checkSendingNotifications", "send");
-                    for (ExternalUser externalUser: user.getFollowing().getUsers()) {
-                        if(!externalUser.isRead()) {
-                            testDatabaseViewModel.addNotification(externalUser.getIdToken(), "newFollowers", user.getIdToken());
-                            externalUser.setRead(true);
+                    for (FollowUser followUser : user.getFollowing().getUsers()) {
+                        if(!followUser.isRead()) {
+                            userViewModel.addNotification(followUser.getIdToken(), "newFollowers", user.getIdToken());
+                            followUser.setRead(true);
                         }
                     }
-                    testDatabaseViewModel.setUserFollowing(user);
+                    userViewModel.setUserFollowing(user);
                 }
             }
         };
@@ -139,7 +139,7 @@ public class NotificationsPageFragment extends Fragment {
                     //set followedByUser
                     for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
                         if(user.getFollowing().getUsers() != null && !user.getFollowing().getUsers().isEmpty()) {
-                            for (ExternalUser following: user.getFollowing().getUsers()) {
+                            for (FollowUser following: user.getFollowing().getUsers()) {
                                 if(notification.getIdToken().equals(following.getIdToken())) {
                                     notification.setFollowedByUser(true);
                                 }
@@ -151,7 +151,7 @@ public class NotificationsPageFragment extends Fragment {
                     //complete fetch
                     if(run[0]) {
                         run[0] = false;
-                        testDatabaseViewModel.completeFetchNotifications(result);
+                        userViewModel.completeFetchNotifications(result);
                     }
                     if(checkFetchingNotifications()) {
                         updateUI();
@@ -159,8 +159,8 @@ public class NotificationsPageFragment extends Fragment {
                 }
             }
         };
-        testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        testDatabaseViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
     public void updateUI() {
@@ -211,13 +211,13 @@ public class NotificationsPageFragment extends Fragment {
             @Override
             public void onFollowUser(String externalUserIdToken) {
                 //todo "show all" should not popping up
-                testDatabaseViewModel.followUser(user.getIdToken(), externalUserIdToken);
+                userViewModel.followUser(user.getIdToken(), externalUserIdToken);
             }
             @Override
             public void onUnfollowUser(String externalUserIdToken) {
-                testDatabaseViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
+                userViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
                 //if unfollow has been confirmed
-                testDatabaseViewModel.removeNotification(externalUserIdToken, "newFollowers", user.getIdToken());
+                userViewModel.removeNotification(externalUserIdToken, "newFollowers", user.getIdToken());
             }
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
@@ -266,8 +266,8 @@ public class NotificationsPageFragment extends Fragment {
     public boolean checkSendingNotifications() {
         boolean sendNotifications = false;
         if(user.getFollowing().getUsers() != null) {
-            for (ExternalUser externalUser: user.getFollowing().getUsers()) {
-                if(!externalUser.isRead()) {
+            for (FollowUser followUser : user.getFollowing().getUsers()) {
+                if(!followUser.isRead()) {
                     sendNotifications = true;
                     break;
                 }

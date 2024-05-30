@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Objects;
 
 import it.unimib.readify.model.Comment;
-import it.unimib.readify.model.ExternalGroup;
-import it.unimib.readify.model.ExternalUser;
+import it.unimib.readify.model.FollowGroup;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
@@ -569,16 +569,16 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         followersReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<ExternalUser> followers = new ArrayList<>();
+                List<FollowUser> followers = new ArrayList<>();
                 int totalFollowers = (int) snapshot.getChildrenCount();
                 final int[] followersLoaded = {0};
                 for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
-                    ExternalUser follower = commentSnapshot.getValue(ExternalUser.class);
+                    FollowUser follower = commentSnapshot.getValue(FollowUser.class);
                     if (follower != null) {
                         fetchUserFromExternalUser(follower, new UserFetchFromExternalUserCallback(){
                             @Override
-                            public void onUserFetched(ExternalUser externalUser) {
-                                followers.add(externalUser);
+                            public void onUserFetched(FollowUser followUser) {
+                                followers.add(followUser);
                                 followersLoaded[0]++;
                                 if(followersLoaded[0] == totalFollowers){
                                     userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
@@ -586,7 +586,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             }
 
                             @Override
-                            public void onUserFetchFailed(ExternalUser externalUser) {
+                            public void onUserFetchFailed(FollowUser followUser) {
                                 followersLoaded[0]++;
                                 if (followersLoaded[0] == totalFollowers) {
                                     // All user information retrieved (even if some failed), trigger callback
@@ -617,16 +617,16 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         followingReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<ExternalUser> followings = new ArrayList<>();
+                List<FollowUser> followings = new ArrayList<>();
                 int totalFollowings = (int) snapshot.getChildrenCount();
                 final int[] followingsLoaded = {0};
                 for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
-                    ExternalUser following = commentSnapshot.getValue(ExternalUser.class);
+                    FollowUser following = commentSnapshot.getValue(FollowUser.class);
                     if (following != null) {
                         fetchUserFromExternalUser(following, new UserFetchFromExternalUserCallback(){
                             @Override
-                            public void onUserFetched(ExternalUser externalUser) {
-                                followings.add(externalUser);
+                            public void onUserFetched(FollowUser followUser) {
+                                followings.add(followUser);
                                 followingsLoaded[0]++;
                                 if(followingsLoaded[0] == totalFollowings){
                                     userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
@@ -634,7 +634,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                             }
 
                             @Override
-                            public void onUserFetchFailed(ExternalUser externalUser) {
+                            public void onUserFetchFailed(FollowUser followUser) {
                                 followingsLoaded[0]++;
                                 if (followingsLoaded[0] == totalFollowings) {
                                     userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
@@ -673,26 +673,26 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ExternalGroup newExternalGroup = new ExternalGroup();
-                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
-                if(externalGroup != null){
-                    int counter = externalGroup.getCounter();
+                FollowGroup newFollowGroup = new FollowGroup();
+                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
+                if(followGroup != null){
+                    int counter = followGroup.getCounter();
                     counter = counter + 1;
 
-                    ExternalUser newFollower = new ExternalUser();
+                    FollowUser newFollower = new FollowUser();
                     newFollower.setTimestamp(new Date().getTime());
                     newFollower.setRead(false);
                     newFollower.setIdToken(idTokenLoggedUser);
 
-                    List<ExternalUser> followersList = externalGroup.getUsers();
+                    List<FollowUser> followersList = followGroup.getUsers();
                     if(followersList == null){
                         followersList = new ArrayList<>();
                     }
                     followersList.add(newFollower);
 
-                    newExternalGroup.setUsers(followersList);
-                    newExternalGroup.setCounter(counter);
-                    followedUserFollowersReference.setValue(newExternalGroup);
+                    newFollowGroup.setUsers(followersList);
+                    newFollowGroup.setCounter(counter);
+                    followedUserFollowersReference.setValue(newFollowGroup);
 
                     insertionsToDo[0] -= 1;
                     if(insertionsToDo[0] == 0){
@@ -713,25 +713,25 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ExternalGroup newExternalGroup = new ExternalGroup();
-                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
-                if(externalGroup != null){
-                    int counter = externalGroup.getCounter();
+                FollowGroup newFollowGroup = new FollowGroup();
+                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
+                if(followGroup != null){
+                    int counter = followGroup.getCounter();
                     counter = counter + 1;
 
-                    ExternalUser newFollowing = new ExternalUser();
+                    FollowUser newFollowing = new FollowUser();
                     newFollowing.setTimestamp(new Date().getTime());
                     newFollowing.setIdToken(idTokenFollowedUser);
 
-                    List<ExternalUser> followingList = externalGroup.getUsers();
+                    List<FollowUser> followingList = followGroup.getUsers();
                     if(followingList == null){
                         followingList = new ArrayList<>();
                     }
                     followingList.add(newFollowing);
 
-                    newExternalGroup.setUsers(followingList);
-                    newExternalGroup.setCounter(counter);
-                    loggedUserFollowingReference.setValue(newExternalGroup);
+                    newFollowGroup.setUsers(followingList);
+                    newFollowGroup.setCounter(counter);
+                    loggedUserFollowingReference.setValue(newFollowGroup);
 
                     insertionsToDo[0] -= 1;
                     if(insertionsToDo[0] == 0){
@@ -768,20 +768,20 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ExternalGroup newExternalGroup = new ExternalGroup();
-                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
-                if(externalGroup != null){
-                    int counter = externalGroup.getCounter();
+                FollowGroup newFollowGroup = new FollowGroup();
+                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
+                if(followGroup != null){
+                    int counter = followGroup.getCounter();
                     counter = counter - 1;
 
-                    List<ExternalUser> followersList = externalGroup.getUsers();
+                    List<FollowUser> followersList = followGroup.getUsers();
                     if(followersList == null){
                         followersList = new ArrayList<>();
                     }
                     followersList.removeIf(follower -> follower.getIdToken().equals(idTokenLoggedUser));
-                    newExternalGroup.setUsers(followersList);
-                    newExternalGroup.setCounter(counter);
-                    followedUserFollowersReference.setValue(newExternalGroup);
+                    newFollowGroup.setUsers(followersList);
+                    newFollowGroup.setCounter(counter);
+                    followedUserFollowersReference.setValue(newFollowGroup);
 
                     deletionsToDo[0] -= 1;
                     if(deletionsToDo[0] == 0){
@@ -802,22 +802,22 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ExternalGroup newExternalGroup = new ExternalGroup();
-                ExternalGroup externalGroup = dataSnapshot.getValue(ExternalGroup.class);
-                if(externalGroup != null){
-                    int counter = externalGroup.getCounter();
+                FollowGroup newFollowGroup = new FollowGroup();
+                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
+                if(followGroup != null){
+                    int counter = followGroup.getCounter();
                     counter = counter - 1;
 
-                    List<ExternalUser> followingList = externalGroup.getUsers();
+                    List<FollowUser> followingList = followGroup.getUsers();
                     if(followingList == null){
                         followingList = new ArrayList<>();
                     }
 
                     followingList.removeIf(following -> following.getIdToken().equals(idTokenFollowedUser));
 
-                    newExternalGroup.setUsers(followingList);
-                    newExternalGroup.setCounter(counter);
-                    loggedUserFollowingReference.setValue(newExternalGroup);
+                    newFollowGroup.setUsers(followingList);
+                    newFollowGroup.setCounter(counter);
+                    loggedUserFollowingReference.setValue(newFollowGroup);
 
                     deletionsToDo[0] -= 1;
                     if(deletionsToDo[0] == 0){
@@ -960,56 +960,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         }
     }
 
-   /*
-    @Override
-    public void getUserPreferences(String idToken) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
-                child(SHARED_PREFERENCES_COUNTRY_OF_INTEREST).get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String countryOfInterest = task.getResult().getValue(String.class);
-                        sharedPreferencesUtil.writeStringData(
-                                SHARED_PREFERENCES_FILE_NAME,
-                                SHARED_PREFERENCES_COUNTRY_OF_INTEREST,
-                                countryOfInterest);
-
-                        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
-                                child(SHARED_PREFERENCES_TOPICS_OF_INTEREST).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            List<String> favoriteTopics = new ArrayList<>();
-                                            for(DataSnapshot ds : task.getResult().getChildren()) {
-                                                String favoriteTopic = ds.getValue(String.class);
-                                                favoriteTopics.add(favoriteTopic);
-                                            }
-
-                                            if (favoriteTopics.size() > 0) {
-                                                Set<String> favoriteNewsSet = new HashSet<>(favoriteTopics);
-                                                favoriteNewsSet.addAll(favoriteTopics);
-
-                                                sharedPreferencesUtil.writeStringSetData(
-                                                        SHARED_PREFERENCES_FILE_NAME,
-                                                        SHARED_PREFERENCES_TOPICS_OF_INTEREST,
-                                                        favoriteNewsSet);
-                                            }
-                                            userResponseCallback.onSuccessFromGettingUserPreferences();
-                                        }
-                                    }
-                                });
-                    }
-                });
-    }
-
-    @Override
-    public void saveUserPreferences(String favoriteCountry, Set<String> favoriteTopics, String idToken) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
-                child(SHARED_PREFERENCES_COUNTRY_OF_INTEREST).setValue(favoriteCountry);
-
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).
-                child(SHARED_PREFERENCES_TOPICS_OF_INTEREST).setValue(new ArrayList<>(favoriteTopics));
-    }
-    */
-
     private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){
         Log.d("DataSource", "start user retrieve");
 
@@ -1034,24 +984,24 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    private void fetchUserFromExternalUser(ExternalUser externalUser, UserFetchFromExternalUserCallback callback){
+    private void fetchUserFromExternalUser(FollowUser followUser, UserFetchFromExternalUserCallback callback){
         //todo manage errors
 
         DatabaseReference userReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
-                .child(externalUser.getIdToken());
+                .child(followUser.getIdToken());
         userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                externalUser.setUser(user);
-                callback.onUserFetched(externalUser);
+                followUser.setUser(user);
+                callback.onUserFetched(followUser);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                externalUser.setUser(null);
-                callback.onUserFetched(externalUser);
+                followUser.setUser(null);
+                callback.onUserFetched(followUser);
             }
         });
     }
@@ -1063,7 +1013,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     private interface UserFetchFromExternalUserCallback {
-        void onUserFetched(ExternalUser externalUser);
-        void onUserFetchFailed(ExternalUser externalUser);
+        void onUserFetched(FollowUser followUser);
+        void onUserFetchFailed(FollowUser followUser);
     }
 }

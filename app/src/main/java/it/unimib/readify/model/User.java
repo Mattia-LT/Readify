@@ -19,8 +19,8 @@ public class User implements Parcelable {
     private List<Social> socialLinks;
     private String username;
     private String visibility;
-    private ExternalGroup followers;
-    private ExternalGroup following;
+    private FollowGroup followers;
+    private FollowGroup following;
     private String idToken;
 
     public User() {}
@@ -39,7 +39,7 @@ public class User implements Parcelable {
 
     public User(String avatar, String biography, HashMap<String, Integer> recommended,
                 String email, String gender, List<Social> socialLinks, String username,
-                String visibility, ExternalGroup followers, ExternalGroup following,
+                String visibility, FollowGroup followers, FollowGroup following,
                 String idToken) {
         this.avatar = avatar;
         this.biography = biography;
@@ -132,19 +132,19 @@ public class User implements Parcelable {
         this.visibility = visibility;
     }
 
-    public ExternalGroup getFollowers() {
+    public FollowGroup getFollowers() {
         return followers;
     }
 
-    public void setFollowers(ExternalGroup followers) {
+    public void setFollowers(FollowGroup followers) {
         this.followers = followers;
     }
 
-    public ExternalGroup getFollowing() {
+    public FollowGroup getFollowing() {
         return following;
     }
 
-    public void setFollowing(ExternalGroup following) {
+    public void setFollowing(FollowGroup following) {
         this.following = following;
     }
 
@@ -185,8 +185,8 @@ public class User implements Parcelable {
         this.socialLinks = source.createTypedArrayList(Social.CREATOR);
         this.username = source.readString();
         this.visibility = source.readString();
-        this.followers = source.readParcelable(ExternalGroup.class.getClassLoader());
-        this.following = source.readParcelable(ExternalGroup.class.getClassLoader());
+        this.followers = source.readParcelable(FollowGroup.class.getClassLoader());
+        this.following = source.readParcelable(FollowGroup.class.getClassLoader());
         this.idToken = source.readString();
     }
 
@@ -199,8 +199,8 @@ public class User implements Parcelable {
         this.socialLinks = in.createTypedArrayList(Social.CREATOR);
         this.username = in.readString();
         this.visibility = in.readString();
-        this.followers = in.readParcelable(ExternalGroup.class.getClassLoader());
-        this.following = in.readParcelable(ExternalGroup.class.getClassLoader());
+        this.followers = in.readParcelable(FollowGroup.class.getClassLoader());
+        this.following = in.readParcelable(FollowGroup.class.getClassLoader());
         this.idToken = in.readString();
     }
 

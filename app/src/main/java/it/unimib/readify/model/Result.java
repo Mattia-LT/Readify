@@ -9,7 +9,7 @@ public abstract class Result {
                 this instanceof UserSuccess ||
                 this instanceof CommentSuccess ||
                 this instanceof CollectionSuccess ||
-                this instanceof ExternalUserSuccess;
+                this instanceof FollowUserSuccess;
     }
 
     /**
@@ -57,13 +57,13 @@ public abstract class Result {
         }
     }
 
-    public static final class ExternalUserSuccess extends Result{
-        private final ExternalUser externalUser;
-        public ExternalUserSuccess(ExternalUser externalUser) {
-            this.externalUser = externalUser;
+    public static final class FollowUserSuccess extends Result{
+        private final FollowUser followUser;
+        public FollowUserSuccess(FollowUser followUser) {
+            this.followUser = followUser;
         }
-        public ExternalUser getData() {
-            return externalUser;
+        public FollowUser getData() {
+            return followUser;
         }
     }
 

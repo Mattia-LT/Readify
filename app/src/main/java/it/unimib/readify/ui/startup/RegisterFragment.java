@@ -34,13 +34,13 @@ import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.util.DataEncryptionUtil;
-import it.unimib.readify.viewmodel.TestDatabaseViewModel;
-import it.unimib.readify.viewmodel.TestDatabaseViewModelFactory;
+import it.unimib.readify.viewmodel.CustomViewModelFactory;
+import it.unimib.readify.viewmodel.UserViewModel;
 
 public class RegisterFragment extends Fragment{
 
     private FragmentRegisterBinding fragmentRegisterBinding;
-    private TestDatabaseViewModel testDatabaseViewModel;
+    private UserViewModel userViewModel;
     private Observer<Result> observer;
     private DataEncryptionUtil dataEncryptionUtil;
 
@@ -53,8 +53,8 @@ public class RegisterFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        testDatabaseViewModel = TestDatabaseViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(TestDatabaseViewModel.class);
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
         Log.d("registration fragment", "onCreate");
         dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
     }
@@ -68,7 +68,7 @@ public class RegisterFragment extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         Log.d("registration fragment", "onViewCreated");
-        testDatabaseViewModel.setUIRunning(false);
+        userViewModel.setUIRunning(false);
 
         //registration set data
         fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
@@ -86,12 +86,12 @@ public class RegisterFragment extends Fragment{
             String passwordConfirm = "password";
 
             if (isEmailOk(email) && isPasswordOk(password) && isPasswordConfirmOk(passwordConfirm)) {
-                testDatabaseViewModel.setUserMutableLiveData(email, password, false);
+                userViewModel.setUserMutableLiveData(email, password, false);
 
                 //registration action
                 observer = result -> {
                     Log.d("registration fragment", "data changed");
-                    if(testDatabaseViewModel.isUIRunning()) {
+                    if(userViewModel.isUIRunning()) {
                         if(result != null) {
                             if(result.isSuccess()) {
                                 User user = ((Result.UserSuccess) result).getData();
@@ -103,7 +103,7 @@ public class RegisterFragment extends Fragment{
                         }
                     }
                 };
-                testDatabaseViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
+                userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
 
 
             } else {
@@ -128,7 +128,7 @@ public class RegisterFragment extends Fragment{
     public void onDestroyView() {
         super.onDestroyView();
         Log.d("registration fragment", "onDestroyView");
-        testDatabaseViewModel.getUserMediatorLiveData().removeObserver(observer);
+        userViewModel.getUserMediatorLiveData().removeObserver(observer);
     }
 
     @Override

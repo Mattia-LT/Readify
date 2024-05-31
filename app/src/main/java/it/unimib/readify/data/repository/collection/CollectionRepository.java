@@ -170,6 +170,11 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     @Override
     public void onSuccessInsertCollectionFromLocal(List<Collection> collectionList) {
         Log.d("CollectionRepository", "Collection created successfully.");
+        List<Result> resultList = new ArrayList<>();
+        for(Collection collection : collectionList){
+            resultList.add(new Result.CollectionSuccess(collection));
+        }
+        loggedUserCollectionListLiveData.postValue(resultList);
     }
 
     @Override
@@ -199,10 +204,16 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     //todo trasforma in onSuccess e fai onFailure
     @Override
-    public void onCreateCollectionResult(Collection collection) {
+    public void onSuccessCreateCollectionFromRemote(Collection collection) {
         ArrayList<Collection> oneItemCollectionList = new ArrayList<>();
         oneItemCollectionList.add(collection);
         bookLocalDataSource.insertCollectionList(oneItemCollectionList);
+    }
+
+    @Override
+    public void onFailureCreateCollectionFromRemote(String errorMessage) {
+        //todo gestisci errori
+        Log.e("errore remote creazione", errorMessage);
     }
 
     @Override

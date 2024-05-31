@@ -95,10 +95,12 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         String collectionId = newCollectionReference.getKey();
         if(collectionId != null){
             Collection newCollection = new Collection(collectionId, collectionName, visible, new ArrayList<>());
-            newCollectionReference.setValue(newCollection);
-            collectionResponseCallback.onCreateCollectionResult(newCollection);
+            newCollectionReference.setValue(newCollection)
+                    .addOnSuccessListener(aVoid -> collectionResponseCallback.onSuccessCreateCollectionFromRemote(newCollection))
+                    .addOnFailureListener(e -> collectionResponseCallback.onFailureCreateCollectionFromRemote(e.getLocalizedMessage()));
         } else {
-            //todo error callback
+            //todo stringa di errore collectionID nullo, magari scriverla meglio
+            collectionResponseCallback.onFailureCreateCollectionFromRemote("Unique ID provided by firebase is null.");
         }
 
     }
@@ -245,12 +247,8 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 .child(FIREBASE_COLLECTIONS_NAME_FIELD);
 
         collectionNameReference.setValue(newCollectionName)
-                .addOnSuccessListener(aVoid -> {
-                    collectionResponseCallback.onSuccessRenameCollectionFromRemote(collectionId, newCollectionName);
-                })
-                .addOnFailureListener(e -> {
-                    collectionResponseCallback.onFailureRenameCollectionFromRemote(e.getLocalizedMessage());
-                });
+                .addOnSuccessListener(aVoid -> collectionResponseCallback.onSuccessRenameCollectionFromRemote(collectionId, newCollectionName))
+                .addOnFailureListener(e -> collectionResponseCallback.onFailureRenameCollectionFromRemote(e.getLocalizedMessage()));
     }
 
     @Override
@@ -262,12 +260,8 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 .child(FIREBASE_COLLECTIONS_VISIBILITY_FIELD);
 
         collectionVisibilityReference.setValue(isCollectionVisible)
-                .addOnSuccessListener(aVoid -> {
-                    collectionResponseCallback.onSuccessChangeCollectionVisibilityFromRemote(collectionId, isCollectionVisible);
-                })
-                .addOnFailureListener(e -> {
-                    collectionResponseCallback.onFailureChangeCollectionVisibilityFromRemote(e.getLocalizedMessage());
-                });
+                .addOnSuccessListener(aVoid -> collectionResponseCallback.onSuccessChangeCollectionVisibilityFromRemote(collectionId, isCollectionVisible))
+                .addOnFailureListener(e -> collectionResponseCallback.onFailureChangeCollectionVisibilityFromRemote(e.getLocalizedMessage()));
     }
 
 

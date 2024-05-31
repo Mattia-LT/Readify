@@ -14,7 +14,8 @@ public interface CollectionResponseCallback {
     void onFailureDeleteCollectionFromLocal(String errorMessage);
     void onSuccessDeleteCollectionFromRemote(Collection deletedCollection);
     void onFailureDeleteCollectionFromRemote(String errorMessage);
-    void onCreateCollectionResult(Collection collection);
+    void onSuccessCreateCollectionFromRemote(Collection collection);
+    void onFailureCreateCollectionFromRemote(String errorMessage);
     void onSuccessAddBookToCollectionFromRemote(String collectionId, OLWorkApiResponse book);
     void onSuccessUpdateCollectionFromLocal();
     void onFailureUpdateCollectionFromLocal(String message);

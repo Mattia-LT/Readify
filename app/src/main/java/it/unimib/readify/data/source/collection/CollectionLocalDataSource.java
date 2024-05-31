@@ -60,24 +60,20 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
             List<Collection> localCollections = collectionDao.getAllCollections();
 
+            //TODO sistemare vicenda degli id = -1
             if(collectionsToInsert != null){
                 for(Collection collection : collectionsToInsert){
-                    if(! localCollections.contains(collection)){
+                    if(!localCollections.contains(collection)){
                         localCollections.add(collection);
                         Long id = insertCollection(collection);
-                        Log.e(" LONG ID", String.valueOf(id));
+                        Log.e("LONG ID", String.valueOf(id));
+                        if(id == -1){
+                            Log.e("LocalDataSource - insertCollectionList","Error with collection : " + collection.getName());
+                        }
                     }
                 }
             }
-
-            //todo gestisci errore se id = -1
-            //collectionDao.insertCollectionList(localCollections);
-            //Log.e("OUTPUT LONG LIST", collectionsInsertedIds.toString());
-
-            // sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME, LAST_UPDATE, String.valueOf(System.currentTimeMillis()));
-
             collectionResponseCallback.onSuccessInsertCollectionFromLocal(localCollections);
-
         });
     }
 

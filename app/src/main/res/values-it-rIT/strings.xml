@@ -104,7 +104,7 @@
     <string name="book_search_error">Si è verificato un errore durante la ricerca, riprova.</string>
     <string name="description_not_available">Questo libro non fornisce una descrizione. Sentiti libero di esplorarne il contenuto attraverso recensioni o commenti per ulteriori informazioni.</string>
     <string name="empty_search_snackbar">La barra di ricerca é vuota</string>
-    <string name="textview_home_suggested">Suggeriti per te</string>
+    <string name="textview_home_recommended">Suggeriti per te</string>
     <string name="textview_new_books">Nuovi libri</string>
     <string name="textview_loading">Caricamento…</string>
     <string name="rating_not_available">Valutazione non disponibile</string>

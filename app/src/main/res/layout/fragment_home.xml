@@ -89,11 +89,11 @@
 
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textview_home_suggested"
+        android:id="@+id/textview_home_recommended"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.Material3.LabelLarge"
-        android:text="@string/textview_home_suggested"
+        android:text="@string/textview_home_recommended"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/trending_container"
         android:layout_marginHorizontal="8dp"
@@ -102,26 +102,26 @@
         />
 
     <ProgressBar
-        android:id="@+id/progressbar_suggested"
+        android:id="@+id/progressbar_recommended"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_home_suggested"
+        app:layout_constraintTop_toBottomOf="@id/textview_home_recommended"
         android:indeterminate="true"
         tools:visibility="visible"
         />
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/suggested_container"
+        android:id="@+id/recommended_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:layout_marginHorizontal="12dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/progressbar_suggested"
+        app:layout_constraintTop_toBottomOf="@id/progressbar_recommended"
         tools:listitem="@layout/book_home_item"
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         >
@@ -135,7 +135,7 @@
         style="@style/TextAppearance.Material3.LabelLarge"
         android:text="@string/textview_new_books"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/suggested_container"
+        app:layout_constraintTop_toBottomOf="@id/recommended_container"
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="10dp"
         android:textSize="18sp"

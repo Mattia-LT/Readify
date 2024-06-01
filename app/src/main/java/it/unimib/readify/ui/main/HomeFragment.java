@@ -21,7 +21,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,11 +37,8 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.BookViewModel;
 
 public class HomeFragment extends Fragment {
-    private List<OLWorkApiResponse> trendingBookList;
-    private List<OLWorkApiResponse> suggestedBookList;
-    private List<OLWorkApiResponse> recentBookList;
     private BookCarouselAdapter trendingBooksAdapter;
-    private BookCarouselAdapter suggestedBooksAdapter;
+    private BookCarouselAdapter recommendedBooksAdapter;
     private BookCarouselAdapter recentBooksAdapter;
     private FragmentHomeBinding fragmentHomeBinding;
     private BookViewModel bookViewModel;
@@ -55,9 +51,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        trendingBookList = new ArrayList<>();
-        suggestedBookList = new ArrayList<>();
-        recentBookList = new ArrayList<>();
         Log.d("home fragment", "onCreate");
     }
 
@@ -90,42 +83,31 @@ public class HomeFragment extends Fragment {
 
         fragmentHomeBinding.progressbarRecent.setVisibility(View.VISIBLE);
         fragmentHomeBinding.progressbarTrending.setVisibility(View.VISIBLE);
-        fragmentHomeBinding.progressbarSuggested.setVisibility(View.VISIBLE);
+        fragmentHomeBinding.progressbarRecommended.setVisibility(View.VISIBLE);
 
-        BookCarouselAdapter.OnItemClickListener onItemClickListener = new BookCarouselAdapter.OnItemClickListener(){
-            @Override
-            public void onBookItemClick(OLWorkApiResponse book) {
-                NavDirections action = HomeFragmentDirections.actionHomeFragmentToBookDetailsFragment(book);
-                Navigation.findNavController(requireView()).navigate(action);
-            }
-
-            @Override
-            public void onAddToCollectionButtonPressed(int position) {
-                //TODO sistemare, magari se tieni premuto appare un dialog per aggiungerlo
-                //bookList.get(position).setFavorite(!newsList.get(position).isFavorite());
-                //iNewsRepository.updateNews(newsList.get(position));
-            }
+        BookCarouselAdapter.OnItemClickListener onItemClickListener = book -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToBookDetailsFragment(book);
+            Navigation.findNavController(requireView()).navigate(action);
         };
 
         RecyclerView.LayoutManager trendingLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        RecyclerView.LayoutManager suggestedLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager recommendedLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         RecyclerView.LayoutManager recentLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
 
         RecyclerView recyclerViewTrendingBooks = fragmentHomeBinding.trendingContainer;
-        RecyclerView recyclerViewSuggestedBooks = fragmentHomeBinding.suggestedContainer;
+        RecyclerView recyclerViewRecommendedBooks = fragmentHomeBinding.recommendedContainer;
         RecyclerView recyclerViewRecentBooks = fragmentHomeBinding.recentContainer;
 
-
-        trendingBooksAdapter = new BookCarouselAdapter(trendingBookList, requireActivity().getApplication(), onItemClickListener);
-        suggestedBooksAdapter = new BookCarouselAdapter(suggestedBookList, requireActivity().getApplication(), onItemClickListener);
-        recentBooksAdapter = new BookCarouselAdapter(recentBookList, requireActivity().getApplication(), onItemClickListener);
+        trendingBooksAdapter = new BookCarouselAdapter(onItemClickListener);
+        recommendedBooksAdapter = new BookCarouselAdapter(onItemClickListener);
+        recentBooksAdapter = new BookCarouselAdapter(onItemClickListener);
 
         recyclerViewTrendingBooks.setAdapter(trendingBooksAdapter);
-        recyclerViewSuggestedBooks.setAdapter(suggestedBooksAdapter);
+        recyclerViewRecommendedBooks.setAdapter(recommendedBooksAdapter);
         recyclerViewRecentBooks.setAdapter(recentBooksAdapter);
 
         recyclerViewTrendingBooks.setLayoutManager(trendingLayoutManager);
-        recyclerViewSuggestedBooks.setLayoutManager(suggestedLayoutManager);
+        recyclerViewRecommendedBooks.setLayoutManager(recommendedLayoutManager);
         recyclerViewRecentBooks.setLayoutManager(recentLayoutManager);
     }
 
@@ -150,8 +132,8 @@ public class HomeFragment extends Fragment {
                     .filter(result -> result instanceof Result.WorkSuccess)
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarSuggested.setVisibility(View.GONE);
-            suggestedBooksAdapter.refreshList(workResultList);
+            fragmentHomeBinding.progressbarRecommended.setVisibility(View.GONE);
+            recommendedBooksAdapter.submitList(workResultList);
         };
 
         Observer<List<Result>> trendingBooksObserver = results -> {
@@ -161,7 +143,7 @@ public class HomeFragment extends Fragment {
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
             fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
-            trendingBooksAdapter.refreshList(workResultList);
+            trendingBooksAdapter.submitList(workResultList);
         };
 
         Observer<List<Result>> recentBooksObserver = results -> {
@@ -171,7 +153,7 @@ public class HomeFragment extends Fragment {
                     .map(result -> ((Result.WorkSuccess) result).getData())
                     .collect(Collectors.toList());
             fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
-            recentBooksAdapter.refreshList(workResultList);
+            recentBooksAdapter.submitList(workResultList);
         };
 
 

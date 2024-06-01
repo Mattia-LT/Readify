@@ -1,5 +1,7 @@
 package it.unimib.readify.util;
 
+import java.util.Calendar;
+
 public class Constants {
 
     // Constants for SharedPreferences
@@ -22,11 +24,15 @@ public class Constants {
     // Constants for API
     public static final String OL_API_BASE_URL = "https://openlibrary.org";
     public static final String OL_SEARCH_ENDPOINT = "/search.json";
+    public static final String OL_TRENDING_ENDPOINT = "/trending/weekly.json";
     public static final String OL_WORKS_ENDPOINT = "/works/";
     public static final String OL_ISBN_ENDPOINT = "/isbn/";
     public static final String OL_AUTHORS_ENDPOINT = "/search/authors.json";
     public static final String OL_COVERS_API_URL = "https://covers.openlibrary.org/";
     public static final String OL_COVERS_API_ID_PARAMETER = "w/id/";
+    public static final String OL_RECENT_BOOKS_QUERY = "subject:* AND first_publish_year:"+ Calendar.getInstance().get(Calendar.YEAR);
+
+    public static final int CAROUSEL_SIZE = 10;
 
     public static final String OL_COVERS_API_IMAGE_SIZE_S = "-S.jpg";
     public static final String OL_COVERS_API_IMAGE_SIZE_M = "-M.jpg";
@@ -43,11 +49,13 @@ public class Constants {
     public static final String OL_SEARCH_OFFSET_PARAMETER = "offset";
     public static final String OL_SEARCH_SUBJECT_PARAMETER = "subject";
     public static final String OL_SORT_RANDOM_DAILY = "random.daily";
+    public static final String OL_SORT_NEW = "new";
+
 
 
     // Constants for recycler views
     public static final String TRENDING = "trending";
-    public static final String SUGGESTED = "suggested";
+    public static final String RECOMMENDED = "recommended";
     public static final String RECENT = "recent";
     public static final String SEARCH = "search";
     public static final String COLLECTION = "collection";

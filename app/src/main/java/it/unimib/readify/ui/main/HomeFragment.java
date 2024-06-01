@@ -3,9 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.DARK_MODE;
 import static it.unimib.readify.util.Constants.LIGHT_MODE;
 import static it.unimib.readify.util.Constants.PREFERRED_THEME;
-import static it.unimib.readify.util.Constants.RECENT;
 import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
-import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -50,7 +48,6 @@ public class HomeFragment extends Fragment {
     private BookViewModel bookViewModel;
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
-    private SharedPreferencesUtil sharedPreferencesUtil;
     private User user;
 
     public HomeFragment() {}
@@ -76,7 +73,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("home fragment", "onViewCreated");
-        sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
+        SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
         //Load user preferences for theme
         String preferredTheme = sharedPreferencesUtil.readStringData(SHARED_PREFERENCES_FILE_NAME, PREFERRED_THEME);
         if(preferredTheme != null) {
@@ -88,39 +85,12 @@ public class HomeFragment extends Fragment {
             }
         }
 
-
-
         initViewModels();
         initObservers();
 
         fragmentHomeBinding.progressbarRecent.setVisibility(View.VISIBLE);
         fragmentHomeBinding.progressbarTrending.setVisibility(View.VISIBLE);
         fragmentHomeBinding.progressbarSuggested.setVisibility(View.VISIBLE);
-
-        //setting mock data
-        List<String> mockDataSuggested = new ArrayList<>();
-        mockDataSuggested.add("/works/OL14933414W");
-        mockDataSuggested.add("/works/OL27479W");
-        mockDataSuggested.add("/works/OL27516W");
-        mockDataSuggested.add("/works/OL262758W");
-        mockDataSuggested.add("/works/OL27658078W");
-        mockDataSuggested.add("/works/OL18146933W");
-
-        List<String> mockDataTrending = new ArrayList<>();
-        mockDataTrending.add("/works/OL5735363W");
-        mockDataTrending.add("/works/OL15413843W");
-        mockDataTrending.add("/works/OL15518787W");
-        mockDataTrending.add("/works/OL5735360W");
-
-        List<String> mockDataRecent = new ArrayList<>();
-        mockDataRecent.add("/works/OL82563W");
-        mockDataRecent.add("/works/OL82586W");
-        mockDataRecent.add("/works/OL82548W");
-        mockDataRecent.add("/works/OL82537W");
-        mockDataRecent.add("/works/OL82536W");
-        mockDataRecent.add("/works/OL82565W");
-        mockDataRecent.add("/works/OL82560W");
-        mockDataRecent.add("/works/OL20874116W");
 
         BookCarouselAdapter.OnItemClickListener onItemClickListener = new BookCarouselAdapter.OnItemClickListener(){
             @Override
@@ -157,25 +127,6 @@ public class HomeFragment extends Fragment {
         recyclerViewTrendingBooks.setLayoutManager(trendingLayoutManager);
         recyclerViewSuggestedBooks.setLayoutManager(suggestedLayoutManager);
         recyclerViewRecentBooks.setLayoutManager(recentLayoutManager);
-
-
-        bookViewModel.fetchBooks(mockDataTrending, TRENDING).observe(getViewLifecycleOwner(),resultList -> {
-            List<OLWorkApiResponse> workResultList = resultList.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
-            trendingBooksAdapter.refreshList(workResultList);
-        });
-
-        bookViewModel.fetchBooks(mockDataRecent, RECENT).observe(getViewLifecycleOwner(), resultList -> {
-            List<OLWorkApiResponse> workResultList = resultList.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
-            recentBooksAdapter.refreshList(workResultList);
-        });
     }
 
     private void initViewModels(){
@@ -203,6 +154,26 @@ public class HomeFragment extends Fragment {
             suggestedBooksAdapter.refreshList(workResultList);
         };
 
+        Observer<List<Result>> trendingBooksObserver = results -> {
+            Log.d("trending observer", "triggered");
+            List<OLWorkApiResponse> workResultList = results.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+            fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
+            trendingBooksAdapter.refreshList(workResultList);
+        };
+
+        Observer<List<Result>> recentBooksObserver = results -> {
+            Log.d("recent observer", "triggered");
+            List<OLWorkApiResponse> workResultList = results.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+            fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
+            recentBooksAdapter.refreshList(workResultList);
+        };
+
 
         Observer<Result> loggedUserObserver = result -> {
             Log.d("BookDetails fragment", "user changed");
@@ -213,6 +184,8 @@ public class HomeFragment extends Fragment {
                     collectionViewModel.resetLogout();
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
                     bookViewModel.loadRecommendedBooks(user.getRecommended());
+                    bookViewModel.loadTrendingBooks();
+                    bookViewModel.loadRecentBooks();
                 }
 
                 if(user.getUsername() != null) {
@@ -228,5 +201,7 @@ public class HomeFragment extends Fragment {
         //get user data from database
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getRecommendedCarouselLiveData().observe(getViewLifecycleOwner(), recommendedBooksObserver);
+        bookViewModel.getTrendingCarouselLiveData().observe(getViewLifecycleOwner(), trendingBooksObserver);
+        bookViewModel.getRecentCarouselLiveData().observe(getViewLifecycleOwner(), recentBooksObserver);
     }
 }

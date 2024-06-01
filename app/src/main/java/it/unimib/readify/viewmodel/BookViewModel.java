@@ -1,8 +1,5 @@
 package it.unimib.readify.viewmodel;
 
-import static it.unimib.readify.util.Constants.RECENT;
-import static it.unimib.readify.util.Constants.TRENDING;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,15 +11,6 @@ import it.unimib.readify.data.repository.book.IBookRepository;
 
 public class BookViewModel extends ViewModel {
 
-    /*
-        todo implement correct MutableLiveData initializations and managing
-         @trendingCarouselLiveData and @recentCarouselLiveData shall remain similar as of now
-         (changed a little bit)
-        the others have to be changed:
-            @suggestedCarouselLiveData has to be dynamic while user is online
-            @searchResultsLiveData CAN be "dynamic" IF we want to memorize previous searches
-            @collectionResultsLiveData has to be dynamic
-     */
     private final IBookRepository bookRepository;
     private final int ITEMS_PER_PAGE = 10;
     private int currentPage = 0;
@@ -63,24 +51,6 @@ public class BookViewModel extends ViewModel {
         bookRepository.searchBooks(query, sort, ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE, subjects);
     }
 
-
-    public MutableLiveData<List<Result>> fetchBooks(List<String> idList, String reference) {
-        switch (reference){
-            case TRENDING:
-                if(trendingCarouselLiveData == null){
-                    trendingCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
-                }
-                return trendingCarouselLiveData;
-            case RECENT:
-                if(recentCarouselLiveData == null){
-                    recentCarouselLiveData = bookRepository.getBooksByIdList(idList, reference);
-                }
-                return recentCarouselLiveData;
-            default:
-                return null;
-        }
-    }
-
     public MutableLiveData<List<String>> getSubjectListLiveData(){
         if(subjectListLiveData == null){
             subjectListLiveData = new MutableLiveData<>();
@@ -110,9 +80,30 @@ public class BookViewModel extends ViewModel {
         return recommendedCarouselLiveData;
     }
 
+    public MutableLiveData<List<Result>> getTrendingCarouselLiveData(){
+        if(trendingCarouselLiveData == null){
+            trendingCarouselLiveData = bookRepository.getTrendingBooksLiveData();
+        }
+        return trendingCarouselLiveData;
+    }
+
+    public void loadTrendingBooks(){
+        bookRepository.loadTrendingBooks();
+    }
+
     public void loadRecommendedBooks(Map<String, Integer> recommendedGenres){
         bookRepository.loadRecommendedBooks(recommendedGenres);
     }
 
+    public MutableLiveData<List<Result>> getRecentCarouselLiveData(){
+        if(recentCarouselLiveData == null){
+            recentCarouselLiveData = bookRepository.getRecentBooksLiveData();
+        }
+        return recentCarouselLiveData;
+    }
+
+    public void loadRecentBooks(){
+        bookRepository.loadRecentBooks();
+    }
 
 }

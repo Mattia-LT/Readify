@@ -1,7 +1,8 @@
 package it.unimib.readify.data.repository.book;
 
-import static it.unimib.readify.util.Constants.COLLECTION;
 import static it.unimib.readify.util.Constants.RECENT;
+import static it.unimib.readify.util.Constants.RECOMMENDED;
+import static it.unimib.readify.util.Constants.SEARCH;
 import static it.unimib.readify.util.Constants.TRENDING;
 
 import android.app.Application;
@@ -25,15 +26,12 @@ import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class BookRepository implements IBookRepository, BookResponseCallback {
 
-    private final MutableLiveData<Result> workApiResponseLiveData;
+    private final String TAG = BookRepository.class.getSimpleName();
     private final MutableLiveData<List<Result>> searchResultsLiveData;
     private final MutableLiveData<List<Result>> recommendedBooksLiveData;
     private final MutableLiveData<List<Result>> recentBooksLiveData;
     private final MutableLiveData<List<Result>> trendingBooksLiveData;
     private final BaseBookRemoteDataSource bookRemoteDataSource;
-    private final MutableLiveData<List<Result>> fetchedCollectionsLiveData;
-    private final MutableLiveData<List<Result>> singleCollectionLiveData;
-
     private boolean firstSearch = true;
     private boolean searchLimitReached = false;
     private int currentSearchLimit = 0;
@@ -45,12 +43,9 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     public BookRepository(BaseBookRemoteDataSource bookRemoteDataSource) {
         searchResultsLiveData = new MutableLiveData<>();
-        workApiResponseLiveData = new MutableLiveData<>();
         recommendedBooksLiveData = new MutableLiveData<>();
         recentBooksLiveData = new MutableLiveData<>();
         trendingBooksLiveData = new MutableLiveData<>();
-        fetchedCollectionsLiveData = new MutableLiveData<>();
-        singleCollectionLiveData = new MutableLiveData<>();
         this.bookRemoteDataSource = bookRemoteDataSource;
         this.bookRemoteDataSource.setBookResponseCallback(this);
     }
@@ -58,7 +53,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     @Override
     public void searchBooks(String query, String sort, int limit, int offset, String genres) {
         this.firstSearch = offset == 0;
-        Log.d("generi", String.valueOf(genres));
         if(firstSearch){
             searchLimitReached = false;
             bookRemoteDataSource.searchBooks(query, sort, limit, offset, genres);
@@ -75,7 +69,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     @Override
     public void loadRecommendedBooks(Map<String, Integer> recommendedGenres) {
         int size = 6;
-        int threshold = 3;
+        int minimumThreshold = 3;
         List<String> recommendedKeys = recommendedGenres
                 .entrySet()
                 .stream()
@@ -87,7 +81,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         int counter = 0;
         List<String> finalRecommendedKeys = new ArrayList<>();
         for(String key : recommendedKeys){
-            if(Objects.requireNonNull(recommendedGenres.get(key)) < threshold){
+            if(Objects.requireNonNull(recommendedGenres.get(key)) < minimumThreshold){
                 finalRecommendedKeys.add(recommendedKeys.get(counter));
                 counter++;
             } else {
@@ -100,25 +94,27 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         Log.d("REPOSITORY", "recommendedKeys" + recommendedKeys);
         Log.d("REPOSITORY", "finalRecommendedKeys" + finalRecommendedKeys);
 
-        bookRemoteDataSource.getSuggestedBooks(finalRecommendedKeys);
+        bookRemoteDataSource.getRecommendedBooks(finalRecommendedKeys);
 
+    }
+
+    @Override
+    public void loadTrendingBooks() {
+        bookRemoteDataSource.getTrendingBooks();
+    }
+
+    @Override
+    public void loadRecentBooks() {
+        bookRemoteDataSource.getRecentBooks();
     }
 
     public MutableLiveData<List<Result>> getSearchResultsLiveData(){
         return searchResultsLiveData;
     }
 
-
     @Override
-    public MutableLiveData<List<Result>> getBooksByIdList(List<String> idList, String reference) {
+    public void getBooksByIdList(List<String> idList, String reference) {
         bookRemoteDataSource.getBooks(idList, reference);
-        switch (reference){
-            case TRENDING:
-                return trendingBooksLiveData;
-            case RECENT:
-                return recentBooksLiveData;
-        }
-        return null;
     }
 
     @Override
@@ -127,27 +123,13 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     }
 
     @Override
-    public void onSuccessSearchFromRemote(List<OLWorkApiResponse> workApiResponseList, int totalNumber) {
-        List<Result> resultList = new ArrayList<>();
-        for(OLWorkApiResponse work : workApiResponseList) {
-            resultList.add(new Result.WorkSuccess(work));
-        }
-        List<Result> currentSearchResultList = new ArrayList<>();
-        if(firstSearch){
-            this.currentSearchLimit = totalNumber;
-            currentSearchResultList = resultList;
-        } else {
-            if (searchResultsLiveData.getValue() != null) {
-                currentSearchResultList.addAll(searchResultsLiveData.getValue());
-                currentSearchResultList.addAll(resultList);
-            }
-        }
-        searchResultsLiveData.postValue(currentSearchResultList);
+    public MutableLiveData<List<Result>> getTrendingBooksLiveData() {
+        return trendingBooksLiveData;
     }
 
     @Override
-    public void onSuccessFetchBookFromRemote(OLWorkApiResponse workApiResponse) {
-        workApiResponseLiveData.postValue(new Result.WorkSuccess(workApiResponse));
+    public MutableLiveData<List<Result>> getRecentBooksLiveData() {
+        return recentBooksLiveData;
     }
 
     @Override
@@ -163,29 +145,86 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
             case RECENT:
                 recentBooksLiveData.postValue(resultList);
                 break;
-            case COLLECTION:
-                singleCollectionLiveData.postValue(resultList);
+            case RECOMMENDED:
+                recommendedBooksLiveData.postValue(resultList);
+                break;
+            case SEARCH:
+                List<Result> currentSearchResultList = new ArrayList<>();
+                if(firstSearch){
+                    currentSearchResultList = resultList;
+                } else {
+                    if (searchResultsLiveData.getValue() != null) {
+                        currentSearchResultList.addAll(searchResultsLiveData.getValue());
+                        currentSearchResultList.addAll(resultList);
+                    }
+                }
+                searchResultsLiveData.postValue(currentSearchResultList);
                 break;
         }
     }
 
     @Override
-    public void onFailureFromRemote(Exception exception) {
-        List<Result> errorList = new ArrayList<>();
-        //todo dividi vari errori in metodi diversi nel callback
-        errorList.add(new Result.Error(exception.getMessage()));
-        searchResultsLiveData.postValue(errorList);
-        workApiResponseLiveData.postValue(new Result.Error(exception.getMessage()));
-        recentBooksLiveData.postValue(errorList);
-        trendingBooksLiveData.postValue(errorList);
+    public void onFailureFetchBooksFromRemote(String message, String reference) {
+        //todo implementare eventuale classe di error e postare il valore qua
+        switch (reference){
+            case TRENDING:
+            case RECENT:
+            case RECOMMENDED:
+            case SEARCH:
+                Log.e(TAG + reference + "Section", message);
+                break;
+        }
+    }
+    @Override
+    public void onSuccessLoadRecommendedList(List<String> recommendedIdList) {
+        getBooksByIdList(recommendedIdList, RECOMMENDED);
     }
 
     @Override
-    public void onSuccessLoadRecommended(List<OLWorkApiResponse> recommendedBookList) {
-        List<Result> resultList = new ArrayList<>();
-        for(OLWorkApiResponse work : recommendedBookList){
-            resultList.add(new Result.WorkSuccess(work));
+    public void onFailureLoadRecommendedList(String message) {
+        Log.e(TAG + " - " + RECOMMENDED, message);
+    }
+
+    @Override
+    public void onSuccessLoadTrendingList(List<String> trendingIdList) {
+        getBooksByIdList(trendingIdList, TRENDING);
+    }
+
+    @Override
+    public void onFailureLoadTrendingList(String message) {
+        Log.e(TAG + " - " + TRENDING, message);
+    }
+
+    @Override
+    public void onSuccessLoadRecentList(List<String> recentIdList) {
+        getBooksByIdList(recentIdList, RECENT);
+    }
+
+    @Override
+    public void onFailureLoadRecentList(String message) {
+        Log.e(TAG + " - " + RECENT, message);
+    }
+
+    @Override
+    public void onSuccessLoadSearchResultList(List<String> searchResultList, int numFound) {
+        if(firstSearch){
+            this.currentSearchLimit = numFound;
         }
-        recommendedBooksLiveData.postValue(resultList);
+        getBooksByIdList(searchResultList, SEARCH);
+    }
+
+    @Override
+    public void onFailureLoadSearchResultList(String message) {
+        Log.e(TAG + " - " + SEARCH, message);
+    }
+
+    @Override
+    public void onFailureFetchRating(String message) {
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchAuthors(String message) {
+        Log.w(TAG, message);
     }
 }

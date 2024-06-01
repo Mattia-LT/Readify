@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -30,6 +32,9 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
     private BottomSheetCollectionCreationBinding binding;
     private CollectionViewModel collectionViewModel;
+    private boolean isNameValid;
+    private boolean isNameUnique;
+    private Button confirmButton;
     private String idToken;
 
     @Nullable
@@ -51,6 +56,7 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
             }
         }
         initViewModels();
+        initObservers();
         this.idToken = CollectionCreationBottomSheetArgs.fromBundle(getArguments()).getIdToken();
         binding.characterCounter.setText("0");
         binding.characterLimit.setText(String.valueOf(COLLECTION_NAME_CHARACTERS_LIMIT));
@@ -71,12 +77,14 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void afterTextChanged(Editable s) {
                 // Update character count
+                collectionViewModel.setNewCollectionName(s.toString());
+                collectionViewModel.validateCollectionName();
                 int currentLength = s.length();
                 binding.characterCounter.setText(String.valueOf(currentLength));
             }
         });
 
-        Button confirmButton = binding.buttonCollectionCreationConfirm;
+        confirmButton = binding.buttonCollectionCreationConfirm;
         confirmButton.setOnClickListener(v -> {
             TextInputLayout textInputLayout = binding.createTextInputLayoutAddCollection;
             EditText editText = textInputLayout.getEditText();
@@ -91,6 +99,47 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
                 requireDialog().dismiss();
             }
         });
+    }
+
+    private void initObservers() {
+        //isValid collection name -> length OK and contain only permitted characters
+        collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
+            if(isValid != null){
+                this.isNameValid = isValid;
+                updateErrorMessage();
+            }
+        });
+
+        //isUnique collection name -> the user doesn't have another collection with the same name
+
+        collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
+            if (isUnique != null) {
+                this.isNameUnique = isUnique;
+                updateErrorMessage();
+            }
+        });
+    }
+
+    private void updateErrorMessage() {
+        if(!isNameValid){
+            //todo usa file string
+            binding.editTextCollectionCreationName.setError("Invalid collection name");
+            confirmButton.setEnabled(false);
+            confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
+        } else if(!isNameUnique){
+            //todo usa file string
+            binding.editTextCollectionCreationName.setError("Collection name must be unique");
+            confirmButton.setEnabled(false);
+            confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
+        } else {
+            //todo usa file string
+            binding.editTextCollectionCreationName.setError(null);
+            confirmButton.setEnabled(true);
+            confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.login_blue));
+        }
     }
 
     private void initViewModels() {

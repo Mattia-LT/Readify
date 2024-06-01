@@ -14,4 +14,5 @@
     <color name="grey_button">#717171</color>
     <color name="light_blue">#b3d9ff</color>
     <color name="rating_yellow">#f8a81b</color>
+    <color name="grey_disabled_item">#FF888888</color>
 </resources>

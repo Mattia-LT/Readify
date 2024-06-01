@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.COLLECTION_NAME_CHARACTERS_LIMIT;
 
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +52,9 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
     private OLWorkApiResponse book;
     private String idToken;
     private User loggedUser;
+    private boolean isNameValid = false;
+    private boolean isNameUnique = false;
+    private Button confirmButton;
     private Observer<Boolean> addToCollectionResultObserver;
     private Observer<Boolean> removeFromCollectionResultObserver;
     private Observer<List<Result>> collectionsObserver;
@@ -81,7 +86,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         collectionViewModel.loadLoggedUserCollections();
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
-        Button confirmButton = binding.buttonConfirmCollectionInsertion;
+        confirmButton = binding.buttonConfirmCollectionInsertion;
         Button showAddCollectionButton = binding.buttonCreateNewCollection;
 
         RecyclerView recyclerViewCollections = binding.recyclerviewSelectCollections;
@@ -123,6 +128,8 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void afterTextChanged(Editable s) {
                 // Update character count
+                collectionViewModel.setNewCollectionName(s.toString());
+                collectionViewModel.validateCollectionName();
                 int currentLength = s.length();
                 binding.characterCounter.setText(String.valueOf(currentLength));
             }
@@ -202,6 +209,7 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     //toast errore
                     Log.d("fragment","aggiunto fail");
                 }
+                //remove observer for single use action
                 collectionViewModel.getAddToCollectionResult().removeObserver(addToCollectionResultObserver);
             } else {
                 Log.d("fragment","aggiunto null");
@@ -247,8 +255,46 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         };
 
 
+        //isValid collection name -> length OK and contain only permitted characters
+        collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
+            if(isValid != null){
+                this.isNameValid = isValid;
+                updateErrorMessage();
+            }
+        });
+
+        //isUnique collection name -> the user doesn't have another collection with the same name
+
+        collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
+            if (isUnique != null) {
+                this.isNameUnique = isUnique;
+                updateErrorMessage();
+            }
+        });
+
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
+    }
+
+    private void updateErrorMessage() {
+        if(!isNameValid){
+            //todo usa file string
+            binding.editTextCreateCollection.setError("Invalid collection name");
+            confirmButton.setEnabled(false);
+            confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
+        } else if(!isNameUnique){
+            //todo usa file string
+            binding.editTextCreateCollection.setError("Collection name must be unique");
+            confirmButton.setEnabled(false);confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
+        } else {
+            //todo usa file string
+            binding.editTextCreateCollection.setError(null);
+            confirmButton.setEnabled(true);
+            confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
+            confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.login_blue));
+        }
     }
 
 

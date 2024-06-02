@@ -360,6 +360,7 @@ public class CollectionFragment extends Fragment {
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
 
         deleteDialogBuilder.show();
+
     }
 
     @NonNull

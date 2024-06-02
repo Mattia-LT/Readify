@@ -118,6 +118,8 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
                 userViewModel.setUserFollowing(onSaveUser);
                 onSaveUser.setVisibility("public");
                 userViewModel.setUserVisibility(onSaveUser);
+                onSaveUser.setBiography("");
+                userViewModel.setUserBiography(onSaveUser);
 
                 Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
                 requireActivity().finish();

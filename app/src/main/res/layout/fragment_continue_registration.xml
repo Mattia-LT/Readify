@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textview_continue_username"
         app:shapeAppearanceOverlay="@style/RoundedEditText"
         app:errorEnabled="true"
-        app:boxStrokeColor="?attr/colorSecondary"
+        app:boxStrokeColor="@color/text_input_box_stroke_color"
         app:hintTextColor="?attr/colorSecondary"
         app:boxStrokeWidth="3dp">
 

@@ -239,7 +239,7 @@ public class ProfileFragment extends Fragment{
         else{
             spinner.setSelection(0);
         }
-        //quello sopra va quello sotto no :D
+        
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

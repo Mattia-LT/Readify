@@ -139,6 +139,8 @@ public class EditProfileFragment extends Fragment {
             fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
             fragmentEditProfileBinding.settingsEmailErrorMessage.setText("");
             fragmentEditProfileBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
+            fragmentEditProfileBinding.settingsBioErrorMessage.setText("");
+            fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.GONE);
             fragmentEditProfileBinding.settingsPasswordErrorMessage.setText("");
             fragmentEditProfileBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
             fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setText("");
@@ -146,10 +148,12 @@ public class EditProfileFragment extends Fragment {
 
             if(fragmentEditProfileBinding.textInputEditTextUsername.getText() != null
                     && fragmentEditProfileBinding.textInputEditTextEmail.getText() != null
+                    && fragmentEditProfileBinding.textInputEditTextBio.getText() != null
                     && fragmentEditProfileBinding.textInputEditTextPassword.getText() != null
                     && fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText() != null) {
                 if(!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().isEmpty()
                         || !fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().isEmpty()
+                        || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().isEmpty()
                         || !fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().isEmpty()
                         || !fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().isEmpty()) {
                     //todo add loading screen
@@ -161,6 +165,7 @@ public class EditProfileFragment extends Fragment {
 
                     onChangeUsername();
                     onChangeEmail();
+                    onChangeBio();
                     onChangePassword();
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
@@ -176,6 +181,7 @@ public class EditProfileFragment extends Fragment {
             public void onClick(View v) {
                 fragmentEditProfileBinding.textInputEditTextUsername.setText("");
                 fragmentEditProfileBinding.textInputEditTextEmail.setText("");
+                fragmentEditProfileBinding.textInputEditTextBio.setText("");
                 fragmentEditProfileBinding.textInputEditTextPassword.setText("");
                 fragmentEditProfileBinding.textInputEditTextPasswordConfirm.setText("");
             }
@@ -218,6 +224,23 @@ public class EditProfileFragment extends Fragment {
             }
         }
     }
+
+    private void onChangeBio() {
+        if(fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
+            if (!fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
+                if (fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().length() > 100) {
+                    fragmentEditProfileBinding.textInputEditTextBio.setText("La bio non deve superare 100 caratteri");
+                    fragmentEditProfileBinding.textInputEditTextBio.setVisibility(View.VISIBLE);
+                }else if(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().equals(user.getBiography())) {
+                    Toast.makeText(requireContext(), "Questa è gia la tua bio", Toast.LENGTH_SHORT).show();
+                } else {
+                    onSaveUser.setBiography(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim());
+                    userViewModel.setUserBiography(onSaveUser);
+                }
+            }
+        }
+    }
+
 
     private void onChangePassword() {
         if(fragmentEditProfileBinding.textInputEditTextPassword.getText() != null

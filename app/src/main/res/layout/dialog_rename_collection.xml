@@ -16,8 +16,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/RoundedEditText"
         app:errorEnabled="true"
-        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+        app:boxStrokeColor="@color/text_input_box_stroke_color"
+        app:hintTextColor="?attr/colorSecondary"
+        app:boxStrokeWidth="3dp"
         android:hint="@string/textview_collection_name_placeholder">
 
         <com.google.android.material.textfield.TextInputEditText

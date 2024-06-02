@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,9 +34,7 @@ import it.unimib.readify.viewmodel.UserViewModel;
 public class TabSearchUsersFragment extends Fragment {
 
     private FragmentTabSearchUsersBinding fragmentTabSearchUsersBinding;
-
     private UserSearchResultAdapter userSearchResultAdapter;
-    private List<User> searchResultsList;
     private String loggedUserIdToken;
     private UserViewModel userViewModel;
 
@@ -56,17 +53,9 @@ public class TabSearchUsersFragment extends Fragment {
 
         RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        userSearchResultAdapter = new UserSearchResultAdapter(searchResultsList, requireActivity().getApplication(), new UserSearchResultAdapter.OnItemClickListener() {
-            @Override
-            public void onUserItemClick(User user) {
-                NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user.getIdToken(), user.getUsername());
-                Navigation.findNavController(requireView()).navigate(action);
-            }
-
-            @Override
-            public void onAddToCollectionButtonPressed(int position) {
-                //todo implementa pulsante segui?
-            }
+        userSearchResultAdapter = new UserSearchResultAdapter(user -> {
+            NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user.getIdToken(), user.getUsername());
+            Navigation.findNavController(requireView()).navigate(action);
         });
         recyclerView.setAdapter(userSearchResultAdapter);
         recyclerView.setLayoutManager(layoutManager);
@@ -102,7 +91,6 @@ public class TabSearchUsersFragment extends Fragment {
     }
 
     private void initObserver(){
-        this.searchResultsList = new ArrayList<>();
 
         final Observer<Result> loggedUserObserver = result -> {
             if(result.isSuccess()) {
@@ -111,6 +99,7 @@ public class TabSearchUsersFragment extends Fragment {
                 this.loggedUserIdToken = loggedUser.getIdToken();
             }
         };
+
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
         final Observer<List<Result>> searchResultsListObserver = results -> {
@@ -120,10 +109,10 @@ public class TabSearchUsersFragment extends Fragment {
                     .filter(user -> !user.getIdToken().equals(loggedUserIdToken))
                     .collect(Collectors.toList());
 
-            searchResultsList = searchResults;
-            userSearchResultAdapter.refreshList(searchResults);
+            userSearchResultAdapter.submitList(searchResults);
             fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);
         };
+
         userViewModel.getUserSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
     }
 }

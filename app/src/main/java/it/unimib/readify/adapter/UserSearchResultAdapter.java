@@ -1,72 +1,60 @@
 package it.unimib.readify.adapter;
 
-import android.app.Application;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-
-import java.util.List;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.UserSearchItemBinding;
 import it.unimib.readify.model.User;
 
-public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class UserSearchResultAdapter extends ListAdapter<User, UserSearchResultAdapter.UserSearchResultViewHolder> {
 
     public interface OnItemClickListener {
         void onUserItemClick(User user);
-        void onAddToCollectionButtonPressed(int position);
     }
 
-    private final List<User> userList;
-    private final Application application;
     private final OnItemClickListener onItemClickListener;
 
 
-    public UserSearchResultAdapter(List<User> userList, Application application, OnItemClickListener onItemClickListener) {
-        this.userList = userList;
-        this.application = application;
+    public UserSearchResultAdapter(OnItemClickListener onItemClickListener) {
+        super(new DiffUtil.ItemCallback<User>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+                return oldItem.getIdToken().equals(newItem.getIdToken());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
         this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserSearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         UserSearchItemBinding binding = UserSearchItemBinding.inflate(inflater, parent, false);
         return new UserSearchResultViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(holder instanceof UserSearchResultViewHolder){
-            ((UserSearchResultViewHolder) holder).bind(userList.get(position));
+    public void onBindViewHolder(@NonNull UserSearchResultViewHolder holder, int position) {
+        if(position != RecyclerView.NO_POSITION){
+            User currentUser = getItem(position);
+            holder.bind(currentUser);
         }
     }
 
-    @Override
-    public int getItemCount() {
-        if(userList != null){
-            return userList.size();
-        }
-        return 0;
-    }
-
-    public void refreshList(List<User> users){
-        int size = this.userList.size();
-        userList.clear();
-        notifyItemRangeRemoved(0,size);
-        userList.addAll(users);
-        notifyItemRangeInserted(0, users.size());
-    }
-
-    // custom viewholder to bind data to recyclerview items (search result items)
     public class UserSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final UserSearchItemBinding binding;
 
@@ -88,7 +76,7 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                    }
 //                }
 //            }
-            String booksRead = application.getString(R.string.textview_books_read);
+            String booksRead = itemView.getResources().getString(R.string.textview_books_read);
             booksRead = booksRead.concat(String.valueOf(numberOfBooks));
             binding.textviewBooksRead.setText(booksRead);
             int avatarId;
@@ -97,7 +85,7 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
             } catch (Exception e) {
                 avatarId = R.drawable.ic_baseline_profile_24;
             }
-            Glide.with(application)
+            Glide.with(itemView.getContext())
                     .load(avatarId)
                     .dontAnimate()
                     .into(binding.imageviewUser);
@@ -105,39 +93,11 @@ public class UserSearchResultAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.imagebutton_add_icon) {
-                // hai premuto il bottone per aggiungere alla raccolta
-                //todo gestire aggiunta alla raccolta
-                //setImageViewFavoriteNews(!newsList.get(getAdapterPosition()).isFavorite());
-                //onItemClickListener.onFavoriteButtonPressed(getAdapterPosition());
-            } else {
-                //hai premuto qualcos'altro
-                onItemClickListener.onUserItemClick(userList.get(getBindingAdapterPosition()));
+            int position = getBindingAdapterPosition();
+            if (position != RecyclerView.NO_POSITION){
+                User user = getItem(position);
+                onItemClickListener.onUserItemClick(user);
             }
-        }
-
-        private void setImageViewAddedBook(boolean isFavorite) {
-            /*
-            if (isFavorite) {
-                imageViewFavoriteNews.setImageDrawable(
-                        AppCompatResources.getDrawable(application,
-                                R.drawable.ic_baseline_favorite_24));
-                imageViewFavoriteNews.setColorFilter(
-                        ContextCompat.getColor(
-                                imageViewFavoriteNews.getContext(),
-                                R.color.red_500)
-                );
-            } else {
-                imageViewFavoriteNews.setImageDrawable(
-                        AppCompatResources.getDrawable(application,
-                                R.drawable.ic_baseline_favorite_border_24));
-                imageViewFavoriteNews.setColorFilter(
-                        ContextCompat.getColor(
-                                imageViewFavoriteNews.getContext(),
-                                R.color.black)
-                );
-            }
-            */
         }
     }
 

@@ -5,19 +5,25 @@ import static it.unimib.readify.util.Constants.OL_COVERS_API_IMAGE_SIZE_L;
 import static it.unimib.readify.util.Constants.OL_COVERS_API_URL;
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.CollectionItemBinding;
@@ -74,6 +80,14 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
         public void bind(Collection collection) {
             //set cover
             if(collection != null && collection.getWorks() != null){
+                //set collection name and visibility
+                binding.collectionNameTextview.setText(collection.getName());
+                if (collection.isVisible()) {
+                    binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
+                } else {
+                    binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
+                }
+
                 boolean isThumbnailAvailable = false;
                 if(collection.getWorks().isEmpty() && collection.getNumberOfBooks() == 0) {
                     binding.collectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
@@ -87,14 +101,40 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                             while (cover == -1 && pos < work.getCovers().size()) {
                                 cover = work.getCovers().get(pos);
                                 pos++;
-                            } if (cover != -1) {
-                                RequestOptions requestOptions = new RequestOptions()
-                                        .placeholder(R.drawable.loading_spinner)
-                                        .error(R.drawable.image_not_available);
+                            }
+                            if (cover != -1) {
                                 Glide.with(this.itemView.getContext())
+                                        .asBitmap()
                                         .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
-                                        .apply(requestOptions)
-                                        .into(binding.collectionThumbnailImageview);
+                                        .placeholder(R.drawable.loading_spinner)
+                                        .error(R.drawable.image_not_available)
+                                        .centerCrop()
+                                        .into(new CustomTarget<Bitmap>() {
+                                            @Override
+                                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                                binding.collectionThumbnailImageview.setImageBitmap(resource);
+                                                Palette.from(resource).generate(palette -> {
+                                                    if (palette != null) {
+                                                        int bookCoverMainColor = palette.getDominantColor(Color.BLACK); // Default color
+                                                        //get brightness of the cover image and set visibility icon color accordingly
+                                                        int brightness = (int) (0.2126 * Color.red(bookCoverMainColor) + 0.7152 * Color.green(bookCoverMainColor) + 0.0722 * Color.blue(bookCoverMainColor));
+                                                        //Log.d("COLLECTION BRIGHTNESS", collection.getName() + brightness);
+                                                        if (brightness < 128) {
+                                                            // Background is dark, use a white icon
+                                                            binding.collectionVisibilityIcon.setColorFilter(Color.WHITE);
+                                                        } else {
+                                                            // Background is light, use a black icon
+                                                            binding.collectionVisibilityIcon.setColorFilter(Color.BLACK);
+                                                        }
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                                // Not needed
+                                            }
+                                        });
                                 isThumbnailAvailable = true;
                                 break;
                             }
@@ -104,20 +144,13 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                         binding.collectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
                     }
                 }
-                //set collection name and visibility
-                binding.collectionNameTextview.setText(collection.getName());
-                if(collection.isVisible()){
-                    binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
-                } else {
-                    binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
-                }
                 //managing layout margin
                 GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) binding.collectionContainer.getLayoutParams();
                 //convert 5dp in px depending on the user's device
                 float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, Resources.getSystem().getDisplayMetrics());
-                if(getBindingAdapterPosition() % 2 == 0){
+                if (getBindingAdapterPosition() % 2 == 0) {
                     layoutParams.rightMargin = (int) margin;
-                } else{
+                } else {
                     layoutParams.leftMargin = (int) margin;
                 }
             }

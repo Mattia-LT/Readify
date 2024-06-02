@@ -43,19 +43,21 @@ dependencies {
 
     val navVersion = "2.7.7"
     val roomVersion = "2.6.1"
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:$navVersion")
     implementation("androidx.navigation:navigation-ui:$navVersion")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.palette:palette:1.0.0")
+
 
 
     implementation("com.google.android.material:material:1.12.0")
-    implementation("com.google.android.gms:play-services-base:18.4.0")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("commons-io:commons-io:2.15.0")
@@ -72,7 +74,7 @@ dependencies {
 
 
     // firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     // Analytics
     implementation("com.google.firebase:firebase-analytics")
     // Authentication

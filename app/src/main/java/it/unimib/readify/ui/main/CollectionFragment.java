@@ -48,7 +48,10 @@ import it.unimib.readify.R;
 import it.unimib.readify.adapter.BookItemCollectionAdapter;
 import it.unimib.readify.databinding.FragmentCollectionBinding;
 import it.unimib.readify.model.Collection;
+import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
+import it.unimib.readify.model.User;
+import it.unimib.readify.util.SubjectsUtil;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
@@ -60,6 +63,7 @@ public class CollectionFragment extends Fragment {
     private CollectionViewModel collectionViewModel;
     private Collection currentCollection;
     private String loggedUserIdToken;
+    private User loggedUser;
     private String collectionOwnerIdToken;
     BookItemCollectionAdapter bookItemCollectionAdapter;
     private AlertDialog renameDialog;
@@ -107,7 +111,8 @@ public class CollectionFragment extends Fragment {
     private void initObservers() {
         final Observer<Result> loggedUserObserver = result -> {
             if(result.isSuccess()) {
-                this.loggedUserIdToken = ((Result.UserSuccess) result).getData().getIdToken();
+                this.loggedUser = ((Result.UserSuccess) result).getData();
+                this.loggedUserIdToken = loggedUser.getIdToken();
                 Log.e("USER OBSERVER","TRIGGERED");
             }
         };
@@ -130,6 +135,32 @@ public class CollectionFragment extends Fragment {
         };
 
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionObserver);
+
+        final Observer<Collection> deleteCollectionResultObserver = deletedCollection -> {
+          if(deletedCollection != null){
+              for(OLWorkApiResponse book : deletedCollection.getWorks()){
+                  SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
+                  for(String subject : book.getSubjects()){
+                      subject = subject.toLowerCase();
+                      if(subjectsUtil.containSubject(subject)){
+                          Integer currentValue = loggedUser.getRecommended().get(subject);
+                          if(currentValue != null){
+                              Integer newValue = currentValue - 1;
+                              loggedUser.getRecommended().put(subject, newValue);
+                          } else {
+                              Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                              loggedUser.getRecommended().put(subject, 0);
+                          }
+                      }
+                  }
+                  userViewModel.setUserRecommended(loggedUser);
+              }
+              collectionViewModel.resetDeleteCollectionResult();
+              requireActivity().getSupportFragmentManager().popBackStack();
+          }
+        };
+
+        collectionViewModel.getDeleteCollectionResult().observe(getViewLifecycleOwner(), deleteCollectionResultObserver);
     }
 
     private void loadMenu(){
@@ -353,10 +384,7 @@ public class CollectionFragment extends Fragment {
         MaterialAlertDialogBuilder deleteDialogBuilder = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.delete_collection_action)
                 .setMessage(formattedMessage)
-                .setPositiveButton(R.string.confirm_action, (dialog, which) -> {
-                    collectionViewModel.deleteCollection(loggedUserIdToken, currentCollection);
-                    requireActivity().getSupportFragmentManager().popBackStack();
-                })
+                .setPositiveButton(R.string.confirm_action, (dialog, which) -> collectionViewModel.deleteCollection(loggedUserIdToken, currentCollection))
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
 
         deleteDialogBuilder.show();

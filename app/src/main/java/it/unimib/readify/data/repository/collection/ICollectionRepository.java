@@ -20,10 +20,13 @@ public interface ICollectionRepository {
     void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible);
     void emptyLocalDb();
     void resetLogout();
+    void resetDeleteCollectionResult();
     MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData();
     MutableLiveData<List<Result>> getOtherUserCollectionListLiveData();
     MutableLiveData<Boolean> getAllCollectionsDeletedResult();
     MutableLiveData<Boolean> getAddToCollectionResult();
     MutableLiveData<Boolean> getRemoveFromCollectionResult();
+    MutableLiveData<Collection> getDeleteCollectionResult();
+
 
 }

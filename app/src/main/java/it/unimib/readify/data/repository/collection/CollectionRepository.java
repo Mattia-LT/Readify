@@ -32,6 +32,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     private final MutableLiveData<Boolean> allCollectionsDeletedResult;
     private final MutableLiveData<Boolean> addToCollectionResult;
     private final MutableLiveData<Boolean> removeFromCollectionResult;
+    private final MutableLiveData<Collection> deletedCollectionResult;
 
 
     public static CollectionRepository getInstance(Application application, CollectionRoomDatabase collectionRoomDatabase, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
@@ -47,6 +48,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
         allCollectionsDeletedResult = new MutableLiveData<>();
         addToCollectionResult = new MutableLiveData<>();
         removeFromCollectionResult = new MutableLiveData<>();
+        deletedCollectionResult = new MutableLiveData<>();
         this.bookLocalDataSource = bookLocalDataSource;
         this.collectionRemoteDataSource = collectionRemoteDataSource;
         this.bookLocalDataSource.setResponseCallback(this);
@@ -77,6 +79,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void deleteCollection(String idToken, Collection collection) {
+        deletedCollectionResult.postValue(null);
         collectionRemoteDataSource.deleteCollection(idToken, collection);
     }
 
@@ -113,6 +116,11 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     }
 
     @Override
+    public void resetDeleteCollectionResult() {
+        deletedCollectionResult.postValue(null);
+    }
+
+    @Override
     public MutableLiveData<List<Result>> getLoggedUserCollectionListLiveData() {
         return loggedUserCollectionListLiveData;
     }
@@ -136,6 +144,12 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     public MutableLiveData<Boolean> getRemoveFromCollectionResult() {
         return removeFromCollectionResult;
     }
+
+    @Override
+    public MutableLiveData<Collection> getDeleteCollectionResult() {
+        return deletedCollectionResult;
+    }
+
 
     @Override
     public void onSuccessFetchCompleteCollectionsFromRemote(List<Collection> collectionList, String reference) {
@@ -179,7 +193,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onSuccessDeleteCollectionFromLocal(Collection deletedCollection) {
-        //todo far vedere all utente se va bene o meno
+        deletedCollectionResult.postValue(deletedCollection);
         Log.e("TUTTO OK", "COLLEZIONE CANCELLATA");
         loadLoggedUserCollectionsFromLocal();
     }

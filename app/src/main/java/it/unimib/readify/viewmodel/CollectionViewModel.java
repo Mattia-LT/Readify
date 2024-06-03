@@ -24,6 +24,8 @@ public class CollectionViewModel extends ViewModel {
     private MutableLiveData<Boolean> deleteAllCollectionResult;
     private MutableLiveData<Boolean> addToCollectionResult;
     private MutableLiveData<Boolean> removeFromCollectionResult;
+    private MutableLiveData<Collection> deleteCollectionResult;
+
 
 
     public CollectionViewModel(ICollectionRepository collectionRepository) {
@@ -168,6 +170,17 @@ public class CollectionViewModel extends ViewModel {
             removeFromCollectionResult = collectionRepository.getRemoveFromCollectionResult();
         }
         return removeFromCollectionResult;
+    }
+
+    public MutableLiveData<Collection> getDeleteCollectionResult() {
+        if(deleteCollectionResult == null){
+            deleteCollectionResult = collectionRepository.getDeleteCollectionResult();
+        }
+        return deleteCollectionResult;
+    }
+
+    public void resetDeleteCollectionResult(){
+        collectionRepository.resetDeleteCollectionResult();
     }
 
     public void changeCollectionVisibility(String loggedUserIdToken, String collectionId, boolean isCollectionVisible){

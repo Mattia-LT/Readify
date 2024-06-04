@@ -81,28 +81,15 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void setUsername(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION)
-                .orderByChild("username").equalTo(user.getUsername())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    userResponseCallback.onUsernameAvailable("notAvailable");
-                } else {
-                    databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                            .child(FIREBASE_USERS_USERNAME_FIELD).setValue(user.getUsername())
-                            .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                            .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                    userResponseCallback.onUsernameAvailable("available");
-                }
-            }
+        DatabaseReference usernameReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_USERNAME_FIELD);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("verifyUsername Firebase error", databaseError.getMessage());
-                userResponseCallback.onUsernameAvailable("error");
-            }
-        });
+        usernameReference.setValue(user.getUsername())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
+        
     }
 
     //todo modify
@@ -958,6 +945,30 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         } else {
             Log.d("removeNotification", "incorrect content input");
         }
+    }
+
+    @Override
+    public void isUsernameAvailable(String username) {
+        databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .orderByChild("username")
+                .equalTo(username.toLowerCase())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            userResponseCallback.onUsernameAvailable("notAvailable");
+                        } else {
+                            userResponseCallback.onUsernameAvailable("available");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("verifyUsername Firebase error", databaseError.getMessage());
+                        userResponseCallback.onUsernameAvailable("error");
+                    }
+                });
     }
 
     private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){

@@ -58,4 +58,5 @@ public abstract class BaseUserDataRemoteDataSource {
      */
     public abstract void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
     public abstract void removeNotification(String targetIdToken, String content, String loggedUserIdToken);
+    public abstract void isUsernameAvailable(String username);
 }

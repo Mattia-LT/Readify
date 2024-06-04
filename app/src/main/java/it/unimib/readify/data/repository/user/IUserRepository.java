@@ -42,16 +42,16 @@ public interface IUserRepository {
     void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void fetchOtherUser(String otherUserIdToken);
+    void isUsernameAvailable(String username);
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
     MutableLiveData<List<Result>> getFollowersListLiveData();
     MutableLiveData<List<Result>> getFollowingListLiveData();
     MutableLiveData<Result> getOtherUserLiveData();
-    MutableLiveData<String> getSourceUsernameError();
+    MutableLiveData<String> getUsernameAvailableResult();
     MutableLiveData<Boolean> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
     MutableLiveData<Boolean> getLogoutResult();
-
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
 }

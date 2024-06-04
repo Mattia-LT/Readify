@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +34,7 @@ public class EditProfileFragment extends Fragment {
     private UserViewModel userViewModel;
     private User user;
     private User onSaveUser;
+    private boolean isUsernameAvailable;
     private Observer<Result> userObserver;
     private Observer<String> usernameErrorObserver;
     private Observer<Boolean> emailErrorObserver;
@@ -53,6 +56,8 @@ public class EditProfileFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        isUsernameAvailable = false;
+
         userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(UserViewModel.class);
 
@@ -68,19 +73,16 @@ public class EditProfileFragment extends Fragment {
         };
 
         usernameErrorObserver = result -> {
-            //todo sometimes observer triggers when input is empty (?)
             switch (result) {
                 case "available":
-                    Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();
-                    fragmentEditProfileBinding.textInputEditTextUsername.setText("");
+                    isUsernameAvailable = true;
                     break;
                 case "notAvailable":
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
+                    isUsernameAvailable = false;
                     break;
                 case "error":
-                    //todo use snack bar instead (to implement an action)?
                     Toast.makeText(requireContext(), "System: username error", Toast.LENGTH_SHORT).show();
+                    isUsernameAvailable = false;
                     break;
             }
         };
@@ -124,7 +126,7 @@ public class EditProfileFragment extends Fragment {
         };
 
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
-        userViewModel.getSourceUsernameError().observe(getViewLifecycleOwner(), usernameErrorObserver);
+        userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
         userViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
         userViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
         fragmentEditProfileBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
@@ -133,6 +135,27 @@ public class EditProfileFragment extends Fragment {
                 Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_profileImageSelectorFragment);
             }
         });
+
+        fragmentEditProfileBinding.textInputEditTextUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed for this implementation
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed for this implementation
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                userViewModel.isUsernameAvailable(s.toString());
+            }
+        });
+
+
+
+
 
         fragmentEditProfileBinding.buttonConfirmEdit.setOnClickListener(v -> {
             fragmentEditProfileBinding.settingsUsernameErrorMessage.setText("");
@@ -201,9 +224,14 @@ public class EditProfileFragment extends Fragment {
                     fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                 } else if(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().equals(user.getUsername())) {
                     Toast.makeText(requireContext(), "This is already your username", Toast.LENGTH_SHORT).show();
+                } else if(!isUsernameAvailable) {
+                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
+                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                 } else {
                     onSaveUser.setUsername(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim());
                     userViewModel.setUserUsername(onSaveUser);
+                    fragmentEditProfileBinding.textInputEditTextUsername.setText("");
+                    Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();
                 }
             }
         }

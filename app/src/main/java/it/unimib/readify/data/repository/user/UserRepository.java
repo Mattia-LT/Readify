@@ -31,7 +31,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<List<Result>> followerListLiveData;
     private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<Result> otherUserLiveData;
-    private final MutableLiveData<String> sourceUsernameError;
+    private final MutableLiveData<String> usernameAvailableResult;
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<Boolean> logoutResult;
@@ -52,7 +52,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         this.followerListLiveData = new MutableLiveData<>();
         this.followingListLiveData = new MutableLiveData<>();
         this.otherUserLiveData = new MutableLiveData<>();
-        this.sourceUsernameError = new MutableLiveData<>();
+        this.usernameAvailableResult = new MutableLiveData<>();
         this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
         this.fetchedNotifications = new MutableLiveData<>();
@@ -73,10 +73,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     public MutableLiveData<Result> getUserMutableLiveData() {
         return userMutableLiveData;
-    }
-
-    public void testSet(Result result) {
-        userMutableLiveData.postValue(result);
     }
 
     @Override
@@ -211,8 +207,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public MutableLiveData<String> getSourceUsernameError() {
-        return sourceUsernameError;
+    public MutableLiveData<String> getUsernameAvailableResult() {
+        return usernameAvailableResult;
     }
 
     @Override
@@ -356,6 +352,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
+    public void isUsernameAvailable(String username) {
+        userDataRemoteDataSource.isUsernameAvailable(username);
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error
@@ -395,7 +396,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onUsernameAvailable(String result) {
-        sourceUsernameError.postValue(result);
+        usernameAvailableResult.postValue(result);
     }
 
     @Override

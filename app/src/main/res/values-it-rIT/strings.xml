@@ -198,4 +198,11 @@
         <item quantity="other">%d libri</item>
     </plurals>
 
+    <plurals name="books_read">
+        <item quantity="one">Questo utente ha letto %d libro</item>
+        <item quantity="many">Questo utente ha letto %d libri</item>
+        <item quantity="other">Questo utente ha letto %d libri</item>
+    </plurals>
+
+
 </resources>

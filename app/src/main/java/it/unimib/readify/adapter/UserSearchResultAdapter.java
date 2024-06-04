@@ -66,13 +66,10 @@ public class UserSearchResultAdapter extends ListAdapter<User, UserSearchResultA
 
         public void bind(User user) {
             binding.textviewUsername.setText(user.getUsername());
-            int numberOfBooks = user.getTotalNumberOfBooks();
-            binding.textviewBooksRead.setText("Libri letti: " + numberOfBooks);
 
-            //todo usa stringa plurals
-            // String booksRead = itemView.getResources().getString(R.string.textview_books_read);
-            //booksRead = booksRead.concat(String.valueOf(numberOfBooks));
-            //binding.textviewBooksRead.setText(booksRead);
+            String booksRead = itemView.getResources().getQuantityString(R.plurals.books_read, user.getTotalNumberOfBooks(), user.getTotalNumberOfBooks());
+            binding.textviewBooksRead.setText(booksRead);
+
             int avatarId;
             try {
                 avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);

@@ -226,4 +226,9 @@
         <item quantity="other">%d books</item>
     </plurals>
 
+    <plurals name="books_read">
+        <item quantity="one">This user has read %d book</item>
+        <item quantity="other">This user has read %d books</item>
+    </plurals>
+
 </resources>

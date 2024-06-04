@@ -26,7 +26,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setBiography(User user);
     public abstract void setFollowers(User user);
     public abstract void setFollowing(User user);
-    public abstract void setSocialLinks(User user);
+    public abstract void setTotalNumberOfBooks(User user);
     public abstract void fetchNotifications(String idToken);
     public abstract void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
     /*

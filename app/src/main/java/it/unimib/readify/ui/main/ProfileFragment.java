@@ -386,28 +386,6 @@ public class ProfileFragment extends Fragment{
         fragmentProfileBinding.textviewFollowingCounter.setText(String.valueOf(loggedUser.getFollowing().getCounter()));
 
         fragmentProfileBinding.textviewUserBiography.setText(loggedUser.getBiography());
-
-        fragmentProfileBinding.textviewFacebook.setVisibility(View.GONE);
-        fragmentProfileBinding.textviewTwitter.setVisibility(View.GONE);
-        fragmentProfileBinding.textviewInstagram.setVisibility(View.GONE);
-        if(loggedUser.getSocialLinks() != null) {
-            for (int i = 0; i < loggedUser.getSocialLinks().size(); i++) {
-                switch (loggedUser.getSocialLinks().get(i).getSocialPlatform()) {
-                    case "facebook":
-                        fragmentProfileBinding.textviewFacebook.setText(loggedUser.getSocialLinks().get(i).getLink());
-                        fragmentProfileBinding.textviewFacebook.setVisibility(View.VISIBLE);
-                        break;
-                    case "twitter":
-                        fragmentProfileBinding.textviewTwitter.setText(loggedUser.getSocialLinks().get(i).getLink());
-                        fragmentProfileBinding.textviewTwitter.setVisibility(View.VISIBLE);
-                        break;
-                    case "instagram":
-                        fragmentProfileBinding.textviewInstagram.setText(loggedUser.getSocialLinks().get(i).getLink());
-                        fragmentProfileBinding.textviewInstagram.setVisibility(View.VISIBLE);
-                        break;
-                }
-            }
-        }
     }
 
     private void setupBadge(TextView notificationsTextView) {

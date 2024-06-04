@@ -10,7 +10,7 @@ import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWERS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWING_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_GENDER_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_RECOMMENDED_FIELD;
-import static it.unimib.readify.util.Constants.FIREBASE_USERS_SOCIAL_LINKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERS_LIST_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_VISIBILITY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
@@ -281,18 +281,22 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void setSocialLinks(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
+    public void setTotalNumberOfBooks(User user) {
+        databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_SOCIAL_LINKS_FIELD).setValue(user.getSocialLinks())
+                            databaseReference
+                                    .child(FIREBASE_USERS_COLLECTION)
+                                    .child(user.getIdToken())
+                                    .child(FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD)
+                                    .setValue(user.getTotalNumberOfBooks())
                                     .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                                     .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                         } else {
-                            //todo manage typo
                             userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
                         }
                     }

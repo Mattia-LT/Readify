@@ -156,6 +156,12 @@ public class CollectionFragment extends Fragment {
                   userViewModel.setUserRecommended(loggedUser);
               }
               collectionViewModel.resetDeleteCollectionResult();
+
+              int totalNumberOfBooks = loggedUser.getTotalNumberOfBooks();
+              totalNumberOfBooks -= deletedCollection.getNumberOfBooks();
+              loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
+              userViewModel.setUserTotalNumberOfBooks(loggedUser);
+
               requireActivity().getSupportFragmentManager().popBackStack();
           }
         };

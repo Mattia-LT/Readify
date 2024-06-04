@@ -95,12 +95,8 @@ public class Constants {
     public static final String FIREBASE_USERS_VISIBILITY_FIELD = "visibility";
     public static final String FIREBASE_USERS_RECOMMENDED_FIELD = "recommended";
     public static final String FIREBASE_USERS_AVATAR_FIELD = "avatar";
-    public static final String FIREBASE_USERS_SOCIAL_LINKS_FIELD = "socialLinks";
     public static final String FIREBASE_USERS_BIOGRAPHY_FIELD = "biography";
-
-
-    public static final String TO_READ = "to_read";
-    public static final String ALREADY_READ = "already_read";
+    public static final String FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD = "totalNumberOfBooks";
 
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
 

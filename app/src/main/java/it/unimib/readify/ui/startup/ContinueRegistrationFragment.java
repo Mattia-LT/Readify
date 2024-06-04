@@ -161,7 +161,8 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
                 userViewModel.setUserFollowing(onSaveUser);
                 onSaveUser.setVisibility("public");
                 userViewModel.setUserVisibility(onSaveUser);
-
+                onSaveUser.setTotalNumberOfBooks(0);
+                userViewModel.setUserTotalNumberOfBooks(onSaveUser);
             } else {
                 if(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition()== 0){
                     fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage.setText(R.string.error_gender);

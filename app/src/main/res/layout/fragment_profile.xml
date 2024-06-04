@@ -121,31 +121,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-
                 />
 
-
-            <!-- social links -->
-            <TextView
-                android:id="@+id/textview_facebook"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/textview_twitter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/textview_instagram"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:visibility="gone"/>
 
             <!-- collections -->
             <TextView

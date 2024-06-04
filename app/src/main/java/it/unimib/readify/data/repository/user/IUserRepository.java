@@ -28,6 +28,7 @@ public interface IUserRepository {
     void setUserBiography(User user);
     void setUserFollowing(User user);
     void setUserFollowers(User user);
+    void setUserTotalNumberOfBooks(User user);
     void fetchNotifications(String idToken);
     void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
     void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);

@@ -245,6 +245,7 @@ public class UserViewModel extends ViewModel {
     public void setUserFollowing(User user) {testDatabaseRepository.setUserFollowing(user);}
 
     public void setUserFollowers(User user) {testDatabaseRepository.setUserFollowers(user);}
+    public void setUserTotalNumberOfBooks(User user) {testDatabaseRepository.setUserTotalNumberOfBooks(user);}
 
     public void fetchNotifications(String idToken) {
         testDatabaseRepository.fetchNotifications(idToken);

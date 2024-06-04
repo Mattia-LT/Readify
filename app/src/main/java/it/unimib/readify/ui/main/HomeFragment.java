@@ -161,7 +161,7 @@ public class HomeFragment extends Fragment {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
-                if(userViewModel.isFirstLoading()){
+                if(user.getUsername() != null && userViewModel.isFirstLoading()){
                     userViewModel.setFirstLoading(false);
                     collectionViewModel.resetLogout();
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());

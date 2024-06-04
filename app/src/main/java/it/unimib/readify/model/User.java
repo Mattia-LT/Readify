@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 public class User implements Parcelable {
@@ -16,12 +15,12 @@ public class User implements Parcelable {
     private HashMap<String, Integer> recommended = new HashMap<>();
     private String email;
     private String gender;
-    private List<Social> socialLinks;
     private String username;
     private String visibility;
     private FollowGroup followers;
     private FollowGroup following;
     private String idToken;
+    private int totalNumberOfBooks;
 
     public User() {}
 
@@ -37,21 +36,18 @@ public class User implements Parcelable {
         this.gender = gender;
     }
 
-    public User(String avatar, String biography, HashMap<String, Integer> recommended,
-                String email, String gender, List<Social> socialLinks, String username,
-                String visibility, FollowGroup followers, FollowGroup following,
-                String idToken) {
+    public User(String avatar, String biography, HashMap<String, Integer> recommended, String email, String gender, String username, String visibility, FollowGroup followers, FollowGroup following, String idToken, int totalNumberOfBooks) {
         this.avatar = avatar;
         this.biography = biography;
         this.recommended = recommended;
         this.email = email;
         this.gender = gender;
-        this.socialLinks = socialLinks;
         this.username = username;
         this.visibility = visibility;
         this.followers = followers;
         this.following = following;
         this.idToken = idToken;
+        this.totalNumberOfBooks = totalNumberOfBooks;
     }
 
     public User (User user) {
@@ -60,12 +56,12 @@ public class User implements Parcelable {
         this.recommended = user.getRecommended();
         this.email = user.getEmail();
         this.gender = user.getGender();
-        this.socialLinks = user.getSocialLinks();
         this.username = user.getUsername();
         this.visibility = user.getVisibility();
         this.followers = user.getFollowers();
         this.following = user.getFollowing();
         this.idToken = user.getIdToken();
+        this.totalNumberOfBooks = user.getTotalNumberOfBooks();
     }
 
     public String getAvatar() {
@@ -108,13 +104,6 @@ public class User implements Parcelable {
         this.gender = gender;
     }
 
-    public List<Social> getSocialLinks() {
-        return socialLinks;
-    }
-
-    public void setSocialLinks(List<Social> socialLinks) {
-        this.socialLinks = socialLinks;
-    }
 
     public String getUsername() {
         return username;
@@ -156,6 +145,15 @@ public class User implements Parcelable {
         this.idToken = idToken;
     }
 
+    public int getTotalNumberOfBooks() {
+        return totalNumberOfBooks;
+    }
+
+    public void setTotalNumberOfBooks(int totalNumberOfBooks) {
+        this.totalNumberOfBooks = totalNumberOfBooks;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -168,12 +166,12 @@ public class User implements Parcelable {
         dest.writeSerializable(this.recommended);
         dest.writeString(this.email);
         dest.writeString(this.gender);
-        dest.writeTypedList(this.socialLinks);
         dest.writeString(this.username);
         dest.writeString(this.visibility);
         dest.writeParcelable(this.followers, flags);
         dest.writeParcelable(this.following, flags);
         dest.writeString(this.idToken);
+        dest.writeInt(this.totalNumberOfBooks);
     }
 
     public void readFromParcel(Parcel source) {
@@ -182,12 +180,12 @@ public class User implements Parcelable {
         this.recommended = (HashMap<String, Integer>) source.readSerializable();
         this.email = source.readString();
         this.gender = source.readString();
-        this.socialLinks = source.createTypedArrayList(Social.CREATOR);
         this.username = source.readString();
         this.visibility = source.readString();
         this.followers = source.readParcelable(FollowGroup.class.getClassLoader());
         this.following = source.readParcelable(FollowGroup.class.getClassLoader());
         this.idToken = source.readString();
+        this.totalNumberOfBooks = source.readInt();
     }
 
     protected User(Parcel in) {
@@ -196,12 +194,12 @@ public class User implements Parcelable {
         this.recommended = (HashMap<String, Integer>) in.readSerializable();
         this.email = in.readString();
         this.gender = in.readString();
-        this.socialLinks = in.createTypedArrayList(Social.CREATOR);
         this.username = in.readString();
         this.visibility = in.readString();
         this.followers = in.readParcelable(FollowGroup.class.getClassLoader());
         this.following = in.readParcelable(FollowGroup.class.getClassLoader());
         this.idToken = in.readString();
+        this.totalNumberOfBooks = in.readInt();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -221,12 +219,12 @@ public class User implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(avatar, user.avatar) && Objects.equals(biography, user.biography) && Objects.equals(recommended, user.recommended) && Objects.equals(email, user.email) && Objects.equals(gender, user.gender) && Objects.equals(socialLinks, user.socialLinks) && Objects.equals(username, user.username) && Objects.equals(visibility, user.visibility) && Objects.equals(followers, user.followers) && Objects.equals(following, user.following) && Objects.equals(idToken, user.idToken);
+        return totalNumberOfBooks == user.totalNumberOfBooks && Objects.equals(avatar, user.avatar) && Objects.equals(biography, user.biography) && Objects.equals(recommended, user.recommended) && Objects.equals(email, user.email) && Objects.equals(gender, user.gender) && Objects.equals(username, user.username) && Objects.equals(visibility, user.visibility) && Objects.equals(followers, user.followers) && Objects.equals(following, user.following) && Objects.equals(idToken, user.idToken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(avatar, biography, recommended, email, gender, socialLinks, username, visibility, followers, following, idToken);
+        return Objects.hash(avatar, biography, recommended, email, gender, username, visibility, followers, following, idToken, totalNumberOfBooks);
     }
 
     @NonNull
@@ -238,16 +236,12 @@ public class User implements Parcelable {
                 ", recommended=" + recommended +
                 ", email='" + email + '\'' +
                 ", gender='" + gender + '\'' +
-                ", socialLinks=" + socialLinks +
                 ", username='" + username + '\'' +
                 ", visibility='" + visibility + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
                 ", idToken='" + idToken + '\'' +
+                ", totalNumberOfBooks=" + totalNumberOfBooks +
                 '}';
-    }
-
-    public String printReference() {
-        return super.toString();
     }
 }

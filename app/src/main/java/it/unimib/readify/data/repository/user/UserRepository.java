@@ -144,6 +144,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
+    public void setUserTotalNumberOfBooks(User user) {
+        userDataRemoteDataSource.setTotalNumberOfBooks(user);
+    }
+
+    @Override
     public void fetchNotifications(String idToken) {
         userDataRemoteDataSource.fetchNotifications(idToken);
     }

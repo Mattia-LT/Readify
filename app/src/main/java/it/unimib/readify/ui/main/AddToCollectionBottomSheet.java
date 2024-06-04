@@ -204,6 +204,12 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                         }
                     }
                     userViewModel.setUserRecommended(loggedUser);
+
+                    int totalNumberOfBooks = loggedUser.getTotalNumberOfBooks();
+                    totalNumberOfBooks += 1;
+                    loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
+                    userViewModel.setUserTotalNumberOfBooks(loggedUser);
+
                     Log.d("fragment","aggiunto OK");
                 } else {
                     //toast errore
@@ -236,6 +242,11 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     }
                     userViewModel.setUserRecommended(loggedUser);
                     Log.d("fragment","rimosso OK");
+
+                    int totalNumberOfBooks = loggedUser.getTotalNumberOfBooks();
+                    totalNumberOfBooks -= 1;
+                    loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
+                    userViewModel.setUserTotalNumberOfBooks(loggedUser);
                 } else {
                     //toast errore
                     Log.d("fragment","rimosso fail");

@@ -78,9 +78,8 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
         }
 
         public void bind(Collection collection) {
-            //set cover
             if(collection != null && collection.getWorks() != null){
-                //set collection name and visibility
+                //Set collection name and visibility
                 binding.collectionNameTextview.setText(collection.getName());
                 if (collection.isVisible()) {
                     binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_visibility_24);
@@ -88,6 +87,7 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                     binding.collectionVisibilityIcon.setImageResource(R.drawable.baseline_lock_outline_24);
                 }
 
+                //Set collection cover
                 boolean isThumbnailAvailable = false;
                 if(collection.getWorks().isEmpty() && collection.getNumberOfBooks() == 0) {
                     binding.collectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
@@ -103,7 +103,7 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                                 pos++;
                             }
                             if (cover != -1) {
-                                Glide.with(this.itemView.getContext())
+                                Glide.with(itemView.getContext())
                                         .asBitmap()
                                         .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                                         .placeholder(R.drawable.loading_spinner)
@@ -116,14 +116,13 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                                                 Palette.from(resource).generate(palette -> {
                                                     if (palette != null) {
                                                         int bookCoverMainColor = palette.getDominantColor(Color.BLACK); // Default color
-                                                        //get brightness of the cover image and set visibility icon color accordingly
+                                                        //Get brightness of the cover image and set visibility icon color accordingly
                                                         int brightness = (int) (0.2126 * Color.red(bookCoverMainColor) + 0.7152 * Color.green(bookCoverMainColor) + 0.0722 * Color.blue(bookCoverMainColor));
-                                                        //Log.d("COLLECTION BRIGHTNESS", collection.getName() + brightness);
                                                         if (brightness < 128) {
-                                                            // Background is dark, use a white icon
+                                                            //Background is dark, use a white icon
                                                             binding.collectionVisibilityIcon.setColorFilter(Color.WHITE);
                                                         } else {
-                                                            // Background is light, use a black icon
+                                                            //Background is light, use a black icon
                                                             binding.collectionVisibilityIcon.setColorFilter(Color.BLACK);
                                                         }
                                                     }
@@ -144,9 +143,9 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                         binding.collectionThumbnailImageview.setImageResource(R.drawable.image_not_available);
                     }
                 }
-                //managing layout margin
+
+                //Set layout margins
                 GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) binding.collectionContainer.getLayoutParams();
-                //convert 5dp in px depending on the user's device
                 float margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, Resources.getSystem().getDisplayMetrics());
                 if (getBindingAdapterPosition() % 2 == 0) {
                     layoutParams.rightMargin = (int) margin;
@@ -160,7 +159,8 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
         public void onClick(View v) {
             int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                onItemClickListener.onCollectionItemClick(getItem(position));
+                Collection collection = getItem(position);
+                onItemClickListener.onCollectionItemClick(collection);
             }
         }
     }

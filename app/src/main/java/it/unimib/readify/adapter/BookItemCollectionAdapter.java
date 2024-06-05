@@ -74,7 +74,6 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
             loadCover(book);
             binding.textviewBookCollectionTitle.setText(book.getTitle());
             loadAuthors(book);
-            //todo
             loadSubjects(book);
             loadRating(book);
         }
@@ -105,7 +104,7 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                             .placeholder(R.drawable.loading_spinner)
                             .error(R.drawable.image_not_available);
 
-                    Glide.with(this.itemView.getContext())
+                    Glide.with(itemView.getContext())
                             .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                             .apply(requestOptions)
                             .into(binding.bookCollectionThumbnailImageview);
@@ -121,7 +120,7 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                     authors.append(author.getName()).append("\n");
                 }
             } else {
-                authors.append(this.itemView.getContext().getString(R.string.error_author_not_found));
+                authors.append(itemView.getContext().getString(R.string.error_author_not_found));
             }
             binding.textviewBookCollectionAuthor.setText(authors.toString());
         }
@@ -129,7 +128,7 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
         private void loadSubjects(OLWorkApiResponse book) {
             if(book.getSubjects() != null){
                 binding.chipgroupBookCollectionGenres.removeAllViews();
-                SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(this.itemView.getContext());
+                SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(itemView.getContext());
                 String[] subjects = itemView.getResources().getStringArray(R.array.chip_genres);
                 for(String subject : book.getSubjects()){
                     if(subjectsUtil.containSubject(subject)){
@@ -140,10 +139,9 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                         binding.chipgroupBookCollectionGenres.addView(chip);
                     }
                 }
-
-
             }
         }
+
         private void loadRating(OLWorkApiResponse book) {
             if(book.getRating() != null && book.getRating().getSummary().getAverage() != 0){
                 float rating = (float) book.getRating().getSummary().getAverage();
@@ -155,8 +153,6 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                 binding.ratingBarLabelBookCollection.setText(R.string.rating_not_available);
             }
         }
-
-
 
     }
 }

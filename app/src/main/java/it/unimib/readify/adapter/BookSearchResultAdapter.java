@@ -84,7 +84,7 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
             }
             description = description.trim();
             if(description.isEmpty()){
-                description = this.itemView.getContext().getString(R.string.description_not_available);
+                description = itemView.getContext().getString(R.string.description_not_available);
             }
             binding.textviewBookDescription.setText(description);
             if(book.getCovers() != null){
@@ -102,15 +102,13 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
                             .error(R.drawable.image_not_available)
                             .transform(new CenterCrop());
 
-                    Glide.with(this.itemView.getContext())
+                    Glide.with(itemView.getContext())
                             .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                             .apply(requestOptions)
                             .into(binding.imageviewBookCover);
                 }
             } else {
-                Glide.with(this.itemView.getContext())
-                        .load(R.drawable.image_not_available)
-                        .into(binding.imageviewBookCover);
+                binding.imageviewBookCover.setImageResource(R.drawable.image_not_available);
             }
         }
 
@@ -122,7 +120,6 @@ public class BookSearchResultAdapter extends ListAdapter<OLWorkApiResponse, Book
                 if (v.getId() == R.id.imagebutton_add_icon) {
                     onItemClickListener.onAddToCollectionButtonPressed(book);
                 } else {
-                    //hai premuto qualcos'altro
                     onItemClickListener.onBookItemClick(book);
                 }
             }

@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/profileImageSelectorFragment"
-        android:name="it.unimib.readify.ui.main.ProfileImageSelector"
+        android:name="it.unimib.readify.ui.main.ProfileImageSelectorFragment"
         android:label="@string/navigation_bar_label_image_selector"
         tools:layout="@layout/fragment_profile_image_selector">
 

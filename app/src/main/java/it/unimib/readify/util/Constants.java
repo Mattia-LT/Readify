@@ -124,5 +124,6 @@ public class Constants {
     public static final String USER_VISIBILITY_PUBLIC = "public";
     public static final String USER_VISIBILITY_PRIVATE = "private";
 
+    public static final String PROFILE_IMAGE_TAG = "avatar";
 
 }

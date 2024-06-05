@@ -1,69 +1,77 @@
 package it.unimib.readify.adapter;
 
-import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import it.unimib.readify.databinding.ProfileImageItemBinding;
 
-import it.unimib.readify.R;
+public class ProfileImageSelectorAdapter extends ListAdapter<Integer, ProfileImageSelectorAdapter.ProfileImageSelectorViewHolder> {
 
-public class ProfileImageSelectorAdapter extends RecyclerView.Adapter<ProfileImageSelectorAdapter.MyViewHolder> {
-    int[] arr;
-    private OnImageClickListener onImageClickListener;
-    private final Application application;
+    public interface OnImageClickListener {
+        void onImageClick(int resourceId);
+    }
 
-    public ProfileImageSelectorAdapter(int[] arr, OnImageClickListener onImageClickListener, Application application) {
-        this.arr = arr;
+    private final OnImageClickListener onImageClickListener;
+
+    public ProfileImageSelectorAdapter(OnImageClickListener onImageClickListener) {
+        super(new DiffUtil.ItemCallback<Integer>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Integer oldItem, @NonNull Integer newItem) {
+                return oldItem.intValue() == newItem.intValue();
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Integer oldItem, @NonNull Integer newItem) {
+                return oldItem.intValue() == newItem.intValue();
+            }
+        });
         this.onImageClickListener = onImageClickListener;
-        this.application = application;
     }
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_image_item, parent, false);
-        MyViewHolder myViewHolder = new MyViewHolder(view);
-        return myViewHolder;
+    public ProfileImageSelectorViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ProfileImageItemBinding binding = ProfileImageItemBinding.inflate(inflater, parent, false);
+        return new ProfileImageSelectorViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.imageView.setImageResource(arr[position]);
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int clickedPosition = holder.getBindingAdapterPosition()        ;
-                if (onImageClickListener != null && clickedPosition != RecyclerView.NO_POSITION) {
-                    onImageClickListener.onImageClick(clickedPosition);
+    public void onBindViewHolder(@NonNull ProfileImageSelectorViewHolder holder, int position) {
+        Integer resourceId = getItem(position);
+        holder.bind(resourceId);
+    }
+
+    public class ProfileImageSelectorViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        private final ProfileImageItemBinding binding;
+
+        public ProfileImageSelectorViewHolder(@NonNull ProfileImageItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.profileImgItem.setOnClickListener(this);
+        }
+
+        public void bind(int resourceId){
+            binding.profileImgItem.setImageResource(resourceId);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getBindingAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                int resourceId = getItem(position);
+                if(v.getId() == binding.profileImgItem.getId()){
+                    onImageClickListener.onImageClick(resourceId);
                 }
             }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return arr.length;
-    }
-
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView imageView;
-
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.profile_img_item);
         }
     }
 
-    // Interfaccia per gestire gli eventi di clic sulle immagini
-    public interface OnImageClickListener {
-        void onImageClick(int position);
-    }
 }

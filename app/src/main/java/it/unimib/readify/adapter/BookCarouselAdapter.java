@@ -73,6 +73,7 @@ public class BookCarouselAdapter extends ListAdapter<OLWorkApiResponse, BookCaro
         public void bind(OLWorkApiResponse book) {
             //Set book's title
             binding.bookTitle.setText(book.getTitle());
+
             //Set book's cover
             if (book.getCovers() != null) {
                 int cover = -1;
@@ -94,9 +95,7 @@ public class BookCarouselAdapter extends ListAdapter<OLWorkApiResponse, BookCaro
                             .into(binding.bookCover);
                 }
             } else {
-                Glide.with(itemView.getContext())
-                        .load(R.drawable.image_not_available)
-                        .into(binding.bookCover);
+                binding.bookCover.setImageResource(R.drawable.image_not_available);
             }
         }
 

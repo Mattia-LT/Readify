@@ -105,14 +105,13 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
                 User user = comment.getUser();
                 int avatarId;
                 if(user != null){
-                    Log.d("USER OK", "USER OK");
                     binding.commentName.setText(comment.getUser().getUsername());
                     try {
                         avatarId = R.drawable.class.getDeclaredField(user.getAvatar().toLowerCase()).getInt(null);
                     } catch (Exception e) {
                         avatarId = R.drawable.ic_baseline_profile_24;
                     }
-                    Glide.with(this.itemView.getContext())
+                    Glide.with(itemView.getContext())
                             .load(avatarId)
                             .dontAnimate()
                             .into(binding.commentImage);
@@ -124,8 +123,7 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
                         binding.deleteCommentButton.setVisibility(View.INVISIBLE);
                     }
                 } else {
-                    Log.d("USER NULL", "USER NULL");
-                    //todo aggiungi errore nel caricamento dell'utente
+                    Log.e("CommentAdapter", "Selected user is null");
                 }
             }
 

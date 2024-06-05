@@ -77,20 +77,23 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         }
 
         public void bind(Notification notification) {
-            //username
+            //Set username
             binding.notificationTitle.setText(notification.getUsername());
-            //icon
+
+            //Set avatar icon
             int avatarId;
             try {
                 avatarId = R.drawable.class.getDeclaredField(notification.getAvatar().toLowerCase()).getInt(null);
             } catch (Exception e) {
                 avatarId = R.drawable.ic_baseline_profile_24;
             }
-            Glide.with(this.itemView.getContext())
+
+            Glide.with(itemView.getContext())
                     .load(avatarId)
                     .dontAnimate()
                     .into(binding.notificationIcon);
-            //date
+
+            //Set date
             Locale locale = Locale.getDefault();
             if (locale.getLanguage().startsWith("it")) {
                 locale = new Locale("it", "IT");
@@ -100,6 +103,7 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
             SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
             String formattedDate = dateFormat.format(timestamp);
             binding.notificationDate.setText(formattedDate);
+
             //button
             /*
                 todo right now, each time the user presses on the button, it refreshes the page,

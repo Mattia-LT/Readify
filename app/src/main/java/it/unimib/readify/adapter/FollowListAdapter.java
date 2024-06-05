@@ -91,16 +91,18 @@ public class FollowListAdapter extends ListAdapter<FollowUser, FollowListAdapter
         public void bind(FollowUser followUser) {
             if (followUser != null) {
                 binding.followUsername.setText(followUser.getUser().getUsername());
+
                 int avatarId;
                 try {
                     avatarId = R.drawable.class.getDeclaredField(followUser.getUser().getAvatar().toLowerCase()).getInt(null);
                 } catch (Exception e) {
                     avatarId = R.drawable.ic_baseline_profile_24;
                 }
-                Glide.with(this.itemView.getContext())
+                Glide.with(itemView.getContext())
                         .load(avatarId)
                         .dontAnimate()
                         .into(binding.followImage);
+
                 if(followUser.getIdToken().equalsIgnoreCase(loggedUserIdToken)){
                     //don't show follow button
                     binding.unfollowButton.setVisibility(View.GONE);
@@ -115,7 +117,6 @@ public class FollowListAdapter extends ListAdapter<FollowUser, FollowListAdapter
                     binding.unfollowButton.setVisibility(View.GONE);
                 }
             }
-
 
         }
 

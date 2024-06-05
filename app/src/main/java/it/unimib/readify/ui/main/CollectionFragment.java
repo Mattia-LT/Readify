@@ -207,9 +207,7 @@ public class CollectionFragment extends Fragment {
         collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
             if (!isValid){
                 if (renameEditText != null) {
-                    //TODO metti un file R.string
-                    Log.e("isNameValid","false");
-                    renameEditText.setError("Invalid collection name");
+                    renameEditText.setError(getString(R.string.error_collection_name_not_valid));
                     renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                 }
             }
@@ -224,9 +222,7 @@ public class CollectionFragment extends Fragment {
                 renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
             } else {
                 if (renameEditText != null) {
-                    //TODO metti un file R.string
-                    Log.e("isNameUnique","false");
-                    renameEditText.setError("Collection name already exists");
+                    renameEditText.setError(getString(R.string.error_collection_name_not_unique));
                     renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                 }
             }

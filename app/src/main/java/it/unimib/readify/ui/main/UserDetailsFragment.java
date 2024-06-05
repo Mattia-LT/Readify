@@ -49,10 +49,6 @@ public class UserDetailsFragment extends Fragment {
 
     public UserDetailsFragment() {}
 
-    public static UserDetailsFragment newInstance() {
-        return new UserDetailsFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,13 +71,13 @@ public class UserDetailsFragment extends Fragment {
     }
 
     private void initViewModels(){
-        //initializing viewModels
         userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(UserViewModel.class);
 
         collectionViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
     }
+
     private void initObservers() {
         final Observer<List<Result>> collectionsObserver = results -> {
             ConstraintLayout noCollectionsFoundLayout = binding.noCollectionsFoundLayout;
@@ -111,7 +107,7 @@ public class UserDetailsFragment extends Fragment {
                     binding.followButton.setVisibility(View.VISIBLE);
                 }
             } else {
-                //todo show error
+                Log.e("UserDetailsFragment", "Logged user error");
             }
         };
 
@@ -128,9 +124,8 @@ public class UserDetailsFragment extends Fragment {
                     hidePrivateUserInfo();
                 }
             } else {
-                // todo manage errors
+                Log.e("UserDetailsFragment", "Other user error");
             }
-
         };
 
         collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionsObserver);
@@ -152,7 +147,6 @@ public class UserDetailsFragment extends Fragment {
                     .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
 
             return otherUserFollowsLoggedUser && loggedUserFollowsOtherUser;
-
         }
 
         return false;

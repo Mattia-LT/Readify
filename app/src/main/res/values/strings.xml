@@ -218,7 +218,9 @@
     <string name="error_password_length">Password length must be 6 characters or higher</string>
     <string name="error_confirm_password_equal">Confirm Password must be equal to Password field</string>
     <string name="error_gender">Select a valid gender identity</string>
-    <string name="error_not_enough_genre">Select at least 3 topic of interest </string>
+    <string name="error_not_enough_genre">Select at least 3 topic of interest</string>
+    <string name="error_collection_name_not_valid">Invalid collection name.</string>
+    <string name="error_collection_name_not_unique">The name of the collection must be unique.</string>
 
     <!-- plurals -->
     <plurals name="books">

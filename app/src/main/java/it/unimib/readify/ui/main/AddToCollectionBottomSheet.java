@@ -289,18 +289,15 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
     private void updateErrorMessage() {
         if(!isNameValid){
-            //todo usa file string
-            binding.editTextCreateCollection.setError("Invalid collection name");
+            binding.editTextCreateCollection.setError(getString(R.string.error_collection_name_not_valid));
             confirmButton.setEnabled(false);
             confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
             confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
         } else if(!isNameUnique){
-            //todo usa file string
-            binding.editTextCreateCollection.setError("Collection name must be unique");
+            binding.editTextCreateCollection.setError(getString(R.string.error_collection_name_not_unique));
             confirmButton.setEnabled(false);confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
             confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
         } else {
-            //todo usa file string
             binding.editTextCreateCollection.setError(null);
             confirmButton.setEnabled(true);
             confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);

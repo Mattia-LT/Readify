@@ -14,6 +14,7 @@ public interface IBookRepository {
     void loadRecommendedBooks(Map<String, Integer> recommendedGenres);
     void loadTrendingBooks();
     void loadRecentBooks();
+    void resetCarousels();
     MutableLiveData<List<Result>> getSearchResultsLiveData();
     MutableLiveData<List<Result>> getRecommendedBooksLiveData();
     MutableLiveData<List<Result>> getTrendingBooksLiveData();

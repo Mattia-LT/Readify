@@ -362,6 +362,13 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
+    public void deleteUserInfo() {
+        User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
+        currentUser.setIdToken(null);
+        userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
+    }
+
+    @Override
     public void onAddCommentResult(Comment comment) {
         if(comment == null){
             //todo error

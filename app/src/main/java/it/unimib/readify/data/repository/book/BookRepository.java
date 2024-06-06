@@ -108,6 +108,13 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
         bookRemoteDataSource.getRecentBooks();
     }
 
+    @Override
+    public void resetCarousels() {
+        trendingBooksLiveData.postValue(null);
+        recentBooksLiveData.postValue(null);
+        recommendedBooksLiveData.postValue(null);
+    }
+
     public MutableLiveData<List<Result>> getSearchResultsLiveData(){
         return searchResultsLiveData;
     }

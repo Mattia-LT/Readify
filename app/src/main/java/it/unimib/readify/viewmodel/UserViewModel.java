@@ -363,5 +363,7 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.isUsernameAvailable(username);
     }
 
-
+    public void deleteUserInfo(){
+        testDatabaseRepository.deleteUserInfo();
+    }
 }

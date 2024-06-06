@@ -166,6 +166,7 @@
     <string name="change_collection_visibility_action">Visibility</string>
     <string name="no_collections_found">No collection found.\nThis user has no public collection!</string>
     <string name="private_profile_message">This user has a private profile.\nTo see his collections, you must follow each other.</string>
+    <string name="empty_biography_message">You don\'t have set a biography yet. You can add it in the edit profile section.</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

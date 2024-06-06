@@ -207,8 +207,9 @@ public class UserDetailsFragment extends Fragment {
 
     private void showPrivateUserInfo(User user){
         binding.textviewUserBiography.setVisibility(View.VISIBLE);
-        binding.textviewUserBiography.setText(user.getBiography());
-
+        if(user.getBiography()!= null){
+            binding.textviewUserBiography.setText(user.getBiography());
+        }
         binding.collectionsProgressBar.setVisibility(View.VISIBLE);
         collectionViewModel.fetchOtherUserCollections(userIdToken);
 

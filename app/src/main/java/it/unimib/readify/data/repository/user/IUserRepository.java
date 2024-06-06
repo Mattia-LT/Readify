@@ -16,6 +16,7 @@ public interface IUserRepository {
     void getUser(String email, String password, boolean isRegistered);
     void signIn(String email, String password);
     void signUp(String email, String password);
+    void userAuthentication(String email, String password);
     void signInWithGoogle(String idToken);
     void logout();
     void changeUserPassword(String newPassword);
@@ -54,5 +55,6 @@ public interface IUserRepository {
     MutableLiveData<Boolean> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
     MutableLiveData<Boolean> getLogoutResult();
+    MutableLiveData<Boolean> getUserAuthenticationResult();
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
 }

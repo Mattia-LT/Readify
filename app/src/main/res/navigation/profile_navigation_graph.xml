@@ -72,6 +72,10 @@
             android:id="@+id/action_editProfileFragment_to_profileImageSelectorFragment"
             app:destination="@+id/profileImageSelectorFragment" />
 
+        <action
+            android:id="@+id/action_editProfileFragment_to_editSensibleFragment"
+            app:destination="@+id/editSensibleFragment" />
+
     </fragment>
 
     <dialog
@@ -247,6 +251,16 @@
             android:id="@+id/action_followListFragment_to_userDetailsFragment"
             app:destination="@id/userDetailsFragment" />
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/editSensibleFragment"
+        android:name="it.unimib.readify.ui.main.EditSensibleFragment"
+        tools:layout="@layout/fragment_edit_sensible">
+
+        <action
+            android:id="@+id/action_editSensibleFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
     </fragment>
 
 </navigation>

@@ -59,6 +59,7 @@ public class UserViewModel extends ViewModel {
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private MutableLiveData<Boolean> logoutResult;
+    private MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private boolean isUIRunning;
     private boolean firstLoading = true;
@@ -119,6 +120,7 @@ public class UserViewModel extends ViewModel {
         sourceEmailError = testDatabaseRepository.getSourceEmailError();
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
         notifications = testDatabaseRepository.getFetchedNotifications();
+        userAuthenticationResult = testDatabaseRepository.getUserAuthenticationResult();
     }
 
     //new logic
@@ -305,6 +307,10 @@ public class UserViewModel extends ViewModel {
         return notifications;
     }
 
+    public MutableLiveData<Boolean> getUserAuthenticationResult() {
+        return userAuthenticationResult;
+    }
+
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser){
         testDatabaseRepository.followUser(idTokenLoggedUser, idTokenFollowedUser);
         Log.d("ViewModel", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
@@ -361,6 +367,10 @@ public class UserViewModel extends ViewModel {
 
     public void isUsernameAvailable(String username){
         testDatabaseRepository.isUsernameAvailable(username);
+    }
+
+    public void userAuthentication(String email, String password){
+        testDatabaseRepository.userAuthentication(email, password);
     }
 
 

@@ -155,6 +155,24 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
         firebaseAuth.signOut();
     }
 
+    @Override
+    public void userAuthentication(String email, String password) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
+        user.reauthenticate(EmailAuthProvider.getCredential(email, password)).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Log.d("userAuthentication", "Success");
+                    userResponseCallback.onSuccessReAuthentication();
+                } else {
+                    Log.d("userAuthentication", "Failure");
+                    userResponseCallback.onFailureReAuthentication();
+                }
+            }
+        });
+    }
+
     private String getErrorMessage(Exception exception) {
         //todo decidere se tenere
         if (exception instanceof FirebaseAuthWeakPasswordException) {

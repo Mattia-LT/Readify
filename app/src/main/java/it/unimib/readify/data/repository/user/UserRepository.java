@@ -35,6 +35,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<Boolean> logoutResult;
+    private final MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
 
     public static IUserRepository getInstance(Application application) {
@@ -57,6 +58,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         this.sourcePasswordError = new MutableLiveData<>();
         this.fetchedNotifications = new MutableLiveData<>();
         this.logoutResult = new MutableLiveData<>();
+        this.userAuthenticationResult = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
     }
@@ -83,6 +85,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void signUp(String email, String password) {
         userAuthRemoteDataSource.signUp(email, password);
+    }
+
+    @Override
+    public void userAuthentication(String email, String password) {
+        userAuthRemoteDataSource.userAuthentication(email, password);
     }
 
     @Override
@@ -234,6 +241,10 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications() {
         return fetchedNotifications;
+    }
+
+    public MutableLiveData<Boolean> getUserAuthenticationResult() {
+        return userAuthenticationResult;
     }
 
     @Override
@@ -430,5 +441,15 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void onFailureCompleteFetchNotifications(String message) {
         Log.d("onFailureCompleteFetchNotification", message);
+    }
+
+    @Override
+    public void onSuccessReAuthentication() {
+        userAuthenticationResult.postValue(true);
+    }
+
+    @Override
+    public void onFailureReAuthentication() {
+        userAuthenticationResult.postValue(false);
     }
 }

@@ -19,8 +19,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.apache.commons.validator.routines.EmailValidator;
-
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentEditProfileBinding;
 import it.unimib.readify.model.Result;
@@ -37,11 +35,6 @@ public class EditProfileFragment extends Fragment {
     private boolean isUsernameAvailable;
     private Observer<Result> userObserver;
     private Observer<String> usernameErrorObserver;
-    private Observer<Boolean> emailErrorObserver;
-    private Observer<Boolean> passwordErrorObserver;
-    private String newPassword;
-    private int imageResourceId;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,48 +80,9 @@ public class EditProfileFragment extends Fragment {
             }
         };
 
-        emailErrorObserver = result -> {
-            /*
-            switch (result) {
-                case "available":
-                    Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
-                    fragmentSettingsBinding.textInputEditTextEmail.setText("");
-                    break;
-                case "notAvailable":
-                    fragmentSettingsBinding.settingsEmailErrorMessage.setText(R.string.email_already_taken);
-                    fragmentSettingsBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
-                    break;
-                case "error":
-                    //todo use snack bar instead (to implement an action)?
-                    Toast.makeText(requireContext(), "System: email error", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-
-             */
-            if(result) {
-                Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
-                fragmentEditProfileBinding.textInputEditTextEmail.setText("");
-            } else {
-                Toast.makeText(requireContext(), "failure", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        passwordErrorObserver = result -> {
-            Log.d("email changed", result.toString());
-            if(result) {
-                Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
-                fragmentEditProfileBinding.textInputEditTextPassword.setText("");
-                fragmentEditProfileBinding.textInputEditTextPasswordConfirm.setText("");
-            } else {
-                //todo use snack bar instead (to implement an action)?
-                Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
-            }
-        };
-
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
         userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
-        userViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
-        userViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
+
         fragmentEditProfileBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,43 +107,25 @@ public class EditProfileFragment extends Fragment {
             }
         });
 
-
-
-
-
         fragmentEditProfileBinding.buttonConfirmEdit.setOnClickListener(v -> {
             fragmentEditProfileBinding.settingsUsernameErrorMessage.setText("");
             fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.GONE);
-            fragmentEditProfileBinding.settingsEmailErrorMessage.setText("");
-            fragmentEditProfileBinding.settingsEmailErrorMessage.setVisibility(View.GONE);
             fragmentEditProfileBinding.settingsBioErrorMessage.setText("");
             fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.GONE);
-            fragmentEditProfileBinding.settingsPasswordErrorMessage.setText("");
-            fragmentEditProfileBinding.settingsPasswordErrorMessage.setVisibility(View.GONE);
-            fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setText("");
-            fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.GONE);
-
             if(fragmentEditProfileBinding.textInputEditTextUsername.getText() != null
-                    && fragmentEditProfileBinding.textInputEditTextEmail.getText() != null
-                    && fragmentEditProfileBinding.textInputEditTextBio.getText() != null
-                    && fragmentEditProfileBinding.textInputEditTextPassword.getText() != null
-                    && fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText() != null) {
+                    && fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
                 if(!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().isEmpty()
-                        || !fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().isEmpty()
-                        || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().isEmpty()
-                        || !fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().isEmpty()
-                        || !fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().isEmpty()) {
-                    //todo add loading screen
-                    //todo deselect accepted field
-                    //todo setText("") when accepted or same value
-                    //todo field value as placeholder?
-                    //todo put result icon?
-                    //todo interface pop up message every time it reloads the fragment
+                        || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().isEmpty()) {
 
+                    showAuthenticationDialog();
+
+                    /*
                     onChangeUsername();
                     onChangeEmail();
                     onChangeBio();
                     onChangePassword();
+
+                     */
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
                 }
@@ -203,11 +139,12 @@ public class EditProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 fragmentEditProfileBinding.textInputEditTextUsername.setText("");
-                fragmentEditProfileBinding.textInputEditTextEmail.setText("");
                 fragmentEditProfileBinding.textInputEditTextBio.setText("");
-                fragmentEditProfileBinding.textInputEditTextPassword.setText("");
-                fragmentEditProfileBinding.textInputEditTextPasswordConfirm.setText("");
             }
+        });
+
+        fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> {
+            Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment);
         });
     }
 
@@ -237,22 +174,6 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    private void onChangeEmail() {
-        if(fragmentEditProfileBinding.textInputEditTextEmail.getText() != null) {
-            if (!fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().trim().isEmpty()) {
-                if(!EmailValidator.getInstance().isValid((fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().trim()))) {
-                    fragmentEditProfileBinding.settingsEmailErrorMessage.setText(R.string.email_invalid_input);
-                    fragmentEditProfileBinding.settingsEmailErrorMessage.setVisibility(View.VISIBLE);
-                } else if(fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().trim().equals(user.getEmail())) {
-                    Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
-                } else {
-                    String newEmail = fragmentEditProfileBinding.textInputEditTextEmail.getText().toString().trim();
-                    userViewModel.setUserEmail(newEmail);
-                }
-            }
-        }
-    }
-
     private void onChangeBio() {
         if(fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
             if (!fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
@@ -264,35 +185,6 @@ public class EditProfileFragment extends Fragment {
                 } else {
                     onSaveUser.setBiography(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim());
                     userViewModel.setUserBiography(onSaveUser);
-                }
-            }
-        }
-    }
-
-
-    private void onChangePassword() {
-        if(fragmentEditProfileBinding.textInputEditTextPassword.getText() != null
-                && fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText() != null) {
-            if(fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
-                    && !fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
-                fragmentEditProfileBinding.settingsPasswordErrorMessage.setText(R.string.field_not_filled_in);
-                fragmentEditProfileBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
-            } else if(!fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
-                    && fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
-                fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setText(R.string.field_not_filled_in);
-                fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.VISIBLE);
-            } else if(!fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim().isEmpty()
-                    && !fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().trim().isEmpty()) {
-                if(fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim().length() < 6) {
-                    fragmentEditProfileBinding.settingsPasswordErrorMessage.setText(R.string.error_password_length);
-                    fragmentEditProfileBinding.settingsPasswordErrorMessage.setVisibility(View.VISIBLE);
-                } else if(!fragmentEditProfileBinding.textInputEditTextPasswordConfirm.getText().toString().trim()
-                        .equals(fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim())) {
-                    fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setText(R.string.error_confirm_password_equal);
-                    fragmentEditProfileBinding.settingsConfirmPasswordErrorMessage.setVisibility(View.VISIBLE);
-                } else {
-                    newPassword = fragmentEditProfileBinding.textInputEditTextPassword.getText().toString().trim();
-                    userViewModel.changeUserPassword(newPassword);
                 }
             }
         }
@@ -313,5 +205,10 @@ public class EditProfileFragment extends Fragment {
         } else {
             Log.d("USER NULL", "USER NULL");
         }
+    }
+
+    private void showAuthenticationDialog() {
+        AuthenticationDialogFragment dialog = new AuthenticationDialogFragment();
+        dialog.show(requireActivity().getSupportFragmentManager(), "AuthenticationDialog");
     }
 }

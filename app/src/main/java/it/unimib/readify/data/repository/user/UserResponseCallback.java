@@ -35,4 +35,6 @@ public interface UserResponseCallback {
     void onFailureFetchNotifications(String message);
     void onSuccessCompleteFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
     void onFailureCompleteFetchNotifications(String message);
+    void onSuccessReAuthentication();
+    void onFailureReAuthentication();
 }

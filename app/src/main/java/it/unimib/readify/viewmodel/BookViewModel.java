@@ -106,4 +106,8 @@ public class BookViewModel extends ViewModel {
         bookRepository.loadRecentBooks();
     }
 
+    public void resetCarousels(){
+        bookRepository.resetCarousels();
+    }
+
 }

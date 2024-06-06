@@ -307,6 +307,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     @Override
     public void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message) {
         //TODO
+        Log.e("ERRORE FETCH", message);
     }
 
     @Override

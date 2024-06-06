@@ -128,32 +128,38 @@ public class HomeFragment extends Fragment {
     private void initObservers(){
         Observer<List<Result>> recommendedBooksObserver = results -> {
             Log.d("recommended observer", "triggered");
-            List<OLWorkApiResponse> workResultList = results.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarRecommended.setVisibility(View.GONE);
-            recommendedBooksAdapter.submitList(workResultList);
+            if(results != null) {
+                List<OLWorkApiResponse> workResultList = results.stream()
+                        .filter(result -> result instanceof Result.WorkSuccess)
+                        .map(result -> ((Result.WorkSuccess) result).getData())
+                        .collect(Collectors.toList());
+                fragmentHomeBinding.progressbarRecommended.setVisibility(View.GONE);
+                recommendedBooksAdapter.submitList(workResultList);
+            }
         };
 
         Observer<List<Result>> trendingBooksObserver = results -> {
             Log.d("trending observer", "triggered");
-            List<OLWorkApiResponse> workResultList = results.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
-            trendingBooksAdapter.submitList(workResultList);
+            if(results != null) {
+                List<OLWorkApiResponse> workResultList = results.stream()
+                        .filter(result -> result instanceof Result.WorkSuccess)
+                        .map(result -> ((Result.WorkSuccess) result).getData())
+                        .collect(Collectors.toList());
+                fragmentHomeBinding.progressbarTrending.setVisibility(View.GONE);
+                trendingBooksAdapter.submitList(workResultList);
+            }
         };
 
         Observer<List<Result>> recentBooksObserver = results -> {
             Log.d("recent observer", "triggered");
-            List<OLWorkApiResponse> workResultList = results.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-            fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
-            recentBooksAdapter.submitList(workResultList);
+            if(results != null){
+                List<OLWorkApiResponse> workResultList = results.stream()
+                        .filter(result -> result instanceof Result.WorkSuccess)
+                        .map(result -> ((Result.WorkSuccess) result).getData())
+                        .collect(Collectors.toList());
+                fragmentHomeBinding.progressbarRecent.setVisibility(View.GONE);
+                recentBooksAdapter.submitList(workResultList);
+            }
         };
 
 
@@ -161,13 +167,14 @@ public class HomeFragment extends Fragment {
             Log.d("BookDetails fragment", "user changed");
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
-                if(user.getUsername() != null && userViewModel.isFirstLoading()){
+                if(user.getUsername() != null && user.getIdToken() != null && userViewModel.isFirstLoading()){
                     userViewModel.setFirstLoading(false);
                     collectionViewModel.resetLogout();
                     collectionViewModel.fetchLoggedUserCollections(user.getIdToken());
                     bookViewModel.loadRecommendedBooks(user.getRecommended());
                     bookViewModel.loadTrendingBooks();
                     bookViewModel.loadRecentBooks();
+                    Log.d("homeFragment","Sono entrato nell'if + " + user.getIdToken());
                 }
 
                 if(user.getUsername() != null) {

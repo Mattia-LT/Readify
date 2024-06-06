@@ -45,6 +45,7 @@ public interface IUserRepository {
     void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
     void fetchOtherUser(String otherUserIdToken);
     void isUsernameAvailable(String username);
+    void deleteUserInfo();
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

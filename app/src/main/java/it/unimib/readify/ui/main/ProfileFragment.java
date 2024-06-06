@@ -58,6 +58,7 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 import it.unimib.readify.ui.startup.WelcomeActivity;
 import it.unimib.readify.util.SharedPreferencesUtil;
+import it.unimib.readify.viewmodel.BookViewModel;
 import it.unimib.readify.viewmodel.CollectionViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
@@ -66,6 +67,7 @@ public class ProfileFragment extends Fragment{
     private FragmentProfileBinding fragmentProfileBinding;
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
+    private BookViewModel bookViewModel;
 
     private CollectionAdapter collectionAdapter;
     private User loggedUser;
@@ -116,6 +118,9 @@ public class ProfileFragment extends Fragment{
 
         collectionViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(CollectionViewModel.class);
+
+        bookViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
     }
 
     private void initObservers() {
@@ -142,7 +147,9 @@ public class ProfileFragment extends Fragment{
                 fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
                 collectionViewModel.loadLoggedUserCollections();
-                userViewModel.fetchNotifications(loggedUser.getIdToken());
+                if(loggedUser.getIdToken() != null){
+                    userViewModel.fetchNotifications(loggedUser.getIdToken());
+                }
                 loadMenu();
             }
         };
@@ -168,6 +175,8 @@ public class ProfileFragment extends Fragment{
                 if(result){
                     userViewModel.setFirstLoading(true);
                     userViewModel.setContinueRegistrationFirstLoading(true);
+                    userViewModel.deleteUserInfo();
+                    bookViewModel.resetCarousels();
                     Intent intent = new Intent(requireActivity(), WelcomeActivity.class);
                     startActivity(intent);
                     requireActivity().finish();
@@ -385,7 +394,11 @@ public class ProfileFragment extends Fragment{
         fragmentProfileBinding.textviewFollowerCounter.setText(String.valueOf(loggedUser.getFollowers().getCounter()));
         fragmentProfileBinding.textviewFollowingCounter.setText(String.valueOf(loggedUser.getFollowing().getCounter()));
 
-        fragmentProfileBinding.textviewUserBiography.setText(loggedUser.getBiography());
+        if(loggedUser.getBiography() != null){
+            fragmentProfileBinding.textviewUserBiography.setText(loggedUser.getBiography());
+        } else {
+            fragmentProfileBinding.textviewUserBiography.setText(getString(R.string.empty_biography_message));
+        }
     }
 
     private void setupBadge(TextView notificationsTextView) {

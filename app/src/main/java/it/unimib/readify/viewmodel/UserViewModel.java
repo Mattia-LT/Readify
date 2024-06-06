@@ -59,7 +59,6 @@ public class UserViewModel extends ViewModel {
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private MutableLiveData<Boolean> logoutResult;
-    private MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private boolean isUIRunning;
     private boolean firstLoading = true;
@@ -373,5 +372,7 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.userAuthentication(email, password);
     }
 
-
+    public void deleteUserInfo(){
+        testDatabaseRepository.deleteUserInfo();
+    }
 }

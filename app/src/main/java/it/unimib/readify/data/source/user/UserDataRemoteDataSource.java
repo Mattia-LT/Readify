@@ -953,14 +953,20 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void isUsernameAvailable(String username) {
-        databaseReference
-                .child(FIREBASE_USERS_COLLECTION)
-                .orderByChild("username")
-                .equalTo(username.toLowerCase())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference usersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION);
+        usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
+                        boolean isUsernameAvailable = true;
+                        for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+                            String existingUsername = userSnapshot.child(FIREBASE_USERS_USERNAME_FIELD).getValue(String.class);
+                            if(username.equalsIgnoreCase(existingUsername)){
+                                isUsernameAvailable = false;
+                                break;
+                            }
+                        }
+                        if (!isUsernameAvailable) {
                             userResponseCallback.onUsernameAvailable("notAvailable");
                         } else {
                             userResponseCallback.onUsernameAvailable("available");
@@ -972,7 +978,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         Log.e("verifyUsername Firebase error", databaseError.getMessage());
                         userResponseCallback.onUsernameAvailable("error");
                     }
-                });
+        });
     }
 
     private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){

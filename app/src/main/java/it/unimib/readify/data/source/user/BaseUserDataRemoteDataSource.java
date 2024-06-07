@@ -37,7 +37,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void getUser(String idToken);
     public abstract void searchUsers(String query);
     public abstract void fetchComments(String bookId);
-    public abstract void addComment(String content, String bookId, String idToken);
+    public abstract void addComment(String commentContent, String bookId, String idToken);
     public abstract void deleteComment(String bookId, Comment comment);
     public abstract void fetchFollowers(String idToken);
     public abstract void fetchFollowings(String idToken);

@@ -31,7 +31,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +53,7 @@ public class BookDetailsFragment extends Fragment {
     private CommentAdapter commentAdapter;
     private UserViewModel userViewModel;
     private OLWorkApiResponse receivedBook;
-    private User user;
+    private User loggedUser;
 
     private Observer<List<Result>> commentListObserver;
     private Observer<Result> loggedUserObserver;
@@ -94,7 +93,7 @@ public class BookDetailsFragment extends Fragment {
         loadRating();
         loadDescription();
         fragmentBookDetailsBinding.iconAdd.setOnClickListener(v -> {
-            NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook, user.getIdToken());
+            NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook, loggedUser.getIdToken());
             Navigation.findNavController(requireView()).navigate(action);
         });
         loadComments();
@@ -187,25 +186,22 @@ public class BookDetailsFragment extends Fragment {
     private void loadComments(){
         RecyclerView recyclerviewComments = fragmentBookDetailsBinding.recyclerviewComments;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        //TODO sistema questa parte una volta sistemato il backend dei commenti
-        user = new User();
-        commentAdapter = new CommentAdapter(user, new CommentAdapter.OnItemClickListener() {
+        commentAdapter = new CommentAdapter(new CommentAdapter.OnItemClickListener() {
             @Override
             public void onCommentClick(Comment comment) {
                 if (comment != null && comment.getIdToken() != null) {
-                    NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser().getIdToken(),comment.getUser().getUsername());
-                    Navigation.findNavController(requireView()).navigate(action);
+                    if(!comment.getIdToken().equalsIgnoreCase(loggedUser.getIdToken())){
+                        NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser().getIdToken(),comment.getUser().getUsername());
+                        Navigation.findNavController(requireView()).navigate(action);
+                    }
                 } else {
                     Log.e(TAG, "Error - comment is null OR commentIdToken is null");
                 }
             }
 
             @Override
-            public void onCommentDelete(Comment comment) {
-                userViewModel.deleteComment(receivedBook.getKey(), comment);
-                List<Comment> newCommentsList = new ArrayList<>(commentAdapter.getCurrentList());
-                newCommentsList.remove(comment);
-                commentAdapter.submitList(newCommentsList);
+            public void onCommentDelete(Comment deletedComment) {
+                userViewModel.deleteComment(receivedBook.getKey(), deletedComment);
             }
         });
         recyclerviewComments.setAdapter(commentAdapter);
@@ -216,23 +212,20 @@ public class BookDetailsFragment extends Fragment {
         TextInputLayout textInputLayout = fragmentBookDetailsBinding.edittextComment;
         EditText editText = textInputLayout.getEditText();
 
-        View.OnClickListener commentListener = v -> {
+        textInputLayout.setEndIconOnClickListener(v -> {
             String commentContent = (editText != null) ? editText.getText().toString() : "";
             commentContent = commentContent.trim();
             if(commentContent.isEmpty()){
                 Snackbar.make(requireView(), getString(R.string.snackbar_empty_comment), Snackbar.LENGTH_SHORT).show();
             } else {
                 String bookId = receivedBook.getKey();
-                String idToken = user.getIdToken();
+                String idToken = loggedUser.getIdToken();
                 userViewModel.addComment(commentContent, bookId, idToken);
                 editText.getText().clear();
                 InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
-                userViewModel.fetchComments(bookId);
             }
-        };
-
-        textInputLayout.setEndIconOnClickListener(commentListener);
+        });
     }
 
     private void initObserver(){
@@ -248,8 +241,8 @@ public class BookDetailsFragment extends Fragment {
 
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
-                user = ((Result.UserSuccess) result).getData();
-                commentAdapter.submitUser(user);
+                loggedUser = ((Result.UserSuccess) result).getData();
+                commentAdapter.submitUser(loggedUser);
             }
         };
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);

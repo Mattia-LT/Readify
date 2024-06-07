@@ -21,9 +21,12 @@ public interface UserResponseCallback {
     void onFailureFetchFollowersFromRemoteDatabase(String message);
     void onSuccessFetchFollowingFromRemoteDatabase(List<FollowUser> followingList);
     void onFailureFetchFollowingFromRemoteDatabase(String message);
-    void onAddCommentResult(Comment comment);
+    void onSuccessAddComment(String bookId, Comment comment);
+    void onFailureAddComment(String message);
+    void onSuccessDeleteComment(String bookId, Comment comment);
+    void onFailureDeleteComment(String message);
+    void onFailureFetchSingleComment(String message);
     void onFetchOtherUserResult(User otherUser);
-    void onDeleteCommentResult();
     void onUserFollowResult();
     void onUserUnfollowResult();
     void onSuccessLogout();

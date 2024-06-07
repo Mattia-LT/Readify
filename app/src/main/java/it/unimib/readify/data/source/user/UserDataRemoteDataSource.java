@@ -33,6 +33,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.FollowGroup;
@@ -42,6 +45,8 @@ import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
+
+    private final String TAG = UserDataRemoteDataSource.class.getSimpleName();
 
     private final DatabaseReference databaseReference;
     private final SharedPreferencesUtil sharedPreferencesUtil;
@@ -92,6 +97,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         
     }
 
+    //TODO sistemare refactor dopo modifiche di ema
     //todo modify
     @Override
     public void setEmail(User user) {
@@ -308,6 +314,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     /*
+        TODO sistema notifiche, magari rimuovere sto commento? chiedere ad ema
         remember that firebase cuts the start "is" from a boolean variable
             es. isRead -> read
      */
@@ -427,57 +434,58 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void fetchComments(String bookId){
-        Log.d("DataSource", "fetchComments start");
+        Log.d(TAG, "Start fetching comments for book with id: " + bookId);
         if (bookId.startsWith("/works/")) {
             bookId = bookId.substring("/works/".length());
         }
-        DatabaseReference customReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(bookId).child(FIREBASE_WORKS_COMMENTS_FIELD);
-        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference commentsReference = databaseReference
+                .child(FIREBASE_WORKS_COLLECTION)
+                .child(bookId)
+                .child(FIREBASE_WORKS_COMMENTS_FIELD);
+
+        commentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("DataSource", "onDataChange ok");
                 List<Comment> comments = new ArrayList<>();
-                int totalComments = (int) snapshot.getChildrenCount();
-                final int[] commentLoaded = {0};
+                CountDownLatch commentsCountDownLatch = new CountDownLatch((int) snapshot.getChildrenCount());
                 for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
                     Comment comment = commentSnapshot.getValue(Comment.class);
                     if (comment != null) {
-                        Log.d("DataSource", "retrieve user information");
-                        fetchUserFromComment(comment, new UserFetchFromCommentCallback(){
-                            @Override
-                            public void onUserFetched(Comment comment) {
-                                Log.d("DataSource", "user information retrieved " + comment.getUser().toString());
+                        CountDownLatch userCountDownLatch = new CountDownLatch(1);
+                        fetchUserFromComment(comment, userCountDownLatch);
+                        ExecutorService singleCommentExecutor = Executors.newSingleThreadExecutor();
+                        singleCommentExecutor.submit(() -> {
+                            try {
+                                userCountDownLatch.await();
                                 comments.add(comment);
-                                commentLoaded[0]++;
-
-                                if(commentLoaded[0] == totalComments){
-                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
-                                }
-                            }
-
-                            @Override
-                            public void onUserFetchFailed(Comment comment) {
-                                commentLoaded[0]++;
-                                Log.d("DataSource", "user information failed");
-                                if (commentLoaded[0] == totalComments) {
-                                    // All user information retrieved (even if some failed), trigger callback
-                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
-                                }
+                                commentsCountDownLatch.countDown();
+                                singleCommentExecutor.shutdown();
+                            } catch (InterruptedException e) {
+                                userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " : " + e.getLocalizedMessage());
+                                commentsCountDownLatch.countDown();
                             }
                         });
                     } else {
-                        commentLoaded[0]++;
-                        Log.d("DataSource", "Comment was null");
+                        userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " : " + "a null comment was found.");
+                        commentsCountDownLatch.countDown();
                     }
                 }
-                Log.d("DataSource", "comments value " + comments);
-                userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                ExecutorService commentListExecutor = Executors.newSingleThreadExecutor();
+                commentListExecutor.submit(() -> {
+                    try {
+                        commentsCountDownLatch.await();
+                        userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                        commentListExecutor.shutdown();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        userResponseCallback.onFailureFetchCommentsFromRemoteDatabase("Error in " + TAG + " : " + e.getLocalizedMessage());
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("DataSource", "comments retrieve failed");
-                userResponseCallback.onFailureFetchCommentsFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFetchCommentsFromRemoteDatabase("Error in " + TAG + " : " + error.getMessage());
             }
         });
     }
@@ -521,7 +529,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    public void addComment(String content,String bookId, String idToken){
+    public void addComment(String commentContent, String bookId, String idToken){
         String finalBookId = bookId.substring("/works/".length());
 
         DatabaseReference commentsReference = databaseReference
@@ -534,21 +542,26 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         String commentId = newCommentReference.getKey();
         long timestamp = new Date().getTime();
 
-        Comment newComment = new Comment(commentId, content, idToken, timestamp);
+        Comment newComment = new Comment(commentId, commentContent, idToken, timestamp);
 
-        newCommentReference.setValue(newComment);
-        userResponseCallback.onAddCommentResult(newComment);
+        newCommentReference.setValue(newComment)
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessAddComment(bookId, newComment))
+                .addOnFailureListener(e -> userResponseCallback.onFailureAddComment(e.getLocalizedMessage()));
     }
 
     @Override
-    public void deleteComment(String bookId, Comment comment) {
+    public void deleteComment(String bookId, Comment deletedComment) {
         String finalBookId = bookId.substring("/works/".length());
+
         DatabaseReference commentsReference = databaseReference
                 .child(FIREBASE_WORKS_COLLECTION)
                 .child(finalBookId)
                 .child(FIREBASE_WORKS_COMMENTS_FIELD)
-                .child(comment.getCommentId());
-        commentsReference.removeValue();
+                .child(deletedComment.getCommentId());
+
+        commentsReference.removeValue()
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessDeleteComment(bookId, deletedComment))
+                .addOnFailureListener(e -> userResponseCallback.onFailureDeleteComment(e.getLocalizedMessage()));
     }
 
     @Override
@@ -981,26 +994,23 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){
-        Log.d("DataSource", "start user retrieve");
-
-        DatabaseReference customReference = databaseReference
+    private void fetchUserFromComment(Comment comment, CountDownLatch userLatch){
+        DatabaseReference userReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
                 .child(comment.getIdToken());
-        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 comment.setUser(user);
-                Log.d("DataSource", "user retrieve OK, " + comment.getUser().toString());
-                callback.onUserFetched(comment);
+                userLatch.countDown();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("DataSource", "user retrieve FAIL");
-                comment.setUser(null);
-                callback.onUserFetched(comment);
+                userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " while retrieving user information : " + error.getMessage());
+                userLatch.countDown();
             }
         });
     }
@@ -1025,12 +1035,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 callback.onUserFetched(followUser);
             }
         });
-    }
-
-
-    private interface UserFetchFromCommentCallback {
-        void onUserFetched(Comment comment);
-        void onUserFetchFailed(Comment comment);
     }
 
     private interface UserFetchFromExternalUserCallback {

@@ -206,12 +206,12 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.fetchComments(bookId);
     }
 
-    public void addComment(String content, String bookId, String idToken){
-        testDatabaseRepository.addComment(content,bookId,idToken);
+    public void addComment(String commentContent, String bookId, String idToken){
+        testDatabaseRepository.addComment(commentContent,bookId,idToken);
     }
 
-    public void deleteComment(String bookId, Comment comment){
-        testDatabaseRepository.deleteComment(bookId, comment);
+    public void deleteComment(String bookId, Comment deletedComment){
+        testDatabaseRepository.deleteComment(bookId, deletedComment);
     }
 
     public void changeUserPassword(String newPassword) {testDatabaseRepository.changeUserPassword(newPassword);}

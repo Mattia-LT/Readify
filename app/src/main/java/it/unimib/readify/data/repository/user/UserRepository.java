@@ -22,6 +22,8 @@ import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserRepository implements IUserRepository, UserResponseCallback {
 
+    private final String TAG = UserRepository.class.getSimpleName();
+
     private final BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
     private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
 
@@ -182,13 +184,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void searchUsers(String query){
-        Log.d("UserRepository", "Query: " + query);
         userDataRemoteDataSource.searchUsers(query);
     }
 
     @Override
     public MutableLiveData<List<Result>> getCommentListLiveData() {
-        Log.d("Repository", "getCommentsListLiveData");
         return commentListLiveData;
     }
 
@@ -214,7 +214,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void fetchComments(String bookId) {
-        Log.d("Repository", "fetch comments : START");
         userDataRemoteDataSource.fetchComments(bookId);
     }
 
@@ -285,21 +284,17 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments) {
-        Log.d("Repository", "fetchComments result OK");
         List<Result> commentResultList = new ArrayList<>();
         for(Comment comment : comments){
             commentResultList.add(new Result.CommentSuccess(comment));
         }
-        Log.d("Repository", "fetchComments result --> " + commentResultList);
+        Log.d(TAG, "Comments fetched successfully.");
         commentListLiveData.postValue(commentResultList);
     }
 
     @Override
     public void onFailureFetchCommentsFromRemoteDatabase(String message) {
-        Result.Error result = new Result.Error(message);
-        List<Result> commentResultList = new ArrayList<>();
-        commentResultList.add(result);
-        commentListLiveData.setValue(commentResultList);
+        Log.e(TAG, "Error during comments retrieving.\n" + message);
     }
 
     @Override
@@ -331,13 +326,42 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void addComment(String content, String bookId, String idToken){
-        userDataRemoteDataSource.addComment(content,bookId,idToken);
+    public void onSuccessAddComment(String bookId, Comment comment) {
+        //TODO vogliamo far vedere qualcos'altro? forse non serve comment? forse possiamo aggiungere direttamente il commento?? vale anchhe per successo di delete
+        Log.d(TAG,"Comment added successfully");
+        fetchComments(bookId);
     }
 
     @Override
-    public void deleteComment(String bookId, Comment comment) {
-        userDataRemoteDataSource.deleteComment(bookId, comment);
+    public void onFailureAddComment(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessDeleteComment(String bookId, Comment comment) {
+        Log.d(TAG,"Comment deleted successfully");
+        fetchComments(bookId);
+    }
+
+    @Override
+    public void onFailureDeleteComment(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleComment(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void addComment(String commentContent, String bookId, String idToken){
+        userDataRemoteDataSource.addComment(commentContent,bookId,idToken);
+    }
+
+    @Override
+    public void deleteComment(String bookId, Comment deletedComment) {
+        userDataRemoteDataSource.deleteComment(bookId, deletedComment);
     }
 
     @Override
@@ -379,22 +403,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
     }
 
-    @Override
-    public void onAddCommentResult(Comment comment) {
-        if(comment == null){
-            //todo error
-        }
-    }
 
     @Override
     public void onFetchOtherUserResult(User otherUser) {
         Result otherUserResult = new Result.UserSuccess(otherUser);
         otherUserLiveData.postValue(otherUserResult);
-    }
-
-    @Override
-    public void onDeleteCommentResult() {
-
     }
 
     @Override

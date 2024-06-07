@@ -26,15 +26,15 @@ import it.unimib.readify.model.User;
 
 public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentViewHolder> {
 
-    private User loggedUser;
     public interface OnItemClickListener {
         void onCommentClick(Comment comment);
         void onCommentDelete(Comment comment);
     }
 
     private final OnItemClickListener onItemClickListener;
+    private User loggedUser;
 
-    public CommentAdapter(User loggedUser, OnItemClickListener onItemClickListener) {
+    public CommentAdapter(OnItemClickListener onItemClickListener) {
         super(new DiffUtil.ItemCallback<Comment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
@@ -47,7 +47,6 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
             }
         });
         this.onItemClickListener = onItemClickListener;
-        this.loggedUser = loggedUser;
     }
 
     @NonNull

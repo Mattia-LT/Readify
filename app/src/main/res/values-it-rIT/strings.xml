@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="button_add_comment">Aggiungi il commento</string>
     <string name="button_getting_started">Inizia</string>
@@ -199,6 +199,8 @@
     <string name="error_not_enough_genre">Seleziona almeno 3 argomenti di interesse</string>
     <string name="error_collection_name_not_valid">Nome della collezione non valido</string>
     <string name="error_collection_name_not_unique">Il nome della collezione deve essere unico.</string>
+    <string name="generic_error">Sistema: errore generico interno</string>
+    <string name="input_lack_error">Campo obbligatorio</string>
 
     <!-- plurals -->
     <plurals name="books">
@@ -212,6 +214,5 @@
         <item quantity="many">Questo utente ha letto %d libri</item>
         <item quantity="other">Questo utente ha letto %d libri</item>
     </plurals>
-
 
 </resources>

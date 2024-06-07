@@ -4,18 +4,18 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.chip.Chip;
@@ -33,7 +33,13 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.util.SubjectsUtil;
 
-public class ContinueRegistrationFragment extends Fragment implements AdapterView.OnItemSelectedListener{
+import static it.unimib.readify.util.Constants.AVATAR_DEFAULT;
+import static it.unimib.readify.util.Constants.USERNAME_AVAILABLE;
+import static it.unimib.readify.util.Constants.USERNAME_ERROR;
+import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
+import static it.unimib.readify.util.Constants.USER_VISIBILITY_PUBLIC;
+
+public class ContinueRegistrationFragment extends Fragment {
 
     private FragmentContinueRegistrationBinding fragmentContinueRegistrationBinding;
     private UserViewModel userViewModel;
@@ -48,12 +54,6 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
 
     public ContinueRegistrationFragment() {}
 
-    public static ContinueRegistrationFragment newInstance() { return new ContinueRegistrationFragment();}
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentContinueRegistrationBinding = FragmentContinueRegistrationBinding.inflate(inflater,container,false);
@@ -62,44 +62,13 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
+        initViewModels();
+        initObservers();
+        setConfirmPreferences();
 
         isContinueButtonPressed = false;
         isUsernameAvailable = false;
         isNavigationStarted = false;
-
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                this.user = ((Result.UserSuccess) result).getData();
-                onSaveUser = new User(user);
-                if(checkUserData(onSaveUser) && isContinueButtonPressed && !isNavigationStarted){
-                    isNavigationStarted = true;
-                    Log.d("USER: ", onSaveUser.toString());
-                    Navigation.findNavController(requireView()).navigate(R.id.action_continueRegistrationFragment_to_homeActivity);
-                    requireActivity().finish();
-                }
-            }
-        };
-
-        usernameErrorObserver = result -> {
-            switch (result) {
-                case "available":
-                    isUsernameAvailable = true;
-                    break;
-                case "notAvailable":
-                    isUsernameAvailable = false;
-                    isContinueButtonPressed = false;
-                    break;
-                case "error":
-                    Toast.makeText(requireContext(), "System: username error", Toast.LENGTH_SHORT).show();
-                    isUsernameAvailable = false;
-                    isContinueButtonPressed = false;
-                    break;
-            }
-        };
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-        userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
 
         fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -118,16 +87,55 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
             }
         });
 
-
-        setConfirmPreferences();
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.requireActivity(), R.array.gender, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter
+                .createFromResource(this.requireActivity(), R.array.gender, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fragmentContinueRegistrationBinding.spinnerGender.setAdapter(adapter);
-        fragmentContinueRegistrationBinding.spinnerGender.setOnItemSelectedListener(this);
 
         chipGroupGenre = fragmentContinueRegistrationBinding.chipgroupGenreFilter;
         loadSubjectsChips();
+    }
+
+    private void initViewModels() {
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
+
+    private void initObservers() {
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                this.user = ((Result.UserSuccess) result).getData();
+                onSaveUser = new User(user);
+                if(checkUserData(onSaveUser) && isContinueButtonPressed && !isNavigationStarted){
+                    isNavigationStarted = true;
+                    //todo verify
+                    NavDirections action = ContinueRegistrationFragmentDirections
+                            .actionContinueRegistrationFragmentToHomeActivity();
+                    Navigation.findNavController(requireView()).navigate(action);
+                    requireActivity().finish();
+                }
+            }
+        };
+
+        usernameErrorObserver = result -> {
+            switch (result) {
+                //todo verify
+                case USERNAME_AVAILABLE:
+                    isUsernameAvailable = true;
+                    break;
+                case USERNAME_NOT_AVAILABLE:
+                    isUsernameAvailable = false;
+                    isContinueButtonPressed = false;
+                    break;
+                case USERNAME_ERROR:
+                    Toast.makeText(requireContext(), R.string.generic_error, Toast.LENGTH_SHORT).show();
+                    isUsernameAvailable = false;
+                    isContinueButtonPressed = false;
+                    break;
+            }
+        };
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
     }
 
     private boolean checkUserData(User onSaveUser) {
@@ -144,76 +152,74 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
         fragmentContinueRegistrationBinding.confirmPreferences.setOnClickListener(v -> {
             isContinueButtonPressed = true;
 
-            String username = Objects.requireNonNull(fragmentContinueRegistrationBinding.textInputLayoutChooseUsername.getEditText()).getText().toString();
+            String username = Objects
+                    .requireNonNull(fragmentContinueRegistrationBinding.textInputLayoutChooseUsername.getEditText())
+                    .getText().toString().trim();
             int selectedChipNumber = getSelectedChipCount(chipGroupGenre);
-            if(isUsernameOk() && (fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition() != 0) && (selectedChipNumber>2)) {
+            if(isUsernameOk() && (fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition() != 0)
+                    && (selectedChipNumber>2)) {
                 onSaveUser.setUsername(username);
                 userViewModel.setUserUsername(onSaveUser);
                 onSaveUser.setGender(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItem().toString());
                 userViewModel.setUserGender(onSaveUser);
                 onSaveUser.setRecommended(getSelectedGenres(chipGroupGenre));
                 userViewModel.setUserRecommended(onSaveUser);
-                onSaveUser.setAvatar("avatar1");
+                //todo verify
+                onSaveUser.setAvatar(AVATAR_DEFAULT);
                 userViewModel.setUserAvatar(onSaveUser);
                 onSaveUser.setFollowers(new FollowGroup(0, null));
                 onSaveUser.setFollowing(new FollowGroup(0, null));
                 userViewModel.setUserFollowers(onSaveUser);
                 userViewModel.setUserFollowing(onSaveUser);
-                onSaveUser.setVisibility("public");
+                //todo verify
+                onSaveUser.setVisibility(USER_VISIBILITY_PUBLIC);
                 userViewModel.setUserVisibility(onSaveUser);
                 onSaveUser.setTotalNumberOfBooks(0);
                 userViewModel.setUserTotalNumberOfBooks(onSaveUser);
             } else {
                 if(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition()== 0){
-                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage.setText(R.string.error_gender);
-                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage.setVisibility(View.VISIBLE);
+                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage
+                            .setText(R.string.error_gender);
+                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage
+                            .setVisibility(View.VISIBLE);
                 }
                 if(selectedChipNumber <= 2){
-                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage.setText(R.string.error_not_enough_genre);
-                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage.setVisibility(View.VISIBLE);
+                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
+                            .setText(R.string.error_not_enough_genre);
+                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
+                            .setVisibility(View.VISIBLE);
                 }
             }
         });
     }
 
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
     private boolean isUsernameOk() {
         if(fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText() != null) {
-            String username = fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText().toString();
-            if (!username.trim().isEmpty()) {
-                if (fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText().toString().trim().length() > 20) {
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setText(R.string.error_username_length);
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setVisibility(View.VISIBLE);
+            String username = fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText()
+                    .toString().trim();
+            TextView errorUsername = fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage;
+            if (!username.isEmpty()) {
+                if (username.length() > 20) {
+                    errorUsername.setText(R.string.error_username_length);
+                    errorUsername.setVisibility(View.VISIBLE);
                     return false;
-                }
-                else if (fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText().toString().trim().contains("/")
-                        || fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText().toString().trim().contains("@")) {
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setText(R.string.error_username_illegal_symbols);
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setVisibility(View.VISIBLE);
+                } else if (username.contains("/") || username.contains("@")) {
+                    errorUsername.setText(R.string.error_username_illegal_symbols);
+                    errorUsername.setVisibility(View.VISIBLE);
                     return false;
-                }else if(isUsernameAvailable){
-                    Toast.makeText(requireContext(), "Correct Username", Toast.LENGTH_SHORT).show();
-                    //fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.setText("");
+                } else if(isUsernameAvailable){
+                    Toast.makeText(requireContext(), USERNAME_AVAILABLE, Toast.LENGTH_SHORT).show();
+                    fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.setText("");
                     return true;
                 } else {
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setText(R.string.username_already_taken);
-                    fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setVisibility(View.VISIBLE);
+                    errorUsername.setText(R.string.username_already_taken);
+                    errorUsername.setVisibility(View.VISIBLE);
                     return false;
                 }
             }
-            //todo string se è vuoto
-            fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setText("RURURURU");
-            fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage.setVisibility(View.VISIBLE);
+            //if username is empty
+            errorUsername.setText(R.string.input_lack_error);
+            errorUsername.setVisibility(View.VISIBLE);
             return false;
         }
         return false;
@@ -225,13 +231,13 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
         String[] subjects = res.getStringArray(R.array.chip_genres);
         int[] subjectIds = subjectsUtil.getChipIdList();
         for(int i = 0; i < subjects.length; i++) {
-            Chip chip = (Chip) getLayoutInflater().inflate(R.layout.single_subject_chip_layout, chipGroupGenre, false);
+            Chip chip = (Chip) getLayoutInflater()
+                    .inflate(R.layout.single_subject_chip_layout, chipGroupGenre, false);
             chip.setText(subjects[i]);
             chip.setId(subjectIds[i]);
             chipGroupGenre.addView(chip);
         }
     }
-
 
     private int getSelectedChipCount(ChipGroup chipGroup) {
         return chipGroup.getCheckedChipIds().size();
@@ -262,7 +268,7 @@ public class ContinueRegistrationFragment extends Fragment implements AdapterVie
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.e("ON DESTROY continue", "TRIGGERED");
         userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUsernameAvailableResult().removeObserver(usernameErrorObserver);
     }
 }

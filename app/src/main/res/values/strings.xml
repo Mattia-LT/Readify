@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="app_name" translatable="false">Readify</string>
     <string name="button_add_comment">Add comment</string>
@@ -228,6 +228,8 @@
     <string name="error_not_enough_genre">Select at least 3 topic of interest</string>
     <string name="error_collection_name_not_valid">Invalid collection name.</string>
     <string name="error_collection_name_not_unique">The name of the collection must be unique.</string>
+    <string name="generic_error">System: generic internal error</string>
+    <string name="input_lack_error">Required field</string>
 
     <!-- plurals -->
     <plurals name="books">

@@ -126,4 +126,9 @@ public class Constants {
 
     public static final String PROFILE_IMAGE_TAG = "avatar";
 
+    public static final String USERNAME_AVAILABLE = "available";
+    public static final String USERNAME_NOT_AVAILABLE = "notAvailable";
+    public static final String USERNAME_ERROR = "error";
+
+    public static final String AVATAR_DEFAULT = "avatar1";
 }

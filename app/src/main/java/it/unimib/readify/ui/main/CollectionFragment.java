@@ -58,6 +58,8 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class CollectionFragment extends Fragment {
 
+    private final String TAG = CollectionFragment.class.getSimpleName();
+
     private FragmentCollectionBinding collectionProfileBinding;
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
@@ -65,8 +67,12 @@ public class CollectionFragment extends Fragment {
     private String loggedUserIdToken;
     private User loggedUser;
     private String collectionOwnerIdToken;
-    BookItemCollectionAdapter bookItemCollectionAdapter;
+    private BookItemCollectionAdapter bookItemCollectionAdapter;
     private AlertDialog renameDialog;
+    private Observer<Result> loggedUserObserver;
+    private Observer<List<Result>> collectionObserver;
+    private Observer<Collection> deleteCollectionResultObserver;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,7 +99,7 @@ public class CollectionFragment extends Fragment {
 
         initRecyclerView();
 
-        //Managing data from Profile Fragment
+        //Set up the toolbar title
         requireActivity().setTitle(collectionName);
 
         showCollectionData();
@@ -109,16 +115,15 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initObservers() {
-        final Observer<Result> loggedUserObserver = result -> {
+        loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.loggedUser = ((Result.UserSuccess) result).getData();
                 this.loggedUserIdToken = loggedUser.getIdToken();
-                Log.e("USER OBSERVER","TRIGGERED");
             }
         };
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
-        final Observer<List<Result>> collectionObserver = results -> {
+        collectionObserver = results -> {
             //orElse is the defaultValue, it should never be called but this is a safety check
             this.currentCollection = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
@@ -133,10 +138,9 @@ public class CollectionFragment extends Fragment {
                 showCollectionData();
             }
         };
-
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionObserver);
 
-        final Observer<Collection> deleteCollectionResultObserver = deletedCollection -> {
+        deleteCollectionResultObserver = deletedCollection -> {
           if(deletedCollection != null){
               for(OLWorkApiResponse book : deletedCollection.getWorks()){
                   SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
@@ -148,7 +152,7 @@ public class CollectionFragment extends Fragment {
                               Integer newValue = currentValue - 1;
                               loggedUser.getRecommended().put(subject, newValue);
                           } else {
-                              Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                              Log.e(TAG, "Unknown subject : " + subject);
                               loggedUser.getRecommended().put(subject, 0);
                           }
                       }
@@ -156,16 +160,13 @@ public class CollectionFragment extends Fragment {
                   userViewModel.setUserRecommended(loggedUser);
               }
               collectionViewModel.resetDeleteCollectionResult();
-
               int totalNumberOfBooks = loggedUser.getTotalNumberOfBooks();
               totalNumberOfBooks -= deletedCollection.getNumberOfBooks();
               loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
               userViewModel.setUserTotalNumberOfBooks(loggedUser);
-
               requireActivity().getSupportFragmentManager().popBackStack();
           }
         };
-
         collectionViewModel.getDeleteCollectionResult().observe(getViewLifecycleOwner(), deleteCollectionResultObserver);
     }
 
@@ -215,7 +216,6 @@ public class CollectionFragment extends Fragment {
 
         collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
             if (isUnique) {
-                Log.e("isNameUnique","true");
                 if (renameEditText != null) {
                     renameEditText.setError(null);
                 }
@@ -320,23 +320,21 @@ public class CollectionFragment extends Fragment {
             collectionProfileBinding.collectionFragmentCollectionVisibility.setImageResource(R.drawable.baseline_lock_outline_24);
         }
 
-        // Show this section only if the collection is owned by the logged user
+        //Show this section only if the collection is owned by the logged user
         if(collectionOwnerIdToken.equalsIgnoreCase(loggedUserIdToken)){
             collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setVisibility(View.GONE);
             collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility.setVisibility(View.VISIBLE);
             Spinner spinner = collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility;
-            // Create an ArrayAdapter using the string array and a default spinner layout.
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                     requireContext(),
                     R.array.visibility,
                     android.R.layout.simple_spinner_item
             );
-            // Specify the layout to use when the list of choices appears.
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner.
             spinner.setAdapter(adapter);
 
             boolean isCollectionVisible = currentCollection.isVisible();
+
             if(isCollectionVisible) {
                 spinner.setSelection(0);
             } else {
@@ -360,9 +358,10 @@ public class CollectionFragment extends Fragment {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-
+                    //Not needed
                 }
             });
+
         } else {
             collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setVisibility(View.VISIBLE);
             collectionProfileBinding.collectionFragmentSpinnerCollectionVisibility.setVisibility(View.GONE);
@@ -370,9 +369,7 @@ public class CollectionFragment extends Fragment {
             collectionProfileBinding.collectionFragmentTextviewCollectionVisibility.setText(
                     currentCollection.isVisible() ? visibility[0] : visibility[1]
             );
-
         }
-
     }
 
     private void loadDeleteCollectionDialog(){
@@ -390,7 +387,6 @@ public class CollectionFragment extends Fragment {
                 .setNegativeButton(R.string.cancel_action, (dialog, which) -> dialog.dismiss());
 
         deleteDialogBuilder.show();
-
     }
 
     @NonNull
@@ -403,4 +399,11 @@ public class CollectionFragment extends Fragment {
         return formattedMessage;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        collectionViewModel.getLoggedUserCollectionListLiveData().removeObserver(collectionObserver);
+        collectionViewModel.getDeleteCollectionResult().removeObserver(deleteCollectionResultObserver);
+    }
 }

@@ -13,7 +13,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,7 @@ public class ProfileImageSelectorFragment extends Fragment {
     private UserViewModel userViewModel;
     private User loggedUser;
     private List<Integer> avatars;
+    private Observer<Result> loggedUserObserver;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -68,7 +68,7 @@ public class ProfileImageSelectorFragment extends Fragment {
     }
 
     private void initObservers() {
-        Observer<Result> userObserver = result -> {
+        loggedUserObserver = result -> {
             if (result.isSuccess()) {
                 loggedUser = ((Result.UserSuccess) result).getData();
             } else {
@@ -76,7 +76,7 @@ public class ProfileImageSelectorFragment extends Fragment {
             }
         };
 
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
     private void initRecyclerView() {
@@ -89,7 +89,6 @@ public class ProfileImageSelectorFragment extends Fragment {
             String newAvatar = PROFILE_IMAGE_TAG + (newAvatarPosition + 1);
             loggedUser.setAvatar(newAvatar);
             userViewModel.setUserAvatar(loggedUser);
-            Log.d("ProfileImageSelectorFragment","Selected avatar: " + newAvatarPosition);
             NavDirections action = ProfileImageSelectorFragmentDirections.actionProfileImageSelectorFragmentToEditProfileFragment();
             Navigation.findNavController(requireView()).navigate(action);
         });
@@ -100,4 +99,9 @@ public class ProfileImageSelectorFragment extends Fragment {
         profileImageSelectorAdapter.submitList(avatars);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+    }
 }

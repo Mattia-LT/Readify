@@ -57,7 +57,9 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         }
         initViewModels();
         initObservers();
+
         this.idToken = CollectionCreationBottomSheetArgs.fromBundle(getArguments()).getIdToken();
+
         binding.characterCounter.setText("0");
         binding.characterLimit.setText(String.valueOf(COLLECTION_NAME_CHARACTERS_LIMIT));
         binding.editTextCollectionCreationName.setFilters(new InputFilter[]{
@@ -101,6 +103,12 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         });
     }
 
+    private void initViewModels() {
+        collectionViewModel = CustomViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(CollectionViewModel.class);
+    }
+
     private void initObservers() {
         //isValid collection name -> length OK and contain only permitted characters
         collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
@@ -111,7 +119,6 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         });
 
         //isUnique collection name -> the user doesn't have another collection with the same name
-
         collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
             if (isUnique != null) {
                 this.isNameUnique = isUnique;
@@ -122,19 +129,16 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
 
     private void updateErrorMessage() {
         if(!isNameValid){
-            //todo usa file string
-            binding.editTextCollectionCreationName.setError("Invalid collection name");
+            binding.editTextCollectionCreationName.setError(getString(R.string.error_collection_name_not_valid));
             confirmButton.setEnabled(false);
             confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
             confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
         } else if(!isNameUnique){
-            //todo usa file string
-            binding.editTextCollectionCreationName.setError("Collection name must be unique");
+            binding.editTextCollectionCreationName.setError(getString(R.string.error_collection_name_not_unique));
             confirmButton.setEnabled(false);
             confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
             confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.grey_disabled_item));
         } else {
-            //todo usa file string
             binding.editTextCollectionCreationName.setError(null);
             confirmButton.setEnabled(true);
             confirmButton.setBackgroundTintMode(PorterDuff.Mode.SRC_IN);
@@ -142,9 +146,4 @@ public class CollectionCreationBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
-    private void initViewModels() {
-        collectionViewModel = CustomViewModelFactory
-                .getInstance(requireActivity().getApplication())
-                .create(CollectionViewModel.class);
-    }
 }

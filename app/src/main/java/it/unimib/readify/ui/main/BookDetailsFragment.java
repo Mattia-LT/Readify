@@ -48,12 +48,17 @@ import it.unimib.readify.viewmodel.UserViewModel;
 
 
 public class BookDetailsFragment extends Fragment {
+    private final String TAG = BookDetailsFragment.class.getSimpleName();
 
     private FragmentBookDetailsBinding fragmentBookDetailsBinding;
     private CommentAdapter commentAdapter;
     private UserViewModel userViewModel;
     private OLWorkApiResponse receivedBook;
     private User user;
+
+    private Observer<List<Result>> commentListObserver;
+    private Observer<Result> loggedUserObserver;
+
     public BookDetailsFragment() {
         // Required empty public constructor
     }
@@ -81,7 +86,7 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void showBookInfo() {
-        receivedBook =  BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
+        receivedBook = BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
         userViewModel.fetchComments(receivedBook.getKey());
         fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
         loadCover();
@@ -155,7 +160,6 @@ public class BookDetailsFragment extends Fragment {
                 cover = receivedBook.getCovers().get(pos);
                 pos++;
             }
-
             if (cover == -1) {
                 fragmentBookDetailsBinding.bookImage.setImageResource(R.drawable.image_not_available);
             } else {
@@ -169,10 +173,7 @@ public class BookDetailsFragment extends Fragment {
                         .into(fragmentBookDetailsBinding.bookBackgroundImage);
             }
         } else {
-            Glide.with(requireActivity().getApplicationContext())
-                    .load(R.drawable.image_not_available)
-                    .apply(requestOptions)
-                    .into(fragmentBookDetailsBinding.bookImage);
+            fragmentBookDetailsBinding.bookImage.setImageResource(R.drawable.image_not_available);
         }
         // background image blurred
         fragmentBookDetailsBinding.bookBackgroundImage.setImageDrawable(fragmentBookDetailsBinding.bookImage.getDrawable());
@@ -184,20 +185,18 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void loadComments(){
-
         RecyclerView recyclerviewComments = fragmentBookDetailsBinding.recyclerviewComments;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        //TODO sistema questa parte una volta sistemato il backend dei commenti
         user = new User();
         commentAdapter = new CommentAdapter(user, new CommentAdapter.OnItemClickListener() {
             @Override
             public void onCommentClick(Comment comment) {
                 if (comment != null && comment.getIdToken() != null) {
-                    Log.d("Fragment", "Comment username:" + comment.getIdToken());
                     NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToUserDetailsFragment(comment.getUser().getIdToken(),comment.getUser().getUsername());
                     Navigation.findNavController(requireView()).navigate(action);
                 } else {
-                    Log.d("Fragment", "Error - comment is null OR userId is null");
-                    // todo handle the error
+                    Log.e(TAG, "Error - comment is null OR commentIdToken is null");
                 }
             }
 
@@ -209,8 +208,6 @@ public class BookDetailsFragment extends Fragment {
                 commentAdapter.submitList(newCommentsList);
             }
         });
-
-        Log.d("BookDetails Fragment", "Fetch comments start : " + receivedBook.getKey());
         recyclerviewComments.setAdapter(commentAdapter);
         recyclerviewComments.setLayoutManager(layoutManager);
     }
@@ -239,23 +236,29 @@ public class BookDetailsFragment extends Fragment {
     }
 
     private void initObserver(){
-        final Observer<List<Result>> commentListObserver = results -> {
+        commentListObserver = results -> {
             List<Comment> commentResultList = results.stream()
                     .filter(result -> result instanceof Result.CommentSuccess)
                     .map(result -> ((Result.CommentSuccess) result).getData())
                     .collect(Collectors.toList());
             commentAdapter.submitList(commentResultList);
         };
+
         userViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
-        final Observer<Result> loggedUserObserver = result -> {
-            Log.d("BookDetails fragment", "user changed");
+        loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
                 commentAdapter.submitUser(user);
             }
         };
-        //get user data from database
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getCommentList().removeObserver(commentListObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

@@ -45,27 +45,23 @@ public class HomeFragment extends Fragment {
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private User user;
+    private Observer<List<Result>> recommendedBooksObserver;
+    private Observer<List<Result>> recentBooksObserver;
+    private Observer<List<Result>> trendingBooksObserver;
+    private Observer<Result> loggedUserObserver;
 
     public HomeFragment() {}
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d("home fragment", "onCreate");
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
-        Log.d("home fragment", "onCreateView");
         return fragmentHomeBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("home fragment", "onViewCreated");
         SharedPreferencesUtil sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
         //Load user preferences for theme
         String preferredTheme = sharedPreferencesUtil.readStringData(SHARED_PREFERENCES_FILE_NAME, PREFERRED_THEME);
@@ -126,8 +122,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initObservers(){
-        Observer<List<Result>> recommendedBooksObserver = results -> {
-            Log.d("recommended observer", "triggered");
+        recommendedBooksObserver = results -> {
             if(results != null) {
                 List<OLWorkApiResponse> workResultList = results.stream()
                         .filter(result -> result instanceof Result.WorkSuccess)
@@ -138,8 +133,7 @@ public class HomeFragment extends Fragment {
             }
         };
 
-        Observer<List<Result>> trendingBooksObserver = results -> {
-            Log.d("trending observer", "triggered");
+        trendingBooksObserver = results -> {
             if(results != null) {
                 List<OLWorkApiResponse> workResultList = results.stream()
                         .filter(result -> result instanceof Result.WorkSuccess)
@@ -150,8 +144,7 @@ public class HomeFragment extends Fragment {
             }
         };
 
-        Observer<List<Result>> recentBooksObserver = results -> {
-            Log.d("recent observer", "triggered");
+        recentBooksObserver = results -> {
             if(results != null){
                 List<OLWorkApiResponse> workResultList = results.stream()
                         .filter(result -> result instanceof Result.WorkSuccess)
@@ -163,8 +156,7 @@ public class HomeFragment extends Fragment {
         };
 
 
-        Observer<Result> loggedUserObserver = result -> {
-            Log.d("BookDetails fragment", "user changed");
+        loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 user = ((Result.UserSuccess) result).getData();
                 if(user.getUsername() != null && user.getIdToken() != null && userViewModel.isFirstLoading()){
@@ -174,7 +166,6 @@ public class HomeFragment extends Fragment {
                     bookViewModel.loadRecommendedBooks(user.getRecommended());
                     bookViewModel.loadTrendingBooks();
                     bookViewModel.loadRecentBooks();
-                    Log.d("homeFragment","Sono entrato nell'if + " + user.getIdToken());
                 }
 
                 if(user.getUsername() != null) {
@@ -187,10 +178,19 @@ public class HomeFragment extends Fragment {
                 }
             }
         };
-        //get user data from database
+
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         bookViewModel.getRecommendedCarouselLiveData().observe(getViewLifecycleOwner(), recommendedBooksObserver);
         bookViewModel.getTrendingCarouselLiveData().observe(getViewLifecycleOwner(), trendingBooksObserver);
         bookViewModel.getRecentCarouselLiveData().observe(getViewLifecycleOwner(), recentBooksObserver);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        bookViewModel.getRecommendedCarouselLiveData().removeObserver(recommendedBooksObserver);
+        bookViewModel.getTrendingCarouselLiveData().removeObserver(trendingBooksObserver);
+        bookViewModel.getRecentCarouselLiveData().removeObserver(recentBooksObserver);
     }
 }

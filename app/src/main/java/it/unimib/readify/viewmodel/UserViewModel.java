@@ -59,6 +59,7 @@ public class UserViewModel extends ViewModel {
     private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private MutableLiveData<Boolean> logoutResult;
+    private final MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> notifications;
     private boolean isUIRunning;
     private boolean firstLoading = true;

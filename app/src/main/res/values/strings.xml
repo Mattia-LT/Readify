@@ -171,7 +171,7 @@
     <string name="error_remove_book_from_collection">Error: remove from collection failed</string>
     <string name="error_logout">An error occurred during logout</string>
     <string name="error_local_database">Local database error</string>
-
+    <string name="no_users_found">No user found.\nWe don\'t have any user with that username.</string>
 
 
     <!-- chip genres -->

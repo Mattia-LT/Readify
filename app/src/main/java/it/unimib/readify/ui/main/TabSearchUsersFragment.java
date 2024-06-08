@@ -1,24 +1,25 @@
 package it.unimib.readify.ui.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class TabSearchUsersFragment extends Fragment {
     private UserSearchResultAdapter userSearchResultAdapter;
     private String loggedUserIdToken;
     private UserViewModel userViewModel;
+    private boolean isSearchRunning;
 
     @Nullable
     @Override
@@ -49,7 +51,7 @@ public class TabSearchUsersFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViewModels();
-        initObserver();
+        initObservers();
 
         RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
@@ -60,11 +62,17 @@ public class TabSearchUsersFragment extends Fragment {
         recyclerView.setAdapter(userSearchResultAdapter);
         recyclerView.setLayoutManager(layoutManager);
 
-
+        isSearchRunning = false;
         fragmentTabSearchUsersBinding.edittextSearchUsers.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (keyEvent != null && (actionId == KeyEvent.ACTION_DOWN || actionId == KeyEvent.KEYCODE_ENTER ||  actionId == EditorInfo.IME_ACTION_SEARCH || keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
+            boolean isEnterKeyPressed = (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN);
+            boolean isSearchActionPressed = (actionId == EditorInfo.IME_ACTION_SEARCH);
+
+            if ( (isEnterKeyPressed || isSearchActionPressed) && !isSearchRunning) {
+                isSearchRunning = true;
+                fragmentTabSearchUsersBinding.noUsersFoundLayout.setVisibility(View.GONE);
                 startSearch();
+                InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
                 return true;
             }
             return false;
@@ -76,11 +84,11 @@ public class TabSearchUsersFragment extends Fragment {
         Editable text = fragmentTabSearchUsersBinding.edittextSearchUsers.getText();
         String query = (text != null) ? text.toString() : "";
         query = query.trim();
-        Snackbar.make(requireView(), "Query: " + query, Snackbar.LENGTH_SHORT).show();
         if(query.isEmpty()){
-            Snackbar.make(requireView(), getString(R.string.empty_search_snackbar), Snackbar.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.empty_search_snackbar), Toast.LENGTH_SHORT).show();
+            isSearchRunning = false;
         } else {
-            Log.d("UserSearchFragment", "Query: " + query);
+            fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
             userViewModel.searchUsers(query);
         }
     }
@@ -90,12 +98,11 @@ public class TabSearchUsersFragment extends Fragment {
                 .create(UserViewModel.class);
     }
 
-    private void initObserver(){
+    private void initObservers(){
 
         final Observer<Result> loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 User loggedUser = ((Result.UserSuccess) result).getData();
-                Log.e("USER OBSERVER","TRIGGERED");
                 this.loggedUserIdToken = loggedUser.getIdToken();
             }
         };
@@ -103,6 +110,13 @@ public class TabSearchUsersFragment extends Fragment {
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
         final Observer<List<Result>> searchResultsListObserver = results -> {
+            ConstraintLayout noUsersFoundLayout = fragmentTabSearchUsersBinding.noUsersFoundLayout;
+            if(results.isEmpty()){
+                noUsersFoundLayout.setVisibility(View.VISIBLE);
+            } else {
+                noUsersFoundLayout.setVisibility(View.GONE);
+            }
+
             List<User> searchResults = results.stream()
                     .filter(result -> result instanceof Result.UserSuccess)
                     .map(result -> ((Result.UserSuccess) result).getData())
@@ -111,6 +125,7 @@ public class TabSearchUsersFragment extends Fragment {
 
             userSearchResultAdapter.submitList(searchResults);
             fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.GONE);
+            isSearchRunning = false;
         };
 
         userViewModel.getUserSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);

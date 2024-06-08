@@ -162,6 +162,7 @@
     <string name="error_remove_book_from_collection">Errore nella rimozione del libro dalla collezione</string>
     <string name="error_logout">Si é verificato un errore durante il logout</string>
     <string name="error_local_database">Errore nel database locale</string>
+    <string name="no_users_found">Nessun utente trovato.\nNon abbiamo nessun utente con quell\'username.</string>
 
 
 

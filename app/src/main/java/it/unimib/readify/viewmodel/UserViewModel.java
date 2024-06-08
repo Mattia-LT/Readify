@@ -18,6 +18,7 @@ import it.unimib.readify.model.User;
 
 public class UserViewModel extends ViewModel {
     private final IUserRepository testDatabaseRepository;
+    private final int USER_SEARCH_LIMIT = 10;
     /*
         With this configuration
          (having two LiveData variables that memorizes data, repositoryData and copiedData),
@@ -179,8 +180,7 @@ public class UserViewModel extends ViewModel {
      */
 
     public void searchUsers(String query){
-        Log.d("UserViewModel", "Query: " + query);
-        testDatabaseRepository.searchUsers(query);
+        testDatabaseRepository.searchUsers(query, USER_SEARCH_LIMIT);
     }
 
     public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){

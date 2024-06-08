@@ -14,6 +14,7 @@ import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
 import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.FollowGroup;
 import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
@@ -183,8 +184,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void searchUsers(String query){
-        userDataRemoteDataSource.searchUsers(query);
+    public void searchUsers(String query, int limit){
+        userDataRemoteDataSource.searchUsers(query, limit);
     }
 
     @Override
@@ -267,13 +268,18 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void onSuccessFromRemoteDatabase(List<User> searchResults) {
+    public void onSuccessUserSearch(List<User> searchResults) {
+        Log.d(TAG, "User search success");
         List<Result> resultList = new ArrayList<>();
         for(User user : searchResults){
-            Log.d("UserRepository", "User: " + user);
             resultList.add(new Result.UserSuccess(user));
         }
         userSearchResultsLiveData.postValue(resultList);
+    }
+
+    @Override
+    public void onFailureUserSearch(String message) {
+        Log.e(TAG, "Error on user search : " + message);
     }
 
     @Override
@@ -308,7 +314,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFetchFollowersFromRemoteDatabase(String message) {
-        //TODO
+        Log.e(TAG, "Error during followers retrieving.\n" + message);
     }
 
     @Override
@@ -322,12 +328,12 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFetchFollowingFromRemoteDatabase(String message) {
-        //TODO
+        Log.e(TAG, "Error during followings retrieving.\n" + message);
     }
 
     @Override
     public void onSuccessAddComment(String bookId, Comment comment) {
-        //TODO vogliamo far vedere qualcos'altro? forse non serve comment? forse possiamo aggiungere direttamente il commento?? vale anchhe per successo di delete
+        //TODO vogliamo far vedere qualcos'altro? forse non serve comment? forse possiamo aggiungere direttamente il commento?? vale anche per successo di delete
         Log.d(TAG,"Comment added successfully");
         fetchComments(bookId);
     }
@@ -355,6 +361,18 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
+    public void onFailureFetchSingleFollower(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleFollowing(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
     public void addComment(String commentContent, String bookId, String idToken){
         userDataRemoteDataSource.addComment(commentContent,bookId,idToken);
     }
@@ -377,13 +395,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser) {
         userDataRemoteDataSource.followUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("REPO", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
     }
 
     @Override
     public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser) {
         userDataRemoteDataSource.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("REPO", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
     }
 
     @Override
@@ -398,26 +414,66 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void deleteUserInfo() {
-        User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
-        currentUser.setIdToken(null);
-        userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
+        if(userMutableLiveData.getValue() != null){
+            User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
+            currentUser.setIdToken(null);
+            userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
+        }
     }
 
 
     @Override
-    public void onFetchOtherUserResult(User otherUser) {
+    public void onSuccessFetchOtherUser(User otherUser) {
         Result otherUserResult = new Result.UserSuccess(otherUser);
         otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
-    public void onUserFollowResult() {
-
+    public void onFailureFetchOtherUser(String message) {
+        Result otherUserResult = new Result.Error(message);
+        otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
-    public void onUserUnfollowResult() {
+    public void onSuccessFollowUser(String loggedUserIdToken, String followedUserIdToken) {
+        userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
+        userDataRemoteDataSource.fetchOtherUser(followedUserIdToken);
+    }
 
+    @Override
+    public void onFailureFollowUser(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessUnfollowUser(String loggedUserIdToken, String unfollowedUserIdToken) {
+        userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
+        userDataRemoteDataSource.fetchOtherUser(unfollowedUserIdToken);
+    }
+
+    @Override
+    public void onFailureUnfollowUser(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessFetchInfoForFollow(String loggedUserIdToken, String followedUserIdToken, FollowGroup loggedUserFollowing, FollowGroup followedUserFollowers) {
+        userDataRemoteDataSource.endFollowOperation(loggedUserIdToken, followedUserIdToken, loggedUserFollowing, followedUserFollowers);
+    }
+
+    @Override
+    public void onFailureFetchInfoForFollow(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessFetchInfoForUnfollow(String loggedUserIdToken, String followedUserIdToken, FollowGroup loggedUserFollowing, FollowGroup followedUserFollowers) {
+        userDataRemoteDataSource.endUnfollowOperation(loggedUserIdToken, followedUserIdToken, loggedUserFollowing, followedUserFollowers);
+    }
+
+    @Override
+    public void onFailureFetchInfoForUnfollow(String message) {
+        Log.e(TAG, message);
     }
 
     @Override

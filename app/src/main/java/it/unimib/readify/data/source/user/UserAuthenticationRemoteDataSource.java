@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import it.unimib.readify.model.User;
@@ -74,25 +75,13 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     public void changeEmail(String newEmail) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
-        user.reauthenticate(EmailAuthProvider.getCredential("prova@gmail.com", "password")).addOnCompleteListener(new OnCompleteListener<Void>() {
+        user.verifyBeforeUpdateEmail(newEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    user.verifyBeforeUpdateEmail(newEmail)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    userResponseCallback.onEmailChanged(task.isSuccessful());
-                                    Log.d("source auth", Boolean.toString(task.isSuccessful()));
-                                    if(!task.isSuccessful()) {
-                                        Log.d("source auth exception", Objects.requireNonNull(task.getException()).toString());
-                                    }
-                                }
-                            });
-                } else {
-                    Log.d("re-authentication failure", Objects.requireNonNull(task.getException()).toString());
-                    userResponseCallback.onEmailChanged(false);
+                if(task.getException() != null) {
+                    Log.d("changeEmail", task.getException().toString());
                 }
+                userResponseCallback.onEmailChanged(task.isSuccessful());
             }
         });
     }
@@ -105,6 +94,9 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        if(task.getException() != null) {
+                            Log.d("changePassword", task.getException().toString());
+                        }
                         userResponseCallback.onPasswordChanged(task.isSuccessful());
                     }
                 });

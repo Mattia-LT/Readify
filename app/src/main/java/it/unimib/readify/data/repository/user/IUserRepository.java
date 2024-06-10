@@ -58,4 +58,5 @@ public interface IUserRepository {
     MutableLiveData<Boolean> getLogoutResult();
     MutableLiveData<Boolean> getUserAuthenticationResult();
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
+    long getLastAuthenticationTimestamp();
 }

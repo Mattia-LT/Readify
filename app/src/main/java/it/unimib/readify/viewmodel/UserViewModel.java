@@ -1,5 +1,7 @@
 package it.unimib.readify.viewmodel;
 
+import static java.text.DateFormat.getTimeInstance;
+
 import android.util.Log;
 
 import androidx.lifecycle.MediatorLiveData;
@@ -64,6 +66,7 @@ public class UserViewModel extends ViewModel {
     private boolean isUIRunning;
     private boolean firstLoading = true;
     private boolean continueRegistrationFirstLoading = true;
+    private long lastAuthenticationTimestamp;
     public UserViewModel(IUserRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
@@ -121,6 +124,9 @@ public class UserViewModel extends ViewModel {
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
         notifications = testDatabaseRepository.getFetchedNotifications();
         userAuthenticationResult = testDatabaseRepository.getUserAuthenticationResult();
+        lastAuthenticationTimestamp = testDatabaseRepository.getLastAuthenticationTimestamp();
+        Log.d("viewmodel", getTimeInstance().format(lastAuthenticationTimestamp));
+
     }
 
     //new logic
@@ -200,6 +206,9 @@ public class UserViewModel extends ViewModel {
         return commentListLiveData;
     }
 
+    public long getLastAuthenticationTimestamp() {
+        return lastAuthenticationTimestamp;
+    }
 
     public void fetchComments(String bookId){
         Log.d("ViewModel", "fetchComments start");

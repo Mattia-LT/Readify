@@ -1,5 +1,7 @@
 package it.unimib.readify.data.repository.user;
 
+import static java.text.DateFormat.getTimeInstance;
+
 import android.app.Application;
 import android.util.Log;
 
@@ -37,6 +39,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
+    private long lastAuthenticationTimestamp;
 
     public static IUserRepository getInstance(Application application) {
         return new UserRepository(new UserAuthenticationRemoteDataSource(),
@@ -247,11 +250,17 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         return userAuthenticationResult;
     }
 
+    public long getLastAuthenticationTimestamp() {
+        return lastAuthenticationTimestamp;
+    }
+
     @Override
     public void onSuccessFromAuthentication(User user) {
         if (user != null) {
             userDataRemoteDataSource.saveUserData(user);
             logoutResult.postValue(null);
+            lastAuthenticationTimestamp = System.currentTimeMillis();
+            Log.d("onSuccessFromAuthentication", getTimeInstance().format(lastAuthenticationTimestamp));
         }
     }
 

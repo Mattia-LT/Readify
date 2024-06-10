@@ -5,14 +5,13 @@ import static it.unimib.readify.util.Constants.BUNDLE_ID_TOKEN;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
@@ -40,6 +39,8 @@ public class TabFollowerListFragment extends Fragment{
     private List<FollowUser> followerList;
     private String idToken;
     private String loggedUserIdToken;
+    private Observer<List<Result>> followersObserver;
+    private Observer<Result> loggedUserObserver;
 
     public TabFollowerListFragment(){}
 
@@ -53,11 +54,46 @@ public class TabFollowerListFragment extends Fragment{
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        initViewModels();
         if(getArguments()!= null){
             this.idToken = getArguments().getString(BUNDLE_ID_TOKEN);
         }
-        initObserver();
+        initViewModels();
+        initObservers();
+        initRecyclerView();
+        setUpSearchSection();
+    }
+
+    private void initViewModels(){
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
+
+    private void initObservers(){
+        this.followerList = new ArrayList<>();
+
+        followersObserver = results -> {
+            List<FollowUser> followersList = results.stream()
+                    .filter(result -> result instanceof Result.FollowUserSuccess)
+                    .map(result -> ((Result.FollowUserSuccess) result).getData())
+                    .collect(Collectors.toList());
+            followListAdapter.submitList(followersList);
+            this.followerList = followersList;
+        };
+
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                User user = ((Result.UserSuccess) result).getData();
+                loggedUserIdToken = user.getIdToken();
+                followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
+                userViewModel.fetchFollowers(idToken);
+            }
+        };
+
+        userViewModel.getFollowersListLiveData().observe(getViewLifecycleOwner(), followersObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+    }
+
+    private void initRecyclerView() {
         RecyclerView recyclerView = fragmentTabFollowerListBinding.recyclerviewFollowerUsers;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         followListAdapter = new FollowListAdapter(new FollowListAdapter.OnItemClickListener() {
@@ -65,7 +101,7 @@ public class TabFollowerListFragment extends Fragment{
             public void onProfileClick(FollowUser followUser) {
                 User selectedUser = followUser.getUser();
                 if(!selectedUser.getIdToken().equals(loggedUserIdToken)){
-                    NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(),selectedUser.getUsername());
+                    NavDirections action = FollowListFragmentDirections.actionFollowListFragmentToUserDetailsFragment(selectedUser.getIdToken(), selectedUser.getUsername());
                     Navigation.findNavController(requireView()).navigate(action);
                 }
             }
@@ -73,19 +109,19 @@ public class TabFollowerListFragment extends Fragment{
             @Override
             public void onFollowButtonClick(FollowUser user) {
                 userViewModel.followUser(idToken, user.getIdToken());
-                Log.d("TabFollowerListFragment", "followButtonClick premuto con idtoken: " + idToken);
             }
 
             @Override
             public void onUnfollowButtonClick(FollowUser user) {
-                //TODO testare bene per trovare eventuali errori
                 userViewModel.unfollowUser(idToken, user.getIdToken());
-                Log.d("TabFollowerListFragment", "UnfollowButtonClick premuto con idtoken: " + idToken);
             }
         });
+
         recyclerView.setAdapter(followListAdapter);
         recyclerView.setLayoutManager(layoutManager);
+    }
 
+    private void setUpSearchSection() {
         fragmentTabFollowerListBinding.edittextFollowerUsers.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -103,41 +139,10 @@ public class TabFollowerListFragment extends Fragment{
                 search(text);
             }
         });
-
-    }
-
-    private void initViewModels(){
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
-    }
-
-    private void initObserver(){
-        this.followerList = new ArrayList<>();
-        final Observer<List<Result>> followersObserver = results -> {
-            List<FollowUser> followersList = results.stream()
-                    .filter(result -> result instanceof Result.FollowUserSuccess)
-                    .map(result -> ((Result.FollowUserSuccess) result).getData())
-                    .collect(Collectors.toList());
-            followListAdapter.submitList(followersList);
-            this.followerList = followersList;
-        };
-
-        final Observer<Result> loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                User user = ((Result.UserSuccess) result).getData();
-                Log.e("USER OBSERVER","TRIGGERED");
-                loggedUserIdToken = user.getIdToken();
-                followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
-                userViewModel.fetchFollowers(idToken);
-            }
-        };
-
-
-        userViewModel.getFollowersListLiveData().observe(getViewLifecycleOwner(), followersObserver);
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
     private void search(String text) {
+        ConstraintLayout noUsersFoundLayout = fragmentTabFollowerListBinding.noFollowersFoundLayout;
         ArrayList<FollowUser> filteredList = new ArrayList<>();
         text = text.trim();
         for (FollowUser user : followerList) {
@@ -145,12 +150,18 @@ public class TabFollowerListFragment extends Fragment{
                 filteredList.add(user);
             }
         }
+        followListAdapter.submitList(filteredList);
         if (filteredList.isEmpty()) {
-            followListAdapter.submitList(filteredList);
-            //Todo cambiare con una texview dietro alla recycler view
-            Toast.makeText(requireActivity(), "No Data Found..", Toast.LENGTH_SHORT).show();
+            noUsersFoundLayout.setVisibility(View.VISIBLE);
         } else {
-            followListAdapter.submitList(filteredList);
+            noUsersFoundLayout.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getFollowersListLiveData().removeObserver(followersObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

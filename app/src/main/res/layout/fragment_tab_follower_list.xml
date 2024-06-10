@@ -18,7 +18,9 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_follower_users"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
+        android:minWidth="390dp"
+        android:maxWidth="485dp"
         android:layout_height="wrap_content"
         android:hint="@string/hint_search_users"
         android:padding="16dp"
@@ -28,7 +30,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:startIconDrawable="@drawable/ic_baseline_search_24"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        >
+        app:shapeAppearanceOverlay="@style/RoundedEditText"
+        app:boxStrokeColor="@color/text_input_box_stroke_color"
+        app:hintTextColor="?attr/colorSecondary"
+        app:boxStrokeWidth="2dp"
+        app:cursorColor="?attr/colorAccent" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edittext_follower_users"
@@ -52,5 +58,43 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:itemCount="12"
         tools:listitem="@layout/follow_item" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/no_followers_found_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/textinputlayout_follower_users"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        tools:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/no_users_found_imageview"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:src="@drawable/no_users_found_icon"
+            />
+
+        <TextView
+            android:id="@+id/no_users_found_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/no_users_found_imageview"
+            android:text="@string/no_users_found_generic"
+            android:gravity="center"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

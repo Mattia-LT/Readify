@@ -7,7 +7,6 @@ import static it.unimib.readify.util.Constants.TITLE_SORT_SEARCH_MODE;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,8 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
     private BookViewModel bookViewModel;
     private ChipGroup chipGroupGenre;
     private ChipGroup chipGroupSort;
+    private Observer<List<String>> genreListObserver;
+    private Observer<String> sortModeObserver;
 
     @Nullable
     @Override
@@ -121,10 +122,9 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void initObserver(){
-        final Observer<List<String>> genreListObserver = genreList -> {
+        genreListObserver = genreList -> {
             SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
             if(genreList != null && !genreList.isEmpty()){
-                Log.d("GENRELIST",genreList.toString());
                 List<Integer> chipIds = new ArrayList<>();
                 for(String apiValue: genreList){
                     int chipId = subjectsUtil.getChipId(apiValue);
@@ -132,7 +132,6 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
                         chipIds.add(chipId);
                     }
                 }
-                Log.d("KEYS-GENRELIST",chipIds.toString());
                 for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
                     if (chipGroupGenre.getChildAt(i) instanceof Chip) {
                         Chip chip = (Chip) chipGroupGenre.getChildAt(i);
@@ -144,7 +143,7 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
             }
         };
 
-        final Observer<String> sortModeObserver = sortMode -> {
+        sortModeObserver = sortMode -> {
             if(sortMode != null && !sortMode.isEmpty()){
                 for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
                     if (chipGroupSort.getChildAt(i) instanceof Chip) {
@@ -176,4 +175,10 @@ public class SearchBooksFilterBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bookViewModel.getSortModeLiveData().removeObserver(sortModeObserver);
+        bookViewModel.getSubjectListLiveData().removeObserver(genreListObserver);
+    }
 }

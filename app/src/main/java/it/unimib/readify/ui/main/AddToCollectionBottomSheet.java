@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,8 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 
 public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
+
+    private final String TAG = AddToCollectionBottomSheet.class.getSimpleName();
 
     private BottomSheetAddToCollectionBinding binding;
     private CollectionViewModel collectionViewModel;
@@ -81,8 +84,10 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
 
         initViewModels();
         initObservers();
+
         this.book = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getBook();
         this.idToken = AddToCollectionBottomSheetArgs.fromBundle(getArguments()).getIdToken();
+
         collectionViewModel.loadLoggedUserCollections();
 
         Button cancelButton = binding.buttonCancelCollectionInsertion;
@@ -185,7 +190,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         collectionViewModel.getLoggedUserCollectionListLiveData().observe(getViewLifecycleOwner(),collectionsObserver);
 
         addToCollectionResultObserver = result -> {
-            Log.e("ADDTOCOLLECTIONRESULT", "TRIGGERED + " + result);
             if(result != null){
                 if(result){
                     SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
@@ -193,12 +197,11 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                         subject = subject.toLowerCase();
                         if(subjectsUtil.containSubject(subject)){
                             Integer currentValue = loggedUser.getRecommended().get(subject);
-                            Log.d("Subject", subject);
                             if(currentValue != null){
                                 Integer newValue = currentValue + 1;
                                 loggedUser.getRecommended().put(subject, newValue);
                             } else {
-                                Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                                Log.e(TAG, "Unknown subject : " + subject);
                                 loggedUser.getRecommended().put(subject, 0);
                             }
                         }
@@ -210,15 +213,11 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                     loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
                     userViewModel.setUserTotalNumberOfBooks(loggedUser);
 
-                    Log.d("fragment","aggiunto OK");
                 } else {
-                    //toast errore
-                    Log.d("fragment","aggiunto fail");
+                    Toast.makeText(requireContext(), R.string.error_add_book_to_collection, Toast.LENGTH_SHORT).show();
                 }
                 //remove observer for single use action
                 collectionViewModel.getAddToCollectionResult().removeObserver(addToCollectionResultObserver);
-            } else {
-                Log.d("fragment","aggiunto null");
             }
         };
 
@@ -230,33 +229,27 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                         subject = subject.toLowerCase();
                         if(subjectsUtil.containSubject(subject)){
                             Integer currentValue = loggedUser.getRecommended().get(subject);
-                            Log.d("Subject", subject);
                             if(currentValue != null){
                                 Integer newValue = currentValue - 1;
                                 loggedUser.getRecommended().put(subject, newValue);
                             } else {
-                                Log.e("AddToCollectionBottomSheet", "Unknown subject : " + subject);
+                                Log.e(TAG, "Unknown subject : " + subject);
                                 loggedUser.getRecommended().put(subject, 0);
                             }
                         }
                     }
                     userViewModel.setUserRecommended(loggedUser);
-                    Log.d("fragment","rimosso OK");
 
                     int totalNumberOfBooks = loggedUser.getTotalNumberOfBooks();
                     totalNumberOfBooks -= 1;
                     loggedUser.setTotalNumberOfBooks(totalNumberOfBooks);
                     userViewModel.setUserTotalNumberOfBooks(loggedUser);
                 } else {
-                    //toast errore
-                    Log.d("fragment","rimosso fail");
+                    Toast.makeText(requireContext(), R.string.error_remove_book_from_collection, Toast.LENGTH_SHORT).show();
                 }
-                //remove this observer
+                //remove observer for single use action
                 collectionViewModel.getRemoveFromCollectionResult().removeObserver(removeFromCollectionResultObserver);
-            } else {
-                Log.d("fragment","rimosso null");
             }
-
         };
 
         loggedUserObserver = result -> {
@@ -264,7 +257,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
                 loggedUser = ((Result.UserSuccess) result).getData();
             }
         };
-
 
         //isValid collection name -> length OK and contain only permitted characters
         collectionViewModel.isNameValid().observe(getViewLifecycleOwner(), isValid -> {
@@ -275,7 +267,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         });
 
         //isUnique collection name -> the user doesn't have another collection with the same name
-
         collectionViewModel.isNameUnique().observe(getViewLifecycleOwner(), isUnique -> {
             if (isUnique != null) {
                 this.isNameUnique = isUnique;
@@ -284,7 +275,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
         });
 
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
-
     }
 
     private void updateErrorMessage() {
@@ -304,7 +294,6 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             confirmButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.login_blue));
         }
     }
-
 
     @Override
     public void onDestroyView() {

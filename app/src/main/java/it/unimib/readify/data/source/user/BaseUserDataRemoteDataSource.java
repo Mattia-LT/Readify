@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import it.unimib.readify.data.repository.user.UserResponseCallback;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.FollowGroup;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 
@@ -35,27 +36,18 @@ public abstract class BaseUserDataRemoteDataSource {
      */
     public abstract void setViewedNotificationsListToRead(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
     public abstract void getUser(String idToken);
-    public abstract void searchUsers(String query);
+    public abstract void searchUsers(String query, int limit);
     public abstract void fetchComments(String bookId);
-    public abstract void addComment(String content, String bookId, String idToken);
+    public abstract void addComment(String commentContent, String bookId, String idToken);
     public abstract void deleteComment(String bookId, Comment comment);
     public abstract void fetchFollowers(String idToken);
     public abstract void fetchFollowings(String idToken);
     public abstract void followUser(String idTokenLoggedUser, String idTokenFollowedUser);
     public abstract void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser);
+    public abstract void endFollowOperation(String idTokenLoggedUser, String idTokenFollowedUser, FollowGroup loggedUserFollowings, FollowGroup followedUserFollowers);
+    public abstract void endUnfollowOperation(String idTokenLoggedUser, String idTokenFollowedUser, FollowGroup loggedUserFollowings, FollowGroup followedUserFollowers);
     public abstract void fetchOtherUser(String otherUserIdToken);
-    //se salviamo le user preferences sul dispositivo (che sembra più sensato), non ci servono
-    public abstract void getUserPreferences(String idToken);
-    public abstract void saveUserPreferences(String message, String idToken);
-
-    //substitute of followUser / unfollowUser
-    /*
-    public abstract void addFollowing(String loggedUserIdToken, String externalUserIdToken);
-    public abstract void addFollower(String externalUserIdToken, String loggedUserIdToken);
-    public abstract void removeFollowing(String loggedUserIdToken, String externalUserIdToken);
-    public abstract void removeFollower(String externalUserIdToken, String loggedUserIdToken);
-
-     */
+    public abstract void refreshLoggedUserData(String loggedUserIdToken);
     public abstract void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
     public abstract void removeNotification(String targetIdToken, String content, String loggedUserIdToken);
     public abstract void isUsernameAvailable(String username);

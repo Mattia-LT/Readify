@@ -20,6 +20,7 @@ import it.unimib.readify.model.User;
 
 public class UserViewModel extends ViewModel {
     private final IUserRepository testDatabaseRepository;
+    private final int USER_SEARCH_LIMIT = 10;
     /*
         With this configuration
          (having two LiveData variables that memorizes data, repositoryData and copiedData),
@@ -185,8 +186,7 @@ public class UserViewModel extends ViewModel {
      */
 
     public void searchUsers(String query){
-        Log.d("UserViewModel", "Query: " + query);
-        testDatabaseRepository.searchUsers(query);
+        testDatabaseRepository.searchUsers(query, USER_SEARCH_LIMIT);
     }
 
     public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){
@@ -215,12 +215,12 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.fetchComments(bookId);
     }
 
-    public void addComment(String content, String bookId, String idToken){
-        testDatabaseRepository.addComment(content,bookId,idToken);
+    public void addComment(String commentContent, String bookId, String idToken){
+        testDatabaseRepository.addComment(commentContent,bookId,idToken);
     }
 
-    public void deleteComment(String bookId, Comment comment){
-        testDatabaseRepository.deleteComment(bookId, comment);
+    public void deleteComment(String bookId, Comment deletedComment){
+        testDatabaseRepository.deleteComment(bookId, deletedComment);
     }
 
     public void changeUserPassword(String newPassword) {testDatabaseRepository.changeUserPassword(newPassword);}

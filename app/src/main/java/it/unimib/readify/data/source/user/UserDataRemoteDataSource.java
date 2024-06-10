@@ -1,21 +1,26 @@
 package it.unimib.readify.data.source.user;
 
-import static it.unimib.readify.util.Constants.FIREBASE_USERS_BIOGRAPHY_FIELD;
-import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_NOTIFICATIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_AVATAR_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_BIOGRAPHY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWERS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWING_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_GENDER_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_RECOMMENDED_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERS_LIST_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_VISIBILITY_FIELD;
-import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
-import static it.unimib.readify.util.Constants.FIREBASE_USERS_USERNAME_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COLLECTION;
+import static it.unimib.readify.util.Constants.FIREBASE_WORKS_COMMENTS_FIELD;
+import static it.unimib.readify.util.Constants.FOLLOW_ACTION;
+import static it.unimib.readify.util.Constants.UNFOLLOW_ACTION;
+import static it.unimib.readify.util.Constants.USERNAME_AVAILABLE;
+import static it.unimib.readify.util.Constants.USERNAME_ERROR;
+import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
 
 import android.util.Log;
 
@@ -32,7 +37,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.FollowGroup;
@@ -42,6 +51,8 @@ import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
+
+    private final String TAG = UserDataRemoteDataSource.class.getSimpleName();
 
     private final DatabaseReference databaseReference;
     private final SharedPreferencesUtil sharedPreferencesUtil;
@@ -54,20 +65,21 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void saveUserData(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference userReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken());
+
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Log.d("save user data: signIn case", "User already present in Firebase Realtime Database");
                     //if snapshot exists, return user data (retrieved from Database)
                     User existingUser = snapshot.getValue(User.class);
                     if(existingUser != null){
                         userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
                     }
                 } else {
-                    Log.d("save user data: signUp case", "User not present in Firebase Realtime Database");
-                    databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken()).setValue(user)
+                    userReference.setValue(user)
                         .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                         .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
                 }
@@ -92,6 +104,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         
     }
 
+    //TODO sistemare refactor dopo modifiche di ema
     //todo modify
     @Override
     public void setEmail(User user) {
@@ -121,193 +134,102 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void setGender(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_GENDER_FIELD).setValue(user.getGender())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference genderReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_GENDER_FIELD);
+
+        genderReference.setValue(user.getGender())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setVisibility(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_VISIBILITY_FIELD).setValue(user.getVisibility())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference visibilityReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_VISIBILITY_FIELD);
+
+        visibilityReference.setValue(user.getVisibility())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setRecommended(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_RECOMMENDED_FIELD).setValue(user.getRecommended())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference recommendedReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_RECOMMENDED_FIELD);
+
+        recommendedReference.setValue(user.getRecommended())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setAvatar(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_AVATAR_FIELD).setValue(user.getAvatar())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference avatarReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_AVATAR_FIELD);
+
+        avatarReference.setValue(user.getAvatar())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setBiography(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_BIOGRAPHY_FIELD).setValue(user.getBiography())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference biographyReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_BIOGRAPHY_FIELD);
+
+        biographyReference.setValue(user.getBiography())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setFollowers(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_FOLLOWERS_FIELD).setValue(user.getFollowers())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference followersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_FOLLOWERS_FIELD);
+
+        followersReference.setValue(user.getFollowers())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setFollowing(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                                    .child(FIREBASE_USERS_FOLLOWING_FIELD).setValue(user.getFollowing())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            //todo manage typo
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+        DatabaseReference followingReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(user.getIdToken())
+                .child(FIREBASE_USERS_FOLLOWING_FIELD);
+
+        followingReference.setValue(user.getFollowing())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     @Override
     public void setTotalNumberOfBooks(User user) {
-        databaseReference
+        DatabaseReference totalNumberOfBooksReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
                 .child(user.getIdToken())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            databaseReference
-                                    .child(FIREBASE_USERS_COLLECTION)
-                                    .child(user.getIdToken())
-                                    .child(FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD)
-                                    .setValue(user.getTotalNumberOfBooks())
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                        } else {
-                            userResponseCallback.onFailureFromRemoteDatabaseUser("User doesn't exist yet");
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFromRemoteDatabaseUser(error.getMessage());
-                    }
-                });
+                .child(FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD);
+
+        totalNumberOfBooksReference.setValue(user.getTotalNumberOfBooks())
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
     /*
+        TODO sistema notifiche, magari rimuovere sto commento? chiedere ad ema
         remember that firebase cuts the start "is" from a boolean variable
             es. isRead -> read
      */
@@ -413,6 +335,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 });
     }
 
+    //TODO rimuovere? non ha usages
     @Override
     public void getUser(String idToken) {
         databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).get().addOnCompleteListener(task -> {
@@ -427,101 +350,102 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void fetchComments(String bookId){
-        Log.d("DataSource", "fetchComments start");
+        Log.d(TAG, "Start fetching comments for book with id: " + bookId);
         if (bookId.startsWith("/works/")) {
             bookId = bookId.substring("/works/".length());
         }
-        DatabaseReference customReference = databaseReference.child(FIREBASE_WORKS_COLLECTION).child(bookId).child(FIREBASE_WORKS_COMMENTS_FIELD);
-        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference commentsReference = databaseReference
+                .child(FIREBASE_WORKS_COLLECTION)
+                .child(bookId)
+                .child(FIREBASE_WORKS_COMMENTS_FIELD);
+
+        commentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("DataSource", "onDataChange ok");
                 List<Comment> comments = new ArrayList<>();
-                int totalComments = (int) snapshot.getChildrenCount();
-                final int[] commentLoaded = {0};
+                CountDownLatch commentsCountDownLatch = new CountDownLatch((int) snapshot.getChildrenCount());
                 for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
                     Comment comment = commentSnapshot.getValue(Comment.class);
                     if (comment != null) {
-                        Log.d("DataSource", "retrieve user information");
-                        fetchUserFromComment(comment, new UserFetchFromCommentCallback(){
-                            @Override
-                            public void onUserFetched(Comment comment) {
-                                Log.d("DataSource", "user information retrieved " + comment.getUser().toString());
+                        CountDownLatch userCountDownLatch = new CountDownLatch(1);
+                        fetchUserFromComment(comment, userCountDownLatch);
+                        ExecutorService singleCommentExecutor = Executors.newSingleThreadExecutor();
+                        singleCommentExecutor.submit(() -> {
+                            try {
+                                userCountDownLatch.await();
                                 comments.add(comment);
-                                commentLoaded[0]++;
-
-                                if(commentLoaded[0] == totalComments){
-                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
-                                }
-                            }
-
-                            @Override
-                            public void onUserFetchFailed(Comment comment) {
-                                commentLoaded[0]++;
-                                Log.d("DataSource", "user information failed");
-                                if (commentLoaded[0] == totalComments) {
-                                    // All user information retrieved (even if some failed), trigger callback
-                                    userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
-                                }
+                                commentsCountDownLatch.countDown();
+                                singleCommentExecutor.shutdown();
+                            } catch (InterruptedException e) {
+                                userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " : " + e.getLocalizedMessage());
+                                commentsCountDownLatch.countDown();
                             }
                         });
                     } else {
-                        commentLoaded[0]++;
-                        Log.d("DataSource", "Comment was null");
+                        userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " : " + "a null comment was found.");
+                        commentsCountDownLatch.countDown();
                     }
                 }
-                Log.d("DataSource", "comments value " + comments);
-                userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                ExecutorService commentListExecutor = Executors.newSingleThreadExecutor();
+                commentListExecutor.submit(() -> {
+                    try {
+                        commentsCountDownLatch.await();
+                        userResponseCallback.onSuccessFetchCommentsFromRemoteDatabase(comments);
+                        commentListExecutor.shutdown();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        userResponseCallback.onFailureFetchCommentsFromRemoteDatabase("Error in " + TAG + " : " + e.getLocalizedMessage());
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("DataSource", "comments retrieve failed");
-                userResponseCallback.onFailureFetchCommentsFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFetchCommentsFromRemoteDatabase("Error in " + TAG + " : " + error.getMessage());
             }
         });
     }
 
     @Override
-    public void searchUsers(String query) {
-        //todo possiamo rimuoverlo o passarlo come parametro. per ora lascio qua
-        int limit = 10;
+    public void searchUsers(String query, int limit) {
         List<User> userSearchResults = new ArrayList<>();
-        DatabaseReference customReference = databaseReference.child(FIREBASE_USERS_COLLECTION);
+        DatabaseReference usersCollectionReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION);
+
+        query = query.toLowerCase();
         // query + "\uf8ff" is used to set the end of the range
-        Log.d("UserRemoteDataSource", customReference.toString());
-        Query searchQuery = customReference.orderByChild(FIREBASE_USERS_USERNAME_FIELD).startAt(query).endAt(query + "\uf8ff");
-        Log.d("UserRemoteDataSource", searchQuery.toString());
+        Query searchQuery = usersCollectionReference
+                .orderByChild(FIREBASE_USERS_USERNAME_FIELD)
+                .startAt(query)
+                .endAt(query + "\uf8ff");
+
         searchQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                // Handle the results
-                int count = 0;
+                int fetchedUserResults = 0;
                 for (DataSnapshot userSnapshot : task.getResult().getChildren()) {
-                    if (count < limit) {
+                    if (fetchedUserResults < limit) {
                         User user = userSnapshot.getValue(User.class);
                         if (user != null) {
-                            Log.d("UserSearch", "Found user: " + user);
                             userSearchResults.add(user);
-                            count++;
+                            fetchedUserResults++;
                         }
                     } else {
-                        // Limit reached, break out of the loop
+                        //Limit reached, break out of the loop
                         break;
                     }
                 }
-                userResponseCallback.onSuccessFromRemoteDatabase(userSearchResults);
+                userResponseCallback.onSuccessUserSearch(userSearchResults);
             } else {
-                // Handle errors
                 Exception exception = task.getException();
                 if (exception != null) {
-                    Log.e("UserSearch", "Error: " + exception.getMessage());
+                    userResponseCallback.onFailureUserSearch(exception.getMessage());
                 }
             }
         });
     }
 
     @Override
-    public void addComment(String content,String bookId, String idToken){
+    public void addComment(String commentContent, String bookId, String idToken){
         String finalBookId = bookId.substring("/works/".length());
 
         DatabaseReference commentsReference = databaseReference
@@ -534,74 +458,87 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         String commentId = newCommentReference.getKey();
         long timestamp = new Date().getTime();
 
-        Comment newComment = new Comment(commentId, content, idToken, timestamp);
+        Comment newComment = new Comment(commentId, commentContent, idToken, timestamp);
 
-        newCommentReference.setValue(newComment);
-        userResponseCallback.onAddCommentResult(newComment);
+        newCommentReference.setValue(newComment)
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessAddComment(bookId, newComment))
+                .addOnFailureListener(e -> userResponseCallback.onFailureAddComment(e.getLocalizedMessage()));
     }
 
     @Override
-    public void deleteComment(String bookId, Comment comment) {
+    public void deleteComment(String bookId, Comment deletedComment) {
         String finalBookId = bookId.substring("/works/".length());
+
         DatabaseReference commentsReference = databaseReference
                 .child(FIREBASE_WORKS_COLLECTION)
                 .child(finalBookId)
                 .child(FIREBASE_WORKS_COMMENTS_FIELD)
-                .child(comment.getCommentId());
-        commentsReference.removeValue();
+                .child(deletedComment.getCommentId());
+
+        commentsReference.removeValue()
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessDeleteComment(bookId, deletedComment))
+                .addOnFailureListener(e -> userResponseCallback.onFailureDeleteComment(e.getLocalizedMessage()));
     }
 
     @Override
     public void fetchFollowers(String idToken) {
-        DatabaseReference followersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference followersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idToken)
                 .child(FIREBASE_USERS_FOLLOWERS_FIELD)
                 .child(FIREBASE_USERS_USERS_LIST_FIELD);
+
         followersReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<FollowUser> followers = new ArrayList<>();
-                int totalFollowers = (int) snapshot.getChildrenCount();
-                final int[] followersLoaded = {0};
-                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
-                    FollowUser follower = commentSnapshot.getValue(FollowUser.class);
-                    if (follower != null) {
-                        fetchUserFromExternalUser(follower, new UserFetchFromExternalUserCallback(){
-                            @Override
-                            public void onUserFetched(FollowUser followUser) {
+                CountDownLatch followersCountDownLatch = new CountDownLatch((int) snapshot.getChildrenCount());
+                for (DataSnapshot singleFollowerSnapshot : snapshot.getChildren()) {
+                    FollowUser followUser = singleFollowerSnapshot.getValue(FollowUser.class);
+                    if (followUser != null) {
+                        CountDownLatch userCountDownLatch = new CountDownLatch(1);
+                        fetchUserFromFollowUser(followUser, userCountDownLatch, FIREBASE_USERS_FOLLOWERS_FIELD);
+                        ExecutorService singleFollowerExecutor = Executors.newSingleThreadExecutor();
+                        singleFollowerExecutor.submit(() -> {
+                            try {
+                                userCountDownLatch.await();
                                 followers.add(followUser);
-                                followersLoaded[0]++;
-                                if(followersLoaded[0] == totalFollowers){
-                                    userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
-                                }
-                            }
-
-                            @Override
-                            public void onUserFetchFailed(FollowUser followUser) {
-                                followersLoaded[0]++;
-                                if (followersLoaded[0] == totalFollowers) {
-                                    // All user information retrieved (even if some failed), trigger callback
-                                    userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
-                                }
+                                followersCountDownLatch.countDown();
+                                singleFollowerExecutor.shutdown();
+                            } catch (InterruptedException e) {
+                                userResponseCallback.onFailureFetchSingleFollower("Error in " + TAG + " : " + e.getLocalizedMessage());
+                                followersCountDownLatch.countDown();
                             }
                         });
                     } else {
-                        followersLoaded[0]++;
+                        userResponseCallback.onFailureFetchSingleFollower("Error in " + TAG + " : " + "a null FollowUser was found.");
+                        followersCountDownLatch.countDown();
                     }
                 }
-                userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
+                ExecutorService followersListExecutor = Executors.newSingleThreadExecutor();
+                followersListExecutor.submit(() -> {
+                    try {
+                        followersCountDownLatch.await();
+                        userResponseCallback.onSuccessFetchFollowersFromRemoteDatabase(followers);
+                        followersListExecutor.shutdown();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        userResponseCallback.onFailureFetchFollowersFromRemoteDatabase("Error in " + TAG + " : " + e.getLocalizedMessage());
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureFetchFollowersFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFetchFollowersFromRemoteDatabase("Error in " + TAG + " : " + error.getMessage());
             }
         });
     }
 
     @Override
     public void fetchFollowings(String idToken) {
-        DatabaseReference followingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference followingReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idToken)
                 .child(FIREBASE_USERS_FOLLOWING_FIELD)
                 .child(FIREBASE_USERS_USERS_LIST_FIELD);
@@ -609,39 +546,45 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<FollowUser> followings = new ArrayList<>();
-                int totalFollowings = (int) snapshot.getChildrenCount();
-                final int[] followingsLoaded = {0};
-                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
-                    FollowUser following = commentSnapshot.getValue(FollowUser.class);
-                    if (following != null) {
-                        fetchUserFromExternalUser(following, new UserFetchFromExternalUserCallback(){
-                            @Override
-                            public void onUserFetched(FollowUser followUser) {
+                CountDownLatch followingsCountDownLatch = new CountDownLatch((int) snapshot.getChildrenCount());
+                for (DataSnapshot singleFollowingSnapshot : snapshot.getChildren()) {
+                    FollowUser followUser = singleFollowingSnapshot.getValue(FollowUser.class);
+                    if (followUser != null) {
+                        CountDownLatch userCountDownLatch = new CountDownLatch(1);
+                        fetchUserFromFollowUser(followUser, userCountDownLatch, FIREBASE_USERS_FOLLOWING_FIELD);
+                        ExecutorService singleFollowingExecutor = Executors.newSingleThreadExecutor();
+                        singleFollowingExecutor.submit(() -> {
+                            try {
+                                userCountDownLatch.await();
                                 followings.add(followUser);
-                                followingsLoaded[0]++;
-                                if(followingsLoaded[0] == totalFollowings){
-                                    userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
-                                }
-                            }
-
-                            @Override
-                            public void onUserFetchFailed(FollowUser followUser) {
-                                followingsLoaded[0]++;
-                                if (followingsLoaded[0] == totalFollowings) {
-                                    userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
-                                }
+                                followingsCountDownLatch.countDown();
+                                singleFollowingExecutor.shutdown();
+                            } catch (InterruptedException e) {
+                                userResponseCallback.onFailureFetchSingleFollowing("Error in " + TAG + " : " + e.getLocalizedMessage());
+                                followingsCountDownLatch.countDown();
                             }
                         });
                     } else {
-                        followingsLoaded[0]++;
+                        userResponseCallback.onFailureFetchSingleFollowing("Error in " + TAG + " : " + "a null FollowUser was found.");
+                        followingsCountDownLatch.countDown();
                     }
                 }
-                userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
+                ExecutorService followingsListExecutor = Executors.newSingleThreadExecutor();
+                followingsListExecutor.submit(() -> {
+                    try {
+                        followingsCountDownLatch.await();
+                        userResponseCallback.onSuccessFetchFollowingFromRemoteDatabase(followings);
+                        followingsListExecutor.shutdown();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        userResponseCallback.onFailureFetchFollowingFromRemoteDatabase("Error in " + TAG + " : " + e.getLocalizedMessage());
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureFetchFollowingFromRemoteDatabase(error.getMessage());
+                userResponseCallback.onFailureFetchFollowingFromRemoteDatabase("Error in " + TAG + " : " + error.getMessage());
             }
         });
     }
@@ -649,241 +592,223 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser) {
-        Log.d("datasource", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
-        //loggedUser references
-        DatabaseReference loggedUserFollowingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference loggedUserFollowGroupReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idTokenLoggedUser)
                 .child(FIREBASE_USERS_FOLLOWING_FIELD);
 
-        //followedUser references
-        DatabaseReference followedUserFollowersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference followedUserFollowGroupReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idTokenFollowedUser)
                 .child(FIREBASE_USERS_FOLLOWERS_FIELD);
 
-        final int[] insertionsToDo = {2};
-        followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        FollowUserHandler followUserHandler = new FollowUserHandler(idTokenLoggedUser, idTokenFollowedUser, FOLLOW_ACTION);
+
+        loggedUserFollowGroupReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                FollowGroup newFollowGroup = new FollowGroup();
-                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
-                if(followGroup != null){
-                    int counter = followGroup.getCounter();
-                    counter = counter + 1;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FollowGroup followGroupFollowing = snapshot.getValue(FollowGroup.class);
 
-                    FollowUser newFollower = new FollowUser();
-                    newFollower.setTimestamp(new Date().getTime());
-                    newFollower.setRead(false);
-                    newFollower.setIdToken(idTokenLoggedUser);
+                FollowUser newFollowing = new FollowUser();
+                newFollowing.setTimestamp(new Date().getTime());
+                newFollowing.setIdToken(idTokenFollowedUser);
+                newFollowing.setRead(false);
 
-                    List<FollowUser> followersList = followGroup.getUsers();
-                    if(followersList == null){
-                        followersList = new ArrayList<>();
-                    }
-                    followersList.add(newFollower);
-
-                    newFollowGroup.setUsers(followersList);
-                    newFollowGroup.setCounter(counter);
-                    followedUserFollowersReference.setValue(newFollowGroup);
-
-                    insertionsToDo[0] -= 1;
-                    if(insertionsToDo[0] == 0){
-                        //TODO passargli qualcosa
-                        userResponseCallback.onUserFollowResult();
-                        refreshLoggedUserData(idTokenLoggedUser);
-                        fetchOtherUser(idTokenFollowedUser);
-                    }
+                if (followGroupFollowing == null) {
+                    followGroupFollowing = new FollowGroup();
+                    followGroupFollowing.setCounter(0);
                 }
+
+                if(followGroupFollowing.getUsers() == null){
+                    followGroupFollowing.setUsers(new ArrayList<>());
+                }
+
+                followGroupFollowing.getUsers().add(newFollowing);
+                followGroupFollowing.setCounter(followGroupFollowing.getUsers().size());
+                followUserHandler.onSuccessFetchLoggedUserFollowing(followGroupFollowing);
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // TODO Handle errors
+            public void onCancelled(@NonNull DatabaseError error) {
+                followUserHandler.onFailureFetchLoggedUserFollowing(error.getMessage());
             }
         });
 
-
-        loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        followedUserFollowGroupReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                FollowGroup newFollowGroup = new FollowGroup();
-                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
-                if(followGroup != null){
-                    int counter = followGroup.getCounter();
-                    counter = counter + 1;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FollowGroup followGroupFollowers = snapshot.getValue(FollowGroup.class);
 
-                    FollowUser newFollowing = new FollowUser();
-                    newFollowing.setTimestamp(new Date().getTime());
-                    newFollowing.setIdToken(idTokenFollowedUser);
+                FollowUser newFollower = new FollowUser();
+                newFollower.setTimestamp(new Date().getTime());
+                newFollower.setIdToken(idTokenLoggedUser);
+                newFollower.setRead(false);
 
-                    List<FollowUser> followingList = followGroup.getUsers();
-                    if(followingList == null){
-                        followingList = new ArrayList<>();
-                    }
-                    followingList.add(newFollowing);
-
-                    newFollowGroup.setUsers(followingList);
-                    newFollowGroup.setCounter(counter);
-                    loggedUserFollowingReference.setValue(newFollowGroup);
-
-                    insertionsToDo[0] -= 1;
-                    if(insertionsToDo[0] == 0){
-                        //TODO passargli qualcosa
-                        userResponseCallback.onUserFollowResult();
-                        refreshLoggedUserData(idTokenLoggedUser);
-                        fetchOtherUser(idTokenFollowedUser);
-                    }
+                if (followGroupFollowers == null) {
+                    followGroupFollowers = new FollowGroup();
+                    followGroupFollowers.setCounter(0);
                 }
+
+                if(followGroupFollowers.getUsers() == null){
+                    followGroupFollowers.setUsers(new ArrayList<>());
+                }
+
+                followGroupFollowers.getUsers().add(newFollower);
+                followGroupFollowers.setCounter(followGroupFollowers.getUsers().size());
+                followUserHandler.onSuccessFetchFollowedUserFollowers(followGroupFollowers);
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // TODO Handle errors
+            public void onCancelled(@NonNull DatabaseError error) {
+                followUserHandler.onFailureFetchFollowedUserFollowers(error.getMessage());
             }
         });
-
     }
 
     @Override
     public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser) {
-        Log.d("datasource", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
-        //loggedUser references
-        DatabaseReference loggedUserFollowingReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference loggedUserFollowGroupReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idTokenLoggedUser)
                 .child(FIREBASE_USERS_FOLLOWING_FIELD);
 
-        //followedUser references
-        DatabaseReference followedUserFollowersReference = databaseReference.child(FIREBASE_USERS_COLLECTION)
+        DatabaseReference followedUserFollowGroupReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
                 .child(idTokenFollowedUser)
                 .child(FIREBASE_USERS_FOLLOWERS_FIELD);
 
-        final int[] deletionsToDo = {2};
-        Log.d("unfollow","done");
-        followedUserFollowersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        FollowUserHandler followUserHandler = new FollowUserHandler(idTokenLoggedUser, idTokenFollowedUser, UNFOLLOW_ACTION);
+
+        loggedUserFollowGroupReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                FollowGroup newFollowGroup = new FollowGroup();
-                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
-                if(followGroup != null){
-                    int counter = followGroup.getCounter();
-                    counter = counter - 1;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FollowGroup followGroupFollowing = snapshot.getValue(FollowGroup.class);
 
-                    List<FollowUser> followersList = followGroup.getUsers();
-                    if(followersList == null){
-                        followersList = new ArrayList<>();
-                    }
-                    followersList.removeIf(follower -> follower.getIdToken().equals(idTokenLoggedUser));
-                    newFollowGroup.setUsers(followersList);
-                    newFollowGroup.setCounter(counter);
-                    followedUserFollowersReference.setValue(newFollowGroup);
-
-                    deletionsToDo[0] -= 1;
-                    if(deletionsToDo[0] == 0){
-                        //TODO passargli qualcosa
-                        userResponseCallback.onUserUnfollowResult();
-                        refreshLoggedUserData(idTokenLoggedUser);
-                        fetchOtherUser(idTokenFollowedUser);
-                    }
+                // remove following
+                if (followGroupFollowing != null && followGroupFollowing.getUsers() != null) {
+                    followGroupFollowing.getUsers().removeIf(following -> following.getIdToken().equals(idTokenFollowedUser));
+                    followGroupFollowing.setCounter(followGroupFollowing.getUsers().size());
+                    followUserHandler.onSuccessFetchLoggedUserFollowing(followGroupFollowing);
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // TODO Handle errors
+            public void onCancelled(@NonNull DatabaseError error) {
+                followUserHandler.onFailureFetchLoggedUserFollowing(error.getMessage());
             }
         });
 
-
-        loggedUserFollowingReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        followedUserFollowGroupReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                FollowGroup newFollowGroup = new FollowGroup();
-                FollowGroup followGroup = dataSnapshot.getValue(FollowGroup.class);
-                if(followGroup != null){
-                    int counter = followGroup.getCounter();
-                    counter = counter - 1;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FollowGroup followGroupFollowers = snapshot.getValue(FollowGroup.class);
 
-                    List<FollowUser> followingList = followGroup.getUsers();
-                    if(followingList == null){
-                        followingList = new ArrayList<>();
-                    }
-
-                    followingList.removeIf(following -> following.getIdToken().equals(idTokenFollowedUser));
-
-                    newFollowGroup.setUsers(followingList);
-                    newFollowGroup.setCounter(counter);
-                    loggedUserFollowingReference.setValue(newFollowGroup);
-
-                    deletionsToDo[0] -= 1;
-                    if(deletionsToDo[0] == 0){
-                        //TODO passargli qualcosa
-                        userResponseCallback.onUserUnfollowResult();
-                        refreshLoggedUserData(idTokenLoggedUser);
-                        fetchOtherUser(idTokenFollowedUser);
-                    }
+                // Remove follower
+                if (followGroupFollowers != null && followGroupFollowers.getUsers() != null) {
+                    followGroupFollowers.getUsers().removeIf(follower -> follower.getIdToken().equals(idTokenLoggedUser));
+                    followGroupFollowers.setCounter(followGroupFollowers.getUsers().size());
+                    followUserHandler.onSuccessFetchFollowedUserFollowers(followGroupFollowers);
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // TODO Handle errors
+            public void onCancelled(@NonNull DatabaseError error) {
+                followUserHandler.onFailureFetchFollowedUserFollowers(error.getMessage());
             }
         });
     }
 
     @Override
+    public void endFollowOperation(String idTokenLoggedUser, String idTokenFollowedUser, FollowGroup loggedUserFollowings, FollowGroup followedUserFollowers) {
+        DatabaseReference usersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION);
+
+        String loggedUserPath = idTokenLoggedUser + "/" + FIREBASE_USERS_FOLLOWING_FIELD;
+        String followedUserPath = idTokenFollowedUser + "/" + FIREBASE_USERS_FOLLOWERS_FIELD;
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(loggedUserPath, loggedUserFollowings);
+        updates.put(followedUserPath, followedUserFollowers);
+
+        usersReference.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFollowUser(idTokenLoggedUser, idTokenFollowedUser))
+                .addOnFailureListener(e -> userResponseCallback.onFailureFollowUser(TAG + " error in endFollowOperation : " + e.getLocalizedMessage()));
+    }
+
+    @Override
+    public void endUnfollowOperation(String idTokenLoggedUser, String idTokenFollowedUser, FollowGroup loggedUserFollowings, FollowGroup followedUserFollowers) {
+        DatabaseReference usersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION);
+
+        String loggedUserPath = idTokenLoggedUser + "/" + FIREBASE_USERS_FOLLOWING_FIELD;
+        String followedUserPath = idTokenFollowedUser + "/" + FIREBASE_USERS_FOLLOWERS_FIELD;
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(loggedUserPath, loggedUserFollowings);
+        updates.put(followedUserPath, followedUserFollowers);
+
+        usersReference.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessUnfollowUser(idTokenLoggedUser, idTokenFollowedUser))
+                .addOnFailureListener(e -> userResponseCallback.onFailureUnfollowUser(TAG + " error in endUnfollowOperation : " + e.getLocalizedMessage()));
+    }
+
+    @Override
     public void fetchOtherUser(String otherUserIdToken) {
-        databaseReference
+        DatabaseReference otherUserReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
-                .child(otherUserIdToken)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(otherUserIdToken);
+
+        otherUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             User otherUser = snapshot.getValue(User.class);
                             if(otherUser != null){
-                                userResponseCallback.onFetchOtherUserResult(otherUser);
+                                userResponseCallback.onSuccessFetchOtherUser(otherUser);
                             } else {
-                                //todo error
+                                userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this user was null");
                             }
                         } else {
-                            //todo error
+                            userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this snapshot doesn't exist");
                         }
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        //todo manage errors
+                        userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : " + error.getMessage());
                     }
                 });
     }
 
+    @Override
+    public void refreshLoggedUserData(String idToken){
+        DatabaseReference loggedUserReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(idToken);
 
-    private void refreshLoggedUserData(String idToken){
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).addListenerForSingleValueEvent(new ValueEventListener() {
+        loggedUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     User existingUser = snapshot.getValue(User.class);
                     if(existingUser != null){
                         userResponseCallback.onSuccessFromRemoteDatabase(existingUser);
+                    } else {
+                        userResponseCallback.onFailureFromRemoteDatabaseUser(TAG + ": error in refreshLoggedUserData : this user was null");
                     }
                 } else {
-                    //Todo manage error
+                    userResponseCallback.onFailureFromRemoteDatabaseUser(TAG + ": error in refreshLoggedUserData : this snapshot doesn't exist");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                //Todo manage error
+                userResponseCallback.onFailureFromRemoteDatabaseUser(TAG + ": error in fetchOtherUser : " + error.getMessage());
             }
         });
     }
 
-    @Override
-    public void getUserPreferences(String idToken) {
-        //todo da implementare
-    }
 
-    @Override
-    public void saveUserPreferences(String message, String idToken) {
-        //todo da implementare
-    }
-
+    //TODO sistema notifiche
     @Override
     public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
         databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
@@ -953,82 +878,157 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void isUsernameAvailable(String username) {
-        databaseReference
-                .child(FIREBASE_USERS_COLLECTION)
-                .orderByChild("username")
-                .equalTo(username.toLowerCase())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference usersReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION);
+        usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            userResponseCallback.onUsernameAvailable("notAvailable");
+                        boolean isUsernameAvailable = true;
+                        for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+                            String existingUsername = userSnapshot.child(FIREBASE_USERS_USERNAME_FIELD).getValue(String.class);
+                            if(username.equalsIgnoreCase(existingUsername)){
+                                isUsernameAvailable = false;
+                                break;
+                            }
+                        }
+                        if (!isUsernameAvailable) {
+                            userResponseCallback.onUsernameAvailable(USERNAME_NOT_AVAILABLE);
                         } else {
-                            userResponseCallback.onUsernameAvailable("available");
+                            userResponseCallback.onUsernameAvailable(USERNAME_AVAILABLE);
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("verifyUsername Firebase error", databaseError.getMessage());
-                        userResponseCallback.onUsernameAvailable("error");
+                        userResponseCallback.onUsernameAvailable(USERNAME_ERROR);
                     }
-                });
+        });
     }
 
-    private void fetchUserFromComment(Comment comment, UserFetchFromCommentCallback callback){
-        Log.d("DataSource", "start user retrieve");
-
-        DatabaseReference customReference = databaseReference
+    private void fetchUserFromComment(Comment comment, CountDownLatch userLatch){
+        DatabaseReference userReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
                 .child(comment.getIdToken());
-        customReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 comment.setUser(user);
-                Log.d("DataSource", "user retrieve OK, " + comment.getUser().toString());
-                callback.onUserFetched(comment);
+                userLatch.countDown();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("DataSource", "user retrieve FAIL");
-                comment.setUser(null);
-                callback.onUserFetched(comment);
+                userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " while retrieving user information : " + error.getMessage());
+                userLatch.countDown();
             }
         });
     }
 
-    private void fetchUserFromExternalUser(FollowUser followUser, UserFetchFromExternalUserCallback callback){
-        //todo manage errors
-
+    private void fetchUserFromFollowUser(FollowUser followUser, CountDownLatch userLatch, String reference){
         DatabaseReference userReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION)
                 .child(followUser.getIdToken());
+
         userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 followUser.setUser(user);
-                callback.onUserFetched(followUser);
+                userLatch.countDown();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                followUser.setUser(null);
-                callback.onUserFetched(followUser);
+                if(reference.equals(FIREBASE_USERS_FOLLOWERS_FIELD)){
+                    userResponseCallback.onFailureFetchSingleFollower("Error in " + TAG + " while retrieving user information : " + error.getMessage());
+                } else if(reference.equals(FIREBASE_USERS_FOLLOWING_FIELD)){
+                    userResponseCallback.onFailureFetchSingleFollowing("Error in " + TAG + " while retrieving user information : " + error.getMessage());
+                }
+                userLatch.countDown();
             }
         });
     }
 
+    private class FollowUserHandler{
+        private final int RESULT_OK = 1;
+        private final int RESULT_FAIL = -1;
+        private final int RESULT_UNKNOWN = 0;
+        private final String reference;
+        private int loggedUserFollowingFetchedResult;
+        private int followedUserFollowersFetchedResult;
+        private FollowGroup loggedUserFollowings;
+        private FollowGroup followedUserFollowers;
+        private final String loggedUserIdToken;
+        private final String followedUserIdToken;
 
-    private interface UserFetchFromCommentCallback {
-        void onUserFetched(Comment comment);
-        void onUserFetchFailed(Comment comment);
-    }
+        private String loggedUserFollowingsErrorMessage;
+        private String followedUserFollowersErrorMessage;
 
-    private interface UserFetchFromExternalUserCallback {
-        void onUserFetched(FollowUser followUser);
-        void onUserFetchFailed(FollowUser followUser);
+        public FollowUserHandler(String loggedUserIdToken, String followedUserIdToken, String reference){
+            this.loggedUserFollowingFetchedResult = RESULT_UNKNOWN;
+            this.followedUserFollowersFetchedResult = RESULT_UNKNOWN;
+            this.loggedUserIdToken = loggedUserIdToken;
+            this.followedUserIdToken = followedUserIdToken;
+            this.reference = reference;
+        }
+        public void onSuccessFetchLoggedUserFollowing(FollowGroup loggedUserFollowings){
+            this.loggedUserFollowingFetchedResult = RESULT_OK;
+            this.loggedUserFollowings = loggedUserFollowings;
+            checkData();
+        }
+
+        public void onFailureFetchLoggedUserFollowing(String message){
+            this.loggedUserFollowingFetchedResult = RESULT_FAIL;
+            this.loggedUserFollowingsErrorMessage = message;
+            checkData();
+        }
+
+        public void onSuccessFetchFollowedUserFollowers(FollowGroup followedUserFollowers){
+            this.followedUserFollowersFetchedResult = RESULT_OK;
+            this.followedUserFollowers = followedUserFollowers;
+            checkData();
+        }
+
+        public void onFailureFetchFollowedUserFollowers(String message){
+            this.followedUserFollowersFetchedResult = RESULT_FAIL;
+            this.followedUserFollowersErrorMessage = message;
+            checkData();
+        }
+
+        private void checkData(){
+            switch (loggedUserFollowingFetchedResult){
+                case RESULT_OK:
+                    switch (followedUserFollowersFetchedResult){
+                        case RESULT_OK:
+                            if(reference.equals(FOLLOW_ACTION)){
+                                userResponseCallback.onSuccessFetchInfoForFollow(loggedUserIdToken, followedUserIdToken, loggedUserFollowings, followedUserFollowers);
+                            } else if(reference.equals(UNFOLLOW_ACTION)){
+                                userResponseCallback.onSuccessFetchInfoForUnfollow(loggedUserIdToken, followedUserIdToken, loggedUserFollowings, followedUserFollowers);
+                            }
+                            break;
+                        case RESULT_FAIL:
+                            if(reference.equals(FOLLOW_ACTION)){
+                                userResponseCallback.onFailureFetchInfoForFollow(followedUserFollowersErrorMessage);
+                            } else if(reference.equals(UNFOLLOW_ACTION)){
+                                userResponseCallback.onFailureFetchInfoForUnfollow(followedUserFollowersErrorMessage);
+                            }
+                            break;
+                        case RESULT_UNKNOWN:
+                            break;
+                    }
+                    break;
+                case RESULT_FAIL:
+                    if(reference.equals(FOLLOW_ACTION)){
+                        userResponseCallback.onFailureFetchInfoForFollow(loggedUserFollowingsErrorMessage);
+                    } else if(reference.equals(UNFOLLOW_ACTION)){
+                        userResponseCallback.onFailureFetchInfoForUnfollow(loggedUserFollowingsErrorMessage);
+                    }
+                    break;
+                case RESULT_UNKNOWN:
+                    break;
+            }
+        }
     }
 }

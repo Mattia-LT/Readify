@@ -16,6 +16,7 @@ import it.unimib.readify.data.source.user.BaseUserDataRemoteDataSource;
 import it.unimib.readify.data.source.user.UserAuthenticationRemoteDataSource;
 import it.unimib.readify.data.source.user.UserDataRemoteDataSource;
 import it.unimib.readify.model.Comment;
+import it.unimib.readify.model.FollowGroup;
 import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
@@ -23,6 +24,8 @@ import it.unimib.readify.model.User;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserRepository implements IUserRepository, UserResponseCallback {
+
+    private final String TAG = UserRepository.class.getSimpleName();
 
     private final BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource;
     private final BaseUserDataRemoteDataSource userDataRemoteDataSource;
@@ -184,14 +187,12 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void searchUsers(String query){
-        Log.d("UserRepository", "Query: " + query);
-        userDataRemoteDataSource.searchUsers(query);
+    public void searchUsers(String query, int limit){
+        userDataRemoteDataSource.searchUsers(query, limit);
     }
 
     @Override
     public MutableLiveData<List<Result>> getCommentListLiveData() {
-        Log.d("Repository", "getCommentsListLiveData");
         return commentListLiveData;
     }
 
@@ -217,7 +218,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void fetchComments(String bookId) {
-        Log.d("Repository", "fetch comments : START");
         userDataRemoteDataSource.fetchComments(bookId);
     }
 
@@ -277,13 +277,18 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void onSuccessFromRemoteDatabase(List<User> searchResults) {
+    public void onSuccessUserSearch(List<User> searchResults) {
+        Log.d(TAG, "User search success");
         List<Result> resultList = new ArrayList<>();
         for(User user : searchResults){
-            Log.d("UserRepository", "User: " + user);
             resultList.add(new Result.UserSuccess(user));
         }
         userSearchResultsLiveData.postValue(resultList);
+    }
+
+    @Override
+    public void onFailureUserSearch(String message) {
+        Log.e(TAG, "Error on user search : " + message);
     }
 
     @Override
@@ -294,21 +299,17 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchCommentsFromRemoteDatabase(List<Comment> comments) {
-        Log.d("Repository", "fetchComments result OK");
         List<Result> commentResultList = new ArrayList<>();
         for(Comment comment : comments){
             commentResultList.add(new Result.CommentSuccess(comment));
         }
-        Log.d("Repository", "fetchComments result --> " + commentResultList);
+        Log.d(TAG, "Comments fetched successfully.");
         commentListLiveData.postValue(commentResultList);
     }
 
     @Override
     public void onFailureFetchCommentsFromRemoteDatabase(String message) {
-        Result.Error result = new Result.Error(message);
-        List<Result> commentResultList = new ArrayList<>();
-        commentResultList.add(result);
-        commentListLiveData.setValue(commentResultList);
+        Log.e(TAG, "Error during comments retrieving.\n" + message);
     }
 
     @Override
@@ -322,7 +323,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFetchFollowersFromRemoteDatabase(String message) {
-        //TODO
+        Log.e(TAG, "Error during followers retrieving.\n" + message);
     }
 
     @Override
@@ -336,17 +337,58 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFetchFollowingFromRemoteDatabase(String message) {
-        //TODO
+        Log.e(TAG, "Error during followings retrieving.\n" + message);
     }
 
     @Override
-    public void addComment(String content, String bookId, String idToken){
-        userDataRemoteDataSource.addComment(content,bookId,idToken);
+    public void onSuccessAddComment(String bookId, Comment comment) {
+        //TODO vogliamo far vedere qualcos'altro? forse non serve comment? forse possiamo aggiungere direttamente il commento?? vale anche per successo di delete
+        Log.d(TAG,"Comment added successfully");
+        fetchComments(bookId);
     }
 
     @Override
-    public void deleteComment(String bookId, Comment comment) {
-        userDataRemoteDataSource.deleteComment(bookId, comment);
+    public void onFailureAddComment(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessDeleteComment(String bookId, Comment comment) {
+        Log.d(TAG,"Comment deleted successfully");
+        fetchComments(bookId);
+    }
+
+    @Override
+    public void onFailureDeleteComment(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleComment(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleFollower(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleFollowing(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void addComment(String commentContent, String bookId, String idToken){
+        userDataRemoteDataSource.addComment(commentContent,bookId,idToken);
+    }
+
+    @Override
+    public void deleteComment(String bookId, Comment deletedComment) {
+        userDataRemoteDataSource.deleteComment(bookId, deletedComment);
     }
 
     @Override
@@ -362,13 +404,11 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser) {
         userDataRemoteDataSource.followUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("REPO", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
     }
 
     @Override
     public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser) {
         userDataRemoteDataSource.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("REPO", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
     }
 
     @Override
@@ -383,37 +423,66 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void deleteUserInfo() {
-        User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
-        currentUser.setIdToken(null);
-        userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
-    }
-
-    @Override
-    public void onAddCommentResult(Comment comment) {
-        if(comment == null){
-            //todo error
+        if(userMutableLiveData.getValue() != null){
+            User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
+            currentUser.setIdToken(null);
+            userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
         }
     }
 
+
     @Override
-    public void onFetchOtherUserResult(User otherUser) {
+    public void onSuccessFetchOtherUser(User otherUser) {
         Result otherUserResult = new Result.UserSuccess(otherUser);
         otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
-    public void onDeleteCommentResult() {
-
+    public void onFailureFetchOtherUser(String message) {
+        Result otherUserResult = new Result.Error(message);
+        otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
-    public void onUserFollowResult() {
-
+    public void onSuccessFollowUser(String loggedUserIdToken, String followedUserIdToken) {
+        userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
+        userDataRemoteDataSource.fetchOtherUser(followedUserIdToken);
     }
 
     @Override
-    public void onUserUnfollowResult() {
+    public void onFailureFollowUser(String message) {
+        Log.e(TAG, message);
+    }
 
+    @Override
+    public void onSuccessUnfollowUser(String loggedUserIdToken, String unfollowedUserIdToken) {
+        userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
+        userDataRemoteDataSource.fetchOtherUser(unfollowedUserIdToken);
+    }
+
+    @Override
+    public void onFailureUnfollowUser(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessFetchInfoForFollow(String loggedUserIdToken, String followedUserIdToken, FollowGroup loggedUserFollowing, FollowGroup followedUserFollowers) {
+        userDataRemoteDataSource.endFollowOperation(loggedUserIdToken, followedUserIdToken, loggedUserFollowing, followedUserFollowers);
+    }
+
+    @Override
+    public void onFailureFetchInfoForFollow(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessFetchInfoForUnfollow(String loggedUserIdToken, String followedUserIdToken, FollowGroup loggedUserFollowing, FollowGroup followedUserFollowers) {
+        userDataRemoteDataSource.endUnfollowOperation(loggedUserIdToken, followedUserIdToken, loggedUserFollowing, followedUserFollowers);
+    }
+
+    @Override
+    public void onFailureFetchInfoForUnfollow(String message) {
+        Log.e(TAG, message);
     }
 
     @Override

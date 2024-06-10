@@ -84,7 +84,6 @@ public class Constants {
     public static final String FIREBASE_COLLECTIONS_NAME_FIELD = "name";
     public static final String FIREBASE_COLLECTIONS_VISIBILITY_FIELD = "visible";
 
-
     public static final String FIREBASE_USERS_EMAILS_FIELD = "email";
     public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
     public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
@@ -97,6 +96,9 @@ public class Constants {
     public static final String FIREBASE_USERS_AVATAR_FIELD = "avatar";
     public static final String FIREBASE_USERS_BIOGRAPHY_FIELD = "biography";
     public static final String FIREBASE_USERS_TOTAL_NUMBER_OF_BOOKS_FIELD = "totalNumberOfBooks";
+
+    public static final String FOLLOW_ACTION = "follow";
+    public static final String UNFOLLOW_ACTION = "unfollow";
 
     public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
 

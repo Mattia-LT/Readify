@@ -20,17 +20,12 @@ import it.unimib.readify.databinding.FragmentSearchBinding;
 public class SearchFragment extends Fragment {
 
     private FragmentSearchBinding fragmentSearchBinding;
-
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
 
 
     public SearchFragment() {
         // Required empty public constructor
-    }
-
-    public static SearchFragment newInstance() {
-        return new SearchFragment();
     }
 
     @Override
@@ -51,7 +46,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         tabLayout = fragmentSearchBinding.tabLayout;
         viewPager = fragmentSearchBinding.viewpager;
         SearchViewPagerAdapter searchViewPagerAdapter = new SearchViewPagerAdapter(this);
@@ -65,7 +59,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                //Not needed
             }
 
             @Override
@@ -83,8 +77,5 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
-
-
     }
-
 }

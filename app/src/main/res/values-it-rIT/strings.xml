@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <string name="button_add_comment">Aggiungi il commento</string>
     <string name="button_getting_started">Inizia</string>
@@ -158,6 +158,13 @@
     <string name="no_collections_found">Nessuna collezione trovata.\nQuesto utente non ha nessuna collezione pubblica!</string>
     <string name="private_profile_message">Questo utente ha il profilo privato.\nPer vedere le sue collezioni, dovete seguirvi a vicenda.</string>
     <string name="empty_biography_message">Non hai ancora inserito una biografia. Puoi aggiungerla nella sezione modifica profilo.</string>
+    <string name="error_add_book_to_collection">Errore nell\'aggiunta del libro alla collezione</string>
+    <string name="error_remove_book_from_collection">Errore nella rimozione del libro dalla collezione</string>
+    <string name="error_logout">Si é verificato un errore durante il logout</string>
+    <string name="error_local_database">Errore nel database locale</string>
+    <string name="no_users_found">Nessun utente trovato.\nNon abbiamo nessun utente con quell\'username.</string>
+
+
 
     <!-- chip genres -->
     <string-array name="chip_genres">

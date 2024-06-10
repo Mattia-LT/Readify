@@ -36,7 +36,7 @@ public interface IUserRepository {
     void addNotification(String receivingIdToken, String content, String loggedUserIdToken);
     void removeNotification(String targetIdToken, String content, String loggedUserIdToken);
     void fetchComments(String bookId);
-    void searchUsers(String query);
+    void searchUsers(String query, int limit);
     void addComment(String content, String bookId, String idToken);
     void deleteComment(String bookId, Comment comment);
     void fetchFollowers(String idToken);

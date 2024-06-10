@@ -64,28 +64,24 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 
 public class ProfileFragment extends Fragment{
+    private final String TAG = ProfileFragment.class.getSimpleName();
+
     private FragmentProfileBinding fragmentProfileBinding;
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private BookViewModel bookViewModel;
-
     private CollectionAdapter collectionAdapter;
     private User loggedUser;
-    private List<Collection> collectionsList;
     private SharedPreferencesUtil sharedPreferencesUtil;
     private HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
     private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private Observer<Result> loggedUserObserver;
     private Observer<Boolean> logoutResultObserver;
     private Observer<Boolean> deleteAllCollectionsResultObserver;
+    private Observer<List<Result>> fetchedCollectionsObserver;
     private boolean firstLoadSpinner;
 
-    private Observer<List<Result>> fetchedCollectionsObserver;
     public ProfileFragment() {}
-
-    public static ProfileFragment newInstance() {
-        return new ProfileFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,7 +97,6 @@ public class ProfileFragment extends Fragment{
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d("profile lifecycle", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         sharedPreferencesUtil = new SharedPreferencesUtil(requireActivity().getApplication());
         initViewModels();
@@ -124,16 +119,12 @@ public class ProfileFragment extends Fragment{
     }
 
     private void initObservers() {
-        //todo all observer (except loggedUser) triggers twice instead of 1 when page is reloaded
-        this.collectionsList = new ArrayList<>();
-
         fetchedCollectionsObserver = results -> {
-            this.collectionsList = results.stream()
+            List<Collection> collectionsList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
-            Log.e("COLLECTIONS OPENLIBRARY","TRIGGERED");
-            //Log.e("COLLECTIONS OPENLIBRARY",collectionsList.toString());
+
             collectionAdapter.submitList(collectionsList);
             fragmentProfileBinding.progressBarProfile.setVisibility(View.GONE);
             fragmentProfileBinding.recyclerviewCollections.setVisibility(View.VISIBLE);
@@ -142,7 +133,6 @@ public class ProfileFragment extends Fragment{
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.loggedUser = ((Result.UserSuccess) result).getData();
-                Log.e("USER OBSERVER","TRIGGERED");
                 updateUI();
                 fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
@@ -154,8 +144,8 @@ public class ProfileFragment extends Fragment{
             }
         };
 
+        //TODO sistema notifiche
         fetchedNotificationsObserver = result -> {
-            Log.e("NOTIFICATIONS OBSERVER","TRIGGERED");
             notifications = result;
             loadMenu();
         };
@@ -165,7 +155,7 @@ public class ProfileFragment extends Fragment{
               if(result){
                   collectionViewModel.emptyLocalDb();
               } else {
-                  Toast.makeText(requireContext(), "Logout error", Toast.LENGTH_SHORT).show();
+                  Toast.makeText(requireContext(), R.string.error_logout, Toast.LENGTH_SHORT).show();
               }
           }
         };
@@ -181,7 +171,7 @@ public class ProfileFragment extends Fragment{
                     startActivity(intent);
                     requireActivity().finish();
                 } else {
-                    Toast.makeText(requireContext(), "Local DB error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.error_local_database, Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -212,7 +202,7 @@ public class ProfileFragment extends Fragment{
 
         int currentNightMode = getSavedNightMode();
 
-        // Imposta lo stato dello SwitchCompat in base al tema corrente
+        //Set the switch on the current mode
         switch (currentNightMode) {
             case Configuration.UI_MODE_NIGHT_YES:
                 switchButton.setChecked(true);
@@ -236,41 +226,41 @@ public class ProfileFragment extends Fragment{
 
         MenuItem spinnerItem = fragmentProfileBinding.navView.getMenu().findItem(R.id.nav_spinner);
         Spinner spinner = (Spinner) spinnerItem.getActionView();
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.visibility, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-
-        String vis = loggedUser.getVisibility();
-        if(vis.equals("private")){
-            spinner.setSelection(1);
-        }
-        else{
-            spinner.setSelection(0);
-        }
-        
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(!firstLoadSpinner){
-                    String selectedVisibility;
-                    if (position == 0) {
-                        selectedVisibility = USER_VISIBILITY_PUBLIC;
+        if (spinner != null) {
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.visibility, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+            String visibility = loggedUser.getVisibility();
+            if(visibility.equals(USER_VISIBILITY_PRIVATE)){
+                spinner.setSelection(1);
+            } else {
+                spinner.setSelection(0);
+            }
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(!firstLoadSpinner){
+                        String selectedVisibility;
+                        if (position == 0) {
+                            selectedVisibility = USER_VISIBILITY_PUBLIC;
+                        } else {
+                            selectedVisibility = USER_VISIBILITY_PRIVATE;
+                        }
+                        loggedUser.setVisibility(selectedVisibility);
+                        userViewModel.setUserVisibility(loggedUser);
                     } else {
-                        selectedVisibility = USER_VISIBILITY_PRIVATE;
+                        firstLoadSpinner = false;
                     }
-                    loggedUser.setVisibility(selectedVisibility);
-                    userViewModel.setUserVisibility(loggedUser);
-                } else{
-                    firstLoadSpinner = false;
                 }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    //Not needed
+                }
+            });
+        }
 
-        // Set up the toolbar and remove all icons
+        //TODO sistema notifiche
+        //Set up the toolbar and remove all icons
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
@@ -319,11 +309,9 @@ public class ProfileFragment extends Fragment{
 
                             if (itemId == R.id.nav_edit_profile) {
                                 Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_editProfileFragment);
-                            }
-                            if(itemId == R.id.nav_logout){
-                                //todo shared pref e auth
+                            } else if(itemId == R.id.nav_logout){
                                 userViewModel.logout();
-                             }
+                            }
 
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return true;
@@ -359,6 +347,7 @@ public class ProfileFragment extends Fragment{
             Navigation.findNavController(requireView()).navigate(action);
         });
     }
+
     private void initFollowersSection() {
         View.OnClickListener followClickListener = v -> {
             NavDirections action = null;
@@ -367,6 +356,7 @@ public class ProfileFragment extends Fragment{
             } else if(v.getId() == fragmentProfileBinding.textviewFollowingCounter.getId() || v.getId() == fragmentProfileBinding.textviewFollowingLabel.getId()) {
                 action = ProfileFragmentDirections.actionProfileFragmentToFollowListFragment(loggedUser.getIdToken(), loggedUser.getUsername(), DESTINATION_FRAGMENT_FOLLOWING);
             }
+
             if(action != null){
                 Navigation.findNavController(requireView()).navigate(action);
             }

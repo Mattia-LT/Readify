@@ -25,6 +25,8 @@ import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class CollectionRepository implements ICollectionRepository, CollectionResponseCallback{
 
+    private final String TAG = CollectionRepository.class.getSimpleName();
+
     private final BaseCollectionRemoteDataSource collectionRemoteDataSource;
     private final BaseCollectionLocalDataSource bookLocalDataSource;
     private final MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
@@ -62,13 +64,13 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void fetchLoggedUserCollections(String idToken) {
-        //Da chiamare solo al primo loading
+        //Fetch logged user collections from remote database on login
         collectionRemoteDataSource.fetchLoggedUserCollections(idToken);
     }
 
     @Override
     public void fetchOtherUserCollections(String otherUserIdToken) {
-        //Sempre da remoto
+        //Fetch other user's collections remotely so that they are always up to date.
         collectionRemoteDataSource.fetchOtherUserCollections(otherUserIdToken);
     }
 
@@ -150,7 +152,6 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
         return deletedCollectionResult;
     }
 
-
     @Override
     public void onSuccessFetchCompleteCollectionsFromRemote(List<Collection> collectionList, String reference) {
         List<Result> resultList = new ArrayList<>();
@@ -170,6 +171,10 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
         }
     }
 
+    @Override
+    public void onFailureFetchCompleteCollectionsFromRemote(String message) {
+        Log.e(TAG, message);
+    }
 
     @Override
     public void onSuccessFetchCollectionsFromLocal(List<Collection> collectionList) {
@@ -178,12 +183,16 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
             resultList.add(new Result.CollectionSuccess(collection));
         }
         loggedUserCollectionListLiveData.postValue(resultList);
-        //todo mettere on failure, magari aggiungendo un fetch da remoto se per qualche motivo non funziona?
+    }
+
+    @Override
+    public void onFailureFetchCollectionsFromLocal(String message) {
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessInsertCollectionFromLocal(List<Collection> collectionList) {
-        Log.d("CollectionRepository", "Collection created successfully.");
+        Log.d(TAG, "Collection created successfully in the local database.");
         List<Result> resultList = new ArrayList<>();
         for(Collection collection : collectionList){
             resultList.add(new Result.CollectionSuccess(collection));
@@ -192,33 +201,36 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
     }
 
     @Override
+    public void onFailureInsertCollectionFromLocal(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
     public void onSuccessDeleteCollectionFromLocal(Collection deletedCollection) {
+        Log.d(TAG, "Collection deleted successfully from the local database.");
         deletedCollectionResult.postValue(deletedCollection);
-        Log.e("TUTTO OK", "COLLEZIONE CANCELLATA");
         loadLoggedUserCollectionsFromLocal();
     }
 
     @Override
     public void onFailureDeleteCollectionFromLocal(String errorMessage) {
-        //TODO far vedere qualcosa all utente
-        Log.e("errore local cancellazione", errorMessage);
-
+        Log.e(TAG, errorMessage);
     }
 
     @Override
     public void onSuccessDeleteCollectionFromRemote(Collection deletedCollection) {
+        Log.d(TAG, "Collection deleted successfully from the remote database.");
         bookLocalDataSource.deleteCollection(deletedCollection);
     }
 
     @Override
     public void onFailureDeleteCollectionFromRemote(String errorMessage) {
-        //todo gestisci errori
-        Log.e("errore remote cancellazione", errorMessage);
+        Log.e(TAG, errorMessage);
     }
 
-    //todo trasforma in onSuccess e fai onFailure
     @Override
     public void onSuccessCreateCollectionFromRemote(Collection collection) {
+        Log.d(TAG, "Collection created successfully in the remote database.");
         ArrayList<Collection> oneItemCollectionList = new ArrayList<>();
         oneItemCollectionList.add(collection);
         bookLocalDataSource.insertCollectionList(oneItemCollectionList);
@@ -226,77 +238,67 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onFailureCreateCollectionFromRemote(String errorMessage) {
-        //todo gestisci errori
-        Log.e("errore remote creazione", errorMessage);
+        Log.e(TAG, errorMessage);
     }
 
     @Override
     public void onSuccessAddBookToCollectionFromRemote(String collectionId, OLWorkApiResponse book) {
+        Log.d(TAG, "Book " + book.getTitle() + " added to collection " + collectionId + " successfully in the remote database.");
         bookLocalDataSource.addBookToCollection(collectionId, book);
     }
 
     @Override
-    public void onSuccessUpdateCollectionFromLocal() {
-        Log.d("CollectionRepository", "Collection updated successfully");
-        bookLocalDataSource.getAllCollections();
-    }
-
-    @Override
-    public void onFailureUpdateCollectionFromLocal(String message) {
-        Log.e("CollectionRepository", message);
+    public void onFailureAddBookToCollectionFromRemote(String message) {
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessAddBookToCollectionFromLocal() {
-        Log.d("CollectionRepository", "Collection updated successfully");
+        Log.d(TAG, "Book added to collection successfully in the local database.");
         addToCollectionResult.postValue(true);
         bookLocalDataSource.getAllCollections();
     }
 
     @Override
+    public void onFailureAddBookToCollectionFromLocal(String message) {
+        Log.e(TAG, message);
+        addToCollectionResult.postValue(false);
+    }
+
+    @Override
     public void onSuccessRemoveBookFromCollectionFromLocal() {
-        Log.d("CollectionRepository", "Collection updated successfully");
+        Log.d(TAG, "Book removed from collection successfully in the local database.");
         removeFromCollectionResult.postValue(true);
         bookLocalDataSource.getAllCollections();
     }
 
     @Override
-    public void onFailureAddBookToCollectionFromLocal(String message) {
-        addToCollectionResult.postValue(false);
-    }
-
-    @Override
     public void onFailureRemoveBookFromCollectionFromLocal(String message) {
+        Log.e(TAG, message);
         removeFromCollectionResult.postValue(false);
     }
 
     @Override
     public void onSuccessRemoveBookFromCollectionFromRemote(String collectionId, String bookId) {
-        Log.d("cancellazione remota ok", "cancellazione remota ok");
+        Log.d(TAG, "Book removed from collection successfully in the remote database.");
         bookLocalDataSource.removeBookFromCollection(collectionId, bookId);
     }
 
     @Override
     public void onFailureRemoveBookFromCollectionFromRemote(String message) {
-        Log.e("CollectionRepository", message);
-
-    }
-
-    @Override
-    public void onFailureAddBookToCollectionFromRemote(String message) {
-        Log.e("CollectionRepository", message);
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessDeleteAllCollectionsFromLocal() {
+        Log.d(TAG, "Collections deletion succeeded");
         allCollectionsDeletedResult.postValue(true);
-        Log.d("CollectionRepository", "Collections deletion succeeded");
     }
 
     @Override
     public void onFailureDeleteAllCollectionsFromLocal(String message) {
+        Log.e(TAG, message);
         allCollectionsDeletedResult.postValue(false);
-        Log.e("CollectionRepository", message);
     }
 
     @Override
@@ -306,8 +308,7 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onFailureFetchLoggedUserCollectionsFromRemoteDatabase(String message) {
-        //TODO
-        Log.e("ERRORE FETCH", message);
+        Log.e(TAG, message);
     }
 
     @Override
@@ -317,46 +318,68 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
 
     @Override
     public void onFailureFetchOtherUserCollectionsFromRemoteDatabase(String message) {
-        //TODO
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessChangeCollectionVisibilityFromRemote(String collectionId, boolean isCollectionVisible) {
+        Log.d(TAG, "Collection visibility changed successfully in remote database");
         bookLocalDataSource.changeCollectionVisibility(collectionId, isCollectionVisible);
     }
 
     @Override
     public void onFailureChangeCollectionVisibilityFromRemote(String message) {
-        Log.e("CollectionRepository", message);
-    }
-
-    @Override
-    public void onSuccessRenameCollectionFromRemote(String collectionId, String newCollectionName) {
-        bookLocalDataSource.renameCollection(collectionId, newCollectionName);
-    }
-
-    @Override
-    public void onFailureRenameCollectionFromRemote(String message) {
-        Log.e("CollectionRepository", message);
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessChangeCollectionVisibilityFromLocal() {
+        Log.d(TAG, "Collection visibility changed successfully in local database");
         bookLocalDataSource.getAllCollections();
     }
 
     @Override
     public void onFailureChangeCollectionVisibilityFromLocal(String message) {
-        Log.e("CollectionRepository", message);
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessRenameCollectionFromRemote(String collectionId, String newCollectionName) {
+        Log.d(TAG, "Collection name changed successfully in remote database");
+        bookLocalDataSource.renameCollection(collectionId, newCollectionName);
+    }
+
+    @Override
+    public void onFailureRenameCollectionFromRemote(String message) {
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessRenameCollectionFromLocal() {
+        Log.d(TAG, "Collection name changed successfully in local database");
         bookLocalDataSource.getAllCollections();
     }
 
     @Override
     public void onFailureRenameCollectionFromLocal(String message) {
-        Log.e("CollectionRepository", message);
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchRating(String message) {
+        //Only a warning, sometimes api doesn't have those information
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchAuthors(String message) {
+        //Only a warning, sometimes api doesn't have those information
+        Log.w(TAG, message);
+    }
+
+    @Override
+    public void onFailureFetchSingleWork(String message) {
+        //Only a warning, sometimes api values can change
+        Log.w(TAG, message);
     }
 }

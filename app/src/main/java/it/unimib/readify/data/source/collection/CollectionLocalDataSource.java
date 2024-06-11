@@ -12,6 +12,7 @@ import android.util.Log;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 import it.unimib.readify.data.database.CollectionDao;
@@ -22,6 +23,9 @@ import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
+
+    private final String TAG = CollectionLocalDataSource.class.getSimpleName();
+
     private final CollectionDao collectionDao;
     private final SharedPreferencesUtil sharedPreferencesUtil;
     private final DataEncryptionUtil dataEncryptionUtil;
@@ -50,7 +54,11 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
         CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             List<Collection> collectionList;
             collectionList = collectionDao.getAllCollections();
-            collectionResponseCallback.onSuccessFetchCollectionsFromLocal(collectionList);
+            if(collectionList != null){
+                collectionResponseCallback.onSuccessFetchCollectionsFromLocal(collectionList);
+            } else {
+                collectionResponseCallback.onFailureFetchCollectionsFromLocal(TAG + "Error: an error occurred while fetching collections from local database");
+            }
         });
     }
 
@@ -60,15 +68,13 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
             List<Collection> localCollections = collectionDao.getAllCollections();
 
-            //TODO sistemare vicenda degli id = -1
             if(collectionsToInsert != null){
                 for(Collection collection : collectionsToInsert){
                     if(!localCollections.contains(collection)){
                         localCollections.add(collection);
                         Long id = insertCollection(collection);
-                        Log.e("LONG ID", String.valueOf(id));
                         if(id == -1){
-                            Log.e("LocalDataSource - insertCollectionList","Error with collection : " + collection.getName());
+                            collectionResponseCallback.onFailureInsertCollectionFromLocal(TAG + " - insertCollectionList, Error with collection : " + collection.getName() + ", operation cancelled.");
                         }
                     }
                 }
@@ -79,14 +85,26 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
 
     private Long insertCollection(Collection collectionToInsert) {
         AtomicLong id = new AtomicLong(-1);
+        CountDownLatch latch = new CountDownLatch(1);
+
         CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
-            if(collectionToInsert != null){
-                List<Collection> localCollections = collectionDao.getAllCollections();
-                if(! localCollections.contains(collectionToInsert)) {
-                    id.set(collectionDao.insertCollection(collectionToInsert));
+            try {
+                if (collectionToInsert != null) {
+                    List<Collection> localCollections = collectionDao.getAllCollections();
+                    if (!localCollections.contains(collectionToInsert)) {
+                        id.set(collectionDao.insertCollection(collectionToInsert));
+                    }
                 }
+            } finally {
+                latch.countDown();
             }
         });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         return id.get();
     }
 
@@ -95,41 +113,40 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
         CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             if(collectionToUpdate != null){
                 int result = collectionDao.updateCollection(collectionToUpdate);
-                Log.d("Update result", String.valueOf(result));
-                collectionResponseCallback.onSuccessUpdateCollectionFromLocal();
-                switch (operation){
-                    case OPERATION_ADD_TO_COLLECTION:
-                        collectionResponseCallback.onSuccessAddBookToCollectionFromLocal();
-                        break;
-                    case OPERATION_REMOVE_FROM_COLLECTION:
-                        collectionResponseCallback.onSuccessRemoveBookFromCollectionFromLocal();
-                        break;
-                    case OPERATION_CHANGE_COLLECTION_VISIBILITY:
-                        collectionResponseCallback.onSuccessChangeCollectionVisibilityFromLocal();
-                        break;
-                    case OPERATION_RENAME_COLLECTION:
-                        collectionResponseCallback.onSuccessRenameCollectionFromLocal();
-                        break;
-                }
-            } else {
-                //todo scrivi errori piu sensati e differenziali usando i file R.string
-                switch (operation){
-                    case OPERATION_ADD_TO_COLLECTION:
-                        collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
-                        break;
-                    case OPERATION_REMOVE_FROM_COLLECTION:
-                        collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
-                        break;
-                    case OPERATION_CHANGE_COLLECTION_VISIBILITY:
-                        collectionResponseCallback.onFailureChangeCollectionVisibilityFromLocal("UPDATE COLLECTION ERROR");
-                        break;
-                    case OPERATION_RENAME_COLLECTION:
-                        collectionResponseCallback.onFailureRenameCollectionFromLocal("UPDATE COLLECTION ERROR");
-                        break;
+                if(result >= 0){
+                    switch (operation){
+                        case OPERATION_ADD_TO_COLLECTION:
+                            collectionResponseCallback.onSuccessAddBookToCollectionFromLocal();
+                            break;
+                        case OPERATION_REMOVE_FROM_COLLECTION:
+                            collectionResponseCallback.onSuccessRemoveBookFromCollectionFromLocal();
+                            break;
+                        case OPERATION_CHANGE_COLLECTION_VISIBILITY:
+                            collectionResponseCallback.onSuccessChangeCollectionVisibilityFromLocal();
+                            break;
+                        case OPERATION_RENAME_COLLECTION:
+                            collectionResponseCallback.onSuccessRenameCollectionFromLocal();
+                            break;
+                    }
+                    return;
                 }
             }
+            //todo scrivi errori piu sensati e differenziali IN TUTTE LE FUNZIONI NON SOLO QUI
+            switch (operation){
+                case OPERATION_ADD_TO_COLLECTION:
+                    collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    break;
+                case OPERATION_REMOVE_FROM_COLLECTION:
+                    collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    break;
+                case OPERATION_CHANGE_COLLECTION_VISIBILITY:
+                    collectionResponseCallback.onFailureChangeCollectionVisibilityFromLocal("UPDATE COLLECTION ERROR");
+                    break;
+                case OPERATION_RENAME_COLLECTION:
+                    collectionResponseCallback.onFailureRenameCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    break;
+            }
         });
-
     }
 
     @Override

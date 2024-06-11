@@ -27,6 +27,4 @@ public interface ICollectionRepository {
     MutableLiveData<Boolean> getAddToCollectionResult();
     MutableLiveData<Boolean> getRemoveFromCollectionResult();
     MutableLiveData<Collection> getDeleteCollectionResult();
-
-
 }

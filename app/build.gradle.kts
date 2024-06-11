@@ -73,7 +73,7 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
 
-    // firebase BoM
+    // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     // Analytics
     implementation("com.google.firebase:firebase-analytics")

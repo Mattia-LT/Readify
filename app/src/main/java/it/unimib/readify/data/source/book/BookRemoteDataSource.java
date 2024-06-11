@@ -33,6 +33,10 @@ import retrofit2.Response;
 
 public class BookRemoteDataSource extends BaseBookRemoteDataSource{
 
+    private final String TAG = BookRemoteDataSource.class.getSimpleName();
+    //TODO in tutti gli errori sostituire bookremotedata source con la variabile TAG
+    //TODO alcuni sono simili a collectionRemoteDataSource
+
     private final OLApiService olApiService;
     private final Application application;
 

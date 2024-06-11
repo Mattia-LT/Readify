@@ -21,8 +21,6 @@ import it.unimib.readify.data.source.book.BaseBookRemoteDataSource;
 import it.unimib.readify.data.source.book.BookRemoteDataSource;
 import it.unimib.readify.model.OLWorkApiResponse;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.util.DataEncryptionUtil;
-import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class BookRepository implements IBookRepository, BookResponseCallback {
 
@@ -36,7 +34,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
     private boolean searchLimitReached = false;
     private int currentSearchLimit = 0;
 
-    public static BookRepository getInstance(Application application, SharedPreferencesUtil sharedPreferencesUtil, DataEncryptionUtil dataEncryptionUtil) {
+    public static BookRepository getInstance(Application application) {
         return new BookRepository(
                 new BookRemoteDataSource(application));
     }
@@ -88,12 +86,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 finalRecommendedKeys.add(key);
             }
         }
-
         Collections.sort(finalRecommendedKeys);
-
-        Log.d("REPOSITORY", "recommendedKeys" + recommendedKeys);
-        Log.d("REPOSITORY", "finalRecommendedKeys" + finalRecommendedKeys);
-
         bookRemoteDataSource.getRecommendedBooks(finalRecommendedKeys);
 
     }
@@ -172,7 +165,6 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     @Override
     public void onFailureFetchBooksFromRemote(String message, String reference) {
-        //todo implementare eventuale classe di error e postare il valore qua
         switch (reference){
             case TRENDING:
             case RECENT:
@@ -182,6 +174,7 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
                 break;
         }
     }
+
     @Override
     public void onSuccessLoadRecommendedList(List<String> recommendedIdList) {
         getBooksByIdList(recommendedIdList, RECOMMENDED);
@@ -227,11 +220,13 @@ public class BookRepository implements IBookRepository, BookResponseCallback {
 
     @Override
     public void onFailureFetchRating(String message) {
+        //Only a warning, sometimes api doesn't have those information
         Log.w(TAG, message);
     }
 
     @Override
     public void onFailureFetchAuthors(String message) {
+        //Only a warning, sometimes api doesn't have those information
         Log.w(TAG, message);
     }
 }

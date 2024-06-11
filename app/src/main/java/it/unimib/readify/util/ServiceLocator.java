@@ -71,7 +71,7 @@ public class ServiceLocator {
                     }
                     //creating BookRepository instance
                     if(repositoryClass == IBookRepository.class) {
-                        repositoryInstance = BookRepository.getInstance(application, sharedPreferencesUtil, dataEncryptionUtil);
+                        repositoryInstance = BookRepository.getInstance(application);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
                     if(repositoryClass == ICollectionRepository.class) {

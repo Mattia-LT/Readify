@@ -76,7 +76,7 @@
     <string name="button_apply">Apply</string>
     <string name="button_reset" translatable="false">Reset</string>
     <string name="content_description_book_cover">Cover of the book</string>
-    <string name="content_description_add_to_bookshelf">Button \"add to bookshelf\"</string>
+    <string name="content_description_add_to_bookshelf">Add to collection</string>
     <string name="content_description_light_mode">Light Mode icon</string>
     <string name="content_description_dark_mode">Dark Mode icon</string>
     <string name="content_description_arrow_notification">Open current notification section icon</string>
@@ -89,7 +89,7 @@
 
     <string name="placeholder_error_message">An error occurred. Please, retry.</string>
     <string name="button_retry">Retry</string>
-    <string name="content_description_filter_button">Filter Search Button</string>
+    <string name="content_description_filter_button">Filter Search</string>
     <string name="placeholder_home_welcome">Hi,</string>
     <string name="textview_home_continue_label">Let\'s continue where we left off</string>
     <string name="textview_trending_books">Trending books</string>
@@ -171,7 +171,9 @@
     <string name="error_remove_book_from_collection">Error: remove from collection failed</string>
     <string name="error_logout">An error occurred during logout</string>
     <string name="error_local_database">Local database error</string>
-    <string name="no_users_found">No user found.\nWe don\'t have any user with that username.</string>
+    <string name="no_users_found">No users found.\nWe don\'t have any user with that username.</string>
+    <string name="no_users_found_generic">No users found.</string>
+
 
 
     <!-- chip genres -->

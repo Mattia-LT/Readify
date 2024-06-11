@@ -8,7 +8,6 @@ import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_VISIBILITY_F
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -43,6 +42,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
+
+    private final String TAG = CollectionRemoteDataSource.class.getSimpleName();
+
     private final OLApiService olApiService;
     private final Application application;
     private final DatabaseReference databaseReference;
@@ -68,19 +70,16 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.submit(() -> {
                 try{
-                    Log.d("fetchCollectionData", "Waiting for all collections...");
                     collectionsToFetchLatch.await();
-                    Log.d("fetchCollectionData", "All collections fetched, returning collections list");
                     collectionResponseCallback.onSuccessFetchCompleteCollectionsFromRemote(collections, reference);
                     executorService.shutdown();
                 } catch (InterruptedException e){
                     Thread.currentThread().interrupt();
-                    //todo error
+                    collectionResponseCallback.onFailureFetchCompleteCollectionsFromRemote(TAG + " - Error : " + e.getLocalizedMessage());
                 }
             });
-
         } else {
-            //todo error
+            collectionResponseCallback.onFailureFetchCompleteCollectionsFromRemote(TAG + " - Error : fetchWorksForCollections -> given collections were null.");
         }
     }
 
@@ -129,7 +128,6 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         booksReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("ON DATA CHANGED", "ON DATA CHANGED ADD BOOK");
                 Set<String> books = new HashSet<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String book = snapshot.getValue(String.class);
@@ -140,11 +138,13 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     booksReference.setValue(new ArrayList<>(books));
                     numberOfBooksReference.setValue(books.size());
                     collectionResponseCallback.onSuccessAddBookToCollectionFromRemote(collectionId, book);
+                } else {
+                    collectionResponseCallback.onFailureAddBookToCollectionFromRemote(TAG + " - Error: book instance was null");
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // TODO Handle errors
+                collectionResponseCallback.onFailureAddBookToCollectionFromRemote(TAG + " - Error: " + databaseError.getMessage());
             }
         });
     }
@@ -224,7 +224,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                             collections.add(collection);
                         }
                     } else {
-                        //todo error
+                        collectionResponseCallback.onFailureFetchOtherUserCollectionsFromRemoteDatabase(TAG + "Error: given collection is null");
                     }
                 }
                 collections.sort(Comparator.comparing(Collection::getName));
@@ -274,10 +274,10 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     if(rating != null){
                         book.setRating(rating);
                     } else {
-                        //todo errore
+                        collectionResponseCallback.onFailureFetchRating(TAG + " - warning : the rating of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
                     }
                 } else {
-                    //todo errore
+                    collectionResponseCallback.onFailureFetchRating(TAG + " - warning : OpenLibrary fetch rating for book with id " + book.getKey() + " wasn't successful");
                 }
 
                 ratingsLatch.countDown();
@@ -285,11 +285,10 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
 
             @Override
             public void onFailure(@NonNull Call<OLRatingResponse> call, @NonNull Throwable t) {
-                //todo errore
+                collectionResponseCallback.onFailureFetchRating(TAG + " - warning : OpenLibrary fetch rating for book with id " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
                 ratingsLatch.countDown();
             }
         });
-
 
     }
 
@@ -308,6 +307,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     authorKey.setAuthor(new OLDocs(authorKey.getKey()));
                 }
                 if(key != null){
+                    String finalKey = key;
                     olApiService.fetchAuthor(key).enqueue(new Callback<OLAuthorApiResponse>() {
                         @Override
                         public void onResponse(@NonNull Call<OLAuthorApiResponse> call, @NonNull Response<OLAuthorApiResponse> response) {
@@ -316,17 +316,17 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                                 if(author != null){
                                     authors.add(author);
                                 } else {
-                                    //todo errore
+                                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : the author with id: " + finalKey + " of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
                                 }
                             } else {
-                                //todo errore
+                                collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " wasn't successful");
                             }
                             tempAuthorsLatch.countDown();
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<OLAuthorApiResponse> call, @NonNull Throwable t) {
-                            //todo errore
+                            collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
                             tempAuthorsLatch.countDown();
                         }
                     });
@@ -340,20 +340,18 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.submit(() -> {
                 try {
-                    Log.d("fetchCollectionData", "Waiting for tempAuthors of " + book.getTitle());
                     tempAuthorsLatch.await();
-                    Log.d("fetchCollectionData", "All tempAuthors of " + book.getTitle() + " fetched.");
                     book.setAuthorList(authors);
                     completeAuthorsLatch.countDown();
                     executorService.shutdown();
                 } catch (InterruptedException e) {
-                    // todo error
+                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : " +  e.getLocalizedMessage());
                     completeAuthorsLatch.countDown();
                 }
             });
 
         } else {
-            //todo errore
+            collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : The book with the id: " + book.getKey() + "has the authorKeys field with a null value or is empty");
             completeAuthorsLatch.countDown();
         }
 
@@ -383,7 +381,6 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         }
         List<OLWorkApiResponse> fetchedWorks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch worksToFetchLatch = new CountDownLatch(bookIdList.size());
-        Log.d("fetchCollectionData","Started fetching of collection : " + collection.getName() + ", number of books : " + bookIdList.size());
         for(String bookId : bookIdList){
             collection.setWorks(new ArrayList<>());
             olApiService.fetchBook(bookId).enqueue(new Callback<OLWorkApiResponse>() {
@@ -394,20 +391,18 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                         if(book != null){
                             checkBookData(book);
                             fetchedWorks.add(book);
-                            Log.d("fetchCollectionData","just fetched data from : " + collection.getName() + ", book : " + book.getTitle() + ", remaining: " + worksToFetchLatch.getCount());
-
                         } else {
-                            //todo gestire errore
+                            collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : the book with id " + bookId + " is null");
                         }
                     } else {
-                        //todo errore
+                        collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : OpenLibrary fetch for book with id " + bookId + " wasn't successful");
                     }
                     worksToFetchLatch.countDown();
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
-                    //todo gestire eventuali errori
+                    collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : OpenLibrary fetch for book with id " + bookId + " failed.\n" + t.getLocalizedMessage());
                     worksToFetchLatch.countDown();
                 }
             });
@@ -416,9 +411,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
             try{
-                Log.d("fetchCollectionData",collection.getName() + " Waiting for all works...");
                 worksToFetchLatch.await();
-                Log.d("fetchCollectionData","All works of "+collection.getName()+" completed");
 
                 collection.setWorks(fetchedWorks);
                 CountDownLatch ratingsToFetchLatch = new CountDownLatch(fetchedWorks.size());
@@ -426,9 +419,8 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 for(OLWorkApiResponse book : fetchedWorks){
                     fetchRatings(book, ratingsToFetchLatch);
                 }
-                Log.d("fetchCollectionData",collection.getName() + " Waiting for all ratings...");
+
                 ratingsToFetchLatch.await();
-                Log.d("fetchCollectionData","All ratings of "+collection.getName()+" completed");
 
 
                 CountDownLatch authorsToFetchLatch = new CountDownLatch(fetchedWorks.size());
@@ -436,9 +428,9 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 for(OLWorkApiResponse book : fetchedWorks){
                     fetchAuthors(book, authorsToFetchLatch);
                 }
-                Log.d("fetchCollectionData",collection.getName() + " Waiting for all authors...");
+
                 authorsToFetchLatch.await();
-                Log.d("fetchCollectionData","All authors of "+collection.getName()+" completed");
+
                 collectionLatch.countDown();
                 executorService.shutdown();
             } catch (InterruptedException e){

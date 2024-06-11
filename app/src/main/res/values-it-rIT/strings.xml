@@ -66,7 +66,7 @@
     <string name="textview_genre_filter_label">Genere</string>
     <string name="button_apply">Applica</string>
     <string name="content_description_book_cover">Copertina del libro</string>
-    <string name="content_description_add_to_bookshelf">Bottone \"aggiungi alla libreria\"</string>
+    <string name="content_description_add_to_bookshelf">Agiungi ad una collezione</string>
     <string name="content_description_light_mode">Icona modalità chiara</string>
     <string name="content_description_dark_mode">Icona modalità scura</string>
     <string name="content_description_arrow_notification">Icona per aprire la sezione di notifiche</string>
@@ -97,7 +97,7 @@
 
     <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
     <string name="button_retry">Riprova</string>
-    <string name="content_description_filter_button">Bottone per i filtri della ricerca</string>
+    <string name="content_description_filter_button">Filtri della ricerca</string>
     <string name="placeholder_home_welcome">Ciao,</string>
     <string name="textview_home_continue_label">Continuiamo da dove eravamo rimasti</string>
     <string name="textview_trending_books">Libri in tendenza</string>
@@ -163,6 +163,7 @@
     <string name="error_logout">Si é verificato un errore durante il logout</string>
     <string name="error_local_database">Errore nel database locale</string>
     <string name="no_users_found">Nessun utente trovato.\nNon abbiamo nessun utente con quell\'username.</string>
+    <string name="no_users_found_generic">Nessun utente trovato.</string>
 
 
 

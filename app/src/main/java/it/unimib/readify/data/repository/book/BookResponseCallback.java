@@ -17,5 +17,4 @@ public interface BookResponseCallback {
     void onFailureLoadSearchResultList(String message);
     void onFailureFetchRating(String message);
     void onFailureFetchAuthors(String message);
-
 }

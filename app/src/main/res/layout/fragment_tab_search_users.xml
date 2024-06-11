@@ -20,7 +20,9 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_search_users"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
+        android:minWidth="390dp"
+        android:maxWidth="485dp"
         android:layout_height="wrap_content"
         android:hint="@string/hint_search_users"
         android:padding="16dp"
@@ -33,7 +35,8 @@
         app:errorEnabled="true"
         app:boxStrokeColor="@color/text_input_box_stroke_color"
         app:hintTextColor="?attr/colorSecondary"
-        app:boxStrokeWidth="3dp">
+        app:boxStrokeWidth="2dp"
+        app:cursorColor="?attr/colorAccent" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edittext_search_users"

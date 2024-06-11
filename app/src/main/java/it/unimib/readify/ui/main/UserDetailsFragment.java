@@ -40,12 +40,17 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class UserDetailsFragment extends Fragment {
 
+    private final String TAG = UserDetailsFragment.class.getSimpleName();
+
     private FragmentUserDetailsBinding binding;
     private UserViewModel userViewModel;
     private CollectionViewModel collectionViewModel;
     private CollectionAdapter collectionAdapter;
     private String userIdToken;
     private String loggedUserIdToken;
+    private Observer<List<Result>> collectionsObserver;
+    private Observer<Result> loggedUserObserver;
+    private Observer<Result> otherUserObserver;
 
     public UserDetailsFragment() {}
 
@@ -79,25 +84,28 @@ public class UserDetailsFragment extends Fragment {
     }
 
     private void initObservers() {
-        final Observer<List<Result>> collectionsObserver = results -> {
+        collectionsObserver = results -> {
             ConstraintLayout noCollectionsFoundLayout = binding.noCollectionsFoundLayout;
+
             if(results.isEmpty()){
                 noCollectionsFoundLayout.setVisibility(View.VISIBLE);
             } else {
                 noCollectionsFoundLayout.setVisibility(View.GONE);
             }
+
             List<Collection> collectionResultList = results.stream()
                     .filter(result -> result instanceof Result.CollectionSuccess)
                     .map(result -> ((Result.CollectionSuccess) result).getData())
                     .collect(Collectors.toList());
+
             collectionAdapter.submitList(collectionResultList);
             binding.collectionsProgressBar.setVisibility(View.GONE);
             binding.recyclerviewUserCollections.setVisibility(View.VISIBLE);
         };
 
-        final Observer<Result> loggedUserObserver = result -> {
-            if(result.isSuccess()){
-                User loggedUser = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()){
+                User loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
                 this.loggedUserIdToken = loggedUser.getIdToken();
                 if(isFollowed(loggedUser)){
                     binding.followButton.setVisibility(View.GONE);
@@ -107,11 +115,12 @@ public class UserDetailsFragment extends Fragment {
                     binding.followButton.setVisibility(View.VISIBLE);
                 }
             } else {
-                Log.e("UserDetailsFragment", "Logged user error");
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 
-        final Observer<Result> otherUserObserver = otherUserResult -> {
+        otherUserObserver = otherUserResult -> {
             if(otherUserResult.isSuccess()){
                 User receivedUser = ((Result.UserSuccess) otherUserResult).getData();
                 showPublicUserInfo(receivedUser);
@@ -124,32 +133,14 @@ public class UserDetailsFragment extends Fragment {
                     hidePrivateUserInfo();
                 }
             } else {
-                Log.e("UserDetailsFragment", "Other user error");
+                String errorMessage = ((Result.Error) otherUserResult).getMessage();
+                Log.e(TAG, "Error: Other user fetch wasn't successful -> " + errorMessage);
             }
         };
 
         collectionViewModel.getOtherUserCollectionListLiveData().observe(getViewLifecycleOwner(), collectionsObserver);
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
         userViewModel.getOtherUserLiveData().observe(getViewLifecycleOwner(),otherUserObserver);
-    }
-
-    private boolean areUsersFriends(String loggedUserIdToken, User otherUser) {
-        if(loggedUserIdToken == null || otherUser == null) {
-            Log.e("UserDetailsFragment", "One of the users is null");
-            return false;
-        }
-
-        if(otherUser.getFollowing().getUsers() != null && otherUser.getFollowers().getUsers() != null){
-            boolean otherUserFollowsLoggedUser = otherUser.getFollowing().getUsers().stream()
-                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
-
-            boolean loggedUserFollowsOtherUser = otherUser.getFollowers().getUsers().stream()
-                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
-
-            return otherUserFollowsLoggedUser && loggedUserFollowsOtherUser;
-        }
-
-        return false;
     }
 
     private void initRecyclerView(){
@@ -161,6 +152,7 @@ public class UserDetailsFragment extends Fragment {
         binding.recyclerviewUserCollections.setLayoutManager(layoutManager);
         binding.recyclerviewUserCollections.setAdapter(collectionAdapter);
     }
+
     private void fetchUserData(){
         this.userIdToken = UserDetailsFragmentArgs.fromBundle(getArguments()).getOtherUserIdToken();
         String username = UserDetailsFragmentArgs.fromBundle(getArguments()).getUsername();
@@ -199,6 +191,7 @@ public class UserDetailsFragment extends Fragment {
         } catch (Exception e) {
             avatarId = R.drawable.ic_baseline_profile_24;
         }
+
         Glide.with(requireActivity().getApplicationContext())
                 .load(avatarId)
                 .dontAnimate()
@@ -212,7 +205,6 @@ public class UserDetailsFragment extends Fragment {
         }
         binding.collectionsProgressBar.setVisibility(View.VISIBLE);
         collectionViewModel.fetchOtherUserCollections(userIdToken);
-
     }
 
     private void hidePrivateUserInfo(){
@@ -231,5 +223,33 @@ public class UserDetailsFragment extends Fragment {
             return loggedUserFollowingList.stream().anyMatch(following -> following.getIdToken().equals(userIdToken));
         }
         return false;
+    }
+
+    private boolean areUsersFriends(String loggedUserIdToken, User otherUser) {
+        if(loggedUserIdToken == null || otherUser == null) {
+            Log.e(TAG, "Error, one of the users instances is null");
+            return false;
+        }
+
+        if(otherUser.getFollowing().getUsers() != null && otherUser.getFollowers().getUsers() != null){
+            boolean otherUserFollowsLoggedUser = otherUser.getFollowing().getUsers().stream()
+                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
+
+            boolean loggedUserFollowsOtherUser = otherUser.getFollowers().getUsers().stream()
+                    .anyMatch(user -> user.getIdToken().equals(loggedUserIdToken));
+
+            return otherUserFollowsLoggedUser && loggedUserFollowsOtherUser;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        collectionViewModel.getOtherUserCollectionListLiveData().removeObserver(collectionsObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getOtherUserLiveData().removeObserver(otherUserObserver);
     }
 }

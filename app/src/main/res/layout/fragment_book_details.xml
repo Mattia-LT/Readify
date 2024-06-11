@@ -235,7 +235,7 @@
 
             <TextView
                 android:id="@+id/book_description"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:paddingHorizontal="20dp"
@@ -264,7 +264,7 @@
                 android:layout_marginTop="30dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider_book_details_3"
@@ -275,7 +275,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintTop_toBottomOf="@id/comments_header"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview_comments"

@@ -19,17 +19,9 @@ import it.unimib.readify.data.service.OLApiService;
 import it.unimib.readify.model.OLDescription;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-/*
-    ServiceLocator is a Singleton class which maps every Repository class
-     with its "repositories" attribute, allowing only one instantiation per Repository class.
-    This make every Repository class having the same behavior as a Singleton class,
-     even though it doesn't implement its classic structure.
-    This allows every Activity / Fragment to have access to the same data,
-     decreasing the possibility of having problems regarding UI data visualization.
-    It is a good practice when it is needed 1) a general UI update of every Activity / Fragment
-     (each time the data the UI based its appearance changes)
-     and 2) an automatic check of data changing during some particular actions (asynchronous actions)
+/**
+ *  Registry to provide the dependencies for the classes
+ *  used in the application.
  */
 public class ServiceLocator {
 
@@ -41,6 +33,11 @@ public class ServiceLocator {
         this.application = application;
     }
 
+    /**
+     * Returns an instance of ServiceLocator class.
+     * @param application Param for accessing the global application state.
+     * @return An instance of ServiceLocator.
+     */
     public static ServiceLocator getInstance(Application application) {
         if (INSTANCE == null) {
             synchronized(ServiceLocator.class) {
@@ -52,10 +49,21 @@ public class ServiceLocator {
         return INSTANCE;
     }
 
+    /**
+     * Returns an instance of CollectionRoomDatabase class to manage collections local Room database.
+     * @param application Param for accessing the global application state.
+     * @return An instance of CollectionRoomDatabase.
+     */
     public CollectionRoomDatabase getBookDao(Application application) {
         return CollectionRoomDatabase.getDatabase(application);
     }
 
+
+    /**
+     * Returns an instance of the IRepository needed.
+     * @param repositoryClass Param for accessing the singleton repository needed.
+     * @return An instance of IRepository needed.
+     */
     public <T> T getRepository(Class<T> repositoryClass) {
         Object repositoryInstance = repositories.get(repositoryClass);
         if(repositoryInstance == null) {
@@ -74,6 +82,7 @@ public class ServiceLocator {
                         repositoryInstance = BookRepository.getInstance(application);
                         repositories.put(repositoryClass, repositoryInstance);
                     }
+                    //creating CollectionRepository instance
                     if(repositoryClass == ICollectionRepository.class) {
                         repositoryInstance = CollectionRepository.getInstance(application, getBookDao(application), sharedPreferencesUtil, dataEncryptionUtil);
                         repositories.put(repositoryClass, repositoryInstance);
@@ -84,6 +93,10 @@ public class ServiceLocator {
         return repositoryClass.cast(repositoryInstance);
     }
 
+    /**
+     * Returns an instance of OLApiService (OL stands for OpenLibrary) class using Retrofit.
+     * @return an instance of OLApiService.
+     */
     public OLApiService getOLApiService() {
         Gson gsonDescriptionManager = new GsonBuilder()
                 .registerTypeAdapter(OLDescription.class, new OLDescriptionDeserializer())
@@ -93,6 +106,7 @@ public class ServiceLocator {
                 .baseUrl(Constants.OL_API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gsonDescriptionManager))
                 .build();
+
         return retrofit.create(OLApiService.class);
     }
 }

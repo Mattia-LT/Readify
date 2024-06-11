@@ -12,10 +12,15 @@ import java.util.Map;
 import it.unimib.readify.R;
 
 public class SubjectsUtil {
+
+    /**
+     * This class is used as a support for genre management. Since there are thousands of different genres
+     * in the API we used, we took the main genres and used the methods contained in this class to handle
+     * all the functionality of the application that relied on book genres.
+     */
+
     private static SubjectsUtil instance;
-
     private Map<Integer, String> subjectsApiValueMap;
-
     private int[] chipIdList;
     private final Context context;
 
@@ -30,6 +35,10 @@ public class SubjectsUtil {
         }
         return instance;
     }
+
+    /**
+     * Initialize the selected subjects hashmap and assigns an id to each subject
+     */
 
     private void initSubjectsHashMap() {
         subjectsApiValueMap = new LinkedHashMap<>();
@@ -64,10 +73,17 @@ public class SubjectsUtil {
         }
     }
 
+    /**
+     * @return an array of integers representing the ids of the chips
+     */
     public int[] getChipIdList() {
         return chipIdList;
     }
 
+    /**
+     * @param subject - a string representing the name of the current subject
+     * @return true if the subject is contained in the hashmap, false otherwise
+     */
     public boolean containSubject(String subject){
         for (Map.Entry<Integer, String> entry : subjectsApiValueMap.entrySet()) {
             if (entry.getValue().equalsIgnoreCase(subject)) {
@@ -77,6 +93,10 @@ public class SubjectsUtil {
         return false;
     }
 
+    /**
+     * @param subject - a string representing the name of the current subject (which can be of any type of supported locale)
+     * @return a String containing the default value for that subject (english)
+     */
     public String getApiValue(String subject){
         Resources res = context.getResources();
         String[] subjectList = res.getStringArray(R.array.chip_genres);
@@ -89,10 +109,12 @@ public class SubjectsUtil {
         return null;
     }
 
+    /**
+     * @param apiValue - a string representing the default value of the current subject (the one supported by the api)
+     * @return an integer representing the id of the corresponding chip
+     */
     public int getChipId(String apiValue) {
-        //Log.e("ENTRY api value", apiValue);
         for (Map.Entry<Integer, String> entry : subjectsApiValueMap.entrySet()) {
-            //Log.e("ENTRY GET VALUE", entry.getValue());
             if (entry.getValue().equalsIgnoreCase(apiValue)) {
                 return entry.getKey();
             }

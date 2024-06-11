@@ -1,62 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:layout_width="match_parent"
+<androidx.core.widget.NestedScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:backgroundTint="?attr/backgroundColor"
-    android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/textview_continue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Continua la registrazione"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/textview_continue_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:layout_marginStart="20dp"
-        android:text="Scegli il tuo username"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_continue" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_choose_username"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_continue_username"
-        app:shapeAppearanceOverlay="@style/RoundedEditText"
-        app:errorEnabled="true"
-        app:boxStrokeColor="@color/text_input_box_stroke_color"
-        app:hintTextColor="?attr/colorSecondary"
-        app:boxStrokeWidth="3dp">
+        android:backgroundTint="?attr/backgroundColor"
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text_input_edit_text_choose_username"
+        <TextView
+            android:id="@+id/textview_continue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_baseline_profile_24"
-            android:drawablePadding="20dp"
-            android:hint="@string/username"
-            android:inputType="text" />
+            android:text="@string/continue_registration"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/textview_continue_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_marginStart="20dp"
+            android:text="@string/choose_username"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_continue" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout_choose_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_continue_username"
+            app:shapeAppearanceOverlay="@style/RoundedEditText"
+            app:errorEnabled="true"
+            app:boxStrokeColor="@color/text_input_box_stroke_color"
+            app:hintTextColor="?attr/colorSecondary"
+            app:boxStrokeWidth="3dp"
+            app:cursorColor="?attr/colorAccent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/text_input_edit_text_choose_username"
+                android:layout_width="wrap_content"
+                android:minWidth="380dp"
+                android:maxWidth="460dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_baseline_profile_24"
+                android:drawablePadding="20dp"
+                android:hint="@string/username"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/continue_registration_username_error_message"
@@ -64,98 +69,104 @@
             android:layout_height="wrap_content"
             android:textColor="#FF0000"
             android:textSize="20sp"
-            android:layout_marginStart="10dp"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_input_layout_choose_username"
+            tools:text="error message" />
+
+        <TextView
+            android:id="@+id/textview_gender_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/choose_gender"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/continue_registration_username_error_message" />
+
+        <Spinner
+            android:id="@+id/spinner_gender"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="240dp"
+            android:paddingVertical="13dp"
+            style="@style/RoundedSpinnerTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textview_gender_selection"
+            app:layout_constraintTop_toBottomOf="@+id/textview_gender_selection" />
+
+        <TextView
+            android:id="@+id/continue_registration_gender_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:textSize="20sp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="50dp"
-            app:layout_constraintStart_toStartOf="@+id/text_input_edit_text_choose_username"
-            app:layout_constraintTop_toBottomOf="@+id/text_input_edit_text_choose_username" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingVertical="12dp"
+            android:gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            app:layout_constraintStart_toEndOf="@+id/spinner_gender"
+            app:layout_constraintTop_toBottomOf="@+id/textview_gender_selection"
+            app:layout_constraintBottom_toBottomOf="@id/spinner_gender"
+            tools:text="error message"
+            />
+
+        <TextView
+            android:id="@+id/textview_choose_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginHorizontal="20dp"
+            android:text="@string/choose_subjects"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_gender" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipgroup_genre_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            app:chipSpacingVertical="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_choose_genre"
+            app:selectionRequired="false"
+            app:singleSelection="false">
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:id="@+id/continue_registration_chip_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:textSize="20sp"
+            android:layout_marginHorizontal="25dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipgroup_genre_filter"
+            tools:text="error message"
+            />
+
+        <Button
+            android:id="@+id/confirm_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/complete_registration"
+            android:layout_marginTop="50dp"
+            android:backgroundTint="?attr/colorPrimaryVariant"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipgroup_genre_filter">
+        </Button>
 
 
-    <TextView
-        android:id="@+id/textview_gender_selection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Scegli la tua identità di genere"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_choose_username" />
-
-    <Spinner
-        android:id="@+id/spinner_gender"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="240dp"
-        android:padding="13dp"
-        android:background="@drawable/custom_textbox_bl"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textview_gender_selection"
-        app:layout_constraintTop_toBottomOf="@+id/textview_gender_selection" />
-
-    <TextView
-        android:id="@+id/continue_registration_gender_error_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FF0000"
-        android:textSize="20sp"
-        android:layout_marginEnd="50dp"
-        android:paddingTop="10dp"
-        app:layout_constraintStart_toStartOf="@+id/spinner_gender"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_gender"
-        />
-
-    <TextView
-        android:id="@+id/textview_choose_genre"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginStart="20dp"
-        android:text="Scegli almeno 3 generi di libri che ti potrebbero interessare"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_gender" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipgroup_genre_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        app:chipSpacingVertical="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_choose_genre"
-        app:selectionRequired="false"
-        app:singleSelection="false">
-    </com.google.android.material.chip.ChipGroup>
-
-    <TextView
-        android:id="@+id/continue_registration_chip_error_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FF0000"
-        android:textSize="20sp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="50dp"
-        app:layout_constraintStart_toStartOf="@+id/chipgroup_genre_filter"
-        app:layout_constraintTop_toBottomOf="@+id/chipgroup_genre_filter"
-        />
-
-    <Button
-        android:id="@+id/confirm_preferences"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Conferma le mie preferenze"
-        android:layout_marginTop="50dp"
-        android:backgroundTint="?attr/colorPrimaryVariant"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chipgroup_genre_filter">
-    </Button>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,8 @@ import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
 import static it.unimib.readify.util.Constants.USER_VISIBILITY_PUBLIC;
 
 public class ContinueRegistrationFragment extends Fragment {
+
+    private final String TAG = ContinueRegistrationFragment.class.getSimpleName();
 
     private FragmentContinueRegistrationBinding fragmentContinueRegistrationBinding;
     private UserViewModel userViewModel;
@@ -102,24 +105,24 @@ public class ContinueRegistrationFragment extends Fragment {
     }
 
     private void initObservers() {
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                this.user = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                this.user = ((Result.UserSuccess) loggedUserResult).getData();
                 onSaveUser = new User(user);
                 if(checkUserData(onSaveUser) && isContinueButtonPressed && !isNavigationStarted){
                     isNavigationStarted = true;
-                    //todo verify
-                    NavDirections action = ContinueRegistrationFragmentDirections
-                            .actionContinueRegistrationFragmentToHomeActivity();
+                    NavDirections action = ContinueRegistrationFragmentDirections.actionContinueRegistrationFragmentToHomeActivity();
                     Navigation.findNavController(requireView()).navigate(action);
                     requireActivity().finish();
                 }
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 
         usernameErrorObserver = result -> {
             switch (result) {
-                //todo verify
                 case USERNAME_AVAILABLE:
                     isUsernameAvailable = true;
                     break;
@@ -164,14 +167,12 @@ public class ContinueRegistrationFragment extends Fragment {
                 userViewModel.setUserGender(onSaveUser);
                 onSaveUser.setRecommended(getSelectedGenres(chipGroupGenre));
                 userViewModel.setUserRecommended(onSaveUser);
-                //todo verify
                 onSaveUser.setAvatar(AVATAR_DEFAULT);
                 userViewModel.setUserAvatar(onSaveUser);
                 onSaveUser.setFollowers(new FollowGroup(0, null));
                 onSaveUser.setFollowing(new FollowGroup(0, null));
                 userViewModel.setUserFollowers(onSaveUser);
                 userViewModel.setUserFollowing(onSaveUser);
-                //todo verify
                 onSaveUser.setVisibility(USER_VISIBILITY_PUBLIC);
                 userViewModel.setUserVisibility(onSaveUser);
                 onSaveUser.setTotalNumberOfBooks(0);
@@ -182,12 +183,23 @@ public class ContinueRegistrationFragment extends Fragment {
                             .setText(R.string.error_gender);
                     fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage
                             .setVisibility(View.VISIBLE);
+                } else {
+                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage
+                            .setText("");
+                    fragmentContinueRegistrationBinding.continueRegistrationGenderErrorMessage
+                            .setVisibility(View.GONE);
                 }
+
                 if(selectedChipNumber <= 2){
                     fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
                             .setText(R.string.error_not_enough_genre);
                     fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
                             .setVisibility(View.VISIBLE);
+                } else {
+                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
+                            .setText("");
+                    fragmentContinueRegistrationBinding.continueRegistrationChipErrorMessage
+                            .setVisibility(View.GONE);
                 }
             }
         });
@@ -195,8 +207,8 @@ public class ContinueRegistrationFragment extends Fragment {
 
     private boolean isUsernameOk() {
         if(fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText() != null) {
-            String username = fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.getText()
-                    .toString().trim();
+            String username = fragmentContinueRegistrationBinding.textInputEditTextChooseUsername
+                    .getText().toString().trim();
             TextView errorUsername = fragmentContinueRegistrationBinding.continueRegistrationUsernameErrorMessage;
             if (!username.isEmpty()) {
                 if (username.length() > 20) {
@@ -208,7 +220,6 @@ public class ContinueRegistrationFragment extends Fragment {
                     errorUsername.setVisibility(View.VISIBLE);
                     return false;
                 } else if(isUsernameAvailable){
-                    Toast.makeText(requireContext(), USERNAME_AVAILABLE, Toast.LENGTH_SHORT).show();
                     fragmentContinueRegistrationBinding.textInputEditTextChooseUsername.setText("");
                     return true;
                 } else {

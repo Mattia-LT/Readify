@@ -26,6 +26,13 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="RoundedSpinnerTheme" parent="android:Widget.Material.Spinner.Underlined">
+        <item name="android:background">@drawable/rounded_spinner_background </item>
+        <item name="android:popupBackground">@drawable/rounded_spinner_background </item>
+        <item name="android:textAlignment">textStart</item>
+    </style>
+
 </resources>
 
 

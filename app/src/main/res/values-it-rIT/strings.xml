@@ -164,8 +164,12 @@
     <string name="error_local_database">Errore nel database locale</string>
     <string name="no_users_found">Nessun utente trovato.\nNon abbiamo nessun utente con quell\'username.</string>
     <string name="no_users_found_generic">Nessun utente trovato.</string>
-
-
+    <string name="started_following_notification_message">ha iniziato a seguirti.</string>
+    <string name="continue_registration">Continua la registrazione</string>
+    <string name="choose_username">Scegli il tuo username</string>
+    <string name="choose_gender">Scegli il tuo sesso</string>
+    <string name="choose_subjects">Scegli almeno 3 argomenti che ti potrebbero interessare</string>
+    <string name="complete_registration">Completa la registrazione</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">

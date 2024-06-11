@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.Readify" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">#000077</item>
@@ -20,6 +20,12 @@
     <style name="RatingBar" parent="Theme.Material3.DayNight">
         <item name="colorControlNormal">@color/grey_button</item>
         <item name="colorControlActivated">@color/rating_yellow</item>
+    </style>
+
+    <style name="RoundedSpinnerTheme" parent="android:Widget.Material.Spinner.Underlined">
+        <item name="android:background">@drawable/rounded_spinner_background </item>
+        <item name="android:popupBackground">@drawable/rounded_spinner_background </item>
+        <item name="android:textAlignment">textStart</item>
     </style>
 
 </resources>

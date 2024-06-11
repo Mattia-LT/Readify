@@ -173,8 +173,12 @@
     <string name="error_local_database">Local database error</string>
     <string name="no_users_found">No users found.\nWe don\'t have any user with that username.</string>
     <string name="no_users_found_generic">No users found.</string>
-
-
+    <string name="started_following_notification_message">started following you.</string>
+    <string name="continue_registration">Continue registration</string>
+    <string name="choose_username">Choose your username</string>
+    <string name="choose_gender">Choose your gender</string>
+    <string name="choose_subjects">Choose at least 3 topics that might interest you</string>
+    <string name="complete_registration">Complete registration</string>
 
     <!-- chip genres -->
     <string-array name="chip_genres">
@@ -226,7 +230,7 @@
     <string name="field_not_filled_in">Fill in the field</string>
     <string name="error_password_length">Password length must be 6 characters or higher</string>
     <string name="error_confirm_password_equal">Confirm Password must be equal to Password field</string>
-    <string name="error_gender">Select a valid gender identity</string>
+    <string name="error_gender">Select a valid gender</string>
     <string name="error_not_enough_genre">Select at least 3 topic of interest</string>
     <string name="error_collection_name_not_valid">Invalid collection name.</string>
     <string name="error_collection_name_not_unique">The name of the collection must be unique.</string>

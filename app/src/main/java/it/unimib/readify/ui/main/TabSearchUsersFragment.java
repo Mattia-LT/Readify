@@ -39,6 +39,9 @@ public class TabSearchUsersFragment extends Fragment {
     private String loggedUserIdToken;
     private UserViewModel userViewModel;
     private boolean isSearchRunning;
+    private Observer<Result> loggedUserObserver;
+    private Observer<List<Result>> searchResultsListObserver;
+
 
     @Nullable
     @Override
@@ -52,45 +55,8 @@ public class TabSearchUsersFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initViewModels();
         initObservers();
-
-        RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        userSearchResultAdapter = new UserSearchResultAdapter(user -> {
-            NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user.getIdToken(), user.getUsername());
-            Navigation.findNavController(requireView()).navigate(action);
-        });
-        recyclerView.setAdapter(userSearchResultAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-
-        isSearchRunning = false;
-        fragmentTabSearchUsersBinding.edittextSearchUsers.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            boolean isEnterKeyPressed = (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN);
-            boolean isSearchActionPressed = (actionId == EditorInfo.IME_ACTION_SEARCH);
-
-            if ( (isEnterKeyPressed || isSearchActionPressed) && !isSearchRunning) {
-                isSearchRunning = true;
-                fragmentTabSearchUsersBinding.noUsersFoundLayout.setVisibility(View.GONE);
-                startSearch();
-                InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    public void startSearch(){
-        // Perform the search when the "Enter" key is pressed
-        Editable text = fragmentTabSearchUsersBinding.edittextSearchUsers.getText();
-        String query = (text != null) ? text.toString() : "";
-        query = query.trim();
-        if(query.isEmpty()){
-            Toast.makeText(requireContext(), getString(R.string.empty_search_snackbar), Toast.LENGTH_SHORT).show();
-            isSearchRunning = false;
-        } else {
-            fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
-            userViewModel.searchUsers(query);
-        }
+        initRecyclerView();
+        setUpSearchSection();
     }
 
     private void initViewModels(){
@@ -99,8 +65,7 @@ public class TabSearchUsersFragment extends Fragment {
     }
 
     private void initObservers(){
-
-        final Observer<Result> loggedUserObserver = result -> {
+        loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 User loggedUser = ((Result.UserSuccess) result).getData();
                 this.loggedUserIdToken = loggedUser.getIdToken();
@@ -109,8 +74,9 @@ public class TabSearchUsersFragment extends Fragment {
 
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
 
-        final Observer<List<Result>> searchResultsListObserver = results -> {
+        searchResultsListObserver = results -> {
             ConstraintLayout noUsersFoundLayout = fragmentTabSearchUsersBinding.noUsersFoundLayout;
+
             if(results.isEmpty()){
                 noUsersFoundLayout.setVisibility(View.VISIBLE);
             } else {
@@ -129,5 +95,56 @@ public class TabSearchUsersFragment extends Fragment {
         };
 
         userViewModel.getUserSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
+    }
+
+    private void initRecyclerView() {
+        RecyclerView recyclerView = fragmentTabSearchUsersBinding.recyclerviewSearchUsers;
+        userSearchResultAdapter = new UserSearchResultAdapter(user -> {
+            NavDirections action = SearchFragmentDirections.actionSearchFragmentToUserDetailsFragment(user.getIdToken(), user.getUsername());
+            Navigation.findNavController(requireView()).navigate(action);
+        });
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        recyclerView.setAdapter(userSearchResultAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+
+    private void setUpSearchSection() {
+        isSearchRunning = false;
+        fragmentTabSearchUsersBinding.edittextSearchUsers.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            boolean isEnterKeyPressed = (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN);
+            boolean isSearchActionPressed = (actionId == EditorInfo.IME_ACTION_SEARCH);
+
+            if ( (isEnterKeyPressed || isSearchActionPressed) && !isSearchRunning) {
+                isSearchRunning = true;
+                fragmentTabSearchUsersBinding.noUsersFoundLayout.setVisibility(View.GONE);
+                startSearch();
+                InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void startSearch(){
+        // Perform the search when the "Enter" key is pressed
+        Editable text = fragmentTabSearchUsersBinding.edittextSearchUsers.getText();
+        String query = (text != null) ? text.toString() : "";
+        query = query.trim();
+        if(query.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.empty_search_snackbar), Toast.LENGTH_SHORT).show();
+            isSearchRunning = false;
+        } else {
+            fragmentTabSearchUsersBinding.progressindicatorSearchUsers.setVisibility(View.VISIBLE);
+            userViewModel.searchUsers(query);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUserSearchResultsLiveData().removeObserver(searchResultsListObserver);
     }
 }

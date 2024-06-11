@@ -39,14 +39,18 @@ import it.unimib.readify.viewmodel.UserViewModel;
 public class TabSearchBooksFragment extends Fragment{
 
     private FragmentTabSearchBooksBinding fragmentTabSearchBooksBinding;
-
     private BookSearchResultAdapter searchResultsAdapter;
     private BookViewModel bookViewModel;
     private UserViewModel userViewModel;
     private String sortMode;
     private String subjects;
     private User loggedUser;
-    private boolean isLoading;
+    private Observer<List<Result>> searchResultsListObserver;
+    private Observer<List<String>> genreListObserver;
+    private Observer<String> sortModeObserver;
+    private Observer<Result> loggedUserObserver;
+    private boolean isSearchRunning;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,7 +62,66 @@ public class TabSearchBooksFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViewModels();
-        initObserver();
+        initObservers();
+        initRecyclerView();
+        setUpSearchSection();
+    }
+
+    private void initViewModels(){
+        bookViewModel = CustomViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(BookViewModel.class);
+
+        userViewModel = CustomViewModelFactory
+                .getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
+
+    private void initObservers(){
+        searchResultsListObserver = results -> {
+            ConstraintLayout noResultsFoundLayout = fragmentTabSearchBooksBinding.noResultsFoundLayout;
+
+            if(results.isEmpty()){
+                noResultsFoundLayout.setVisibility(View.VISIBLE);
+            } else {
+                noResultsFoundLayout.setVisibility(View.GONE);
+            }
+
+            List<OLWorkApiResponse> searchResults = results.stream()
+                    .filter(result -> result instanceof Result.WorkSuccess)
+                    .map(result -> ((Result.WorkSuccess) result).getData())
+                    .collect(Collectors.toList());
+
+            searchResultsAdapter.submitList(searchResults);
+            fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
+            isSearchRunning = false;
+        };
+
+        genreListObserver = genreList -> {
+            this.subjects = null;
+            if(genreList != null && !genreList.isEmpty()){
+                this.subjects = "";
+                for(String genre : genreList){
+                    this.subjects = subjects.concat(genre).concat(" ");
+                }
+            }
+        };
+
+        sortModeObserver = sortMode -> this.sortMode = sortMode;
+
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()){
+                loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
+            }
+        };
+
+        bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
+        bookViewModel.getSortModeLiveData().observe(getViewLifecycleOwner(), sortModeObserver);
+        bookViewModel.getSubjectListLiveData().observe(getViewLifecycleOwner(), genreListObserver);
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
+    }
+
+    private void initRecyclerView() {
         RecyclerView recyclerViewSearchResults = fragmentTabSearchBooksBinding.recyclerviewSearch;
         searchResultsAdapter = new BookSearchResultAdapter(new BookSearchResultAdapter.OnItemClickListener() {
             @Override
@@ -87,18 +150,18 @@ public class TabSearchBooksFragment extends Fragment{
                     int visibleItemCount = layoutManager.getChildCount();
                     int totalItemCount = layoutManager.getItemCount();
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
+                    if (!isSearchRunning && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
                         fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.VISIBLE);
                         bookViewModel.loadMoreSearchResults();
                         // Flag to prevent multiple load requests
-                        isLoading = true;
+                        isSearchRunning = true;
                     }
                 }
             }
         });
+    }
 
-
-
+    private void setUpSearchSection() {
         MaterialButton filterButton = fragmentTabSearchBooksBinding.buttonSearchFilter;
 
         filterButton.setOnClickListener( v -> {
@@ -120,7 +183,7 @@ public class TabSearchBooksFragment extends Fragment{
         });
     }
 
-    public void startSearch(){
+    private void startSearch(){
         // Perform the search when the "Enter" key is pressed
         Editable text = fragmentTabSearchBooksBinding.edittextSearch.getText();
         String query = (text != null) ? text.toString() : "";
@@ -133,57 +196,12 @@ public class TabSearchBooksFragment extends Fragment{
 
     }
 
-    private void initViewModels(){
-        bookViewModel = CustomViewModelFactory
-                .getInstance(requireActivity().getApplication())
-                .create(BookViewModel.class);
-
-        userViewModel = CustomViewModelFactory
-                .getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
-    }
-
-    private void initObserver(){
-        final Observer<List<Result>> searchResultsListObserver = results -> {
-            ConstraintLayout noResultsFoundLayout = fragmentTabSearchBooksBinding.noResultsFoundLayout;
-            if(results.isEmpty()){
-                noResultsFoundLayout.setVisibility(View.VISIBLE);
-            } else {
-                noResultsFoundLayout.setVisibility(View.GONE);
-            }
-
-            List<OLWorkApiResponse> searchResults = results.stream()
-                    .filter(result -> result instanceof Result.WorkSuccess)
-                    .map(result -> ((Result.WorkSuccess) result).getData())
-                    .collect(Collectors.toList());
-
-
-            searchResultsAdapter.submitList(searchResults);
-            fragmentTabSearchBooksBinding.progressindicatorSearchBooks.setVisibility(View.GONE);
-            isLoading = false;
-        };
-
-        final Observer<List<String>> genreListObserver = genreList -> {
-            this.subjects = null;
-            if(genreList != null && !genreList.isEmpty()){
-                this.subjects = "";
-                for(String genre : genreList){
-                    this.subjects = subjects.concat(genre).concat(" ");
-                }
-            }
-        };
-
-        final Observer<String> sortModeObserver = sortMode -> this.sortMode = sortMode;
-
-        final Observer<Result> userObserver = loggedUserResult -> {
-            if(loggedUserResult.isSuccess()){
-                loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
-            }
-        };
-
-        bookViewModel.getSearchResultsLiveData().observe(getViewLifecycleOwner(), searchResultsListObserver);
-        bookViewModel.getSortModeLiveData().observe(getViewLifecycleOwner(), sortModeObserver);
-        bookViewModel.getSubjectListLiveData().observe(getViewLifecycleOwner(), genreListObserver);
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bookViewModel.getSearchResultsLiveData().removeObserver(searchResultsListObserver);
+        bookViewModel.getSortModeLiveData().removeObserver(sortModeObserver);
+        bookViewModel.getSubjectListLiveData().removeObserver(genreListObserver);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

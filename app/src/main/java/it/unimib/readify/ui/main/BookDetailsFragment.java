@@ -54,7 +54,6 @@ public class BookDetailsFragment extends Fragment {
     private UserViewModel userViewModel;
     private OLWorkApiResponse receivedBook;
     private User loggedUser;
-
     private Observer<List<Result>> commentListObserver;
     private Observer<Result> loggedUserObserver;
 
@@ -70,32 +69,29 @@ public class BookDetailsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         fragmentBookDetailsBinding = FragmentBookDetailsBinding.inflate(inflater, container, false);
         return fragmentBookDetailsBinding.getRoot();
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViewModels();
-        initObserver();
+        initObservers();
         showBookInfo();
     }
 
     private void showBookInfo() {
         receivedBook = BookDetailsFragmentArgs.fromBundle(getArguments()).getBook();
-        userViewModel.fetchComments(receivedBook.getKey());
         fragmentBookDetailsBinding.bookTitle.setText(receivedBook.getTitle());
         loadCover();
         loadAuthors();
         loadRating();
-        loadDescription();
         fragmentBookDetailsBinding.iconAdd.setOnClickListener(v -> {
             NavDirections action = BookDetailsFragmentDirections.actionBookDetailsFragmentToAddToCollectionDialog(receivedBook, loggedUser.getIdToken());
             Navigation.findNavController(requireView()).navigate(action);
         });
+        loadDescription();
         loadComments();
         loadAddCommentSection();
     }
@@ -105,46 +101,24 @@ public class BookDetailsFragment extends Fragment {
                 .create(UserViewModel.class);
     }
 
-    private void loadRating(){
-        if(receivedBook.getRating() != null && receivedBook.getRating().getSummary().getAverage() != 0){
-            float rating = (float) receivedBook.getRating().getSummary().getAverage();
-            fragmentBookDetailsBinding.ratingbarBook.setRating(rating);
-            String ratingString = String.format("%s", rating).substring(0,3)
-                    .concat(" (")
-                    .concat(String.format("%s", receivedBook.getRating().getSummary().getCount()))
-                    .concat(")");
-            fragmentBookDetailsBinding.textviewRating.setText(ratingString);
-        } else {
-            fragmentBookDetailsBinding.ratingbarBook.setRating(0);
-            fragmentBookDetailsBinding.textviewRating.setText(R.string.rating_not_available);
-        }
-    }
+    private void initObservers(){
+        commentListObserver = results -> {
+            List<Comment> commentResultList = results.stream()
+                    .filter(result -> result instanceof Result.CommentSuccess)
+                    .map(result -> ((Result.CommentSuccess) result).getData())
+                    .collect(Collectors.toList());
+            commentAdapter.submitList(commentResultList);
+        };
 
-    private void loadAuthors(){
-        StringBuilder authors = new StringBuilder();
-        if(receivedBook.getAuthorList() != null){
-            for(OLAuthorApiResponse author : receivedBook.getAuthorList()){
-                authors.append(author.getName()).append("\n");
-            }
-        } else {
-            authors.append(requireContext().getString(R.string.error_author_not_found));
-        }
-        fragmentBookDetailsBinding.bookAuthor.setText(authors.toString());
-    }
+        userViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
-    private void loadDescription() {
-        String description = receivedBook.getDescription().getValue();
-        for(String option : DESCRIPTION_TRIM_OPTIONS){
-            if(description.contains(option)){
-                int position = description.indexOf(option);
-                description = description.substring(0, position);
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                loggedUser = ((Result.UserSuccess) result).getData();
+                commentAdapter.submitUser(loggedUser);
             }
-        }
-        description = description.trim();
-        if(description.isEmpty()){
-            description = getString(R.string.description_not_available);
-        }
-        fragmentBookDetailsBinding.bookDescription.setText(description);
+        };
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
     private void loadCover(){
@@ -166,6 +140,7 @@ public class BookDetailsFragment extends Fragment {
                         .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                         .apply(requestOptions)
                         .into(fragmentBookDetailsBinding.bookImage);
+
                 Glide.with(requireActivity().getApplicationContext())
                         .load(OL_COVERS_API_URL + OL_COVERS_API_ID_PARAMETER + cover + OL_COVERS_API_IMAGE_SIZE_L)
                         .apply(requestOptions)
@@ -174,6 +149,7 @@ public class BookDetailsFragment extends Fragment {
         } else {
             fragmentBookDetailsBinding.bookImage.setImageResource(R.drawable.image_not_available);
         }
+
         // background image blurred
         fragmentBookDetailsBinding.bookBackgroundImage.setImageDrawable(fragmentBookDetailsBinding.bookImage.getDrawable());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -183,7 +159,51 @@ public class BookDetailsFragment extends Fragment {
         }
     }
 
+    private void loadAuthors(){
+        StringBuilder authors = new StringBuilder();
+        if(receivedBook.getAuthorList() != null){
+            for(OLAuthorApiResponse author : receivedBook.getAuthorList()){
+                authors.append(author.getName()).append("\n");
+            }
+        } else {
+            authors.append(requireContext().getString(R.string.error_author_not_found));
+        }
+        fragmentBookDetailsBinding.bookAuthor.setText(authors.toString());
+    }
+
+    private void loadRating(){
+        if(receivedBook.getRating() != null && receivedBook.getRating().getSummary().getAverage() != 0){
+            float rating = (float) receivedBook.getRating().getSummary().getAverage();
+            fragmentBookDetailsBinding.ratingbarBook.setRating(rating);
+            String ratingString = String.format("%s", rating).substring(0,3)
+                    .concat(" (")
+                    .concat(String.format("%s", receivedBook.getRating().getSummary().getCount()))
+                    .concat(")");
+            fragmentBookDetailsBinding.textviewRating.setText(ratingString);
+        } else {
+            fragmentBookDetailsBinding.ratingbarBook.setRating(0);
+            fragmentBookDetailsBinding.textviewRating.setText(R.string.rating_not_available);
+        }
+    }
+
+    private void loadDescription() {
+        String description = receivedBook.getDescription().getValue();
+        for(String option : DESCRIPTION_TRIM_OPTIONS){
+            if(description.contains(option)){
+                int position = description.indexOf(option);
+                description = description.substring(0, position);
+            }
+        }
+        description = description.trim();
+        if(description.isEmpty()){
+            description = getString(R.string.description_not_available);
+        }
+        fragmentBookDetailsBinding.bookDescription.setText(description);
+    }
+
     private void loadComments(){
+        userViewModel.fetchComments(receivedBook.getKey());
+
         RecyclerView recyclerviewComments = fragmentBookDetailsBinding.recyclerviewComments;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         commentAdapter = new CommentAdapter(new CommentAdapter.OnItemClickListener() {
@@ -226,26 +246,6 @@ public class BookDetailsFragment extends Fragment {
                 inputMethodManager.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
             }
         });
-    }
-
-    private void initObserver(){
-        commentListObserver = results -> {
-            List<Comment> commentResultList = results.stream()
-                    .filter(result -> result instanceof Result.CommentSuccess)
-                    .map(result -> ((Result.CommentSuccess) result).getData())
-                    .collect(Collectors.toList());
-            commentAdapter.submitList(commentResultList);
-        };
-
-        userViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
-
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                loggedUser = ((Result.UserSuccess) result).getData();
-                commentAdapter.submitUser(loggedUser);
-            }
-        };
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
     }
 
     @Override

@@ -18,7 +18,6 @@ public class BookViewModel extends ViewModel {
     private String sort;
     private String subjects;
 
-
     private MutableLiveData<List<String>> subjectListLiveData;
     private MutableLiveData<String> sortModeLiveData;
     private MutableLiveData<List<Result>> recommendedCarouselLiveData;

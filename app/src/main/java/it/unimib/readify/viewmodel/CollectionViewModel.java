@@ -16,6 +16,7 @@ import it.unimib.readify.model.Result;
 public class CollectionViewModel extends ViewModel {
 
     private final ICollectionRepository collectionRepository;
+
     private MutableLiveData<List<Result>> loggedUserCollectionListLiveData;
     private MutableLiveData<List<Result>> otherUserCollectionListLiveData;
     private MutableLiveData<Boolean> isCollectionNameValid;
@@ -39,8 +40,6 @@ public class CollectionViewModel extends ViewModel {
         return loggedUserCollectionListLiveData;
     }
 
-    //todo togli ovunque tranne che in home fragment, per caricare le collections dobbiamo usare il
-    //todo metodo load collections
     public void fetchLoggedUserCollections(String idToken){
         collectionRepository.fetchLoggedUserCollections(idToken);
     }
@@ -121,7 +120,6 @@ public class CollectionViewModel extends ViewModel {
     }
 
     private boolean isValidCollectionFormat(String name) {
-        //todo aggiungere ulteriori controlli in caso
         return name.length() <= COLLECTION_NAME_CHARACTERS_LIMIT &&
                 !name.isEmpty() &&
                 name.length() > 4;

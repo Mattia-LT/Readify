@@ -15,20 +15,13 @@ import it.unimib.readify.data.repository.collection.ICollectionRepository;
 
 import it.unimib.readify.util.ServiceLocator;
 
-/*
-    CustomViewModelFactory is a Singleton class which maps every ViewModel class
-     with its "viewModels" attribute, allowing only one instantiation per ViewModel class.
-    This make every ViewModel class having the same behavior as a Singleton class,
-     even though it doesn't implement its classic structure.
-    This allows every Activity / Fragment to have access to the same data,
-     decreasing the possibility of having problems regarding UI data visualization.
-    It is a good practice when it is needed 1) a general UI update of every Activity / Fragment
-     (each time the data the UI based its appearance changes)
-     and 2) an automatic check of data changing during some particular actions (asynchronous actions)
 
-     EDITED: CustomViewModelFactory now manages the creation of every ViewModel Class
- */
 public class CustomViewModelFactory implements ViewModelProvider.Factory {
+
+    /**
+     * Custom ViewModelProvider to be able to have a custom constructor
+     * for all viewmodel class.
+     */
 
     private static volatile CustomViewModelFactory INSTANCE = null;
     private final Map<Class<? extends ViewModel>, ViewModel> viewModels = new ConcurrentHashMap<>();

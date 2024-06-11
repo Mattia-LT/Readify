@@ -29,7 +29,6 @@ public interface OLApiService {
             @Query(OL_SEARCH_OFFSET_PARAMETER) int offset,
             @Query(OL_SEARCH_SUBJECT_PARAMETER) String subject);
 
-
     @GET("{id}.json")
     Call<OLWorkApiResponse> fetchBook(@Path("id") String id );
 
@@ -57,6 +56,5 @@ public interface OLApiService {
             @Query(OL_SEARCH_SORT_PARAMETER) String sort,
             @Query(OL_SEARCH_LIMIT_PARAMETER) int limit
     );
-
 
 }

@@ -153,7 +153,6 @@ public class User implements Parcelable {
         this.totalNumberOfBooks = totalNumberOfBooks;
     }
 
-
     @Override
     public int describeContents() {
         return 0;

@@ -43,4 +43,5 @@ public interface CollectionResponseCallback {
     void onFailureFetchRating(String message);
     void onFailureFetchAuthors(String message);
     void onFailureFetchSingleWork(String message);
+    void onFailureFetchSingleCollection(String message);
 }

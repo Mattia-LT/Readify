@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 public class OLSummaryRating implements Parcelable {
+
     private double average;
     private int count;
     private double sortable;

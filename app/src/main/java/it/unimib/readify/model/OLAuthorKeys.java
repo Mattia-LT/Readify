@@ -57,7 +57,6 @@ public class OLAuthorKeys implements Parcelable {
         return Objects.hash(author, key);
     }
 
-
     @Override
     public int describeContents() {
         return 0;

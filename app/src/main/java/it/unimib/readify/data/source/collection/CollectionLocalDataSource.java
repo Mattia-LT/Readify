@@ -8,8 +8,6 @@ import static it.unimib.readify.util.Constants.OPERATION_REMOVE_FROM_COLLECTION;
 import static it.unimib.readify.util.Constants.OPERATION_RENAME_COLLECTION;
 import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
 
-import android.util.Log;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -131,19 +129,18 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
                     return;
                 }
             }
-            //todo scrivi errori piu sensati e differenziali IN TUTTE LE FUNZIONI NON SOLO QUI
             switch (operation){
                 case OPERATION_ADD_TO_COLLECTION:
-                    collectionResponseCallback.onFailureAddBookToCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    collectionResponseCallback.onFailureAddBookToCollectionFromLocal(TAG + " - error in update collection on local database. AddBookToCollection failed.");
                     break;
                 case OPERATION_REMOVE_FROM_COLLECTION:
-                    collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    collectionResponseCallback.onFailureRemoveBookFromCollectionFromLocal(TAG + " - error in update collection on local database. RemoveBookFromCollection failed.");
                     break;
                 case OPERATION_CHANGE_COLLECTION_VISIBILITY:
-                    collectionResponseCallback.onFailureChangeCollectionVisibilityFromLocal("UPDATE COLLECTION ERROR");
+                    collectionResponseCallback.onFailureChangeCollectionVisibilityFromLocal(TAG + " - error in update collection on local database. ChangeCollectionVisibility failed.");
                     break;
                 case OPERATION_RENAME_COLLECTION:
-                    collectionResponseCallback.onFailureRenameCollectionFromLocal("UPDATE COLLECTION ERROR");
+                    collectionResponseCallback.onFailureRenameCollectionFromLocal(TAG + " - error in update collection on local database. RenameCollection failed.");
                     break;
             }
         });
@@ -156,7 +153,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
                 collectionDao.deleteCollection(collectionToDelete);
                 collectionResponseCallback.onSuccessDeleteCollectionFromLocal(collectionToDelete);
             } else {
-                collectionResponseCallback.onFailureDeleteCollectionFromLocal("DELETE COLLECTION ERROR");
+                collectionResponseCallback.onFailureDeleteCollectionFromLocal(TAG + " - error in delete single collection: collectionToDelete was null");
             }
         });
     }
@@ -171,11 +168,9 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             if (collectionCounter == collectionsDeleted) {
                 sharedPreferencesUtil.deleteAll(SHARED_PREFERENCES_FILE_NAME);
                 dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
-
                 collectionResponseCallback.onSuccessDeleteAllCollectionsFromLocal();
             } else {
-                collectionResponseCallback.onFailureDeleteAllCollectionsFromLocal("COLLECTIONS DELETION FAILED");
-
+                collectionResponseCallback.onFailureDeleteAllCollectionsFromLocal(TAG + " - error in deleteAllCollection: some collections couldn't be deleted.");
             }
         });
     }
@@ -185,13 +180,12 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
         CollectionRoomDatabase.databaseWriteExecutor.execute(() -> {
             Collection collectionToUpdate = collectionDao.getCollectionById(collectionId);
             int numberOfBooks = collectionToUpdate.getNumberOfBooks();
-            Log.d("numberOfBooks", String.valueOf(numberOfBooks));
             numberOfBooks++;
-
             List<String> books = collectionToUpdate.getBooks();
             books.add(book.getKey());
             List<OLWorkApiResponse> works = collectionToUpdate.getWorks();
             works.add(book);
+
             collectionToUpdate.setNumberOfBooks(numberOfBooks);
             collectionToUpdate.setBooks(books);
             collectionToUpdate.setWorks(works);
@@ -208,6 +202,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
             List<String> books = collectionToUpdate.getBooks();
             books.remove(bookId);
             List<OLWorkApiResponse> works = collectionToUpdate.getWorks();
+
             Iterator<OLWorkApiResponse> iterator = works.iterator();
             while (iterator.hasNext()) {
                 OLWorkApiResponse work = iterator.next();
@@ -216,6 +211,7 @@ public class CollectionLocalDataSource extends BaseCollectionLocalDataSource {
                     break;
                 }
             }
+
             collectionToUpdate.setNumberOfBooks(numberOfBooks);
             collectionToUpdate.setBooks(books);
             collectionToUpdate.setWorks(works);

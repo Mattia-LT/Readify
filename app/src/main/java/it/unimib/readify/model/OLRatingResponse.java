@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 public class OLRatingResponse implements Parcelable {
+
     private OLSummaryRating summary;
 
     public OLRatingResponse(OLSummaryRating summary) {

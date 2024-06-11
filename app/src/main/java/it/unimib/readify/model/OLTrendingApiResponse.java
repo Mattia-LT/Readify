@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class OLTrendingApiResponse implements Parcelable {
+
     private List<OLDocs> works;
 
     public OLTrendingApiResponse() {}
@@ -20,7 +21,6 @@ public class OLTrendingApiResponse implements Parcelable {
     public void setWorks(List<OLDocs> works) {
         this.works = works;
     }
-
 
     @Override
     public int describeContents() {

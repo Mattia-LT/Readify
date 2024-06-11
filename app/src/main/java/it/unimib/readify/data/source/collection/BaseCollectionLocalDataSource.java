@@ -7,13 +7,10 @@ import it.unimib.readify.model.Collection;
 import it.unimib.readify.model.OLWorkApiResponse;
 
 public abstract class BaseCollectionLocalDataSource {
-
     protected CollectionResponseCallback collectionResponseCallback;
-
     public void setResponseCallback(CollectionResponseCallback collectionResponseCallback) {
         this.collectionResponseCallback = collectionResponseCallback;
     }
-
     public abstract void initLocalCollections(List<Collection> collectionList);
     public abstract void getAllCollections();
     public abstract void insertCollectionList(List<Collection> collectionList);
@@ -24,6 +21,4 @@ public abstract class BaseCollectionLocalDataSource {
     public abstract void removeBookFromCollection(String collectionId, String bookId);
     public abstract void renameCollection(String collectionId, String newCollectionName);
     public abstract void changeCollectionVisibility(String collectionId, boolean isCollectionVisible);
-
-
 }

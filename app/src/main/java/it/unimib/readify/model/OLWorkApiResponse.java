@@ -161,7 +161,7 @@ public class OLWorkApiResponse implements Parcelable {
     public void readFromParcel(Parcel source) {
         this.description = source.readParcelable(OLDescription.class.getClassLoader());
         this.title = source.readString();
-        this.covers = new ArrayList<Integer>();
+        this.covers = new ArrayList<>();
         source.readList(this.covers, Integer.class.getClassLoader());
         this.firstPublishDate = source.readString();
         this.key = source.readString();
@@ -169,14 +169,14 @@ public class OLWorkApiResponse implements Parcelable {
         this.subjects = source.createStringArrayList();
         this.rating = source.readParcelable(OLRatingResponse.class.getClassLoader());
         this.authorList = source.createTypedArrayList(OLAuthorApiResponse.CREATOR);
-        this.comments = new ArrayList<Comment>();
+        this.comments = new ArrayList<>();
         source.readList(this.comments, Comment.class.getClassLoader());
     }
 
     protected OLWorkApiResponse(Parcel in) {
         this.description = in.readParcelable(OLDescription.class.getClassLoader());
         this.title = in.readString();
-        this.covers = new ArrayList<Integer>();
+        this.covers = new ArrayList<>();
         in.readList(this.covers, Integer.class.getClassLoader());
         this.firstPublishDate = in.readString();
         this.key = in.readString();
@@ -184,7 +184,7 @@ public class OLWorkApiResponse implements Parcelable {
         this.subjects = in.createStringArrayList();
         this.rating = in.readParcelable(OLRatingResponse.class.getClassLoader());
         this.authorList = in.createTypedArrayList(OLAuthorApiResponse.CREATOR);
-        this.comments = new ArrayList<Comment>();
+        this.comments = new ArrayList<>();
         in.readList(this.comments, Comment.class.getClassLoader());
     }
 

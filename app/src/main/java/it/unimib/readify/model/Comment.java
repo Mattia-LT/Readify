@@ -14,9 +14,6 @@ public class Comment implements Parcelable {
     private String content;
     private String idToken;
     private long timestamp;
-
-    //todo rimuovi seguente commento
-    //Non va salvato nel database
     private User user;
 
     public Comment() {
@@ -69,7 +66,6 @@ public class Comment implements Parcelable {
     public void setUser(User user) {
         this.user = user;
     }
-
 
     @Override
     public int describeContents() {

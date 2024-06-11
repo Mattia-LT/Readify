@@ -3,14 +3,12 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 public class Notification implements Parcelable, Comparable<Notification> {
 
-    /*
-        implementing only "newFollowers" notifications, a notificationIdToken is not needed:
-         there's already @idToken, which is unique and multiple notifications from same token shouldn't exist
-     */
     private String idToken;
     private boolean read;
     private long timestamp;
@@ -100,6 +98,7 @@ public class Notification implements Parcelable, Comparable<Notification> {
         }
     };
 
+    @NonNull
     @Override
     public String toString() {
         return "Notification{" +

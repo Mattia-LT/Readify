@@ -382,4 +382,10 @@ public class CollectionRepository implements ICollectionRepository, CollectionRe
         //Only a warning, sometimes api values can change
         Log.w(TAG, message);
     }
+
+    @Override
+    public void onFailureFetchSingleCollection(String message) {
+        //Only a warning, sometimes api values can change
+        Log.w(TAG, message);
+    }
 }

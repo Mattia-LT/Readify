@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.List;
 
 public class FollowGroup implements Parcelable {
+
     private int counter;
     private List<FollowUser> users;
 
@@ -33,7 +34,6 @@ public class FollowGroup implements Parcelable {
     public void setUsers(List<FollowUser> users) {
         this.users = users;
     }
-
 
     @Override
     public int describeContents() {

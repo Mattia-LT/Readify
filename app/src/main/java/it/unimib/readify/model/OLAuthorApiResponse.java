@@ -95,7 +95,6 @@ public class OLAuthorApiResponse implements Parcelable {
                 '}';
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -115,7 +114,7 @@ public class OLAuthorApiResponse implements Parcelable {
         this.name = source.readString();
         this.birthDate = source.readString();
         this.deathDate = source.readString();
-        this.photos = new ArrayList<Integer>();
+        this.photos = new ArrayList<>();
         source.readList(this.photos, Integer.class.getClassLoader());
     }
 
@@ -124,7 +123,7 @@ public class OLAuthorApiResponse implements Parcelable {
         this.name = in.readString();
         this.birthDate = in.readString();
         this.deathDate = in.readString();
-        this.photos = new ArrayList<Integer>();
+        this.photos = new ArrayList<>();
         in.readList(this.photos, Integer.class.getClassLoader());
     }
 

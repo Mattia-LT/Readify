@@ -15,8 +15,6 @@ import java.util.Objects;
 
 import it.unimib.readify.util.CustomTypeConverter;
 
-
-// TODO: 09/12/2023 managing thumbnail
 @Entity(tableName = "collection")
 public class Collection implements Parcelable {
 

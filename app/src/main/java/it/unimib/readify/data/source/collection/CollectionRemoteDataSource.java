@@ -98,8 +98,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     .addOnSuccessListener(aVoid -> collectionResponseCallback.onSuccessCreateCollectionFromRemote(newCollection))
                     .addOnFailureListener(e -> collectionResponseCallback.onFailureCreateCollectionFromRemote(e.getLocalizedMessage()));
         } else {
-            //todo stringa di errore collectionID nullo, magari scriverla meglio
-            collectionResponseCallback.onFailureCreateCollectionFromRemote("Unique ID provided by firebase is null.");
+            collectionResponseCallback.onFailureCreateCollectionFromRemote(TAG + "Error: Unique collection ID provided by firebase is null.");
         }
 
     }
@@ -274,18 +273,17 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     if(rating != null){
                         book.setRating(rating);
                     } else {
-                        collectionResponseCallback.onFailureFetchRating(TAG + " - warning : the rating of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
+                        collectionResponseCallback.onFailureFetchRating(TAG + " - Warning : the rating of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
                     }
                 } else {
-                    collectionResponseCallback.onFailureFetchRating(TAG + " - warning : OpenLibrary fetch rating for book with id " + book.getKey() + " wasn't successful");
+                    collectionResponseCallback.onFailureFetchRating(TAG + " - Warning : OpenLibrary fetch rating for book with id " + book.getKey() + " wasn't successful");
                 }
-
                 ratingsLatch.countDown();
             }
 
             @Override
             public void onFailure(@NonNull Call<OLRatingResponse> call, @NonNull Throwable t) {
-                collectionResponseCallback.onFailureFetchRating(TAG + " - warning : OpenLibrary fetch rating for book with id " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
+                collectionResponseCallback.onFailureFetchRating(TAG + " - Warning : OpenLibrary fetch rating for book with id " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
                 ratingsLatch.countDown();
             }
         });
@@ -316,26 +314,24 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                                 if(author != null){
                                     authors.add(author);
                                 } else {
-                                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : the author with id: " + finalKey + " of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
+                                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - Warning : the author with id: " + finalKey + " of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
                                 }
                             } else {
-                                collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " wasn't successful");
+                                collectionResponseCallback.onFailureFetchAuthors(TAG + " - Warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " wasn't successful");
                             }
                             tempAuthorsLatch.countDown();
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<OLAuthorApiResponse> call, @NonNull Throwable t) {
-                            collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
+                            collectionResponseCallback.onFailureFetchAuthors(TAG + " - Warning : OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
                             tempAuthorsLatch.countDown();
                         }
                     });
                 } else {
                     tempAuthorsLatch.countDown();
                 }
-
             }
-
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.submit(() -> {
@@ -345,13 +341,13 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                     completeAuthorsLatch.countDown();
                     executorService.shutdown();
                 } catch (InterruptedException e) {
-                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : " +  e.getLocalizedMessage());
+                    collectionResponseCallback.onFailureFetchAuthors(TAG + " - Warning : " +  e.getLocalizedMessage());
                     completeAuthorsLatch.countDown();
                 }
             });
 
         } else {
-            collectionResponseCallback.onFailureFetchAuthors(TAG + " - warning : The book with the id: " + book.getKey() + "has the authorKeys field with a null value or is empty");
+            collectionResponseCallback.onFailureFetchAuthors(TAG + " - Warning : The book with the id: " + book.getKey() + "has the authorKeys field with a null value or is empty");
             completeAuthorsLatch.countDown();
         }
 
@@ -373,6 +369,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         if (collection.getBooks() == null) {
             collection.setBooks(new ArrayList<>());
         }
+
         List<String> bookIdList = collection.getBooks();
 
         if (bookIdList.isEmpty()) {
@@ -392,17 +389,17 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                             checkBookData(book);
                             fetchedWorks.add(book);
                         } else {
-                            collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : the book with id " + bookId + " is null");
+                            collectionResponseCallback.onFailureFetchSingleWork(TAG + " - Warning : the book with id " + bookId + " is null");
                         }
                     } else {
-                        collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : OpenLibrary fetch for book with id " + bookId + " wasn't successful");
+                        collectionResponseCallback.onFailureFetchSingleWork(TAG + " - Warning : OpenLibrary fetch for book with id " + bookId + " wasn't successful");
                     }
                     worksToFetchLatch.countDown();
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
-                    collectionResponseCallback.onFailureFetchSingleWork(TAG + " - warning : OpenLibrary fetch for book with id " + bookId + " failed.\n" + t.getLocalizedMessage());
+                    collectionResponseCallback.onFailureFetchSingleWork(TAG + " - Warning : OpenLibrary fetch for book with id " + bookId + " failed.\n" + t.getLocalizedMessage());
                     worksToFetchLatch.countDown();
                 }
             });
@@ -412,35 +409,27 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
         executorService.submit(() -> {
             try{
                 worksToFetchLatch.await();
-
                 collection.setWorks(fetchedWorks);
-                CountDownLatch ratingsToFetchLatch = new CountDownLatch(fetchedWorks.size());
 
+                CountDownLatch ratingsToFetchLatch = new CountDownLatch(fetchedWorks.size());
                 for(OLWorkApiResponse book : fetchedWorks){
                     fetchRatings(book, ratingsToFetchLatch);
                 }
-
                 ratingsToFetchLatch.await();
 
-
                 CountDownLatch authorsToFetchLatch = new CountDownLatch(fetchedWorks.size());
-
                 for(OLWorkApiResponse book : fetchedWorks){
                     fetchAuthors(book, authorsToFetchLatch);
                 }
-
                 authorsToFetchLatch.await();
 
                 collectionLatch.countDown();
                 executorService.shutdown();
             } catch (InterruptedException e){
                 Thread.currentThread().interrupt();
-                //todo error
+                collectionResponseCallback.onFailureFetchSingleCollection(e.getLocalizedMessage());
                 collectionLatch.countDown();
             }
         });
-
     }
-
-
 }

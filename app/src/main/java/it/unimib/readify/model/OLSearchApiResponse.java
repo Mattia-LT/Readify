@@ -8,9 +8,6 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-usata per registrare la risposta dell'api alla nostra richiesta
- */
 public class OLSearchApiResponse implements Parcelable {
 
     private int numFound;

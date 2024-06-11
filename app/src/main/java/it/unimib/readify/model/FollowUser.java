@@ -9,6 +9,7 @@ import java.util.Objects;
 
 
 public class FollowUser implements Parcelable {
+
     private boolean read;
     private long timestamp;
     private String idToken;

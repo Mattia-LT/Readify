@@ -34,8 +34,6 @@ import retrofit2.Response;
 public class BookRemoteDataSource extends BaseBookRemoteDataSource{
 
     private final String TAG = BookRemoteDataSource.class.getSimpleName();
-    //TODO in tutti gli errori sostituire bookremotedata source con la variabile TAG
-    //TODO alcuni sono simili a collectionRemoteDataSource
 
     private final OLApiService olApiService;
     private final Application application;
@@ -63,19 +61,19 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             }
                             bookResponseCallback.onSuccessLoadSearchResultList(idList, searchApiResponse.getNumFound());
                         } else {
-                            bookResponseCallback.onFailureLoadSearchResultList("Error in BookRemoteDataSource: searchApiResponse.getDocs() is null");
+                            bookResponseCallback.onFailureLoadSearchResultList(TAG + " - Error: searchApiResponse.getDocs() is null");
                         }
                     } else {
-                        bookResponseCallback.onFailureLoadSearchResultList("Error in BookRemoteDataSource: searchApiResponse is null");
+                        bookResponseCallback.onFailureLoadSearchResultList(TAG + " - Error: searchApiResponse is null");
                     }
                 } else {
-                    bookResponseCallback.onFailureLoadSearchResultList("Error in BookRemoteDataSource: OpenLibrary response wasn't successful");
+                    bookResponseCallback.onFailureLoadSearchResultList(TAG + " - Error: OpenLibrary response wasn't successful");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<OLSearchApiResponse> call, @NonNull Throwable t) {
-                bookResponseCallback.onFailureLoadSearchResultList("Error in BookRemoteDataSource: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
+                bookResponseCallback.onFailureLoadSearchResultList(TAG + " - Error: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
             }
         });
     }
@@ -94,17 +92,17 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             checkBookData(book);
                             fetchedWorks.add(book);
                         } else {
-                            bookResponseCallback.onFailureFetchBooksFromRemote("Error in BookRemoteDataSource: Fetched book with id " + id + " is null", reference);
+                            bookResponseCallback.onFailureFetchBooksFromRemote(TAG + " - Error: Fetched book with id " + id + " is null", reference);
                         }
                     } else {
-                        bookResponseCallback.onFailureFetchBooksFromRemote("Error in BookRemoteDataSource: OpenLibrary response wasn't successful", reference);
+                        bookResponseCallback.onFailureFetchBooksFromRemote(TAG + " - Error: OpenLibrary response wasn't successful", reference);
                     }
                     countDownLatchFetchedWorks.countDown();
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<OLWorkApiResponse> call, @NonNull Throwable t) {
-                    bookResponseCallback.onFailureFetchBooksFromRemote("Error in BookRemoteDataSource: OpenLibrary fetch call with id: " + id + " failed.\n" + t.getLocalizedMessage(), reference);
+                    bookResponseCallback.onFailureFetchBooksFromRemote(TAG + " - Error: OpenLibrary fetch call with id: " + id + " failed.\n" + t.getLocalizedMessage(), reference);
                     countDownLatchFetchedWorks.countDown();
                 }
             });
@@ -130,7 +128,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 executorService.shutdown();
 
             } catch (InterruptedException e) {
-                bookResponseCallback.onFailureFetchBooksFromRemote("Error in BookRemoteDataSource: " +  e.getLocalizedMessage(), reference);
+                bookResponseCallback.onFailureFetchBooksFromRemote(TAG + " - Error: " +  e.getLocalizedMessage(), reference);
                 Thread.currentThread().interrupt();
             }
         });
@@ -162,18 +160,18 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                                     countDownLatchRecommended.countDown();
                                 }
                             } else {
-                                bookResponseCallback.onFailureLoadRecommendedList("Error in BookRemoteDataSource: searchApiResponse.getDocs() is null");
+                                bookResponseCallback.onFailureLoadRecommendedList(TAG + " - Error: searchApiResponse.getDocs() is null");
                             }
                         } else{
-                            bookResponseCallback.onFailureLoadRecommendedList("Error in BookRemoteDataSource: searchApiResponse is null");
+                            bookResponseCallback.onFailureLoadRecommendedList(TAG + " - Error: searchApiResponse is null");
                         }
                     } else {
-                        bookResponseCallback.onFailureLoadRecommendedList("Error in BookRemoteDataSource: OpenLibrary response wasn't successful");
+                        bookResponseCallback.onFailureLoadRecommendedList(TAG + " - Error: OpenLibrary response wasn't successful");
                     }
                 }
                 @Override
                 public void onFailure(@NonNull Call<OLSearchApiResponse> call, @NonNull Throwable t) {
-                    bookResponseCallback.onFailureLoadRecommendedList("Error in BookRemoteDataSource: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
+                    bookResponseCallback.onFailureLoadRecommendedList(TAG + " - Error: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
                     for(int i = 0; i < subjectFrequency; i++){
                         countDownLatchRecommended.countDown();
                     }
@@ -188,7 +186,7 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                 countDownLatchRecommended.await();
                 bookResponseCallback.onSuccessLoadRecommendedList(recommendedIdList);
             } catch (InterruptedException e) {
-                bookResponseCallback.onFailureLoadRecommendedList("Error in BookRemoteDataSource: " +  e.getLocalizedMessage());
+                bookResponseCallback.onFailureLoadRecommendedList(TAG + " - Error: " +  e.getLocalizedMessage());
                 Thread.currentThread().interrupt();
             }
         });
@@ -212,19 +210,19 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             }
                             bookResponseCallback.onSuccessLoadTrendingList(idList);
                         } else {
-                            bookResponseCallback.onFailureLoadTrendingList("Error in BookRemoteDataSource: trendingApiResponse.getWorks() is null");
+                            bookResponseCallback.onFailureLoadTrendingList(TAG + " - Error: trendingApiResponse.getWorks() is null");
                         }
                     } else {
-                        bookResponseCallback.onFailureLoadTrendingList("Error in BookRemoteDataSource: trendingApiResponse is null");
+                        bookResponseCallback.onFailureLoadTrendingList(TAG + " - Error: trendingApiResponse is null");
                     }
                 } else {
-                    bookResponseCallback.onFailureLoadTrendingList("Error in BookRemoteDataSource: OpenLibrary response wasn't successful");
+                    bookResponseCallback.onFailureLoadTrendingList(TAG + " - Error: OpenLibrary response wasn't successful");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<OLTrendingApiResponse> call, @NonNull Throwable t) {
-                bookResponseCallback.onFailureLoadTrendingList("Error in BookRemoteDataSource: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
+                bookResponseCallback.onFailureLoadTrendingList(TAG + " - Error: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
             }
         });
     }
@@ -247,19 +245,19 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                             }
                             bookResponseCallback.onSuccessLoadRecentList(idList);
                         } else {
-                            bookResponseCallback.onFailureLoadRecentList("Error in BookRemoteDataSource: searchApiResponse.getDocs() is null");
+                            bookResponseCallback.onFailureLoadRecentList(TAG + " - Error: searchApiResponse.getDocs() is null");
                         }
                     } else {
-                        bookResponseCallback.onFailureLoadRecentList("Error in BookRemoteDataSource: searchApiResponse is null");
+                        bookResponseCallback.onFailureLoadRecentList(TAG + " - Error: searchApiResponse is null");
                     }
                 } else {
-                    bookResponseCallback.onFailureLoadRecentList("Error in BookRemoteDataSource: OpenLibrary response wasn't successful");
+                    bookResponseCallback.onFailureLoadRecentList(TAG + " - Error: OpenLibrary response wasn't successful");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<OLSearchApiResponse> call, @NonNull Throwable t) {
-                bookResponseCallback.onFailureLoadRecentList("Error in BookRemoteDataSource: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
+                bookResponseCallback.onFailureLoadRecentList(TAG + " - Error: OpenLibrary Search call failed.\n" + t.getLocalizedMessage());
             }
         });
     }
@@ -274,17 +272,17 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                     if(rating != null){
                         book.setRating(rating);
                     } else {
-                        bookResponseCallback.onFailureFetchRating("Error in BookRemoteDataSource: the rating of the book " + book.getTitle() + " with id: " + bookId + " is null");
+                        bookResponseCallback.onFailureFetchRating(TAG + " - Warning: the rating of the book " + book.getTitle() + " with id: " + bookId + " is null");
                     }
                 } else {
-                    bookResponseCallback.onFailureFetchRating("Error in BookRemoteDataSource: OpenLibrary fetch rating for book with id " + bookId + " wasn't successful");
+                    bookResponseCallback.onFailureFetchRating(TAG + " - Warning: OpenLibrary fetch rating for book with id " + bookId + " wasn't successful");
                 }
                 ratingsToFetchLatch.countDown();
             }
 
             @Override
             public void onFailure(@NonNull Call<OLRatingResponse> call, @NonNull Throwable t) {
-                bookResponseCallback.onFailureFetchRating("Error in BookRemoteDataSource: OpenLibrary fetch rating for book with id " + bookId + " failed.\n" + t.getLocalizedMessage());
+                bookResponseCallback.onFailureFetchRating(TAG + " - Warning: OpenLibrary fetch rating for book with id " + bookId + " failed.\n" + t.getLocalizedMessage());
                 ratingsToFetchLatch.countDown();
             }
         });
@@ -314,22 +312,22 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                                     if(author != null){
                                         authors.add(author);
                                     } else {
-                                        bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: the author with id: " + finalKey + " of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
+                                        bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: the author with id: " + finalKey + " of the book " + book.getTitle() + " with id: " + book.getKey() + " is null");
                                     }
                                 } else {
-                                    bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " wasn't successful");
+                                    bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " wasn't successful");
                                 }
                                 tempAuthorsLatch.countDown();
                             }
 
                             @Override
                             public void onFailure(@NonNull Call<OLAuthorApiResponse> call, @NonNull Throwable t) {
-                                bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
+                                bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: OpenLibrary fetch author with id: " + finalKey + " for the book with id: " + book.getKey() + " failed.\n" + t.getLocalizedMessage());
                                 tempAuthorsLatch.countDown();
                             }
                         });
                     } else {
-                        bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: OpenLibrary fetch author failed because the key was null");
+                        bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: OpenLibrary fetch author failed because the key was null");
                         tempAuthorsLatch.countDown();
                     }
                 }
@@ -342,15 +340,15 @@ public class BookRemoteDataSource extends BaseBookRemoteDataSource{
                         authorsToFetchLatch.countDown();
                         authorExecutorService.shutdown();
                     } catch (InterruptedException e) {
-                        bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: " +  e.getLocalizedMessage());
+                        bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: " +  e.getLocalizedMessage());
                         authorsToFetchLatch.countDown();
                     }
                 });
             } else {
-                bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: The book with the id: " + book.getKey() + "has no authors in authorKeys");
+                bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: The book with the id: " + book.getKey() + "has no authors in authorKeys");
             }
         } else {
-            bookResponseCallback.onFailureFetchAuthors("Error in BookRemoteDataSource: The book with the id: " + book.getKey() + " has the authorKeys field with a null value");
+            bookResponseCallback.onFailureFetchAuthors(TAG + " - Warning: The book with the id: " + book.getKey() + " has the authorKeys field with a null value");
             authorsToFetchLatch.countDown();
         }
     }

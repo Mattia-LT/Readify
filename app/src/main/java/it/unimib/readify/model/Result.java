@@ -71,6 +71,7 @@ public abstract class Result {
      * Class that represents an error occurred during the interaction
      * with a Web Service or a local database.
      */
+
     public static final class Error extends Result {
         private final String message;
 

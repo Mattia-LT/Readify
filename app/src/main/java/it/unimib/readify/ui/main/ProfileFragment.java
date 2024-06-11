@@ -144,10 +144,11 @@ public class ProfileFragment extends Fragment{
             }
         };
 
-        //TODO sistema notifiche
         fetchedNotificationsObserver = result -> {
             notifications = result;
-            loadMenu();
+            if(notifications != null) {
+                loadMenu();
+            }
         };
 
         logoutResultObserver = result -> {

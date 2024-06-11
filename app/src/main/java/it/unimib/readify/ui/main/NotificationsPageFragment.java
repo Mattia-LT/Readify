@@ -18,14 +18,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.adapter.NotificationsAdapter;
 import it.unimib.readify.databinding.FragmentNotificationsPageBinding;
-import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
@@ -46,6 +44,8 @@ public class NotificationsPageFragment extends Fragment {
     private Observer<Result> loggedUserObserver;
     private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
     private NotificationsAdapter notificationsAdapter;
+    private boolean isShowAllButtonVisible;
+    private boolean isShowAllButtonPressed;
 
     public NotificationsPageFragment() {}
 
@@ -69,19 +69,25 @@ public class NotificationsPageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        isShowAllButtonVisible = false;
+        isShowAllButtonPressed = false;
         //initRecyclerView() should be executed before initObservers()
         initRecyclerView();
         loadMenu();
         initViewModels();
         initObservers();
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        //todo remove field followedByUser from notifications
-        Log.d("set notifications read", "read");
-        userViewModel.setNotificationsList(user.getIdToken(), receivedContent, notifications);
+        fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
+            if(notifications.get(receivedContent) != null) {
+                notificationsAdapter.submitList(notifications.get(receivedContent));
+
+            }
+            isShowAllButtonVisible = false;
+            isShowAllButtonPressed = true;
+            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
+            //fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(null);
+        });
     }
 
     private void loadMenu(){
@@ -107,56 +113,19 @@ public class NotificationsPageFragment extends Fragment {
              system updates the same LiveData (@Notifications in VM); @run interrupt an infinite loop
              of method invocation
          */
-        final boolean[] run = {true, true};
         loggedUserObserver = result -> {
             if(result.isSuccess()) {
                 this.user = ((Result.UserSuccess) result).getData();
-                run[0] = true;
+                notificationsAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
                 userViewModel.fetchNotifications(user.getIdToken());
-                //send notifications
-                if(checkSendingNotifications()) {
-                    Log.d("checkSendingNotifications", "send");
-                    for (FollowUser followUser : user.getFollowing().getUsers()) {
-                        if(!followUser.isRead()) {
-                            userViewModel.addNotification(followUser.getIdToken(), "newFollowers", user.getIdToken());
-                            followUser.setRead(true);
-                        }
-                    }
-                    userViewModel.setUserFollowing(user);
-                }
             }
         };
 
         fetchedNotificationsObserver = result -> {
             notifications = result;
             if(notifications != null) {
-                Log.d("notifications check2", Objects.requireNonNull(notifications.toString()));
-                //sort by date
-                for (String key: notifications.keySet()) {
-                    Objects.requireNonNull(notifications.get(key)).sort(Collections.reverseOrder());
-                }
-                if(notifications.get("newFollowers") != null) {
-                    //set followedByUser
-                    for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
-                        if(user.getFollowing().getUsers() != null && !user.getFollowing().getUsers().isEmpty()) {
-                            for (FollowUser following: user.getFollowing().getUsers()) {
-                                if(notification.getIdToken().equals(following.getIdToken())) {
-                                    notification.setFollowedByUser(true);
-                                }
-                            }
-                        } else {
-                            notification.setFollowedByUser(false);
-                        }
-                    }
-                    //complete fetch
-                    if(run[0]) {
-                        run[0] = false;
-                        userViewModel.completeFetchNotifications(result);
-                    }
-                    if(checkFetchingNotifications()) {
-                        updateUI();
-                    }
-                }
+                Log.d("notifications check", Objects.requireNonNull(notifications.toString()));
+                updateUI();
             }
         };
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
@@ -165,33 +134,42 @@ public class NotificationsPageFragment extends Fragment {
 
     public void updateUI() {
         if(notifications.get(receivedContent) != null) {
-            Log.d("page notifications", notifications.toString());
-            if(Objects.requireNonNull(notifications.get(receivedContent)).isEmpty()) {
+            ArrayList<Notification> notificationsToRead = new ArrayList<>();
+            for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
+                if(!notification.isRead()) {
+                    notificationsToRead.add(notification);
+                }
+            }
+
+            //no notifications
+            if(notificationsToRead.isEmpty()) {
                 fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
-                fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
             } else {
-                ArrayList<Notification> notificationsToRead = new ArrayList<>();
-                for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
-                    if(!notification.isRead()) {
-                        notificationsToRead.add(notification);
-                    }
-                }
-                if(!notificationsToRead.isEmpty()) {
-                    fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.GONE);
-                    notificationsAdapter.submitList(notificationsToRead);
-                } else {
-                    fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
-                }
-                if(notificationsToRead.size() < Objects.requireNonNull(notifications.get(receivedContent)).size()) {
+                fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.GONE);
+            }
+            //button
+            if(!isShowAllButtonVisible) {
+                notificationsAdapter.submitList(notifications.get(receivedContent));
+                if(notificationsToRead.size() < Objects.requireNonNull(notifications.get(receivedContent)).size()
+                        && !isShowAllButtonPressed) {
+                    Log.d("updateUI", "showAll true");
                     fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.VISIBLE);
-                    setViewAllNotifications();
-                }
-                if(fragmentNotificationsPageBinding.notificationsPageNoNotifications.getVisibility() == View.VISIBLE
-                    && fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.getVisibility() == View.VISIBLE) {
-                    fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.VISIBLE);
+                    isShowAllButtonVisible = true;
                 } else {
-                    fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.GONE);
+                    Log.d("updateUI", "showAll false");
+                    fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
                 }
+            } else {
+                notificationsAdapter.submitList(notificationsToRead);
+            }
+            //separator
+            if((fragmentNotificationsPageBinding.notificationsPageNoNotifications.getVisibility() == View.VISIBLE
+                    && fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.getVisibility() == View.VISIBLE)
+                || (fragmentNotificationsPageBinding.notificationsPageNoNotifications.getVisibility() == View.VISIBLE
+                    && !notificationsAdapter.getCurrentList().isEmpty())) {
+                fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.VISIBLE);
+            } else {
+                fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.GONE);
             }
         } else {
             Log.d("notifications null", "null");
@@ -205,7 +183,7 @@ public class NotificationsPageFragment extends Fragment {
             @Override
             public void onNotificationItemClick(Notification notification) {
                 NavDirections action = NotificationsPageFragmentDirections
-                        .actionNotificationsPageFragmentToUserDetailsFragment(notification.getIdToken(), notification.getUsername());
+                        .actionNotificationsPageFragmentToUserDetailsFragment(notification.getIdToken(), notification.getUser().getUsername());
                 Navigation.findNavController(requireView()).navigate(action);
             }
             @Override
@@ -216,8 +194,6 @@ public class NotificationsPageFragment extends Fragment {
             @Override
             public void onUnfollowUser(String externalUserIdToken) {
                 userViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
-                //if unfollow has been confirmed
-                userViewModel.removeNotification(externalUserIdToken, "newFollowers", user.getIdToken());
             }
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
@@ -225,54 +201,11 @@ public class NotificationsPageFragment extends Fragment {
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setAdapter(notificationsAdapter);
     }
 
-    public void setViewAllNotifications() {
-        /*
-            when there's no new notification
-            todo when the user follow / unfollow another user, the fragment not refreshes itself;
-             in addition, it appears the text "View all"
-         */
-        fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
-            if(notifications.get(receivedContent) != null) {
-                notificationsAdapter.submitList(notifications.get(receivedContent));
-            }
-            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
-            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(null);
-        });
-    }
-
-    public boolean checkFetchingNotifications() {
-        boolean fetchIsCompleted = true;
-        switch (receivedContent) {
-            case "newFollowers":
-                for (Notification notification: Objects.requireNonNull(notifications.get("newFollowers"))) {
-                    if(notification.getUsername() == null || notification.getAvatar() == null) {
-                        fetchIsCompleted = false;
-                        break;
-                    }
-                }
-                break;
-            case "recommendedBooks":
-                break;
-            case "sharedProfiles":
-                break;
-            case "system":
-                break;
-            case "statistics":
-                break;
-        }
-        return fetchIsCompleted;
-    }
-
-    public boolean checkSendingNotifications() {
-        boolean sendNotifications = false;
-        if(user.getFollowing().getUsers() != null) {
-            for (FollowUser followUser : user.getFollowing().getUsers()) {
-                if(!followUser.isRead()) {
-                    sendNotifications = true;
-                    break;
-                }
-            }
-        }
-        return sendNotifications;
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.readNotifications(user.getIdToken(), receivedContent);
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
     }
 }

@@ -1,5 +1,7 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.NEW_FOLLOWER;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,7 +81,7 @@ public class NotificationsFragment extends Fragment {
 
     private void navigateToNotificationPage() {
         fragmentNotificationsBinding.notificationsNewFollowersContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("newFollowers");
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NEW_FOLLOWER);
             Navigation.findNavController(requireView()).navigate(action);
         });
         fragmentNotificationsBinding.notificationsRecommendedBooksContainer.setOnClickListener(v -> {
@@ -108,7 +110,7 @@ public class NotificationsFragment extends Fragment {
                     notificationsToRead++;
             }
             switch (key) {
-                case "newFollowers":
+                case NEW_FOLLOWER:
                     fragmentNotificationsBinding.notificationNewFollowersIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
                 case "recommendedBooks":

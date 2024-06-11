@@ -133,4 +133,6 @@ public class Constants {
     public static final String USERNAME_ERROR = "error";
 
     public static final String AVATAR_DEFAULT = "avatar1";
+
+    public static final String NEW_FOLLOWER = "newFollower";
 }

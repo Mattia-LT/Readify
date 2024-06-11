@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,16 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.NotificationItemBinding;
+import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 
 public class NotificationsAdapter extends ListAdapter<Notification, NotificationsAdapter.NotificationsViewHolder> {
 
     private final OnItemClickListener onItemClickListener;
+    private List<FollowUser> currentFollowing;
+    private String loggedUserIdToken;
 
     public interface OnItemClickListener {
         void onNotificationItemClick(Notification notification);
@@ -66,6 +72,22 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         holder.bind(notification);
     }
 
+    @Override
+    public void submitList(@Nullable List<Notification> list) {
+        if (list != null) {
+            list.sort(Comparator.comparing(Notification::getTimestamp).reversed());
+        }
+        Log.d("adapter", "submit");
+        super.submitList(list);
+    }
+
+    public void submitFollowings(List<FollowUser> currentFollowing, String loggedUserIdToken){
+        if(currentFollowing != null){
+            this.currentFollowing = currentFollowing;
+            this.loggedUserIdToken = loggedUserIdToken;
+        }
+    }
+
     public class NotificationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final NotificationItemBinding binding;
@@ -73,66 +95,85 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         public NotificationsViewHolder(@NonNull NotificationItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.getRoot().setOnClickListener(this);
+            binding.followButton.setOnClickListener(this);
+            binding.unfollowButton.setOnClickListener(this);
+            binding.notificationTextContainer.setOnClickListener(this);
+            binding.notificationIcon.setOnClickListener(this);
         }
 
         public void bind(Notification notification) {
-            //Set username
-            binding.notificationTitle.setText(notification.getUsername());
+            if(notification != null) {
+                //Set username
+                binding.notificationTitle.setText(notification.getUser().getUsername());
 
-            //Set avatar icon
-            int avatarId;
-            try {
-                avatarId = R.drawable.class.getDeclaredField(notification.getAvatar().toLowerCase()).getInt(null);
-            } catch (Exception e) {
-                avatarId = R.drawable.ic_baseline_profile_24;
-            }
+                //Set avatar icon
+                int avatarId;
+                try {
+                    avatarId = R.drawable.class.getDeclaredField(notification.getUser().getAvatar().toLowerCase()).getInt(null);
+                } catch (Exception e) {
+                    avatarId = R.drawable.ic_baseline_profile_24;
+                }
 
-            Glide.with(itemView.getContext())
-                    .load(avatarId)
-                    .dontAnimate()
-                    .into(binding.notificationIcon);
+                Glide.with(itemView.getContext())
+                        .load(avatarId)
+                        .dontAnimate()
+                        .into(binding.notificationIcon);
 
-            //Set date
-            Locale locale = Locale.getDefault();
-            if (locale.getLanguage().startsWith("it")) {
-                locale = new Locale("it", "IT");
-            }
-            Date timestamp = new Date(notification.getTimestamp());
-            String pattern = "dd/MM/yyyy";
-            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
-            String formattedDate = dateFormat.format(timestamp);
-            binding.notificationDate.setText(formattedDate);
+                //Set date
+                Locale locale = Locale.getDefault();
+                if (locale.getLanguage().startsWith("it")) {
+                    locale = new Locale("it", "IT");
+                }
+                Date timestamp = new Date(notification.getTimestamp());
+                String pattern = "dd/MM/yyyy";
+                SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
+                String formattedDate = dateFormat.format(timestamp);
+                binding.notificationDate.setText(formattedDate);
 
-            //button
-            /*
-                todo right now, each time the user presses on the button, it refreshes the page,
-                 closing the "show all section" (in case it was open)
-             */
-            if(notification.isFollowedByUser()) {
-                binding.notificationButton.setText("Unfollow");
-                binding.notificationButton.setOnClickListener(v -> {
-                    onItemClickListener.onUnfollowUser(notification.getIdToken());
-                    binding.notificationButton.setOnClickListener(null);
-                });
-            } else {
-                binding.notificationButton.setText("Follow");
-                binding.notificationButton.setOnClickListener(v -> {
-                    onItemClickListener.onFollowUser(notification.getIdToken());
-                    binding.notificationButton.setOnClickListener(null);
-                });
+                //button
+                /*
+                    todo right now, each time the user presses on the button, it refreshes the page,
+                     closing the "show all section" (in case it was open)
+                 */
+
+                if(isFollowed(notification.getIdToken())) {
+                    Log.d("adapter", "true");
+                    binding.unfollowButton.setVisibility(View.VISIBLE);
+                    binding.followButton.setVisibility(View.GONE);
+                } else {
+                    Log.d("adapter", "false");
+                    binding.followButton.setVisibility(View.VISIBLE);
+                    binding.unfollowButton.setVisibility(View.GONE);
+                }
             }
         }
 
         @Override
         public void onClick(View v) {
-            Log.d("notification page", "aww");
             int position = getBindingAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Notification notification = getItem(position);
-                Log.d("notification page", notification.toString());
-                onItemClickListener.onNotificationItemClick(notification);
+                if(v.getId() == binding.notificationIcon.getId()
+                        || v.getId() == binding.notificationTextContainer.getId()){
+                    onItemClickListener.onNotificationItemClick(notification);
+                } else if(v.getId() == binding.followButton.getId()){
+                    onItemClickListener.onFollowUser(notification.getIdToken());
+                } else if(v.getId() == binding.unfollowButton.getId()){
+                    onItemClickListener.onUnfollowUser(notification.getIdToken());
+                }
             }
+        }
+
+        private boolean isFollowed(String followerUserIdToken){
+            if(currentFollowing != null){
+                for(FollowUser user : currentFollowing){
+                    if(user.getIdToken().equals(followerUserIdToken)){
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

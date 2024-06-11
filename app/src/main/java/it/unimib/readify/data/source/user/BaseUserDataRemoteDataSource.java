@@ -1,13 +1,8 @@
 package it.unimib.readify.data.source.user;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import it.unimib.readify.data.repository.user.UserResponseCallback;
 import it.unimib.readify.model.Comment;
 import it.unimib.readify.model.FollowGroup;
-import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
 
 public abstract class BaseUserDataRemoteDataSource {
@@ -29,13 +24,7 @@ public abstract class BaseUserDataRemoteDataSource {
     public abstract void setFollowing(User user);
     public abstract void setTotalNumberOfBooks(User user);
     public abstract void fetchNotifications(String idToken);
-    public abstract void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications);
-    /*
-        setViewedNotificationsListToRead is a disgusting name;
-         it sets a List of Notifications' "read" field to true
-     */
-    public abstract void setViewedNotificationsListToRead(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications);
-    public abstract void getUser(String idToken);
+    public abstract void readNotifications(String idToken, String notificationType);
     public abstract void searchUsers(String query, int limit);
     public abstract void fetchComments(String bookId);
     public abstract void addComment(String commentContent, String bookId, String idToken);

@@ -228,34 +228,62 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
     }
 
-    /*
-        TODO sistema notifiche, magari rimuovere sto commento? chiedere ad ema
-        remember that firebase cuts the start "is" from a boolean variable
-            es. isRead -> read
-     */
     @Override
     public void fetchNotifications(String idToken) {
+        Log.d(TAG, "fetchNotifications");
         databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
                 .addValueEventListener (new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
-                        if (snapshot.exists()) {
-                            for (DataSnapshot notificationList: snapshot.getChildren()) {
-                                ArrayList<Notification> temp = new ArrayList<>();
-                                for (DataSnapshot notification: notificationList.getChildren()) {
-                                    String idToken = notification.child("idToken").getValue(String.class);
-                                    boolean isRead = Boolean.TRUE.equals(notification.child("read").getValue(Boolean.class));
-                                    Object timestampObject = notification.child("timestamp").getValue();
-                                    if(timestampObject != null) {
-                                        long timeStamp = (long) timestampObject;
-                                        temp.add(new Notification(idToken, isRead, timeStamp));
-                                    }
+                        CountDownLatch notificationsTotalTypeCountDownLatch = new CountDownLatch((int)snapshot.getChildrenCount());
+                        for (DataSnapshot notificationType: snapshot.getChildren()) {
+                            ArrayList<Notification> notificationTypeList = new ArrayList<>();
+                            CountDownLatch notificationsTypeCountDownLatch = new CountDownLatch((int)notificationType.getChildrenCount());
+                            for (DataSnapshot notificationSnapshot: notificationType.getChildren()) {
+                                Notification notification = notificationSnapshot.getValue(Notification.class);
+                                if(notification != null) {
+                                    CountDownLatch userCountDownLatch = new CountDownLatch(1);
+                                    fetchUserFromNotification(notification, userCountDownLatch);
+                                    ExecutorService singleNotificationExecutor = Executors.newSingleThreadExecutor();
+                                    singleNotificationExecutor.submit(() -> {
+                                        try {
+                                            userCountDownLatch.await();
+                                            notificationTypeList.add(notification);
+                                            notificationsTypeCountDownLatch.countDown();
+                                            singleNotificationExecutor.shutdown();
+                                        } catch (InterruptedException e) {
+                                            userResponseCallback.onFailureFetchSingleNotification("Error in " + TAG + " : " + e.getLocalizedMessage());
+                                            notificationsTypeCountDownLatch.countDown();
+                                        }
+                                    });
                                 }
-                                notifications.put(notificationList.getKey(), temp);
                             }
+                            ExecutorService notificationTypeExecutor = Executors.newSingleThreadExecutor();
+                            notificationTypeExecutor.submit(() -> {
+                                try {
+                                    notificationsTypeCountDownLatch.await();
+                                    notifications.put(notificationType.getKey(), notificationTypeList);
+                                    notificationsTotalTypeCountDownLatch.countDown();
+                                    notificationTypeExecutor.shutdown();
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                    userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
+                                }
+                            });
                         }
-                        userResponseCallback.onSuccessFetchNotifications(notifications);
+                        ExecutorService notificationTotalTypeExecutor = Executors.newSingleThreadExecutor();
+                        notificationTotalTypeExecutor.submit(() -> {
+                            try {
+                                notificationsTotalTypeCountDownLatch.await();
+                                userResponseCallback.onSuccessFetchNotifications(notifications);
+                                notificationTotalTypeExecutor.shutdown();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
+                            }
+                        });
+
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -265,66 +293,24 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     }
 
     @Override
-    //this approach is very efficient IF there aren't many users and usersTokens to match
-    public void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications) {
-        List<String> usersTokens = new ArrayList<>();
-        for (String key: notifications.keySet()) {
-            for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
-                if(!usersTokens.contains(notification.getIdToken())) {
-                    usersTokens.add(notification.getIdToken());
-                }
-            }
-        }
-        databaseReference.child(FIREBASE_USERS_COLLECTION)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (String idToken: usersTokens) {
-                    for (DataSnapshot datasnapshot: snapshot.getChildren()) {
-                        User user = datasnapshot.getValue(User.class);
-                        if(user != null && idToken.equals(user.getIdToken())) {
-                            for (String key: notifications.keySet()) {
-                                for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
-                                    if(user.getIdToken().equals(notification.getIdToken())
-                                            && key.equals("newFollowers")) {
-                                        notification.setUsername(user.getUsername());
-                                        notification.setAvatar(user.getAvatar());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                userResponseCallback.onSuccessCompleteFetchNotifications(notifications);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                userResponseCallback.onFailureCompleteFetchNotifications("completeNotificationsFetch error");
-            }
-        });
-    }
-
-    @Override
-    public void setViewedNotificationsListToRead(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken).child(content)
+    public void readNotifications(String idToken, String notificationType) {
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken).child(notificationType)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()) {
-                            ArrayList<Notification> tempList = new ArrayList<>();
-                            for (Notification notification: Objects.requireNonNull(notifications.get(content))) {
-                                notification.setRead(true);
-                                Notification temp = new Notification(notification);
-                                temp.setUsername(null);
-                                temp.setAvatar(null);
-                                temp.setFollowedByUser(false);
-                                tempList.add(temp);
+                            ArrayList<Notification> notificationList = new ArrayList<>();
+                            for (DataSnapshot notification: snapshot.getChildren()) {
+                                Notification singleNotification = notification.getValue(Notification.class);
+                                if(singleNotification != null) {
+                                    singleNotification.setRead(true);
+                                    notificationList.add(singleNotification);
+                                }
                             }
                             databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
-                                    .child(content).setValue(tempList)
-                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFetchNotifications(notifications))
-                                    .addOnFailureListener(e -> userResponseCallback.onFailureFetchNotifications(e.getLocalizedMessage()));
+                                    .child(notificationType).setValue(notificationList)
+                                    .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessReadNotification(idToken))
+                                    .addOnFailureListener(e -> userResponseCallback.onFailureReadNotification(e.getLocalizedMessage()));
                         }
                     }
 
@@ -333,19 +319,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                         //todo manage errors
                     }
                 });
-    }
-
-    //TODO rimuovere? non ha usages
-    @Override
-    public void getUser(String idToken) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION).child(idToken).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()) {
-                userResponseCallback.onSuccessFromRemoteDatabase(task.getResult().getValue(User.class));
-            }
-            else {
-                userResponseCallback.onFailureFromRemoteDatabaseUser(Objects.requireNonNull(task.getException()).getLocalizedMessage());
-            }
-        });
     }
 
     @Override
@@ -812,28 +785,25 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
     @Override
     public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
         databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
-                .child(content).child(loggedUserIdToken)
+                .child(content)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
                 ArrayList<Notification> notificationsList = new ArrayList<>();
-                if(snapshot.exists()) {
-                    for (DataSnapshot datasnapshot: snapshot.getChildren()) {
-                        Notification notification = datasnapshot.getValue(Notification.class);
-                        notificationsList.add(notification);
-                    }
+                for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                    Notification notification = datasnapshot.getValue(Notification.class);
+                    notificationsList.add(notification);
                 }
                 notificationsList.add(new Notification(loggedUserIdToken, false, new Date().getTime()));
                 databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
                         .child(content).setValue(notificationsList)
-                        .addOnSuccessListener(aVoid -> Log.d("addNotification", "success"))
-                        .addOnFailureListener(e -> Log.d("addNotification", Objects.requireNonNull(e.getLocalizedMessage())));
+                        .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessAddNotification())
+                        .addOnFailureListener(e -> userResponseCallback.onFailureAddNotification(e.getLocalizedMessage()));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("addNotification", error.toString());
+                userResponseCallback.onFailureAddNotification(error.getMessage());
             }
         });
     }
@@ -844,36 +814,34 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
      */
     @Override
     public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
-        if(content.equals("newFollowers")) {
-            databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken).child(content)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()) {
-                            ArrayList<Notification> newFollowersNotifications = new ArrayList<>();
-                            for (DataSnapshot datasnapshot: snapshot.getChildren()) {
-                                Notification notification = datasnapshot.getValue(Notification.class);
-                                if(notification != null && !notification.getIdToken().equals(loggedUserIdToken)) {
-                                    newFollowersNotifications.add(notification);
-                                }
+        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION)
+                .child(targetIdToken)
+                .child(content)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        ArrayList<Notification> newFollowersNotifications = new ArrayList<>();
+                        for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                            Notification notification = datasnapshot.getValue(Notification.class);
+                            if(notification != null && !notification.getIdToken().equals(loggedUserIdToken)) {
+                                newFollowersNotifications.add(notification);
                             }
-                            databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken)
-                                    .child(content).setValue(newFollowersNotifications)
-                                    .addOnSuccessListener(aVoid -> Log.d("removeNotification", "success"))
-                                    .addOnFailureListener(e -> Log.d("removeNotification", Objects.requireNonNull(e.getLocalizedMessage())));
-                        } else {
-                            Log.d("removeNotification", "no newFollowers notifications detected");
                         }
+                        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken)
+                                .child(content).setValue(newFollowersNotifications)
+                                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessRemoveNotification())
+                                .addOnFailureListener(e -> userResponseCallback.onFailureRemoveNotification(e.getLocalizedMessage()));
+                    } else {
+                        userResponseCallback.onFailureRemoveNotification("no newFollowers notifications detected");
                     }
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.d("removeNotification", error.toString());
-                    }
-                });
-        } else {
-            Log.d("removeNotification", "incorrect content input");
-        }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    userResponseCallback.onFailureRemoveNotification(error.getMessage());
+                }
+            });
     }
 
     @Override
@@ -922,6 +890,27 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
             public void onCancelled(@NonNull DatabaseError error) {
                 userResponseCallback.onFailureFetchSingleComment("Error in " + TAG + " while retrieving user information : " + error.getMessage());
                 userLatch.countDown();
+            }
+        });
+    }
+
+    private void fetchUserFromNotification(Notification notification, CountDownLatch userLatch){
+        DatabaseReference userReference = databaseReference
+                .child(FIREBASE_USERS_COLLECTION)
+                .child(notification.getIdToken());
+
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                notification.setUser(user);
+                userLatch.countDown();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+               userResponseCallback.onFailureFetchSingleNotification("Error in " + TAG + " while retrieving user information : " + error.getMessage());
+               userLatch.countDown();
             }
         });
     }

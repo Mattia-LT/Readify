@@ -3,8 +3,6 @@ package it.unimib.readify.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-
 import java.util.Objects;
 
 public class Notification implements Parcelable, Comparable<Notification> {
@@ -13,38 +11,17 @@ public class Notification implements Parcelable, Comparable<Notification> {
         implementing only "newFollowers" notifications, a notificationIdToken is not needed:
          there's already @idToken, which is unique and multiple notifications from same token shouldn't exist
      */
-
     private String idToken;
-    private String username;
-    private String avatar;
-    private boolean followedByUser;
-    private boolean isRead;
+    private boolean read;
     private long timestamp;
+    private User user;
 
     public Notification() {}
 
-    public Notification(String idToken, boolean isRead, long timestamp) {
+    public Notification(String idToken, boolean read, long timestamp) {
         this.idToken = idToken;
-        this.isRead = isRead;
+        this.read = read;
         this.timestamp = timestamp;
-    }
-
-    public Notification(String idToken, String username, String avatar, boolean followedByUser, boolean isRead, long timestamp) {
-        this.idToken = idToken;
-        this.username = username;
-        this.avatar = avatar;
-        this.followedByUser = followedByUser;
-        this.isRead = isRead;
-        this.timestamp = timestamp;
-    }
-
-    public Notification(Notification notification) {
-        this.idToken = notification.getIdToken();
-        this.username = notification.getUsername();
-        this.avatar = notification.getAvatar();
-        this.followedByUser = notification.isFollowedByUser();
-        this.isRead = notification.isRead();
-        this.timestamp = notification.getTimestamp();
     }
 
     public String getIdToken() {
@@ -55,36 +32,12 @@ public class Notification implements Parcelable, Comparable<Notification> {
         this.idToken = idToken;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public boolean isFollowedByUser() {
-        return followedByUser;
-    }
-
-    public void setFollowedByUser(boolean followedByUser) {
-        this.followedByUser = followedByUser;
-    }
-
     public boolean isRead() {
-        return isRead;
+        return read;
     }
 
     public void setRead(boolean read) {
-        this.isRead = read;
+        this.read = read;
     }
 
     public long getTimestamp() {
@@ -95,17 +48,12 @@ public class Notification implements Parcelable, Comparable<Notification> {
         this.timestamp = timestamp;
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "Notification{" +
-                "idToken='" + idToken + '\'' +
-                ", username='" + username + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", isFollowedByUser=" + followedByUser +
-                ", isRead=" + isRead +
-                ", timestamp=" + timestamp +
-                '}';
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -121,29 +69,23 @@ public class Notification implements Parcelable, Comparable<Notification> {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.idToken);
-        dest.writeString(this.username);
-        dest.writeString(this.avatar);
-        dest.writeByte(this.followedByUser ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.isRead ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.read ? (byte) 1 : (byte) 0);
         dest.writeLong(this.timestamp);
+        dest.writeParcelable(this.user, flags);
     }
 
     public void readFromParcel(Parcel source) {
         this.idToken = source.readString();
-        this.username = source.readString();
-        this.avatar = source.readString();
-        this.followedByUser = source.readByte() != 0;
-        this.isRead = source.readByte() != 0;
+        this.read = source.readByte() != 0;
         this.timestamp = source.readLong();
+        this.user = source.readParcelable(User.class.getClassLoader());
     }
 
     protected Notification(Parcel in) {
         this.idToken = in.readString();
-        this.username = in.readString();
-        this.avatar = in.readString();
-        this.followedByUser = in.readByte() != 0;
-        this.isRead = in.readByte() != 0;
+        this.read = in.readByte() != 0;
         this.timestamp = in.readLong();
+        this.user = in.readParcelable(User.class.getClassLoader());
     }
 
     public static final Creator<Notification> CREATOR = new Creator<Notification>() {
@@ -159,15 +101,25 @@ public class Notification implements Parcelable, Comparable<Notification> {
     };
 
     @Override
+    public String toString() {
+        return "Notification{" +
+                "idToken='" + idToken + '\'' +
+                ", read=" + read +
+                ", timestamp=" + timestamp +
+                ", user=" + user +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Notification that = (Notification) o;
-        return followedByUser == that.followedByUser && isRead == that.isRead && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(username, that.username) && Objects.equals(avatar, that.avatar);
+        return read == that.read && timestamp == that.timestamp && Objects.equals(idToken, that.idToken) && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idToken, username, avatar, followedByUser, isRead, timestamp);
+        return Objects.hash(idToken, read, timestamp, user);
     }
 }

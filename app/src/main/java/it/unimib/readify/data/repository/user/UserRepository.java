@@ -2,6 +2,8 @@ package it.unimib.readify.data.repository.user;
 
 import static java.text.DateFormat.getTimeInstance;
 
+import static it.unimib.readify.util.Constants.NEW_FOLLOWER;
+
 import android.app.Application;
 import android.util.Log;
 
@@ -167,13 +169,8 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
-    public void completeNotificationsFetch(HashMap<String, ArrayList<Notification>> notifications) {
-        userDataRemoteDataSource.completeNotificationsFetch(notifications);
-    }
-
-    @Override
-    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
-        userDataRemoteDataSource.setViewedNotificationsListToRead(idToken, content, notifications);
+    public void readNotifications(String idToken, String notificationType) {
+        userDataRemoteDataSource.readNotifications(idToken, notificationType);
     }
 
     @Override
@@ -382,6 +379,12 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     }
 
     @Override
+    public void onFailureFetchSingleNotification(String message) {
+        //Only a warning because the operation might be successful anyways.
+        Log.w(TAG, message);
+    }
+
+    @Override
     public void addComment(String commentContent, String bookId, String idToken){
         userDataRemoteDataSource.addComment(commentContent,bookId,idToken);
     }
@@ -445,8 +448,10 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFollowUser(String loggedUserIdToken, String followedUserIdToken) {
+        Log.d("onSuccessFollowUser", "success");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(followedUserIdToken);
+        addNotification(followedUserIdToken, NEW_FOLLOWER, loggedUserIdToken);
     }
 
     @Override
@@ -456,8 +461,10 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessUnfollowUser(String loggedUserIdToken, String unfollowedUserIdToken) {
+        Log.d("onSuccessUnfollowUser", "success");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(unfollowedUserIdToken);
+        removeNotification(unfollowedUserIdToken, NEW_FOLLOWER, loggedUserIdToken);
     }
 
     @Override
@@ -510,22 +517,13 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
+        Log.d(TAG, "onSuccessFetchNotifications");
         this.fetchedNotifications.postValue(notifications);
     }
 
     @Override
     public void onFailureFetchNotifications(String message) {
         Log.d("onFailureFetchNotifications", message);
-    }
-
-    @Override
-    public void onSuccessCompleteFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
-        fetchedNotifications.postValue(notifications);
-    }
-
-    @Override
-    public void onFailureCompleteFetchNotifications(String message) {
-        Log.d("onFailureCompleteFetchNotification", message);
     }
 
     @Override
@@ -536,5 +534,35 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void onFailureReAuthentication() {
         userAuthenticationResult.postValue(false);
+    }
+
+    @Override
+    public void onSuccessReadNotification(String loggedUserIdToken) {
+        fetchNotifications(loggedUserIdToken);
+    }
+
+    @Override
+    public void onFailureReadNotification(String message) {
+        Log.e(TAG, message);
+    }
+
+    @Override
+    public void onSuccessAddNotification() {
+        Log.d("onSuccessAddNotification", "success");
+    }
+
+    @Override
+    public void onFailureAddNotification(String message) {
+        Log.d("onFailureAddNotification", message);
+    }
+
+    @Override
+    public void onSuccessRemoveNotification() {
+        Log.d("onSuccessRemoveNotification", "success");
+    }
+
+    @Override
+    public void onFailureRemoveNotification(String message) {
+        Log.d("onFailureRemoveNotification", message);
     }
 }

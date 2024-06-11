@@ -262,20 +262,8 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.fetchNotifications(idToken);
     }
 
-    public void completeFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
-        testDatabaseRepository.completeNotificationsFetch(notifications);
-    }
-
-    public void setNotificationsList(String idToken, String content, HashMap<String, ArrayList<Notification>> notifications) {
-        testDatabaseRepository.setNotificationsList(idToken, content, notifications);
-    }
-
-    public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
-        testDatabaseRepository.addNotification(receivingIdToken, content, loggedUserIdToken);
-    }
-
-    public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
-        testDatabaseRepository.removeNotification(targetIdToken, content, loggedUserIdToken);
+    public void readNotifications(String idToken, String notificationType) {
+        testDatabaseRepository.readNotifications(idToken, notificationType);
     }
 
     public void fetchFollowers(String idToken){

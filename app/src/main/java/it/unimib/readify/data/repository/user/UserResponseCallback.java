@@ -30,6 +30,7 @@ public interface UserResponseCallback {
     void onFailureFetchSingleComment(String message);
     void onFailureFetchSingleFollower(String message);
     void onFailureFetchSingleFollowing(String message);
+    void onFailureFetchSingleNotification(String message);
     void onSuccessFetchOtherUser(User otherUser);
     void onFailureFetchOtherUser(String message);
     void onSuccessFollowUser(String loggedUserIdToken, String followedUserIdToken);
@@ -47,8 +48,12 @@ public interface UserResponseCallback {
     void onPasswordChanged(Boolean result);
     void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
     void onFailureFetchNotifications(String message);
-    void onSuccessCompleteFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
-    void onFailureCompleteFetchNotifications(String message);
     void onSuccessReAuthentication();
     void onFailureReAuthentication();
+    void onSuccessReadNotification(String loggedUserIdToken);
+    void onFailureReadNotification(String message);
+    void onSuccessAddNotification();
+    void onFailureAddNotification(String message);
+    void onSuccessRemoveNotification();
+    void onFailureRemoveNotification(String message);
 }

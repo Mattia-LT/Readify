@@ -2,7 +2,7 @@ package it.unimib.readify.data.repository.user;
 
 import static java.text.DateFormat.getTimeInstance;
 
-import static it.unimib.readify.util.Constants.NEW_FOLLOWER;
+import static it.unimib.readify.util.Constants.NOTIFICATION_NEW_FOLLOWER;
 
 import android.app.Application;
 import android.util.Log;
@@ -451,7 +451,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         Log.d("onSuccessFollowUser", "success");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(followedUserIdToken);
-        addNotification(followedUserIdToken, NEW_FOLLOWER, loggedUserIdToken);
+        addNotification(followedUserIdToken, NOTIFICATION_NEW_FOLLOWER, loggedUserIdToken);
     }
 
     @Override
@@ -464,7 +464,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         Log.d("onSuccessUnfollowUser", "success");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(unfollowedUserIdToken);
-        removeNotification(unfollowedUserIdToken, NEW_FOLLOWER, loggedUserIdToken);
+        removeNotification(unfollowedUserIdToken, NOTIFICATION_NEW_FOLLOWER, loggedUserIdToken);
     }
 
     @Override

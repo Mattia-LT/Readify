@@ -134,5 +134,10 @@ public class Constants {
 
     public static final String AVATAR_DEFAULT = "avatar1";
 
-    public static final String NEW_FOLLOWER = "newFollower";
+    public static final String NOTIFICATION_NEW_FOLLOWER = "newFollower";
+    public static final String NOTIFICATION_RECOMMENDED_BOOKS = "recommendedBooks";
+    public static final String NOTIFICATION_SHARED_PROFILES = "sharedProfiles";
+    public static final String NOTIFICATION_SYSTEM = "system";
+    public static final String NOTIFICATION_STATISTICS = "statistics";
+
 }

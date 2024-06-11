@@ -33,9 +33,12 @@ import it.unimib.readify.viewmodel.UserViewModel;
 public class NotificationsPageFragment extends Fragment {
 
     /*
-        todo assure to initialize correct UI elements for each type of notificationList
-         (in case there are going to be multiple types)
+        For future developments, any dedicated implementations for each type of notification
+        will need to be implemented here
      */
+
+    private final String TAG = NotificationsPageFragment.class.getSimpleName();
+
     private FragmentNotificationsPageBinding fragmentNotificationsPageBinding;
     private String receivedContent;
     private UserViewModel userViewModel;
@@ -48,10 +51,6 @@ public class NotificationsPageFragment extends Fragment {
     private boolean isShowAllButtonPressed;
 
     public NotificationsPageFragment() {}
-
-    public static NotificationsPageFragment newInstance() {
-        return new NotificationsPageFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,25 +68,13 @@ public class NotificationsPageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         isShowAllButtonVisible = false;
         isShowAllButtonPressed = false;
-        //initRecyclerView() should be executed before initObservers()
-        initRecyclerView();
         loadMenu();
         initViewModels();
         initObservers();
-
-        fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
-            if(notifications.get(receivedContent) != null) {
-                notificationsAdapter.submitList(notifications.get(receivedContent));
-
-            }
-            isShowAllButtonVisible = false;
-            isShowAllButtonPressed = true;
-            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
-            //fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(null);
-        });
+        initRecyclerView();
+        setUpShowAllSection();
     }
 
     private void loadMenu(){
@@ -102,29 +89,20 @@ public class NotificationsPageFragment extends Fragment {
     }
 
     public void initObservers() {
-        /*
-            todo in case user is going to open the app by tapping a notification,
-             it probably needs to add userObserver (because method fetchNotifications needs user idToken)
-         */
-
-        /*
-            @run is used to manage completeFetchNotifications method invocation:
-             instead of creating another LiveData variable (to memorize complete notifications),
-             system updates the same LiveData (@Notifications in VM); @run interrupt an infinite loop
-             of method invocation
-         */
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                this.user = ((Result.UserSuccess) result).getData();
-                notificationsAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                this.user = ((Result.UserSuccess) loggedUserResult).getData();
+                notificationsAdapter.submitFollowings(user.getFollowing().getUsers());
                 userViewModel.fetchNotifications(user.getIdToken());
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 
         fetchedNotificationsObserver = result -> {
             notifications = result;
             if(notifications != null) {
-                Log.d("notifications check", Objects.requireNonNull(notifications.toString()));
                 updateUI();
             }
         };
@@ -132,7 +110,7 @@ public class NotificationsPageFragment extends Fragment {
         userViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
-    public void updateUI() {
+    private void updateUI() {
         if(notifications.get(receivedContent) != null) {
             ArrayList<Notification> notificationsToRead = new ArrayList<>();
             for (Notification notification: Objects.requireNonNull(notifications.get(receivedContent))) {
@@ -152,11 +130,9 @@ public class NotificationsPageFragment extends Fragment {
                 notificationsAdapter.submitList(notifications.get(receivedContent));
                 if(notificationsToRead.size() < Objects.requireNonNull(notifications.get(receivedContent)).size()
                         && !isShowAllButtonPressed) {
-                    Log.d("updateUI", "showAll true");
                     fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.VISIBLE);
                     isShowAllButtonVisible = true;
                 } else {
-                    Log.d("updateUI", "showAll false");
                     fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
                 }
             } else {
@@ -172,13 +148,13 @@ public class NotificationsPageFragment extends Fragment {
                 fragmentNotificationsPageBinding.notificationsPageSeparator.setVisibility(View.GONE);
             }
         } else {
-            Log.d("notifications null", "null");
+            Log.e(TAG, "error: notifications instance is null");
             fragmentNotificationsPageBinding.notificationsPageNoNotifications.setVisibility(View.VISIBLE);
             fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
         }
     }
 
-    public void initRecyclerView(){
+    private void initRecyclerView(){
         notificationsAdapter = new NotificationsAdapter(new NotificationsAdapter.OnItemClickListener() {
             @Override
             public void onNotificationItemClick(Notification notification) {
@@ -188,7 +164,6 @@ public class NotificationsPageFragment extends Fragment {
             }
             @Override
             public void onFollowUser(String externalUserIdToken) {
-                //todo "show all" should not popping up
                 userViewModel.followUser(user.getIdToken(), externalUserIdToken);
             }
             @Override
@@ -199,6 +174,18 @@ public class NotificationsPageFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setLayoutManager(layoutManager);
         fragmentNotificationsPageBinding.notificationsPageRecyclerView.setAdapter(notificationsAdapter);
+    }
+
+    private void setUpShowAllSection() {
+        fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setOnClickListener(v -> {
+            if(notifications.get(receivedContent) != null) {
+                notificationsAdapter.submitList(notifications.get(receivedContent));
+
+            }
+            isShowAllButtonVisible = false;
+            isShowAllButtonPressed = true;
+            fragmentNotificationsPageBinding.notificationsPageShowAllTextContainer.setVisibility(View.GONE);
+        });
     }
 
     @Override

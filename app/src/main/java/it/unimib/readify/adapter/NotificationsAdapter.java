@@ -1,6 +1,5 @@
 package it.unimib.readify.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,6 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
 
     private final OnItemClickListener onItemClickListener;
     private List<FollowUser> currentFollowing;
-    private String loggedUserIdToken;
 
     public interface OnItemClickListener {
         void onNotificationItemClick(Notification notification);
@@ -37,11 +35,6 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
     }
 
     public NotificationsAdapter(OnItemClickListener onItemClickListener) {
-        /*
-            makes sense to use DiffUtil.ItemCallback because, everytime the user opens NotificationPageFragment,
-             he is going to modify interested notification instances; it will always return false,
-             except when there isn't any new notification
-         */
 
         super(new DiffUtil.ItemCallback<Notification>() {
             @Override
@@ -60,7 +53,6 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
     @NonNull
     @Override
     public NotificationsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //todo switch for layout in case of implementation of different types of notifications (from newFollowers)
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         NotificationItemBinding binding = NotificationItemBinding.inflate(inflater, parent, false);
         return new NotificationsViewHolder(binding);
@@ -77,14 +69,12 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
         if (list != null) {
             list.sort(Comparator.comparing(Notification::getTimestamp).reversed());
         }
-        Log.d("adapter", "submit");
         super.submitList(list);
     }
 
-    public void submitFollowings(List<FollowUser> currentFollowing, String loggedUserIdToken){
+    public void submitFollowings(List<FollowUser> currentFollowing){
         if(currentFollowing != null){
             this.currentFollowing = currentFollowing;
-            this.loggedUserIdToken = loggedUserIdToken;
         }
     }
 
@@ -130,18 +120,10 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
                 String formattedDate = dateFormat.format(timestamp);
                 binding.notificationDate.setText(formattedDate);
 
-                //button
-                /*
-                    todo right now, each time the user presses on the button, it refreshes the page,
-                     closing the "show all section" (in case it was open)
-                 */
-
                 if(isFollowed(notification.getIdToken())) {
-                    Log.d("adapter", "true");
                     binding.unfollowButton.setVisibility(View.VISIBLE);
                     binding.followButton.setVisibility(View.GONE);
                 } else {
-                    Log.d("adapter", "false");
                     binding.followButton.setVisibility(View.VISIBLE);
                     binding.unfollowButton.setVisibility(View.GONE);
                 }

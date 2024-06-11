@@ -1,9 +1,12 @@
 package it.unimib.readify.ui.main;
 
-import static it.unimib.readify.util.Constants.NEW_FOLLOWER;
+import static it.unimib.readify.util.Constants.NOTIFICATION_NEW_FOLLOWER;
+import static it.unimib.readify.util.Constants.NOTIFICATION_RECOMMENDED_BOOKS;
+import static it.unimib.readify.util.Constants.NOTIFICATION_SHARED_PROFILES;
+import static it.unimib.readify.util.Constants.NOTIFICATION_STATISTICS;
+import static it.unimib.readify.util.Constants.NOTIFICATION_SYSTEM;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +30,17 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class NotificationsFragment extends Fragment {
 
+    /*
+        For future developments, any dedicated implementations for each type of notification
+        will need to be implemented here
+     */
+
     private FragmentNotificationsBinding fragmentNotificationsBinding;
     private UserViewModel userViewModel;
     private HashMap<String, ArrayList<Notification>> notifications;
-    Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
+    private Observer<HashMap<String, ArrayList<Notification>>> fetchedNotificationsObserver;
 
     public NotificationsFragment() {}
-
-    public static NotificationsFragment newInstance() {
-        return new NotificationsFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,10 +57,9 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         initViewModels();
         initObservers();
-        navigateToNotificationPage();
+        setUpNavigationToNotificationPageSection();
     }
 
 
@@ -66,38 +69,33 @@ public class NotificationsFragment extends Fragment {
     }
 
     public void initObservers() {
-        /*
-            todo in case user is going to open the app by tapping a notification,
-             it probably needs to add userObserver (because method fetchNotifications needs user idToken)
-         */
         fetchedNotificationsObserver = result -> {
             notifications = result;
-            Log.d("notifications", notifications.toString());
             updateUI();
         };
 
         userViewModel.getNotifications().observe(getViewLifecycleOwner(), fetchedNotificationsObserver);
     }
 
-    private void navigateToNotificationPage() {
+    private void setUpNavigationToNotificationPageSection() {
         fragmentNotificationsBinding.notificationsNewFollowersContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NEW_FOLLOWER);
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NOTIFICATION_NEW_FOLLOWER);
             Navigation.findNavController(requireView()).navigate(action);
         });
         fragmentNotificationsBinding.notificationsRecommendedBooksContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("recommendedBooks");
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NOTIFICATION_RECOMMENDED_BOOKS);
             Navigation.findNavController(requireView()).navigate(action);
         });
         fragmentNotificationsBinding.notificationsSharedProfilesContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("sharedProfiles");
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NOTIFICATION_SHARED_PROFILES);
             Navigation.findNavController(requireView()).navigate(action);
         });
         fragmentNotificationsBinding.notificationsSystemContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("system");
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NOTIFICATION_SYSTEM);
             Navigation.findNavController(requireView()).navigate(action);
         });
         fragmentNotificationsBinding.notificationsStatisticsContainer.setOnClickListener(v -> {
-            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment("statistics");
+            NavDirections action = NotificationsFragmentDirections.actionNotificationsFragmentToNotificationPageFragment(NOTIFICATION_STATISTICS);
             Navigation.findNavController(requireView()).navigate(action);
         });
     }
@@ -106,23 +104,24 @@ public class NotificationsFragment extends Fragment {
         for (String key: notifications.keySet()) {
             int notificationsToRead = 0;
             for (Notification notification: Objects.requireNonNull(notifications.get(key))) {
-                if(!notification.isRead())
+                if(!notification.isRead()){
                     notificationsToRead++;
+                }
             }
             switch (key) {
-                case NEW_FOLLOWER:
+                case NOTIFICATION_NEW_FOLLOWER:
                     fragmentNotificationsBinding.notificationNewFollowersIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
-                case "recommendedBooks":
+                case NOTIFICATION_RECOMMENDED_BOOKS:
                     fragmentNotificationsBinding.notificationRecommendedBooksIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
-                case "sharedProfiles":
+                case NOTIFICATION_SHARED_PROFILES:
                     fragmentNotificationsBinding.notificationSharedProfilesIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
-                case "system":
+                case NOTIFICATION_SYSTEM:
                     fragmentNotificationsBinding.notificationSystemIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
-                case "statistics":
+                case NOTIFICATION_STATISTICS:
                     fragmentNotificationsBinding.notificationStatisticsIconBadge.setText(String.format("%s", notificationsToRead));
                     break;
             }
@@ -151,5 +150,11 @@ public class NotificationsFragment extends Fragment {
                 notificationsTextView.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getNotifications().removeObserver(fetchedNotificationsObserver);
     }
 }

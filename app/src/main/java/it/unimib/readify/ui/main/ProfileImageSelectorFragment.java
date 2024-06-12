@@ -13,11 +13,10 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +32,7 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class ProfileImageSelectorFragment extends Fragment {
 
+    private final String TAG = ProfileImageSelectorFragment.class.getSimpleName();
     private FragmentProfileImageSelectorBinding fragmentProfileImageSelectorBinding;
     private UserViewModel userViewModel;
     private User loggedUser;
@@ -68,11 +68,12 @@ public class ProfileImageSelectorFragment extends Fragment {
     }
 
     private void initObservers() {
-        loggedUserObserver = result -> {
-            if (result.isSuccess()) {
-                loggedUser = ((Result.UserSuccess) result).getData();
-            } else {
-                Snackbar.make(requireView(), ((Result.Error) result).getMessage(), Snackbar.LENGTH_SHORT).show();
+        loggedUserObserver = loggedUserResult -> {
+            if (loggedUserResult.isSuccess()) {
+                loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
+            }  else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 

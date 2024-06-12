@@ -32,7 +32,7 @@ import it.unimib.readify.viewmodel.UserViewModel;
 
 public class NotificationsPageFragment extends Fragment {
 
-    /*
+    /**
         For future developments, any dedicated implementations for each type of notification
         will need to be implemented here
      */

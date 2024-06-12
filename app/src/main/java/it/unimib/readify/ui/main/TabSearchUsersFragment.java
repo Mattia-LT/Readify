@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import it.unimib.readify.viewmodel.UserViewModel;
 
 public class TabSearchUsersFragment extends Fragment {
 
+    private final String TAG = TabSearchUsersFragment.class.getSimpleName();
     private FragmentTabSearchUsersBinding fragmentTabSearchUsersBinding;
     private UserSearchResultAdapter userSearchResultAdapter;
     private String loggedUserIdToken;
@@ -65,10 +67,13 @@ public class TabSearchUsersFragment extends Fragment {
     }
 
     private void initObservers(){
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                User loggedUser = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                User loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
                 this.loggedUserIdToken = loggedUser.getIdToken();
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 

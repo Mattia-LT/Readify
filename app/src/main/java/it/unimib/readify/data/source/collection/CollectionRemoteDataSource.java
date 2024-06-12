@@ -3,7 +3,7 @@ package it.unimib.readify.data.source.collection;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_BOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_COLLECTION;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NAME_FIELD;
-import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD;
+import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_NUMBER_OF_BOOKS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_COLLECTIONS_VISIBILITY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 
@@ -123,7 +123,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 .child(collectionId);
 
         DatabaseReference booksReference = collectionReference.child(FIREBASE_COLLECTIONS_BOOKS_FIELD);
-        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD);
+        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBER_OF_BOOKS_FIELD);
         booksReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -156,7 +156,7 @@ public class CollectionRemoteDataSource extends BaseCollectionRemoteDataSource{
                 .child(collectionId);
 
         DatabaseReference booksReference = collectionReference.child(FIREBASE_COLLECTIONS_BOOKS_FIELD);
-        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD);
+        DatabaseReference numberOfBooksReference = collectionReference.child(FIREBASE_COLLECTIONS_NUMBER_OF_BOOKS_FIELD);
         booksReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

@@ -112,10 +112,13 @@ public class BookDetailsFragment extends Fragment {
 
         userViewModel.getCommentList().observe(getViewLifecycleOwner(), commentListObserver);
 
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                loggedUser = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
                 commentAdapter.submitUser(loggedUser);
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);

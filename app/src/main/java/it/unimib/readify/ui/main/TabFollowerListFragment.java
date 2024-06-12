@@ -5,6 +5,7 @@ import static it.unimib.readify.util.Constants.BUNDLE_ID_TOKEN;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class TabFollowerListFragment extends Fragment{
 
+    private final String TAG = TabFollowerListFragment.class.getSimpleName();
     private FragmentTabFollowerListBinding fragmentTabFollowerListBinding;
     private UserViewModel userViewModel;
     private FollowListAdapter followListAdapter;
@@ -80,12 +82,15 @@ public class TabFollowerListFragment extends Fragment{
             this.followerList = followersList;
         };
 
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                User user = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                User user = ((Result.UserSuccess) loggedUserResult).getData();
                 loggedUserIdToken = user.getIdToken();
                 followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
                 userViewModel.fetchFollowers(idToken);
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 

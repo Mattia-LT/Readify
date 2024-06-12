@@ -16,9 +16,9 @@ public class Constants {
     // Constants for encrypted files
     public static final String ENCRYPTED_DATA_FILE_NAME = "it.unimib.readify.encrypted_file.txt";
 
-    public static String DARK_MODE = "dark_mode";
-    public static String LIGHT_MODE = "light_mode";
-    public static String PREFERRED_THEME = "preferred_theme";
+    public static final String DARK_MODE = "dark_mode";
+    public static final String LIGHT_MODE = "light_mode";
+    public static final String PREFERRED_THEME = "preferred_theme";
 
 
     // Constants for API
@@ -85,10 +85,9 @@ public class Constants {
     public static final String FIREBASE_COLLECTIONS_VISIBILITY_FIELD = "visible";
 
     public static final String FIREBASE_USERS_EMAILS_FIELD = "email";
-    public static final String FIREBASE_COLLECTIONS_NUMBEROFBOOKS_FIELD = "numberOfBooks";
+    public static final String FIREBASE_COLLECTIONS_NUMBER_OF_BOOKS_FIELD = "numberOfBooks";
     public static final String FIREBASE_USERS_FOLLOWERS_FIELD = "followers";
     public static final String FIREBASE_USERS_FOLLOWING_FIELD = "following";
-    //TODO magari rinominare o spostare numberOfFollowers come parametro dell'user stesso andando a eliminare external group
     public static final String FIREBASE_USERS_USERS_LIST_FIELD = "users";
     public static final String FIREBASE_USERS_GENDER_FIELD = "gender";
     public static final String FIREBASE_USERS_VISIBILITY_FIELD = "visibility";
@@ -100,17 +99,17 @@ public class Constants {
     public static final String FOLLOW_ACTION = "follow";
     public static final String UNFOLLOW_ACTION = "unfollow";
 
-    public static int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
+    public static final int COLLECTION_NAME_CHARACTERS_LIMIT = 12;
 
-    public static String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]", "[Source]", "Contains:" };
+    public static final String[] DESCRIPTION_TRIM_OPTIONS = { "----" , "([source]", "[Source]", "Contains:" };
 
-    public static int DESTINATION_FRAGMENT_FOLLOWER = 0;
-    public static int DESTINATION_FRAGMENT_FOLLOWING = 1;
+    public static final int DESTINATION_FRAGMENT_FOLLOWER = 0;
+    public static final int DESTINATION_FRAGMENT_FOLLOWING = 1;
 
-    public static String BUNDLE_ID_TOKEN = "idToken";
+    public static final String BUNDLE_ID_TOKEN = "idToken";
 
-    public static String RATING_SORT_SEARCH_MODE = "rating";
-    public static String TITLE_SORT_SEARCH_MODE = "title";
+    public static final String RATING_SORT_SEARCH_MODE = "rating";
+    public static final String TITLE_SORT_SEARCH_MODE = "title";
 
     public static final int DATABASE_VERSION = 1;
     public static final String BOOK_DATABASE_NAME = "book_db";

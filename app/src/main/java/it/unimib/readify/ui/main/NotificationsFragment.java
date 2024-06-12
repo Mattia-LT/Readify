@@ -30,7 +30,7 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class NotificationsFragment extends Fragment {
 
-    /*
+    /**
         For future developments, any dedicated implementations for each type of notification
         will need to be implemented here
      */

@@ -37,6 +37,7 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.BookViewModel;
 
 public class HomeFragment extends Fragment {
+    private final String TAG = HomeFragment.class.getSimpleName();
     private BookCarouselAdapter trendingBooksAdapter;
     private BookCarouselAdapter recommendedBooksAdapter;
     private BookCarouselAdapter recentBooksAdapter;
@@ -156,9 +157,9 @@ public class HomeFragment extends Fragment {
         };
 
 
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                user = ((Result.UserSuccess) loggedUserResult).getData();
                 if(user.getUsername() != null && user.getIdToken() != null && userViewModel.isFirstLoading()){
                     userViewModel.setFirstLoading(false);
                     collectionViewModel.resetLogout();
@@ -176,6 +177,9 @@ public class HomeFragment extends Fragment {
                             .concat("\uD83D\uDC4B");
                     fragmentHomeBinding.textviewHomeTitle.setText(welcomeMessage);
                 }
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 

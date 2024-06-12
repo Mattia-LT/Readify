@@ -115,10 +115,13 @@ public class CollectionFragment extends Fragment {
     }
 
     private void initObservers() {
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                this.loggedUser = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                this.loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
                 this.loggedUserIdToken = loggedUser.getIdToken();
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);

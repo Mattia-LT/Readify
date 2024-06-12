@@ -130,9 +130,9 @@ public class ProfileFragment extends Fragment{
             fragmentProfileBinding.recyclerviewCollections.setVisibility(View.VISIBLE);
         };
 
-        loggedUserObserver = result -> {
-            if(result.isSuccess()) {
-                this.loggedUser = ((Result.UserSuccess) result).getData();
+        loggedUserObserver = loggedUserResult -> {
+            if(loggedUserResult.isSuccess()) {
+                this.loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
                 updateUI();
                 fragmentProfileBinding.recyclerviewCollections.setVisibility(View.GONE);
                 fragmentProfileBinding.progressBarProfile.setVisibility(View.VISIBLE);
@@ -141,6 +141,9 @@ public class ProfileFragment extends Fragment{
                     userViewModel.fetchNotifications(loggedUser.getIdToken());
                 }
                 loadMenu();
+            } else {
+                String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
             }
         };
 
@@ -260,7 +263,6 @@ public class ProfileFragment extends Fragment{
             });
         }
 
-        //TODO sistema notifiche
         //Set up the toolbar and remove all icons
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
@@ -303,20 +305,17 @@ public class ProfileFragment extends Fragment{
                         drawerLayout.openDrawer(GravityCompat.END);
                     }
 
-                    navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                            int itemId = menuItem.getItemId();
+                    navigationView.setNavigationItemSelectedListener(menuItem1 -> {
+                        int itemId = menuItem1.getItemId();
 
-                            if (itemId == R.id.nav_edit_profile) {
-                                Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_editProfileFragment);
-                            } else if(itemId == R.id.nav_logout){
-                                userViewModel.logout();
-                            }
-
-                            drawerLayout.closeDrawer(GravityCompat.END);
-                            return true;
+                        if (itemId == R.id.nav_edit_profile) {
+                            Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_editProfileFragment);
+                        } else if(itemId == R.id.nav_logout){
+                            userViewModel.logout();
                         }
+
+                        drawerLayout.closeDrawer(GravityCompat.END);
+                        return true;
                     });
                     return true;
                 }

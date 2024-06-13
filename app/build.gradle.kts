@@ -49,7 +49,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:$navVersion")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.2")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.palette:palette:1.0.0")
 

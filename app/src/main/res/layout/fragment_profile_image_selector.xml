@@ -1,7 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:paddingBottom="40dp">
 
     <LinearLayout
@@ -23,7 +23,14 @@
                 android:id="@+id/recyclerview_profile_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="5dp"
+                tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                tools:listitem="@layout/profile_image_item"
+                tools:itemCount="4"
+                tools:orientation="vertical"
+                tools:scrollbars="vertical"
+                tools:spanCount="2"
+                />
 
     </LinearLayout>
 

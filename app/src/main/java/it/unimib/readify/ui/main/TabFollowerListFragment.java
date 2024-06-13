@@ -74,6 +74,8 @@ public class TabFollowerListFragment extends Fragment{
         this.followerList = new ArrayList<>();
 
         followersObserver = results -> {
+            ConstraintLayout noUsersFoundLayout = fragmentTabFollowerListBinding.noFollowersFoundLayout;
+            noUsersFoundLayout.setVisibility(View.GONE);
             List<FollowUser> followersList = results.stream()
                     .filter(result -> result instanceof Result.FollowUserSuccess)
                     .map(result -> ((Result.FollowUserSuccess) result).getData())

@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/notification_icon"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:contentDescription="@string/imageview_avatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,8 +24,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/notification_icon"
-        android:layout_marginStart="15dp">
+        app:layout_constraintStart_toEndOf="@id/notification_icon"
+        android:layout_marginStart="5dp">
 
         <TextView
             android:id="@+id/notification_title"
@@ -41,17 +41,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/started_following_notification_message"
-            android:textSize="17sp"
+            android:textSize="13sp"
             app:layout_constraintTop_toBottomOf="@+id/notification_title"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:maxLines="2"
+            android:ellipsize="marquee"
+            />
 
         <TextView
             android:id="@+id/notification_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
+            android:textSize="13sp"
             app:layout_constraintTop_toBottomOf="@+id/notification_message"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="1/01/2001" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -64,14 +68,14 @@
         android:text="@string/follow_button_string"
         android:textColor="?attr/colorOnBackground"
         app:iconTint="?attr/colorOnBackground"
-        app:layout_constrainedWidth="true"
         app:icon="@drawable/person_add_black_24dp"
         app:iconPadding="5dp"
+        app:layout_constraintStart_toEndOf="@id/notification_textContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
-        tools:visibility="visible"
+        tools:visibility="gone"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -92,7 +96,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:backgroundTint="?attr/colorButtonNormal"
         android:visibility="gone"
-        tools:visibility="gone"
+        tools:visibility="visible"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

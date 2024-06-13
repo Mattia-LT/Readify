@@ -23,7 +23,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_search"
         android:layout_width="wrap_content"
-        android:minWidth="300dp"
+        android:minWidth="290dp"
         android:maxWidth="485dp"
         android:layout_height="wrap_content"
         android:hint="@string/hint_search_book"

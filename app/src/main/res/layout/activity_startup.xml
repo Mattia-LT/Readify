@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/mobile_gradient_backgrounds_intro"
     >
 
@@ -51,6 +51,7 @@
         android:textSize="48sp"
         android:textStyle="italic"
         android:background="@drawable/blur_effect"
+        android:lines="2"
         />
 
 
@@ -59,14 +60,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="120dp"
         android:backgroundTint="@color/login_blue"
         android:paddingHorizontal="50sp"
         android:paddingVertical="15sp"
         android:text="@string/button_getting_started"
         android:textColor="@color/white"
         android:textSize="24sp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="150dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

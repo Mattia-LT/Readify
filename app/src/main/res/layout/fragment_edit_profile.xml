@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/baseline_waving_hand_24"
             android:drawablePadding="20dp"
-            android:hint="Biografia"
+            android:hint=""
             android:inputType="textEmailAddress"
             android:minHeight="100dp"
             />
@@ -164,7 +164,7 @@
         android:id="@+id/button_navigate_to_sensible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit sensible data"
+        android:text="@string/edit_sensible_data"
         android:textSize="14sp"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/orange"

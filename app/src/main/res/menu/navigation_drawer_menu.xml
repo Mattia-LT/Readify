@@ -12,13 +12,13 @@
 
     <item
         android:id="@+id/nav_switch"
-        android:title="Tema"
+        android:title="@string/theme"
         app:actionLayout="@layout/custom_switch"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/nav_spinner"
-        android:title="Visibilità Profilo"
+        android:title="@string/change_collection_visibility_action"
         app:actionViewClass="android.widget.Spinner"
         app:showAsAction="always"/>
 
@@ -26,7 +26,7 @@
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_baseline_logout"
-            android:title="Logout" />
+            android:title="@string/logout" />
     </group>
 
 </menu>

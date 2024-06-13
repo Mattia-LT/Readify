@@ -55,7 +55,7 @@
     <string name="textview_description_title">Descrizione</string>
     <string name="textview_icon_already_read">Già letto?</string>
     <string name="textview_icon_add_to_collection">Aggiungi a …</string>
-    <string name="textview_slogan">Leggi.\nIn modo intelligente</string>
+    <string name="textview_slogan">La tua libreria a portata di mano.</string>
     <string name="hint_search_book">Inserisci il titolo del libro</string>
     <string name="button_search">Cerca</string>
     <string name="hint_search_author">Inserisci il nome dell\'autore</string>
@@ -113,7 +113,7 @@
     <string name="books_section">Libri</string>
     <string name="unexpected_error">Si è verificato un errore inaspettato, perfavore riprova.</string>
     <string name="error_login_user_message">Si è verificato un errore durante il login, perfavore riprova</string>
-    <string name="error_login_password_message">SI è verificato un errore durante il login, ricontrolla la tua password.</string>
+    <string name="error_login_password_message">Si è verificato un errore durante il login, ricontrolla la tua password.</string>
     <string name="error_no_google_account_found_message">Errore: nessun account google associato a questa mail</string>
     <string name="hint_search_users">Cerca un utente</string>
     <string name="textview_books_read">"Libri letti: "</string>
@@ -170,6 +170,13 @@
     <string name="choose_gender">Scegli il tuo sesso</string>
     <string name="choose_subjects">Scegli almeno 3 argomenti che ti potrebbero interessare</string>
     <string name="complete_registration">Completa la registrazione</string>
+    <string name="theme">Tema</string>
+    <string name="authentication_required">Autenticazione richiesta</string>
+    <string name="current_email">Email corrente</string>
+    <string name="biography">Biografia</string>
+    <string name="edit_sensible_data">Modifica dati sensibili</string>
+    <string name="error_bio_length">La biografia non deve superare 100 caratteri.</string>
+
 
     <!-- chip genres -->
     <string-array name="chip_genres">

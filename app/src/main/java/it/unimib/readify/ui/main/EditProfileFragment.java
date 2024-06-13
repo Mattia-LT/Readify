@@ -100,12 +100,7 @@ public class EditProfileFragment extends Fragment {
         userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
         userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
 
-        fragmentEditProfileBinding.profileImageSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_profileImageSelectorFragment);
-            }
-        });
+        fragmentEditProfileBinding.profileImageSelect.setOnClickListener(v -> Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_profileImageSelectorFragment));
 
         fragmentEditProfileBinding.textInputEditTextUsername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -144,12 +139,9 @@ public class EditProfileFragment extends Fragment {
             }
         });
 
-        fragmentEditProfileBinding.buttonUndoChanges.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentEditProfileBinding.textInputEditTextUsername.setText("");
-                fragmentEditProfileBinding.textInputEditTextBio.setText("");
-            }
+        fragmentEditProfileBinding.buttonUndoChanges.setOnClickListener(v -> {
+            fragmentEditProfileBinding.textInputEditTextUsername.setText("");
+            fragmentEditProfileBinding.textInputEditTextBio.setText("");
         });
 
         //handling sensible data navigation
@@ -158,9 +150,7 @@ public class EditProfileFragment extends Fragment {
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
             if(savedEmail != null && savedPassword != null) {
                 fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.VISIBLE);
-                fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> {
-                    Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment);
-                });
+                fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment));
             } else {
                 fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.GONE);
                 fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(null);
@@ -203,10 +193,8 @@ public class EditProfileFragment extends Fragment {
         if(fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
             if (!fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
                 if (fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().length() > 100) {
-                    fragmentEditProfileBinding.settingsBioErrorMessage.setText("La bio non deve superare 100 caratteri");
+                    fragmentEditProfileBinding.settingsBioErrorMessage.setText(R.string.error_bio_length);
                     fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.VISIBLE);
-                }else if(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().equals(user.getBiography())) {
-                    Toast.makeText(requireContext(), "Questa è gia la tua bio", Toast.LENGTH_SHORT).show();
                 } else {
                     onSaveUser.setBiography(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim());
                     userViewModel.setUserBiography(onSaveUser);

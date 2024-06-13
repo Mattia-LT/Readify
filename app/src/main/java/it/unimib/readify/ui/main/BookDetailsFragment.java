@@ -158,7 +158,7 @@ public class BookDetailsFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             fragmentBookDetailsBinding.bookBackgroundImage.setRenderEffect(RenderEffect.createBlurEffect(70, 70, Shader.TileMode.MIRROR));
         } else {
-            fragmentBookDetailsBinding.bookBackgroundImage.setImageResource(R.drawable.sfondo_13);
+            fragmentBookDetailsBinding.bookBackgroundImage.setImageResource(R.drawable.bg_default_no_blur);
         }
     }
 

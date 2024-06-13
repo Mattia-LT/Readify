@@ -130,13 +130,15 @@ public class BookItemCollectionAdapter extends ListAdapter<OLWorkApiResponse, Bo
                 binding.chipgroupBookCollectionGenres.removeAllViews();
                 SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(itemView.getContext());
                 String[] subjects = itemView.getResources().getStringArray(R.array.chip_genres);
-                for(String subject : book.getSubjects()){
-                    if(subjectsUtil.containSubject(subject)){
-                        Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.single_subject_chip_layout_small, binding.chipgroupBookCollectionGenres, false);
-                        int id = subjectsUtil.getChipId(subject);
-                        chip.setText(subjects[id - 1]);
-                        chip.setClickable(false);
-                        binding.chipgroupBookCollectionGenres.addView(chip);
+                if(book.getSubjects() != null){
+                    for(String subject : book.getSubjects()){
+                        if(subjectsUtil.containSubject(subject)){
+                            Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.single_subject_chip_layout_small, binding.chipgroupBookCollectionGenres, false);
+                            int id = subjectsUtil.getChipId(subject);
+                            chip.setText(subjects[id - 1]);
+                            chip.setClickable(false);
+                            binding.chipgroupBookCollectionGenres.addView(chip);
+                        }
                     }
                 }
             }

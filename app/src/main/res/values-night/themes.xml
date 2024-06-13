@@ -1,7 +1,7 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.Readify" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#000077</item>
+        <item name="colorPrimary">#01015A</item>
         <item name="colorPrimaryVariant">#334C9C</item>
         <item name="colorOnPrimary">#FFFFFF</item>
 
@@ -18,6 +18,11 @@
     </style>
 
     <style name="RatingBar" parent="Theme.Material3.DayNight">
+        <item name="colorControlNormal">@color/grey_button</item>
+        <item name="colorControlActivated">@color/rating_yellow</item>
+    </style>
+
+    <style name="RatingBarBookDetails" parent="Theme.Material3.DayNight">
         <item name="colorControlNormal">@color/grey_button</item>
         <item name="colorControlActivated">@color/rating_yellow</item>
     </style>

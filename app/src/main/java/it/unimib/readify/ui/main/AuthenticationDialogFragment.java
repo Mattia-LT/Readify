@@ -134,7 +134,7 @@ public class AuthenticationDialogFragment extends DialogFragment {
             confirm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.login_blue));
             confirm.setEnabled(true);
         } else {
-            confirm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_blue));
+            confirm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.grey_disabled_item));
             confirm.setEnabled(false);
         }
     }

@@ -139,4 +139,5 @@ public class Constants {
     public static final String NOTIFICATION_SYSTEM = "system";
     public static final String NOTIFICATION_STATISTICS = "statistics";
 
+    public static final String GOOGLE_SESSION_EXPIRED = "invalidCredentials";
 }

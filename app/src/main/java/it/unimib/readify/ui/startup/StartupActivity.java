@@ -1,7 +1,9 @@
 package it.unimib.readify.ui.startup;
 
 import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
+import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.GOOGLE_SESSION_EXPIRED;
 import static it.unimib.readify.util.Constants.LOGIN_ID_TOKEN;
 import static it.unimib.readify.util.Constants.PASSWORD;
 
@@ -26,6 +28,7 @@ import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class StartupActivity extends AppCompatActivity {
 
+    private final String TAG = StartupActivity.class.getSimpleName();
     private DataEncryptionUtil dataEncryptionUtil;
     private Observer<Result> loggedUserObserver;
     private UserViewModel userViewModel;
@@ -40,14 +43,10 @@ public class StartupActivity extends AppCompatActivity {
             String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
             String savedGoogleLoginIdToken = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN);
-            Log.d(String.valueOf(savedEmail), String.valueOf(savedEmail));
-            Log.d("loginToken", String.valueOf(savedGoogleLoginIdToken));
-            Log.d(String.valueOf(savedPassword), String.valueOf(savedPassword));
-
-            loggedUserObserver = result -> {
+            loggedUserObserver = loggedUserResult -> {
                 if(userViewModel.isUIRunning()) {
-                    if(result.isSuccess()) {
-                        User user = ((Result.UserSuccess) result).getData();
+                    if(loggedUserResult.isSuccess()) {
+                        User user = ((Result.UserSuccess) loggedUserResult).getData();
                         Intent intent;
                         if(user.getUsername() == null){
                             intent = new Intent(this, WelcomeActivity.class);
@@ -57,6 +56,13 @@ public class StartupActivity extends AppCompatActivity {
                         }
                         startActivity(intent);
                         finish();
+                    } else {
+                        String errorMessage = ((Result.Error) loggedUserResult).getMessage();
+                        Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
+                        if(errorMessage.equals(GOOGLE_SESSION_EXPIRED)){
+                            dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
+                            showStartupLayout();
+                        }
                     }
                 }
             };
@@ -84,7 +90,6 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("ON DESTROY STARTUP", "TRIGGERED");
         if(loggedUserObserver != null){
             userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         }

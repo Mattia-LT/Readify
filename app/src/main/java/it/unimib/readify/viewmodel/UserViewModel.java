@@ -375,4 +375,8 @@ public class UserViewModel extends ViewModel {
     public void deleteUserInfo(){
         testDatabaseRepository.deleteUserInfo();
     }
+
+    public void resetPasswordErrorResult() {
+        testDatabaseRepository.resetPasswordErrorResult();
+    }
 }

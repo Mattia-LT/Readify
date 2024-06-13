@@ -441,6 +441,10 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         userAuthenticationResult.postValue(null);
     }
 
+    @Override
+    public void resetPasswordErrorResult() {
+        sourcePasswordError.postValue(null);
+    }
 
     @Override
     public void onSuccessFetchOtherUser(User otherUser) {

@@ -46,6 +46,7 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class LoginFragment extends Fragment {
+    private final String TAG = LoginFragment.class.getSimpleName();
     private FragmentLoginBinding fragmentLoginBinding;
     private UserViewModel userViewModel;
     private DataEncryptionUtil dataEncryptionUtil;
@@ -58,10 +59,6 @@ public class LoginFragment extends Fragment {
     private SignInClient signInClient;
     public LoginFragment(){}
 
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,14 +68,12 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentLoginBinding = FragmentLoginBinding.inflate(inflater,container,false);
-        Log.d("login fragment", "onCreateView");
         return fragmentLoginBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("login fragment", "onViewCreated");
         initViewModels();
 
         if(userViewModel.isContinueRegistrationFirstLoading()){
@@ -94,7 +89,7 @@ public class LoginFragment extends Fragment {
                         if(userViewModel.isUIRunning()) {
                             if(result.isSuccess()) {
                                 User user = ((Result.UserSuccess) result).getData();
-                                if(user.getUsername() == null){
+                                if(user.getUsername() == null && user.getIdToken() != null){
                                     userViewModel.setContinueRegistrationFirstLoading(false);
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
                                     userViewModel.setUIRunning(false);
@@ -118,70 +113,6 @@ public class LoginFragment extends Fragment {
             }
         }
 
-
-
-        /*
-            Observer Class allows to observe a particular instance of LiveData,
-             contained in the ViewModel, and invoke its body (interface) each time this instance changes
-             its value. The Observer is going to catch an update when the value changes regarding
-             both its reference and internal data.
-            UI data visualization is one of its biggest usages.
-
-            Anyway, this class can be tricky if its internal behavior is not known:
-                1) Managing the correct instance of LiveData
-                    Initializing the Observer with the correct LiveData instance
-                     is the most important thing: once the LiveData instance is initialized
-                     in the ViewModel, it shouldn't be changed.
-                    For example, in the ViewModel we currently have this initialization:
-                        copiedData = new MediatorLiveData<>();
-                    This is the first and only time the variable @copiedData is initialized;
-                     that is important for the reason that the Observer is going to observe only
-                     the instance of the variable we pass to it.
-                    It means that, each time we CREATE another instance of @copiedData
-                     in the observed method, not only a) a new Observer IS GOING TO be created
-                     and observe the newborn instance, causing some MESS in the memory,
-                     but also b) we lose the capability to change and observe the correct
-                     instance of LiveData.
-                    In other words, it is greatly recommended a) to use postValue() to update the
-                     value of LiveData when it is observed, avoiding the practice of
-                     Object Referencing, and b) implementing simple and solid methods
-                     (like the current ones)
-                    However, everything can be done (professor version is working),
-                     but in my opinion this current implementation is the easiest to understand,
-                     build and use.
-                2) Previous changes in other containers
-                    First of all, a container is intended to be an Activity or a Fragment.
-                    It can happen that a portion of the data (assuming the user data)
-                     changes in a previous container:
-                     for example, before logging in the HomeActivity, the user has to log in
-                     in the LoginFragment (or in the RegistrationFragment).
-                    Doing so, the data memorized in the ViewModel is UPDATED
-                     (from null value to UserSuccess), implying that EVERY Observer
-                     pointed to @copiedData (user data) is going to capture this update and
-                     invoke its body, when its container is active.
-                    A little clarification:
-                     a) To capture an update, an Observer doesn't need to be initialized,
-                        nor its container to be active;
-                        Any Observer catches any update.
-                     b) To invoke its body, an Observer needs to be initialized and active.
-                        An observer is active from its initialization to its deletion OR
-                         until its container is active.
-                     c) To be initialized, an Observer needs its container to be active
-                        and to run its initialization;
-                     d) If the observed data changes MULTIPLE TIMES when the Observer isn't active,
-                         it is going to catch only the last update, invoking its body
-                         when it is initialized.
-                        That seems to be because the Observer compares the last memorized value
-                         of the LiveData with the current one: if they aren't identical, it detects
-                         the update and invokes its body; if the Observer wasn't even initialized at the
-                         time of the update, the Observer IS GOING TO KNOW the starter value of
-                         the LiveData (somehow I guess).
-                        That's smooth.
-                3) Observer deletion
-                    An Observer is going to catch an update until it is deleted,
-                     even when its container has been destroyed; this may have a negative impact on the memory.
-                    Remember to delete it when its working is unnecessary.
-        */
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
             String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
@@ -194,15 +125,13 @@ public class LoginFragment extends Fragment {
                     if(userViewModel.isUIRunning()) {
                         if(result.isSuccess()) {
                             User user = ((Result.UserSuccess) result).getData();
-                            Log.e("USER SAVED", user.toString());
-                            if(user.getEmail().equalsIgnoreCase(email)){
+                            if(user.getEmail().equalsIgnoreCase(email) && user.getIdToken() != null){
                                 saveNormalLoginData(email, password);
                                 if(user.getUsername() == null){
                                     userViewModel.setContinueRegistrationFirstLoading(false);
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
                                     userViewModel.setUIRunning(false);
                                 } else {
-                                    Log.d("NAVIGAZIONE", "APERTO DA ELSE DI BUTTON LISTENER");
                                     navigateToHomeActivity();
                                     requireActivity().finish();
                                     userViewModel.setUIRunning(false);
@@ -248,28 +177,6 @@ public class LoginFragment extends Fragment {
 
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("login fragment", "onDestroyView");
-        fragmentLoginBinding = null;
-        /*
-            (Read first Life Cycles, Backstack and Navigation explanation)
-            Here I put the removeObserver() because
-             onDestroyView() is a safe place to put it and the logic alternatives aren't.
-            With the current implementation (initializing the Observer in onViewCreated() ),
-             the only logic alternative to put removeObserver() is inside the Observer's body itself,
-             right after the navigation action, but doing so, if the user comes back with
-             the Back button or after the logout, the Observer is not going to work because
-             it was deleted and never re-initialized
-             (because onViewCreated is not going to be invoked anymore).
-            It would have been different if we initialized the Observer in onStart():
-             like this, method removeObserver() can be put in its body.
-         */
-        Log.e("ON DESTROY login", "TRIGGERED");
-        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
-    }
-
     private void signInWithGoogle() {
         GetSignInIntentRequest signInRequest = GetSignInIntentRequest.builder()
                 .setServerClientId(getString(R.string.default_web_client_id))
@@ -295,24 +202,18 @@ public class LoginFragment extends Fragment {
             // Google Sign In was successful, authenticate with Firebase
             SignInCredential credential = signInClient.getSignInCredentialFromIntent(data);
             String idToken = credential.getGoogleIdToken();
-            Log.d("handleSignInResult", "firebaseAuthWithGoogle:" + credential.getId());
             if(idToken != null){
                 userViewModel.signInWithGoogle(idToken);
                 loggedUserObserver = result -> {
                     if(userViewModel.isUIRunning()) {
                         if(result.isSuccess()) {
                             User user = ((Result.UserSuccess) result).getData();
-                            Log.e("user72kkkkk",user.toString());
-                            Log.e("idtoken_problematico", idToken);
-                            Log.e("idtoken_FORSE", credential.getId());
-                            if(user.getEmail().equalsIgnoreCase(credential.getId())){
-                                Log.e("user73kkkkk",user.toString());
+                            if(user.getEmail().equalsIgnoreCase(credential.getId()) && user.getIdToken() != null){
                                 saveGoogleLoginData(idToken);
                                 if(user.getUsername() == null){
                                     Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_continueRegistrationFragment);
                                     userViewModel.setUIRunning(false);
                                 } else {
-                                    Log.d("NAVIGAZIONE", "APERTO DA ELSE DI GOOGLE BUTTON LISTENER");
                                     navigateToHomeActivity();
                                     requireActivity().finish();
                                     userViewModel.setUIRunning(false);
@@ -362,17 +263,6 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private String getErrorMessage(String errorType) {
-        switch (errorType) {
-            case INVALID_CREDENTIALS_ERROR:
-                return requireActivity().getString(R.string.error_login_password_message);
-            case INVALID_USER_ERROR:
-                return requireActivity().getString(R.string.error_login_user_message);
-            default:
-                return requireActivity().getString(R.string.unexpected_error);
-        }
-    }
-
     private void initViewModels(){
         userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(UserViewModel.class);
@@ -392,7 +282,7 @@ public class LoginFragment extends Fragment {
                         email.concat(":").concat(password));
             }
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, String.valueOf(e.getLocalizedMessage()));
         }
     }
 
@@ -407,9 +297,9 @@ public class LoginFragment extends Fragment {
 
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e("ON DESTROY login", "TRIGGERED");
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentLoginBinding = null;
         userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

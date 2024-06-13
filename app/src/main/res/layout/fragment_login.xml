@@ -50,7 +50,8 @@
         app:errorEnabled="true"
         app:boxStrokeColor="@color/white"
         app:hintTextColor="@color/white"
-        app:boxStrokeWidth="3dp">
+        app:boxStrokeWidth="3dp"
+        app:cursorColor="@color/white">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_email"
@@ -80,7 +81,8 @@
         app:errorEnabled="true"
         app:boxStrokeColor="@color/white"
         app:hintTextColor="@color/white"
-        app:boxStrokeWidth="3dp">
+        app:boxStrokeWidth="3dp"
+        app:cursorColor="@color/white">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text_password"

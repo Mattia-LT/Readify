@@ -46,6 +46,7 @@ public interface IUserRepository {
     void isUsernameAvailable(String username);
     void deleteUserInfo();
     void resetAuthenticationResult();
+    void resetPasswordErrorResult();
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();

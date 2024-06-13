@@ -4,7 +4,7 @@ import static java.text.DateFormat.getTimeInstance;
 
 import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
-import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.PASSWORD;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -23,10 +23,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Objects;
 
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentEditSensibleBinding;
@@ -125,13 +124,30 @@ public class EditSensibleFragment extends Fragment {
         };
 
         passwordErrorObserver = result -> {
-            if(result) {
-                Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
-                fragmentEditSensibleBinding.editSensibleInputPassword.setText("");
-                fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.setText("");
-                dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
-            } else {
-                Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
+            if(result != null){
+                if(result) {
+                    String password = Objects.requireNonNull(fragmentEditSensibleBinding.editSensibleInputPassword.getText()).toString();
+                    if(!password.trim().isEmpty()){
+                        try {
+                            String email = user.getEmail();
+                            dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
+                                    ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD, password);
+
+                            dataEncryptionUtil.writeSecreteDataOnFile(ENCRYPTED_DATA_FILE_NAME,
+                                    email.concat(":").concat(password));
+
+                            Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
+                            fragmentEditSensibleBinding.editSensibleInputPassword.setText("");
+                            fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.setText("");
+                            userViewModel.resetPasswordErrorResult();
+                        } catch (GeneralSecurityException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
+                    userViewModel.resetPasswordErrorResult();
+                }
             }
         };
 

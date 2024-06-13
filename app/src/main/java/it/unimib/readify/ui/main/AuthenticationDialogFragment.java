@@ -3,7 +3,6 @@ package it.unimib.readify.ui.main;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import it.unimib.readify.viewmodel.UserViewModel;
 
 public class AuthenticationDialogFragment extends DialogFragment {
 
-    //private FragmentDialogAuthenticationBinding fragmentDialogAuthenticationBinding = null;
     private UserViewModel userViewModel;
     private Observer<Boolean> userAuthenticationObserver;
     private boolean emailCanBeSubmitted;
@@ -53,9 +51,7 @@ public class AuthenticationDialogFragment extends DialogFragment {
         emailCanBeSubmitted = false;
         passwordCanBeSubmitted = false;
 
-        cancel.setOnClickListener(e -> {
-            dismiss();
-        });
+        cancel.setOnClickListener(e -> dismiss());
 
         if(email != null) {
             email.addTextChangedListener(new TextWatcher() {
@@ -117,11 +113,11 @@ public class AuthenticationDialogFragment extends DialogFragment {
         userAuthenticationObserver = result -> {
             if(result != null) {
                 if(result) {
-                    Toast.makeText(requireContext(), "Authentication confirmed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.authentication_confirmed, Toast.LENGTH_SHORT).show();
                     userViewModel.resetAuthenticationResult();
                     dismiss();
                 } else {
-                    Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.authentication_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         };

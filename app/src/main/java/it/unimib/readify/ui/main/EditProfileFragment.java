@@ -3,6 +3,9 @@ package it.unimib.readify.ui.main;
 import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.PASSWORD;
+import static it.unimib.readify.util.Constants.USERNAME_AVAILABLE;
+import static it.unimib.readify.util.Constants.USERNAME_ERROR;
+import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
 
 import android.os.Bundle;
 
@@ -10,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.text.Editable;
@@ -18,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -35,16 +40,17 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class EditProfileFragment extends Fragment {
+    private final String TAG = EditProfileFragment.class.getSimpleName();
 
     private FragmentEditProfileBinding fragmentEditProfileBinding;
     private UserViewModel userViewModel;
+    private Observer<Result> loggedUserObserver;
+    private Observer<String> usernameErrorObserver;
     private DataEncryptionUtil dataEncryptionUtil;
     private User user;
     private User onSaveUser;
     private boolean isUsernameAvailable;
     private boolean isUserChanged;
-    private Observer<Result> userObserver;
-    private Observer<String> usernameErrorObserver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,44 +69,13 @@ public class EditProfileFragment extends Fragment {
         isUsernameAvailable = false;
         isUserChanged = false;
 
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
+        initViewModels();
+        initObservers();
 
-        userObserver = result -> {
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess)result).getData();
-                onSaveUser = new User(user);
-                updateUI();
-
-                if(isUserChanged) {
-                    isUserChanged = false;
-                    Toast.makeText(requireContext(), "Profile has been updated", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                //todo navigate to login(?)
-                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        };
-
-        usernameErrorObserver = result -> {
-            switch (result) {
-                case "available":
-                    isUsernameAvailable = true;
-                    break;
-                case "notAvailable":
-                    isUsernameAvailable = false;
-                    break;
-                case "error":
-                    Toast.makeText(requireContext(), "System: username error", Toast.LENGTH_SHORT).show();
-                    isUsernameAvailable = false;
-                    break;
-            }
-        };
-
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
-        userViewModel.getUsernameAvailableResult().observe(getViewLifecycleOwner(), usernameErrorObserver);
-
-        fragmentEditProfileBinding.profileImageSelect.setOnClickListener(v -> Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_profileImageSelectorFragment));
+        fragmentEditProfileBinding.profileImageSelect.setOnClickListener(v -> {
+            NavDirections action = EditProfileFragmentDirections.actionEditProfileFragmentToProfileImageSelectorFragment();
+            Navigation.findNavController(requireView()).navigate(action);
+        });
 
         fragmentEditProfileBinding.textInputEditTextUsername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -115,7 +90,7 @@ public class EditProfileFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                userViewModel.isUsernameAvailable(s.toString());
+                userViewModel.isUsernameAvailable(s.toString().trim());
             }
         });
 
@@ -126,16 +101,15 @@ public class EditProfileFragment extends Fragment {
             fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.GONE);
             if(fragmentEditProfileBinding.textInputEditTextUsername.getText() != null
                     && fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
-                if(!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().isEmpty()
-                        || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().isEmpty()) {
+                if(!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().isEmpty()
+                        || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
                     onChangeUsername();
                     onChangeBio();
                 } else {
-                    Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.fields_not_filled_in, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                //todo add Snack bar action (reload app?)
-                Snackbar.make(view, "System error", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, R.string.unexpected_error, Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -144,13 +118,17 @@ public class EditProfileFragment extends Fragment {
             fragmentEditProfileBinding.textInputEditTextBio.setText("");
         });
 
-        //handling sensible data navigation
+        //Handling sensible data navigation
         try {
             String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
             if(savedEmail != null && savedPassword != null) {
                 fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.VISIBLE);
-                fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment));
+                fragmentEditProfileBinding.buttonNavigateToSensible
+                        .setOnClickListener(e -> {
+                            NavDirections action = EditProfileFragmentDirections.actionEditProfileFragmentToEditSensibleFragment();
+                            Navigation.findNavController(requireView()).navigate(action);
+                        });
             } else {
                 fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.GONE);
                 fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(null);
@@ -158,29 +136,70 @@ public class EditProfileFragment extends Fragment {
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public void initViewModels() {
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
 
+    public void initObservers() {
+        loggedUserObserver = result -> {
+            if(result.isSuccess()) {
+                user = ((Result.UserSuccess)result).getData();
+                onSaveUser = new User(user);
+                updateUI();
+                if(isUserChanged) {
+                    isUserChanged = false;
+                    Toast.makeText(requireContext(), R.string.updated_profile, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                String errorMessage = ((Result.Error) result).getMessage();
+                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
+            }
+        };
 
+        usernameErrorObserver = result -> {
+            switch (result) {
+                case USERNAME_AVAILABLE:
+                    isUsernameAvailable = true;
+                    break;
+                case USERNAME_NOT_AVAILABLE:
+                    isUsernameAvailable = false;
+                    break;
+                case USERNAME_ERROR:
+                    Toast.makeText(requireContext(), R.string.generic_error_username, Toast.LENGTH_SHORT).show();
+                    isUsernameAvailable = false;
+                    break;
+            }
+        };
+
+        userViewModel.getUserMediatorLiveData()
+                .observe(getViewLifecycleOwner(), loggedUserObserver);
+        userViewModel.getUsernameAvailableResult()
+                .observe(getViewLifecycleOwner(), usernameErrorObserver);
     }
 
     private void onChangeUsername() {
         if(fragmentEditProfileBinding.textInputEditTextUsername.getText() != null) {
-            if (!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().isEmpty()) {
-                if (fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().length() > 20) {
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.error_username_length);
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
+            String username = fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim();
+            TextView usernameError = fragmentEditProfileBinding.settingsUsernameErrorMessage;
+            if (!username.isEmpty()) {
+                if (username.length() > 20) {
+                    usernameError.setText(R.string.error_username_length);
+                    usernameError.setVisibility(View.VISIBLE);
                 }
-                else if (fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().contains("/")
-                        || fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().contains("@")) {
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.error_username_illegal_symbols);
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
-                } else if(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().equals(user.getUsername())) {
-                    Toast.makeText(requireContext(), "This is already your username", Toast.LENGTH_SHORT).show();
+                else if (username.contains("/")
+                        || username.contains("@")) {
+                    usernameError.setText(R.string.error_username_illegal_symbols);
+                    usernameError.setVisibility(View.VISIBLE);
+                } else if(username.equals(user.getUsername())) {
+                    Toast.makeText(requireContext(), R.string.username_already_own, Toast.LENGTH_SHORT).show();
                 } else if(!isUsernameAvailable) {
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
-                    fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
+                    usernameError.setText(R.string.username_already_taken);
+                    usernameError.setVisibility(View.VISIBLE);
                 } else {
-                    onSaveUser.setUsername(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().toLowerCase());
+                    onSaveUser.setUsername(username.toLowerCase());
                     userViewModel.setUserUsername(onSaveUser);
                     fragmentEditProfileBinding.textInputEditTextUsername.setText("");
                     isUserChanged = true;
@@ -191,12 +210,13 @@ public class EditProfileFragment extends Fragment {
 
     private void onChangeBio() {
         if(fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
-            if (!fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
-                if (fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().length() > 100) {
+            String bio = fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim();
+            if (!bio.isEmpty()) {
+                if (bio.length() > 100) {
                     fragmentEditProfileBinding.settingsBioErrorMessage.setText(R.string.error_bio_length);
                     fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.VISIBLE);
                 } else {
-                    onSaveUser.setBiography(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim());
+                    onSaveUser.setBiography(bio);
                     userViewModel.setUserBiography(onSaveUser);
                     fragmentEditProfileBinding.textInputEditTextBio.setText("");
                     isUserChanged = true;
@@ -217,8 +237,13 @@ public class EditProfileFragment extends Fragment {
                     .load(avatarId)
                     .dontAnimate()
                     .into(fragmentEditProfileBinding.profileImageSelect);
-        } else {
-            Log.d("USER NULL", "USER NULL");
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
+        userViewModel.getUsernameAvailableResult().removeObserver(usernameErrorObserver);
     }
 }

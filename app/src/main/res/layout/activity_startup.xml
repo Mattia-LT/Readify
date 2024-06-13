@@ -48,10 +48,10 @@
         android:layout_marginHorizontal="10dp"
         android:textColor="@color/black"
         android:text="@string/textview_slogan"
-        android:textSize="48sp"
+        android:textSize="42sp"
         android:textStyle="italic"
         android:background="@drawable/blur_effect"
-        android:lines="2"
+        android:maxLines="3"
         />
 
 

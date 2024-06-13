@@ -193,16 +193,18 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             if(result != null){
                 if(result){
                     SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
-                    for(String subject : book.getSubjects()){
-                        subject = subject.toLowerCase();
-                        if(subjectsUtil.containSubject(subject)){
-                            Integer currentValue = loggedUser.getRecommended().get(subject);
-                            if(currentValue != null){
-                                Integer newValue = currentValue + 1;
-                                loggedUser.getRecommended().put(subject, newValue);
-                            } else {
-                                Log.e(TAG, "Unknown subject : " + subject);
-                                loggedUser.getRecommended().put(subject, 0);
+                    if(book.getSubjects() != null){
+                        for(String subject : book.getSubjects()){
+                            subject = subject.toLowerCase();
+                            if(subjectsUtil.containSubject(subject)){
+                                Integer currentValue = loggedUser.getRecommended().get(subject);
+                                if(currentValue != null){
+                                    Integer newValue = currentValue + 1;
+                                    loggedUser.getRecommended().put(subject, newValue);
+                                } else {
+                                    Log.e(TAG, "Unknown subject : " + subject);
+                                    loggedUser.getRecommended().put(subject, 0);
+                                }
                             }
                         }
                     }
@@ -225,16 +227,18 @@ public class AddToCollectionBottomSheet extends BottomSheetDialogFragment {
             if(result != null){
                 if(result){
                     SubjectsUtil subjectsUtil = SubjectsUtil.getSubjectsUtil(requireContext());
-                    for(String subject : book.getSubjects()){
-                        subject = subject.toLowerCase();
-                        if(subjectsUtil.containSubject(subject)){
-                            Integer currentValue = loggedUser.getRecommended().get(subject);
-                            if(currentValue != null){
-                                Integer newValue = currentValue - 1;
-                                loggedUser.getRecommended().put(subject, newValue);
-                            } else {
-                                Log.e(TAG, "Unknown subject : " + subject);
-                                loggedUser.getRecommended().put(subject, 0);
+                    if(book.getSubjects() != null){
+                        for(String subject : book.getSubjects()){
+                            subject = subject.toLowerCase();
+                            if(subjectsUtil.containSubject(subject)){
+                                Integer currentValue = loggedUser.getRecommended().get(subject);
+                                if(currentValue != null){
+                                    Integer newValue = currentValue - 1;
+                                    loggedUser.getRecommended().put(subject, newValue);
+                                } else {
+                                    Log.e(TAG, "Unknown subject : " + subject);
+                                    loggedUser.getRecommended().put(subject, 0);
+                                }
                             }
                         }
                     }

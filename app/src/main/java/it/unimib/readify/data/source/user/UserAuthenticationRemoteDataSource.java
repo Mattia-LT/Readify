@@ -72,21 +72,6 @@ public class UserAuthenticationRemoteDataSource extends BaseUserAuthenticationRe
     }
 
     @Override
-    public void changeEmail(String newEmail) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        assert user != null;
-        user.verifyBeforeUpdateEmail(newEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.getException() != null) {
-                    Log.d("changeEmail", task.getException().toString());
-                }
-                userResponseCallback.onEmailChanged(task.isSuccessful());
-            }
-        });
-    }
-
-    @Override
     public void changePassword(String newPassword) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;

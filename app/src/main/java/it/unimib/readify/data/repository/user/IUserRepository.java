@@ -21,7 +21,6 @@ public interface IUserRepository {
     void logout();
     void changeUserPassword(String newPassword);
     void setUserUsername(User user);
-    void setUserEmail(String newEmail);
     void setUserGender(User user);
     void setUserVisibility(User user);
     void setUserRecommended(User user);
@@ -54,7 +53,6 @@ public interface IUserRepository {
     MutableLiveData<List<Result>> getFollowingListLiveData();
     MutableLiveData<Result> getOtherUserLiveData();
     MutableLiveData<String> getUsernameAvailableResult();
-    MutableLiveData<Boolean> getSourceEmailError();
     MutableLiveData<Boolean> getSourcePasswordError();
     MutableLiveData<Boolean> getLogoutResult();
     MutableLiveData<Boolean> getUserAuthenticationResult();

@@ -4,8 +4,6 @@ import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
 import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.LOGIN_ID_TOKEN;
-import static it.unimib.readify.util.Constants.INVALID_CREDENTIALS_ERROR;
-import static it.unimib.readify.util.Constants.INVALID_USER_ERROR;
 import static it.unimib.readify.util.Constants.PASSWORD;
 
 import android.app.PendingIntent;
@@ -117,8 +115,6 @@ public class LoginFragment extends Fragment {
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
             String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
             String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
-            //String email = "prova@gmail.com";
-            //String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 userViewModel.setUserMutableLiveData(email, password, true);
                 loggedUserObserver = result -> {

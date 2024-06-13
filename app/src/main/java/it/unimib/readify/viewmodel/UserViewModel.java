@@ -59,7 +59,6 @@ public class UserViewModel extends ViewModel {
     private MutableLiveData<Result> otherUserLiveData;
 
     private final MutableLiveData<String> usernameAvailableResult;
-    private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<Boolean> userAuthenticationResult;
@@ -121,7 +120,6 @@ public class UserViewModel extends ViewModel {
             copiedData.postValue(result);
         });
         usernameAvailableResult = testDatabaseRepository.getUsernameAvailableResult();
-        sourceEmailError = testDatabaseRepository.getSourceEmailError();
         sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
         notifications = testDatabaseRepository.getFetchedNotifications();
         userAuthenticationResult = testDatabaseRepository.getUserAuthenticationResult();
@@ -227,10 +225,6 @@ public class UserViewModel extends ViewModel {
         testDatabaseRepository.setUserUsername(user);
     }
 
-    public void setUserEmail(String newEmail) {
-        testDatabaseRepository.setUserEmail(newEmail);
-    }
-
     public void setUserGender(User user) {
         testDatabaseRepository.setUserGender(user);
     }
@@ -288,10 +282,6 @@ public class UserViewModel extends ViewModel {
 
     public MutableLiveData<String> getUsernameAvailableResult() {
         return usernameAvailableResult;
-    }
-
-    public MutableLiveData<Boolean> getSourceEmailError() {
-        return sourceEmailError;
     }
 
     public MutableLiveData<Boolean> getSourcePasswordError() {

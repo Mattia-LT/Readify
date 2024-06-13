@@ -39,7 +39,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<List<Result>> followingListLiveData;
     private final MutableLiveData<Result> otherUserLiveData;
     private final MutableLiveData<String> usernameAvailableResult;
-    private final MutableLiveData<Boolean> sourceEmailError;
     private final MutableLiveData<Boolean> sourcePasswordError;
     private final MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<Boolean> userAuthenticationResult;
@@ -62,7 +61,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         this.followingListLiveData = new MutableLiveData<>();
         this.otherUserLiveData = new MutableLiveData<>();
         this.usernameAvailableResult = new MutableLiveData<>();
-        this.sourceEmailError = new MutableLiveData<>();
         this.sourcePasswordError = new MutableLiveData<>();
         this.fetchedNotifications = new MutableLiveData<>();
         this.logoutResult = new MutableLiveData<>();
@@ -119,11 +117,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void setUserUsername(User user) {
         userDataRemoteDataSource.setUsername(user);
-    }
-
-    @Override
-    public void setUserEmail(String newEmail) {
-        userAuthRemoteDataSource.changeEmail(newEmail);
     }
 
     @Override
@@ -222,11 +215,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public MutableLiveData<String> getUsernameAvailableResult() {
         return usernameAvailableResult;
-    }
-
-    @Override
-    public MutableLiveData<Boolean> getSourceEmailError() {
-        return sourceEmailError;
     }
 
     @Override
@@ -518,9 +506,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     public void onUsernameAvailable(String result) {
         usernameAvailableResult.postValue(result);
     }
-
-    @Override
-    public void onEmailChanged(Boolean result) {sourceEmailError.postValue(result);}
 
     @Override
     public void onPasswordChanged(Boolean result) {

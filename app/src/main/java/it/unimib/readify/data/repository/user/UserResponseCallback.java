@@ -44,7 +44,6 @@ public interface UserResponseCallback {
     void onSuccessLogout();
     void onFailureLogout();
     void onUsernameAvailable(String result);
-    void onEmailChanged(Boolean result);
     void onPasswordChanged(Boolean result);
     void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications);
     void onFailureFetchNotifications(String message);

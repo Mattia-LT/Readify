@@ -75,15 +75,10 @@ public class RegisterFragment extends Fragment{
             //todo is the reference (textInputLayoutEmail) correct?
             String email = fragmentRegisterBinding.textInputLayoutEmail
                     .getEditText().getText().toString();
-            /*
             String password = fragmentRegisterBinding.textInputLayoutPassword
                     .getEditText().getText().toString();
             String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm
                     .getEditText().getText().toString();
-             */
-
-            String password = "password";
-            String passwordConfirm = "password";
 
             if (isEmailOk(email) && isPasswordOk(password) && isPasswordConfirmOk(passwordConfirm)) {
                 userViewModel.setUserMutableLiveData(email, password, false);

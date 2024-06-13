@@ -102,7 +102,6 @@ public class AuthenticationDialogFragment extends DialogFragment {
         confirm.setOnClickListener(e -> {
             if(confirm.isEnabled()) {
                 if(emailCanBeSubmitted && passwordCanBeSubmitted) {
-                    Toast.makeText(requireContext(), "data has been submitted", Toast.LENGTH_SHORT).show();
                     userViewModel.userAuthentication(emailToVerify, passwordToVerify);
                 }
             }

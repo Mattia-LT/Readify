@@ -21,6 +21,7 @@
         android:hint="Current email"
         android:textSize="22sp"
         android:layout_margin="20dp"
+        app:endIconMode="clear_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/authentication_title"/>
 
@@ -58,11 +59,10 @@
             android:layout_height="wrap_content"
             android:text="Confirm"
             android:textSize="20sp"
+            android:enabled="false"
             android:layout_marginStart="10dp"
             android:backgroundTint="@color/light_blue"
             />
 
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

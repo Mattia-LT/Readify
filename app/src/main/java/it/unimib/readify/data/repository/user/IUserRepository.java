@@ -45,6 +45,7 @@ public interface IUserRepository {
     void fetchOtherUser(String otherUserIdToken);
     void isUsernameAvailable(String username);
     void deleteUserInfo();
+    void resetAuthenticationResult();
     MutableLiveData<Result> getUserMutableLiveData();
     MutableLiveData<List<Result>> getUserSearchResultsLiveData();
     MutableLiveData<List<Result>> getCommentListLiveData();
@@ -57,5 +58,5 @@ public interface IUserRepository {
     MutableLiveData<Boolean> getLogoutResult();
     MutableLiveData<Boolean> getUserAuthenticationResult();
     MutableLiveData<HashMap<String, ArrayList<Notification>>> getFetchedNotifications();
-    long getLastAuthenticationTimestamp();
+    MutableLiveData<Long> getLastAuthenticationTimestamp();
 }

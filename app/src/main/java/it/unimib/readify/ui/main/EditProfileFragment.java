@@ -1,5 +1,9 @@
 package it.unimib.readify.ui.main;
 
+import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
+import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.PASSWORD;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,10 +23,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentEditProfileBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
@@ -30,15 +38,18 @@ public class EditProfileFragment extends Fragment {
 
     private FragmentEditProfileBinding fragmentEditProfileBinding;
     private UserViewModel userViewModel;
+    private DataEncryptionUtil dataEncryptionUtil;
     private User user;
     private User onSaveUser;
     private boolean isUsernameAvailable;
+    private boolean isUserChanged;
     private Observer<Result> userObserver;
     private Observer<String> usernameErrorObserver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
     }
 
     @Override
@@ -50,6 +61,7 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         isUsernameAvailable = false;
+        isUserChanged = false;
 
         userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
                 .create(UserViewModel.class);
@@ -59,6 +71,11 @@ public class EditProfileFragment extends Fragment {
                 user = ((Result.UserSuccess)result).getData();
                 onSaveUser = new User(user);
                 updateUI();
+
+                if(isUserChanged) {
+                    isUserChanged = false;
+                    Toast.makeText(requireContext(), "Profile has been updated", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 //todo navigate to login(?)
                 Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
@@ -116,16 +133,8 @@ public class EditProfileFragment extends Fragment {
                     && fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
                 if(!fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().isEmpty()
                         || !fragmentEditProfileBinding.textInputEditTextBio.getText().toString().isEmpty()) {
-
-                    showAuthenticationDialog();
-
-                    /*
                     onChangeUsername();
-                    onChangeEmail();
                     onChangeBio();
-                    onChangePassword();
-
-                     */
                 } else {
                     Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
                 }
@@ -143,9 +152,25 @@ public class EditProfileFragment extends Fragment {
             }
         });
 
-        fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> {
-            Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment);
-        });
+        //handling sensible data navigation
+        try {
+            String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
+            String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
+            if(savedEmail != null && savedPassword != null) {
+                fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.VISIBLE);
+                fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(e -> {
+                    Navigation.findNavController(requireView()).navigate(R.id.action_editProfileFragment_to_editSensibleFragment);
+                });
+            } else {
+                fragmentEditProfileBinding.buttonNavigateToSensible.setVisibility(View.GONE);
+                fragmentEditProfileBinding.buttonNavigateToSensible.setOnClickListener(null);
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 
     private void onChangeUsername() {
@@ -168,7 +193,7 @@ public class EditProfileFragment extends Fragment {
                     onSaveUser.setUsername(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim());
                     userViewModel.setUserUsername(onSaveUser);
                     fragmentEditProfileBinding.textInputEditTextUsername.setText("");
-                    Toast.makeText(requireContext(), "Username updated", Toast.LENGTH_SHORT).show();
+                    isUserChanged = true;
                 }
             }
         }
@@ -178,13 +203,15 @@ public class EditProfileFragment extends Fragment {
         if(fragmentEditProfileBinding.textInputEditTextBio.getText() != null) {
             if (!fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().isEmpty()) {
                 if (fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().length() > 100) {
-                    fragmentEditProfileBinding.textInputEditTextBio.setText("La bio non deve superare 100 caratteri");
-                    fragmentEditProfileBinding.textInputEditTextBio.setVisibility(View.VISIBLE);
+                    fragmentEditProfileBinding.settingsBioErrorMessage.setText("La bio non deve superare 100 caratteri");
+                    fragmentEditProfileBinding.settingsBioErrorMessage.setVisibility(View.VISIBLE);
                 }else if(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim().equals(user.getBiography())) {
                     Toast.makeText(requireContext(), "Questa è gia la tua bio", Toast.LENGTH_SHORT).show();
                 } else {
                     onSaveUser.setBiography(fragmentEditProfileBinding.textInputEditTextBio.getText().toString().trim());
                     userViewModel.setUserBiography(onSaveUser);
+                    fragmentEditProfileBinding.textInputEditTextBio.setText("");
+                    isUserChanged = true;
                 }
             }
         }
@@ -205,10 +232,5 @@ public class EditProfileFragment extends Fragment {
         } else {
             Log.d("USER NULL", "USER NULL");
         }
-    }
-
-    private void showAuthenticationDialog() {
-        AuthenticationDialogFragment dialog = new AuthenticationDialogFragment();
-        dialog.show(requireActivity().getSupportFragmentManager(), "AuthenticationDialog");
     }
 }

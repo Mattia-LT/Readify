@@ -67,7 +67,7 @@ public class UserViewModel extends ViewModel {
     private boolean isUIRunning;
     private boolean firstLoading = true;
     private boolean continueRegistrationFirstLoading = true;
-    private long lastAuthenticationTimestamp;
+    private final MutableLiveData<Long> lastAuthenticationTimestamp;
     public UserViewModel(IUserRepository testDatabaseRepository) {
         this.testDatabaseRepository = testDatabaseRepository;
         /*
@@ -126,8 +126,6 @@ public class UserViewModel extends ViewModel {
         notifications = testDatabaseRepository.getFetchedNotifications();
         userAuthenticationResult = testDatabaseRepository.getUserAuthenticationResult();
         lastAuthenticationTimestamp = testDatabaseRepository.getLastAuthenticationTimestamp();
-        Log.d("viewmodel", getTimeInstance().format(lastAuthenticationTimestamp));
-
     }
 
     //new logic
@@ -206,7 +204,7 @@ public class UserViewModel extends ViewModel {
         return commentListLiveData;
     }
 
-    public long getLastAuthenticationTimestamp() {
+    public MutableLiveData<Long> getLastAuthenticationTimestamp() {
         return lastAuthenticationTimestamp;
     }
 
@@ -360,6 +358,10 @@ public class UserViewModel extends ViewModel {
 
     public void setContinueRegistrationFirstLoading(boolean continueRegistrationFirstLoading) {
         this.continueRegistrationFirstLoading = continueRegistrationFirstLoading;
+    }
+
+    public void resetAuthenticationResult() {
+        testDatabaseRepository.resetAuthenticationResult();
     }
 
     public void isUsernameAvailable(String username){

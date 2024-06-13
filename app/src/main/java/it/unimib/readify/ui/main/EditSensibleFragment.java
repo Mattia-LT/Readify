@@ -1,10 +1,17 @@
 package it.unimib.readify.ui.main;
 
+import static java.text.DateFormat.getTimeInstance;
+
+import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
+import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
+import static it.unimib.readify.util.Constants.SHARED_PREFERENCES_FILE_NAME;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,10 +23,16 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import it.unimib.readify.R;
 import it.unimib.readify.databinding.FragmentEditSensibleBinding;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
+import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 
@@ -30,9 +43,11 @@ public class EditSensibleFragment extends Fragment {
     private Observer<Boolean> emailErrorObserver;
     private Observer<Boolean> passwordErrorObserver;
     private Observer<Result> userObserver;
+    private Observer<Long> lastAuthenticationTimestampObserver;
     private User user;
-    private User onSaveUser;
     private String newPassword;
+    private Long lastAuthenticationTimestamp;
+    private DataEncryptionUtil dataEncryptionUtil;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,80 +58,40 @@ public class EditSensibleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
 
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
+        initViewModels();
+        initObservers();
 
-        emailErrorObserver = result -> {
-            /*
-            switch (result) {
-                case "available":
-                    Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
-                    fragmentSettingsBinding.editSensibleInputEmail.setText("");
-                    break;
-                case "notAvailable":
-                    fragmentSettingsBinding.editSensibleErrorEmail.setText(R.string.email_already_taken);
-                    fragmentSettingsBinding.editSensibleErrorEmail.setVisibility(View.VISIBLE);
-                    break;
-                case "error":
-                    //todo use snack bar instead (to implement an action)?
-                    Toast.makeText(requireContext(), "System: email error", Toast.LENGTH_SHORT).show();
-                    break;
-            }
+        fragmentEditSensibleBinding.buttonConfirmEdit.setOnClickListener(v -> {
+            fragmentEditSensibleBinding.editSensibleErrorEmail.setText("");
+            fragmentEditSensibleBinding.editSensibleErrorEmail.setVisibility(View.GONE);
+            fragmentEditSensibleBinding.editSensibleErrorPassword.setText("");
+            fragmentEditSensibleBinding.editSensibleErrorPassword.setVisibility(View.GONE);
+            fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setText("");
+            fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setVisibility(View.GONE);
 
-             */
-            if(result) {
-                Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
-                fragmentEditSensibleBinding.editSensibleInputEmail.setText("");
+            if(fragmentEditSensibleBinding.editSensibleInputEmail.getText() != null
+                    && fragmentEditSensibleBinding.editSensibleInputPassword.getText() != null
+                    && fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText() != null) {
+                if(!fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim().isEmpty()
+                        || !fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim().isEmpty()
+                        || !fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim().isEmpty()) {
+                    if(isReAuthenticationRequired()) {
+                        showAuthenticationDialog();
+                    } else {
+                        Toast.makeText(requireContext(), "OK", Toast.LENGTH_SHORT).show();
+                        onChangeEmail();
+                        onChangePassword();
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Fill in at least one field", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(requireContext(), "failure", Toast.LENGTH_SHORT).show();
+                //todo add Snack bar action (reload app?)
+                Snackbar.make(view, "System error", Snackbar.LENGTH_SHORT).show();
             }
-        };
-
-        userObserver = result -> {
-            if(result.isSuccess()) {
-                user = ((Result.UserSuccess)result).getData();
-                onSaveUser = new User(user);
-            } else {
-                //todo navigate to login(?)
-                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        };
-
-        passwordErrorObserver = result -> {
-            Log.d("email changed", result.toString());
-            if(result) {
-                Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
-                fragmentEditSensibleBinding.editSensibleInputPassword.setText("");
-                fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.setText("");
-            } else {
-                //todo use snack bar instead (to implement an action)?
-                Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        userViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
-        userViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
-        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
-
-        //onclicklistener confirm
-        /*
-        fragmentEditSensibleBinding.editSensibleErrorEmail.setText("");
-        fragmentEditSensibleBinding.editSensibleErrorEmail.setVisibility(View.GONE);
-        fragmentEditSensibleBinding.editSensibleErrorPassword.setText("");
-        fragmentEditSensibleBinding.editSensibleErrorPassword.setVisibility(View.GONE);
-        fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setText("");
-        fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setVisibility(View.GONE);
-
-            && fragmentEditSensibleBinding.editSensibleInputEmail.getText() != null
-                && fragmentEditSensibleBinding.editSensibleInputPassword.getText() != null
-                && fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText() != null)
-
-                    || !fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().isEmpty()
-                || !fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().isEmpty()
-                || !fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().isEmpty()
-
-         */
+        });
 
         fragmentEditSensibleBinding.buttonUndoChanges.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,16 +103,61 @@ public class EditSensibleFragment extends Fragment {
         });
     }
 
+    private void initViewModels() {
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
+
+    private void initObservers() {
+        userObserver = result -> {
+            if(result.isSuccess()) {
+                user = ((Result.UserSuccess)result).getData();
+            }
+        };
+
+        emailErrorObserver = result -> {
+            if(result) {
+                Toast.makeText(requireContext(), "Email updated", Toast.LENGTH_SHORT).show();
+                fragmentEditSensibleBinding.editSensibleInputEmail.setText("");
+            } else {
+                Toast.makeText(requireContext(), "failure", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        passwordErrorObserver = result -> {
+            if(result) {
+                Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
+                fragmentEditSensibleBinding.editSensibleInputPassword.setText("");
+                fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.setText("");
+                dataEncryptionUtil.deleteAll(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, ENCRYPTED_DATA_FILE_NAME);
+            } else {
+                Toast.makeText(requireContext(), "System: password error", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        lastAuthenticationTimestampObserver = result -> {
+            if(result != null) {
+                lastAuthenticationTimestamp = result;
+                Log.d("editSensibleFragment last timestamp", getTimeInstance().format(lastAuthenticationTimestamp));
+            }
+        };
+
+        userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), userObserver);
+        userViewModel.getSourceEmailError().observe(getViewLifecycleOwner(), emailErrorObserver);
+        userViewModel.getSourcePasswordError().observe(getViewLifecycleOwner(), passwordErrorObserver);
+        userViewModel.getLastAuthenticationTimestamp().observe(getViewLifecycleOwner(), lastAuthenticationTimestampObserver);
+    }
+
     private void onChangeEmail() {
         if(fragmentEditSensibleBinding.editSensibleInputEmail.getText() != null) {
-            if (!fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim().isEmpty()) {
-                if(!EmailValidator.getInstance().isValid((fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim()))) {
+            String newEmail = fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim();
+            if (!newEmail.isEmpty()) {
+                if(!EmailValidator.getInstance().isValid((newEmail))) {
                     fragmentEditSensibleBinding.editSensibleErrorEmail.setText(R.string.email_invalid_input);
                     fragmentEditSensibleBinding.editSensibleErrorEmail.setVisibility(View.VISIBLE);
-                } else if(fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim().equals(user.getEmail())) {
+                } else if(newEmail.equals(user.getEmail())) {
                     Toast.makeText(requireContext(), "This is already your email", Toast.LENGTH_SHORT).show();
                 } else {
-                    String newEmail = fragmentEditSensibleBinding.editSensibleInputEmail.getText().toString().trim();
                     userViewModel.setUserEmail(newEmail);
                 }
             }
@@ -147,28 +167,52 @@ public class EditSensibleFragment extends Fragment {
     private void onChangePassword() {
         if(fragmentEditSensibleBinding.editSensibleInputPassword.getText() != null
                 && fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText() != null) {
-            if(fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim().isEmpty()
-                    && !fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim().isEmpty()) {
-                fragmentEditSensibleBinding.editSensibleErrorPassword.setText(R.string.field_not_filled_in);
-                fragmentEditSensibleBinding.editSensibleErrorPassword.setVisibility(View.VISIBLE);
-            } else if(!fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim().isEmpty()
-                    && fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim().isEmpty()) {
-                fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setText(R.string.field_not_filled_in);
-                fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setVisibility(View.VISIBLE);
-            } else if(!fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim().isEmpty()
-                    && !fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim().isEmpty()) {
-                if(fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim().length() < 6) {
-                    fragmentEditSensibleBinding.editSensibleErrorPassword.setText(R.string.error_password_length);
-                    fragmentEditSensibleBinding.editSensibleErrorPassword.setVisibility(View.VISIBLE);
-                } else if(!fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim()
-                        .equals(fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim())) {
-                    fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setText(R.string.error_confirm_password_equal);
-                    fragmentEditSensibleBinding.editSensibleErrorConfirmPassword.setVisibility(View.VISIBLE);
+            String password = fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim();
+            String confirmPassword = fragmentEditSensibleBinding.editSensibleInputPasswordConfirm.getText().toString().trim();
+            TextView errorPassword = fragmentEditSensibleBinding.editSensibleErrorPassword;
+            TextView errorConfirmPassword = fragmentEditSensibleBinding.editSensibleErrorConfirmPassword;
+            if(password.isEmpty() && !confirmPassword.isEmpty()) {
+                errorPassword.setText(R.string.field_not_filled_in);
+                errorPassword.setVisibility(View.VISIBLE);
+            } else if(!password.isEmpty() && confirmPassword.isEmpty()) {
+                errorConfirmPassword.setText(R.string.field_not_filled_in);
+                errorConfirmPassword.setVisibility(View.VISIBLE);
+            } else if(!password.isEmpty()) {
+                if(password.length() < 6) {
+                    errorPassword.setText(R.string.error_password_length);
+                    errorPassword.setVisibility(View.VISIBLE);
+                } else if(!confirmPassword.equals(password)) {
+                    errorConfirmPassword.setText(R.string.error_confirm_password_equal);
+                    errorConfirmPassword.setVisibility(View.VISIBLE);
                 } else {
-                    newPassword = fragmentEditSensibleBinding.editSensibleInputPassword.getText().toString().trim();
+                    newPassword = password;
                     userViewModel.changeUserPassword(newPassword);
                 }
             }
         }
+    }
+
+    private boolean isReAuthenticationRequired() {
+        boolean isReAuthenticationRequired = false;
+        long currentTimestamp = System.currentTimeMillis();
+        Log.d("currentTimestamp", getTimeInstance().format(currentTimestamp));
+        Log.d("lastAuthenticationTimestamp", getTimeInstance().format(lastAuthenticationTimestamp));
+        //checks if 20 seconds have passed since last authentication
+        if(lastAuthenticationTimestamp + 20000 < currentTimestamp)
+            isReAuthenticationRequired = true;
+        return  isReAuthenticationRequired;
+    }
+
+    private void showAuthenticationDialog() {
+        AuthenticationDialogFragment dialog = new AuthenticationDialogFragment();
+        dialog.show(requireActivity().getSupportFragmentManager(), "AuthenticationDialog");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserMediatorLiveData().removeObserver(userObserver);
+        userViewModel.getSourceEmailError().removeObserver(emailErrorObserver);
+        userViewModel.getSourcePasswordError().removeObserver(passwordErrorObserver);
     }
 }

@@ -3,6 +3,7 @@ package it.unimib.readify.ui.main;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class AuthenticationDialogFragment extends DialogFragment {
 
     //private FragmentDialogAuthenticationBinding fragmentDialogAuthenticationBinding = null;
     private UserViewModel userViewModel;
+    private Observer<Boolean> userAuthenticationObserver;
     private boolean emailCanBeSubmitted;
     private boolean passwordCanBeSubmitted;
     private String emailToVerify;
@@ -41,25 +43,13 @@ public class AuthenticationDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
-
-        final Observer<Boolean> userAuthenticationObserver = result -> {
-            if(result != null) {
-                if(result) {
-                    Toast.makeText(requireContext(), "Authentication confirmed", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-        userViewModel.getUserAuthenticationResult().observe(getViewLifecycleOwner(), userAuthenticationObserver);
+        initViewModels();
+        initObservers();
 
         EditText email = view.findViewById(R.id.authentication_email);
         EditText password = view.findViewById(R.id.authentication_password);
         Button cancel = view.findViewById(R.id.authentication_cancel);
         Button confirm = view.findViewById(R.id.authentication_confirm);
-
         emailCanBeSubmitted = false;
         passwordCanBeSubmitted = false;
 
@@ -110,30 +100,48 @@ public class AuthenticationDialogFragment extends DialogFragment {
         }
 
         confirm.setOnClickListener(e -> {
-            if(emailCanBeSubmitted && passwordCanBeSubmitted) {
-                Toast.makeText(requireContext(), "data has been submitted", Toast.LENGTH_SHORT).show();
-                userViewModel.userAuthentication(emailToVerify, passwordToVerify);
+            if(confirm.isEnabled()) {
+                if(emailCanBeSubmitted && passwordCanBeSubmitted) {
+                    Toast.makeText(requireContext(), "data has been submitted", Toast.LENGTH_SHORT).show();
+                    userViewModel.userAuthentication(emailToVerify, passwordToVerify);
+                }
             }
         });
+    }
+
+    public void initViewModels() {
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
+    }
+
+    public void initObservers() {
+        userAuthenticationObserver = result -> {
+            if(result != null) {
+                if(result) {
+                    Toast.makeText(requireContext(), "Authentication confirmed", Toast.LENGTH_SHORT).show();
+                    userViewModel.resetAuthenticationResult();
+                    dismiss();
+                } else {
+                    Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        userViewModel.getUserAuthenticationResult().observe(getViewLifecycleOwner(), userAuthenticationObserver);
     }
 
     public void setConfirmButtonState(Button confirm) {
         if(emailCanBeSubmitted && passwordCanBeSubmitted) {
             confirm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.login_blue));
+            confirm.setEnabled(true);
         } else {
             confirm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_blue));
+            confirm.setEnabled(false);
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        userViewModel.getUserAuthenticationResult().removeObserver(userAuthenticationObserver);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -184,10 +184,10 @@ public class LoginFragment extends Fragment {
         */
         //login set data
         fragmentLoginBinding.buttonLogin.setOnClickListener(v -> {
-            //String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
-            //String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
-            String email = "prova@gmail.com";
-            String password = "password";
+            String email = fragmentLoginBinding.textInputEditTextEmail.getEditableText().toString();
+            String password = fragmentLoginBinding.textInputEditTextPassword.getEditableText().toString();
+            //String email = "prova@gmail.com";
+            //String password = "password";
             if(isEmailOk(email) && isPasswordOk(password)) {
                 userViewModel.setUserMutableLiveData(email, password, true);
                 loggedUserObserver = result -> {

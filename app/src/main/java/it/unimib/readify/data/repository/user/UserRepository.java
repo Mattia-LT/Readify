@@ -44,7 +44,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<Boolean> logoutResult;
     private final MutableLiveData<Boolean> userAuthenticationResult;
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
-    private long lastAuthenticationTimestamp;
+    private final MutableLiveData<Long> lastAuthenticationTimestamp;
 
     public static IUserRepository getInstance(Application application) {
         return new UserRepository(new UserAuthenticationRemoteDataSource(),
@@ -66,6 +66,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         this.sourcePasswordError = new MutableLiveData<>();
         this.fetchedNotifications = new MutableLiveData<>();
         this.logoutResult = new MutableLiveData<>();
+        this.lastAuthenticationTimestamp = new MutableLiveData<>();
         this.userAuthenticationResult = new MutableLiveData<>();
         this.userAuthRemoteDataSource.setUserResponseCallback(this);
         this.userDataRemoteDataSource.setUserResponseCallback(this);
@@ -247,7 +248,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         return userAuthenticationResult;
     }
 
-    public long getLastAuthenticationTimestamp() {
+    public MutableLiveData<Long> getLastAuthenticationTimestamp() {
         return lastAuthenticationTimestamp;
     }
 
@@ -256,8 +257,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
         if (user != null) {
             userDataRemoteDataSource.saveUserData(user);
             logoutResult.postValue(null);
-            lastAuthenticationTimestamp = System.currentTimeMillis();
-            Log.d("onSuccessFromAuthentication", getTimeInstance().format(lastAuthenticationTimestamp));
+            lastAuthenticationTimestamp.postValue(System.currentTimeMillis());
         }
     }
 
@@ -427,10 +427,18 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void deleteUserInfo() {
         if(userMutableLiveData.getValue() != null){
-            User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
-            currentUser.setIdToken(null);
-            userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
+            Result currentValue = userMutableLiveData.getValue();
+            if(currentValue.isSuccess()) {
+                User currentUser = ((Result.UserSuccess)(userMutableLiveData.getValue())).getData();
+                currentUser.setIdToken(null);
+                userMutableLiveData.postValue(new Result.UserSuccess(currentUser));
+            }
         }
+    }
+
+    @Override
+    public void resetAuthenticationResult() {
+        userAuthenticationResult.postValue(null);
     }
 
 
@@ -513,6 +521,12 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void onPasswordChanged(Boolean result) {
         sourcePasswordError.postValue(result);
+        if(result) {
+            Log.d("onPasswordChanged", "true");
+        } else {
+            Log.d("onPasswordChanged", "false");
+        }
+
     }
 
     @Override
@@ -529,6 +543,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void onSuccessReAuthentication() {
         userAuthenticationResult.postValue(true);
+        lastAuthenticationTimestamp.postValue(System.currentTimeMillis());
     }
 
     @Override

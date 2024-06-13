@@ -89,7 +89,7 @@
     <string name="no_notifications_found">Nessuna nuova notifica</string>
     <string name="content_description_logo_startup">Logo dell\'applicazione, caricamento…</string>
     <string name="textview_select_avatar">Seleziona l\'immagine profilo</string>
-    <string name="content_description_button_edit_profile">Bottone per confermare le modifiche al profilo</string>
+    <string name="content_description_button_edit_profile">Conferma le modifiche al profilo</string>
     <string name="textview_already_registered">Hai già un account?</string>
 
 
@@ -130,7 +130,7 @@
     <string name="follow_button_string">Segui</string>
     <string name="unfollow_button_string">Smetti di seguire</string>
     <string name="content_description_background_book">Sfondo contenente una versione blurrata della copertina del libro.</string>
-    <string name="content_description_add_to_collection">Bottone utilizzato per aggiungere un libro ad una collezione.</string>
+    <string name="content_description_add_to_collection">Aggiungi un libro ad una collezione.</string>
     <string name="snackbar_empty_comment">Non puoi inserire un commento vuoto.</string>
     <string name="delete_comment_button">Elimina questo commento</string>
     <string name="textview_add_to_collection_title">Seleziona una collezione</string>

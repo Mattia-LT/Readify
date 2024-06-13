@@ -117,7 +117,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:itemCount="1"
+        tools:itemCount="3"
         tools:listitem="@layout/book_search_item"
         />
 

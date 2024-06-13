@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:theme="@style/RatingBar"
-                />
+                android:rating="4.5" />
 
 
             <TextView

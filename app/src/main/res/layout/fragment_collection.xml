@@ -19,8 +19,7 @@
             android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/textview_collection_name_placeholder"
-            />
+            tools:text="@string/textview_collection_name_placeholder" />
 
         <TextView
             android:id="@+id/collection_fragment_number_of_books"
@@ -31,8 +30,7 @@
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/collection_fragment_collection_name"
-            tools:text="45 books"
-            />
+            tools:text="45 books" />
 
         <ImageView
             android:id="@+id/collection_fragment_collection_visibility"
@@ -43,8 +41,7 @@
             app:layout_constraintStart_toEndOf="@id/collection_fragment_number_of_books"
             app:layout_constraintTop_toBottomOf="@id/collection_fragment_collection_name"
             android:contentDescription="@string/content_description_collection_visibility"
-            tools:src="@drawable/baseline_lock_outline_24"
-            />
+            tools:src="@drawable/baseline_lock_outline_24" />
 
         <Spinner
             android:id="@+id/collection_fragment_spinner_collection_visibility"
@@ -58,8 +55,7 @@
             android:entries="@array/visibility"
             tools:entries="@array/visibility"
             tools:listitem="@layout/support_simple_spinner_dropdown_item"
-            tools:visibility="gone"
-            />
+            tools:visibility="gone" />
 
         <TextView
             android:id="@+id/collection_fragment_textview_collection_visibility"
@@ -72,8 +68,7 @@
             app:layout_constraintTop_toBottomOf="@id/collection_fragment_collection_name"
             android:gravity="center_vertical"
             tools:visibility="visible"
-            tools:text="Public"
-            />
+            tools:text="Public" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collectionFragment_booksRecyclerView"
@@ -85,8 +80,7 @@
             app:layout_constraintTop_toBottomOf="@id/collection_fragment_number_of_books"
             tools:itemCount="6"
             tools:listitem="@layout/book_collection_item"
-            tools:visibility="visible"
-            />
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

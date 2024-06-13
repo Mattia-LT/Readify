@@ -34,18 +34,17 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:text="@string/placeholder_username"
-                />
+                tools:text="@string/placeholder_username" />
 
             <TextView
                 android:id="@+id/textview_books_read"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/textview_books_read"
-                android:layout_marginTop="10dp"
-                />
+                tools:text="@string/textview_books_read"
+                android:layout_marginTop="10dp" />
 
         </LinearLayout>
 
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

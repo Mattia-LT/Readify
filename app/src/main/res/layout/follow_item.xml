@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/follow_image"
@@ -51,8 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
-        tools:visibility="visible"
-        />
+        tools:visibility="visible" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/unfollow_button"
@@ -74,8 +72,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:backgroundTint="?attr/colorButtonNormal"
         android:visibility="gone"
-        tools:visibility="gone"
-        />
-
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

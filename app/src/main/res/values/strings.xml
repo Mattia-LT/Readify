@@ -123,7 +123,7 @@
     <string name="follow_button_string">Follow</string>
     <string name="unfollow_button_string">Unfollow</string>
     <string name="content_description_background_book">A background containning a blurred version of the book\'s cover.</string>
-    <string name="content_description_add_to_collection">Button used to add a book into a collection.</string>
+    <string name="content_description_add_to_collection">Add a book into a collection.</string>
     <string name="snackbar_empty_comment">You cannot enter an empty comment.</string>
     <string name="delete_comment_button">Delete this comment</string>
     <string name="textview_add_to_collection_title">Select a collection</string>
@@ -161,7 +161,7 @@
     <string name="no_notifications_found">No new notifications yet</string>
     <string name="content_description_logo_startup">Application logo, loading…</string>
     <string name="textview_select_avatar">Select your profile picture</string>
-    <string name="content_description_button_edit_profile">Button to confirm profile changes</string>
+    <string name="content_description_button_edit_profile">Confirm profile changes</string>
     <string name="textview_already_registered">Do you already have an account?</string>
     <string name="change_collection_visibility_action">Visibility</string>
     <string name="no_collections_found">No collection found.\nThis user has no public collection!</string>

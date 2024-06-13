@@ -51,6 +51,7 @@
         app:layout_constraintTop_toBottomOf="@+id/authentication_email"/>
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/authentication_password"
@@ -60,15 +61,18 @@
 
         <Button
             android:id="@+id/authentication_cancel"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel_action"
             android:textSize="20sp"
+            android:textColor="@color/white"
             android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/grey_disabled_item"/>
+            android:backgroundTint="@color/grey_disabled_item" />
 
         <Button
             android:id="@+id/authentication_confirm"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_action"

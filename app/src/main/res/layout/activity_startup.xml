@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/mobile_gradient_backgrounds_intro"
@@ -20,8 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_readify_logo_colored"
         app:layout_constraintHorizontal_chainStyle="packed"
-
-        />
+        app:tint="?attr/colorPrimary" />
 
     <TextView
         android:id="@+id/title_startup"
@@ -29,7 +27,7 @@
         android:layout_height="100dp"
         android:layout_marginTop="140dp"
         android:text="@string/app_name"
-        android:textColor="@color/login_blue"
+        android:textColor="?attr/colorPrimary"
         android:textSize="50sp"
         android:textStyle="bold|italic"
         android:gravity="center"
@@ -68,13 +66,12 @@
         android:text="@string/button_getting_started"
         android:textColor="@color/white"
         android:textSize="24sp"
+        android:layout_marginTop="200dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-
         app:layout_constraintTop_toBottomOf="@+id/textview_slogan"
-        app:layout_constraintVertical_bias="0.751" />
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

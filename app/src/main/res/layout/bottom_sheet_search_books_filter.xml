@@ -6,8 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomsheet"
@@ -15,8 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingBottom="16dp"
-        >
+        android:paddingBottom="16dp">
 
         <com.google.android.material.bottomsheet.BottomSheetDragHandleView
             android:id="@+id/bottomsheet_drag_handler"
@@ -24,8 +22,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/bottom_sheet_title"
@@ -116,7 +113,6 @@
             app:layout_constraintTop_toBottomOf="@id/textview_genre_filter_title"
             app:selectionRequired="false"
             app:singleSelection="false">
-
 
         </com.google.android.material.chip.ChipGroup>
 

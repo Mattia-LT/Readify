@@ -6,124 +6,121 @@
     android:id="@+id/book_collection_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="160dp"
-    >
+    android:minHeight="160dp">
 
-        <ImageView
-            android:id="@+id/book_collection_thumbnail_imageview"
-            android:layout_width="100dp"
+    <ImageView
+        android:id="@+id/book_collection_thumbnail_imageview"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/content_description_book_cover"
+        android:layout_marginVertical="10dp"
+        android:paddingVertical="5dp"
+        android:paddingHorizontal="5dp"
+        android:layout_gravity="center_vertical"
+        tools:src="@drawable/image_not_available" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/book_collection_data_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        >
+
+        <TextView
+            android:id="@+id/textview_book_collection_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/content_description_book_cover"
-            android:layout_marginVertical="10dp"
-            android:paddingVertical="5dp"
-            android:paddingHorizontal="5dp"
-            android:layout_gravity="center_vertical"
-            tools:src="@drawable/image_not_available"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="18dp"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            tools:text="@string/placeholder_book_title"
             />
 
+        <TextView
+            android:id="@+id/textview_book_collection_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_book_collection_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="18dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            style="@style/TextAppearance.AppCompat.Small"
+            tools:text="@string/placeholder_book_author"
+            />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/book_collection_data_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+        <HorizontalScrollView
+            android:id="@+id/scroll_view_book_collection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_book_collection_author"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="18dp"
             >
 
-            <TextView
-                android:id="@+id/textview_book_collection_title"
-                android:layout_width="match_parent"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipgroup_book_collection_genres"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="5dp"
+                app:singleLine="true">
+
+            </com.google.android.material.chip.ChipGroup>
+
+
+        </HorizontalScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/scroll_view_book_collection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginHorizontal="18dp"
+            >
+
+            <RatingBar
+                android:id="@+id/rating_bar_book_collection"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:layout_marginTop="24dp"
-                android:layout_marginStart="18dp"
-                style="@style/TextAppearance.Material3.TitleMedium"
-                tools:text="@string/placeholder_book_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:theme="@style/RatingBar"
                 />
+
 
             <TextView
-                android:id="@+id/textview_book_collection_author"
-                android:layout_width="match_parent"
+                android:id="@+id/rating_bar_label_book_collection"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textview_book_collection_title"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="12dp"
-                android:layout_marginStart="18dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                style="@style/TextAppearance.AppCompat.Small"
-                tools:text="@string/placeholder_book_author"
-                />
-
-            <HorizontalScrollView
-                android:id="@+id/scroll_view_book_collection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textview_book_collection_author"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="12dp"
-                android:layout_marginHorizontal="18dp"
-                >
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipgroup_book_collection_genres"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:chipSpacingHorizontal="5dp"
-                    app:singleLine="true">
-
-                </com.google.android.material.chip.ChipGroup>
-
-
-            </HorizontalScrollView>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/scroll_view_book_collection"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginHorizontal="18dp"
-                >
-
-                <RatingBar
-                    android:id="@+id/rating_bar_book_collection"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.AppCompat.RatingBar.Small"
-                    android:theme="@style/RatingBar"
-                    />
-
-
-                <TextView
-                    android:id="@+id/rating_bar_label_book_collection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/rating_bar_book_collection"
-                    android:textColor="@color/rating_yellow"
-                    android:layout_marginStart="4dp"
-                    android:textStyle="bold"
-                    style="@style/TextAppearance.Material3.BodySmall"
-                    tools:text="4.5"
-                    />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toEndOf="@id/rating_bar_book_collection"
+                android:textColor="@color/rating_yellow"
+                android:layout_marginStart="4dp"
+                android:textStyle="bold"
+                style="@style/TextAppearance.Material3.BodySmall"
+                tools:text="4.5"
+                />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

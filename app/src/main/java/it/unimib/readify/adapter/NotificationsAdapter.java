@@ -30,8 +30,8 @@ public class NotificationsAdapter extends ListAdapter<Notification, Notification
 
     public interface OnItemClickListener {
         void onNotificationItemClick(Notification notification);
-        void onFollowUser(String externalUserIdToken);
-        void onUnfollowUser(String externalUserIdToken);
+        void onFollowUser(String followedUserIdToken);
+        void onUnfollowUser(String followedUserIdToken);
     }
 
     public NotificationsAdapter(OnItemClickListener onItemClickListener) {

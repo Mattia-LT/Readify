@@ -17,7 +17,8 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:indicatorColor="?attr/colorAccent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_search"
@@ -108,7 +109,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         app:layout_constrainedHeight="true"
@@ -116,7 +117,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:itemCount="12"
+        tools:itemCount="1"
         tools:listitem="@layout/book_search_item"
         />
 

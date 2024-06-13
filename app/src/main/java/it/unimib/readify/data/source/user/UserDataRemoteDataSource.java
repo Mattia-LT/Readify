@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -386,11 +385,20 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .child(FIREBASE_USERS_COLLECTION);
 
         query = query.toLowerCase();
-        // query + "\uf8ff" is used to set the end of the range
-        Query searchQuery = usersCollectionReference
-                .orderByChild(FIREBASE_USERS_USERNAME_FIELD)
-                .startAt(query)
-                .endAt(query + "\uf8ff");
+        Query searchQuery;
+        //'~' to include all characters that follow the query
+        if (query.length() == 1) {
+            searchQuery = usersCollectionReference
+                    .orderByChild(FIREBASE_USERS_USERNAME_FIELD)
+                    .startAt(query)
+                    .endAt(query + "~");
+        } else {
+            // query + "\uf8ff" is used to set the end of the range
+            searchQuery = usersCollectionReference
+                    .orderByChild(FIREBASE_USERS_USERNAME_FIELD)
+                    .startAt(query)
+                    .endAt(query + "\uf8ff");
+        }
 
         searchQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

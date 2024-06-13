@@ -212,7 +212,9 @@ public class CollectionFragment extends Fragment {
             if (!isValid){
                 if (renameEditText != null) {
                     renameEditText.setError(getString(R.string.error_collection_name_not_valid));
-                    renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    if(renameDialog!= null){
+                        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    }
                 }
             }
         });
@@ -222,11 +224,15 @@ public class CollectionFragment extends Fragment {
                 if (renameEditText != null) {
                     renameEditText.setError(null);
                 }
-                renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                if(renameDialog != null){
+                    renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
             } else {
                 if (renameEditText != null) {
                     renameEditText.setError(getString(R.string.error_collection_name_not_unique));
-                    renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    if(renameDialog!= null){
+                        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    }
                 }
             }
         });
@@ -262,7 +268,7 @@ public class CollectionFragment extends Fragment {
             });
         }
 
-        AlertDialog.Builder renameDialogBuilder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder renameDialogBuilder = new AlertDialog.Builder(requireContext(), R.style.RenameAlertDialogTheme);
         renameDialogBuilder
                 .setTitle(R.string.rename_collection_action)
                 .setMessage(originalMessage)

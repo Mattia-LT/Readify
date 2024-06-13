@@ -33,6 +33,23 @@
         <item name="android:textAlignment">textStart</item>
     </style>
 
+    <style name="CustomCollectionVisibilitySwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">?attr/colorAccent</item>
+    </style>
+
+    <style name="RenameAlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@drawable/dialog_button_selector</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@drawable/dialog_button_selector</item>
+    </style>
+
 </resources>
 
 

@@ -113,7 +113,13 @@ public class CollectionAdapter extends ListAdapter<Collection, CollectionAdapter
                                             @Override
                                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                                 binding.collectionThumbnailImageview.setImageBitmap(resource);
-                                                Palette.from(resource).generate(palette -> {
+                                                int width = resource.getWidth();
+                                                int height = resource.getHeight();
+                                                int cornerWidth = width / 3;
+                                                int cornerHeight = height / 4;
+                                                Bitmap cornerBitmap = Bitmap.createBitmap(resource, width - cornerWidth, 0, cornerWidth, cornerHeight);
+
+                                                Palette.from(cornerBitmap).generate(palette -> {
                                                     if (palette != null) {
                                                         int bookCoverMainColor = palette.getDominantColor(Color.BLACK); // Default color
                                                         //Get brightness of the cover image and set visibility icon color accordingly

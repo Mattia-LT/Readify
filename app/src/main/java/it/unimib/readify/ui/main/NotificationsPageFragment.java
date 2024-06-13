@@ -163,12 +163,12 @@ public class NotificationsPageFragment extends Fragment {
                 Navigation.findNavController(requireView()).navigate(action);
             }
             @Override
-            public void onFollowUser(String externalUserIdToken) {
-                userViewModel.followUser(user.getIdToken(), externalUserIdToken);
+            public void onFollowUser(String followedUserIdToken) {
+                userViewModel.followUser(user.getIdToken(), followedUserIdToken);
             }
             @Override
-            public void onUnfollowUser(String externalUserIdToken) {
-                userViewModel.unfollowUser(user.getIdToken(), externalUserIdToken);
+            public void onUnfollowUser(String followedUserIdToken) {
+                userViewModel.unfollowUser(user.getIdToken(), followedUserIdToken);
             }
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());

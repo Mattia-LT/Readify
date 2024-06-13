@@ -161,6 +161,7 @@ public class ContinueRegistrationFragment extends Fragment {
             int selectedChipNumber = getSelectedChipCount(chipGroupGenre);
             if(isUsernameOk() && (fragmentContinueRegistrationBinding.spinnerGender.getSelectedItemPosition() != 0)
                     && (selectedChipNumber>2)) {
+                username = username.toLowerCase();
                 onSaveUser.setUsername(username);
                 userViewModel.setUserUsername(onSaveUser);
                 onSaveUser.setGender(fragmentContinueRegistrationBinding.spinnerGender.getSelectedItem().toString());

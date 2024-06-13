@@ -190,7 +190,7 @@ public class EditProfileFragment extends Fragment {
                     fragmentEditProfileBinding.settingsUsernameErrorMessage.setText(R.string.username_already_taken);
                     fragmentEditProfileBinding.settingsUsernameErrorMessage.setVisibility(View.VISIBLE);
                 } else {
-                    onSaveUser.setUsername(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim());
+                    onSaveUser.setUsername(fragmentEditProfileBinding.textInputEditTextUsername.getText().toString().trim().toLowerCase());
                     userViewModel.setUserUsername(onSaveUser);
                     fragmentEditProfileBinding.textInputEditTextUsername.setText("");
                     isUserChanged = true;

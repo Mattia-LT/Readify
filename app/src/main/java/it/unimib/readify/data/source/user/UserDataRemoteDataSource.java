@@ -97,7 +97,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .child(user.getIdToken())
                 .child(FIREBASE_USERS_USERNAME_FIELD);
 
-        usernameReference.setValue(user.getUsername())
+        usernameReference.setValue(user.getUsername().toLowerCase())
                 .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                 .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
         

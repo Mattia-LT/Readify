@@ -84,9 +84,9 @@ public class TabFollowingListFragment extends Fragment {
 
         loggedUserObserver = loggedUserResult -> {
             if(loggedUserResult.isSuccess()) {
-                User user = ((Result.UserSuccess) loggedUserResult).getData();
-                loggedUserIdToken = user.getIdToken();
-                followListAdapter.submitFollowings(user.getFollowing().getUsers(), user.getIdToken());
+                User loggedUser = ((Result.UserSuccess) loggedUserResult).getData();
+                loggedUserIdToken = loggedUser.getIdToken();
+                followListAdapter.submitFollowings(loggedUser.getFollowing().getUsers(), loggedUser.getIdToken());
                 userViewModel.fetchFollowing(idToken);
             } else {
                 String errorMessage = ((Result.Error) loggedUserResult).getMessage();
@@ -113,12 +113,12 @@ public class TabFollowingListFragment extends Fragment {
 
             @Override
             public void onFollowButtonClick(FollowUser user) {
-                userViewModel.followUser(idToken, user.getIdToken());
+                userViewModel.followUser(loggedUserIdToken, user.getIdToken());
             }
 
             @Override
             public void onUnfollowButtonClick(FollowUser user) {
-                userViewModel.unfollowUser(idToken, user.getIdToken());
+                userViewModel.unfollowUser(loggedUserIdToken, user.getIdToken());
             }
         });
 

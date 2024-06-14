@@ -41,21 +41,18 @@ import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
 import static it.unimib.readify.util.Constants.USER_VISIBILITY_PUBLIC;
 
 public class ContinueRegistrationFragment extends Fragment {
-
     private final String TAG = ContinueRegistrationFragment.class.getSimpleName();
 
     private FragmentContinueRegistrationBinding fragmentContinueRegistrationBinding;
     private UserViewModel userViewModel;
+    private Observer<String> usernameErrorObserver;
+    private Observer<Result> loggedUserObserver;
     private User user;
     private User onSaveUser;
-    private Observer<String> usernameErrorObserver;
     private ChipGroup chipGroupGenre;
-    private Observer<Result> loggedUserObserver;
     private boolean isUsernameAvailable;
     private boolean isContinueButtonPressed;
     private boolean isNavigationStarted;
-
-    public ContinueRegistrationFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,7 +83,7 @@ public class ContinueRegistrationFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                userViewModel.isUsernameAvailable(s.toString());
+                userViewModel.isUsernameAvailable(s.toString().trim());
             }
         });
 
@@ -111,8 +108,8 @@ public class ContinueRegistrationFragment extends Fragment {
                 onSaveUser = new User(user);
                 if(checkUserData(onSaveUser) && isContinueButtonPressed && !isNavigationStarted){
                     isNavigationStarted = true;
-                    NavDirections action = ContinueRegistrationFragmentDirections.actionContinueRegistrationFragmentToHomeActivity();
-                    Navigation.findNavController(requireView()).navigate(action);
+                        NavDirections action = ContinueRegistrationFragmentDirections.actionContinueRegistrationFragmentToHomeActivity();
+                        Navigation.findNavController(requireView()).navigate(action);
                     requireActivity().finish();
                 }
             } else {
@@ -280,6 +277,7 @@ public class ContinueRegistrationFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        fragmentContinueRegistrationBinding = null;
         userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         userViewModel.getUsernameAvailableResult().removeObserver(usernameErrorObserver);
     }

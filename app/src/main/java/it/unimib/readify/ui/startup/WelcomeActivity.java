@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import it.unimib.readify.R;
 
-
 public class WelcomeActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {

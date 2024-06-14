@@ -4,8 +4,6 @@ import static it.unimib.readify.util.Constants.EMAIL_ADDRESS;
 import static it.unimib.readify.util.Constants.ENCRYPTED_DATA_FILE_NAME;
 import static it.unimib.readify.util.Constants.ENCRYPTED_SHARED_PREFERENCES_FILE_NAME;
 import static it.unimib.readify.util.Constants.PASSWORD;
-import static it.unimib.readify.util.Constants.USER_COLLISION_ERROR;
-import static it.unimib.readify.util.Constants.WEAK_PASSWORD_ERROR;
 
 import android.os.Bundle;
 
@@ -21,92 +19,74 @@ import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Objects;
 
 import it.unimib.readify.R;
 
 import it.unimib.readify.databinding.FragmentRegisterBinding;
 import it.unimib.readify.model.Result;
-import it.unimib.readify.model.User;
 import it.unimib.readify.util.DataEncryptionUtil;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 import it.unimib.readify.viewmodel.UserViewModel;
 
 public class RegisterFragment extends Fragment{
+    private final String TAG = RegisterFragment.class.getSimpleName();
 
     private FragmentRegisterBinding fragmentRegisterBinding;
     private UserViewModel userViewModel;
-    private Observer<Result> observer;
+    private Observer<Result> loggedUserObserver;
     private DataEncryptionUtil dataEncryptionUtil;
-
-    public RegisterFragment() {}
-
-    public static RegisterFragment newInstance() {
-        return new RegisterFragment();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
-                .create(UserViewModel.class);
-        Log.d("registration fragment", "onCreate");
         dataEncryptionUtil = new DataEncryptionUtil(requireActivity().getApplication());
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentRegisterBinding = FragmentRegisterBinding.inflate(inflater,container,false);
-        Log.d("registration fragment", "onCreateView");
         return fragmentRegisterBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-        Log.d("registration fragment", "onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+        initViewModels();
         userViewModel.setUIRunning(false);
 
-        //registration set data
+        //Set registration data
         fragmentRegisterBinding.buttonConfirmRegistration.setOnClickListener(v -> {
-            //todo is the reference (textInputLayoutEmail) correct?
-            String email = fragmentRegisterBinding.textInputLayoutEmail
-                    .getEditText().getText().toString();
-            String password = fragmentRegisterBinding.textInputLayoutPassword
-                    .getEditText().getText().toString();
-            String passwordConfirm = fragmentRegisterBinding.textInputLayoutPasswordConfirm
-                    .getEditText().getText().toString();
+            String email = Objects.requireNonNull(fragmentRegisterBinding.textInputLayoutEmail
+                    .getEditText()).getText().toString().trim();
+            String password = Objects.requireNonNull(fragmentRegisterBinding.textInputLayoutPassword
+                    .getEditText()).getText().toString().trim();
+            String passwordConfirm = Objects.requireNonNull(fragmentRegisterBinding.textInputLayoutPasswordConfirm
+                    .getEditText()).getText().toString().trim();
 
             if (isEmailOk(email) && isPasswordOk(password) && isPasswordConfirmOk(passwordConfirm)) {
                 userViewModel.setUserMutableLiveData(email, password, false);
-
-                //registration action
-                observer = result -> {
-                    Log.d("registration fragment", "data changed");
+                //Registration
+                loggedUserObserver = result -> {
                     if(userViewModel.isUIRunning()) {
                         if(result != null) {
                             if(result.isSuccess()) {
-                                User user = ((Result.UserSuccess) result).getData();
                                 saveLoginData(email, password);
-                                navigateToContinueRegistration();
+                                NavDirections action = RegisterFragmentDirections.actionRegisterFragmentToContinueRegistrationFragment();
+                                Navigation.findNavController(requireView()).navigate(action);
                             } else {
-                                Snackbar.make(view, ((Result.Error)result).getMessage(), Snackbar.LENGTH_SHORT).show();
+                                String errorMessage = ((Result.Error) result).getMessage();
+                                Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
                             }
                         }
                     }
                 };
-                userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), observer);
-
-
-            } else {
-                //todo managing specific behavior when an error occurs
-                Snackbar.make(view, "error data insertion", Snackbar.LENGTH_SHORT).show();
+                userViewModel.getUserMediatorLiveData().observe(getViewLifecycleOwner(), loggedUserObserver);
             }
         });
-
 
         fragmentRegisterBinding.buttonBackToLogin.setOnClickListener(v -> {
             NavDirections action = RegisterFragmentDirections.actionRegisterFragmentToLoginFragment();
@@ -114,24 +94,10 @@ public class RegisterFragment extends Fragment{
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("registration fragment", "onStart");
+    public void initViewModels() {
+        userViewModel = CustomViewModelFactory.getInstance(requireActivity().getApplication())
+                .create(UserViewModel.class);
     }
-
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("registration fragment", "onDestroyView");
-        userViewModel.getUserMediatorLiveData().removeObserver(observer);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("registration fragment", "onDestroy");
-    }
-
 
     private boolean isEmailOk(String email) {
         if (!EmailValidator.getInstance().isValid((email))) {
@@ -144,7 +110,11 @@ public class RegisterFragment extends Fragment{
     }
 
     private boolean isPasswordOk(String password) {
+        //todo it is incomplete
         if (password.isEmpty()) {
+            fragmentRegisterBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
+            return false;
+        } else if(password.length() < 6){
             fragmentRegisterBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
             return false;
         } else {
@@ -154,7 +124,7 @@ public class RegisterFragment extends Fragment{
     }
 
     private boolean isPasswordConfirmOk(String passwordConfirm) {
-        //todo it seems incomplete
+        //todo it is incomplete
         if (passwordConfirm.isEmpty()) {
             fragmentRegisterBinding.textInputLayoutPasswordConfirm.setError(getString(R.string.error_password));
             return false;
@@ -164,35 +134,25 @@ public class RegisterFragment extends Fragment{
         }
     }
 
-    private String getErrorMessage(String message) {
-        switch(message) {
-            case WEAK_PASSWORD_ERROR:
-                return requireActivity().getString(R.string.error_password);
-            case USER_COLLISION_ERROR:
-                return requireActivity().getString(R.string.placeholder_error_message);
-            default:
-                return requireActivity().getString(R.string.unexpected_error);
-        }
-    }
-
-    private void navigateToContinueRegistration() {
-        Navigation.findNavController(requireView()).navigate(R.id.action_registerFragment_to_continueRegistrationFragment);
-    }
-
     private void saveLoginData(String email, String password) {
         try {
             dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
                     ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS, email);
             dataEncryptionUtil.writeSecretDataWithEncryptedSharedPreferences(
                     ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD, password);
-
-            //normal login (not google)
+            //Normal login
             if (password != null) {
                 dataEncryptionUtil.writeSecreteDataOnFile(ENCRYPTED_DATA_FILE_NAME,
                         email.concat(":").concat(password));
             }
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, String.valueOf(e.getLocalizedMessage()));
         }
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentRegisterBinding = null;
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

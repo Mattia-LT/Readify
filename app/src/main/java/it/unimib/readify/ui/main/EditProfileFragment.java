@@ -243,6 +243,7 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        fragmentEditProfileBinding = null;
         userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         userViewModel.getUsernameAvailableResult().removeObserver(usernameErrorObserver);
     }

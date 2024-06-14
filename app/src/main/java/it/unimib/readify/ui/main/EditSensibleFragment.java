@@ -184,6 +184,7 @@ public class EditSensibleFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        fragmentEditSensibleBinding = null;
         userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         userViewModel.getSourcePasswordError().removeObserver(passwordErrorObserver);
         userViewModel.getLastAuthenticationTimestamp().removeObserver(lastAuthenticationTimestampObserver);

@@ -27,15 +27,17 @@ import it.unimib.readify.viewmodel.UserViewModel;
 import it.unimib.readify.viewmodel.CustomViewModelFactory;
 
 public class StartupActivity extends AppCompatActivity {
-
     private final String TAG = StartupActivity.class.getSimpleName();
-    private DataEncryptionUtil dataEncryptionUtil;
+
     private Observer<Result> loggedUserObserver;
     private UserViewModel userViewModel;
+    private DataEncryptionUtil dataEncryptionUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startup_loading);
+
         dataEncryptionUtil = new DataEncryptionUtil(this.getApplication());
         userViewModel = CustomViewModelFactory.getInstance(this.getApplication())
                 .create(UserViewModel.class);
@@ -43,6 +45,7 @@ public class StartupActivity extends AppCompatActivity {
             String savedEmail = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, EMAIL_ADDRESS);
             String savedPassword = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, PASSWORD);
             String savedGoogleLoginIdToken = dataEncryptionUtil.readSecretDataWithEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCES_FILE_NAME, LOGIN_ID_TOKEN);
+
             loggedUserObserver = loggedUserResult -> {
                 if(userViewModel.isUIRunning()) {
                     if(loggedUserResult.isSuccess()) {
@@ -51,7 +54,7 @@ public class StartupActivity extends AppCompatActivity {
                         if(user.getUsername() == null){
                             intent = new Intent(this, WelcomeActivity.class);
                         } else {
-                            //skippa login
+                            //Skip login
                             intent = new Intent(this, HomeActivity.class);
                         }
                         startActivity(intent);
@@ -69,29 +72,19 @@ public class StartupActivity extends AppCompatActivity {
 
             if(savedEmail != null){
                 if(savedPassword != null){
-                    //login normale
+                    //Normal login
                     userViewModel.setUserMutableLiveData(savedEmail, savedPassword, true);
                     userViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
                 }
             } else if(savedGoogleLoginIdToken != null){
-                //login google
-                Log.d("dovrebbe entrare qui", "please");
+                //Google login
                 userViewModel.signInWithGoogle(savedGoogleLoginIdToken);
                 userViewModel.getUserMediatorLiveData().observe(this, loggedUserObserver);
-
             } else {
                 showStartupLayout();
             }
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(loggedUserObserver != null){
-            userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
         }
     }
 
@@ -103,5 +96,11 @@ public class StartupActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        userViewModel.getUserMediatorLiveData().removeObserver(loggedUserObserver);
     }
 }

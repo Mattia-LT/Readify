@@ -5,7 +5,7 @@
     <string name="button_getting_started">Inizia</string>
     <string name="error_email">La mail non è valida</string>
     <string name="error_password">La password non è valida</string>
-    <string name="password_confirm">Confirma Password</string>
+    <string name="password_confirm">Conferma Password</string>
     <string name="google_login">Login con Google</string>
     <string name="hint_comment">Scrivi qui il tuo commento</string>
     <string name="logo">Logo applicazione</string>

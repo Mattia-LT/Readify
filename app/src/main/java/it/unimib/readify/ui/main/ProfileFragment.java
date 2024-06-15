@@ -19,9 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,7 +76,6 @@ public class ProfileFragment extends Fragment{
     private Observer<Boolean> logoutResultObserver;
     private Observer<Boolean> deleteAllCollectionsResultObserver;
     private Observer<List<Result>> fetchedCollectionsObserver;
-    private boolean firstLoadSpinner;
 
     public ProfileFragment() {}
 
@@ -200,23 +196,22 @@ public class ProfileFragment extends Fragment{
    }
 
     public void loadMenu(){
-        firstLoadSpinner = true;
-        SwitchCompat switchButton = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
-                .findItem(R.id.nav_switch).getActionView()).findViewById(R.id.switch_compat);
+        SwitchCompat switchButtonTheme = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
+                .findItem(R.id.nav_switch_theme).getActionView()).findViewById(R.id.switch_compat);
 
         int currentNightMode = getSavedNightMode();
 
         //Set the switch on the current mode
         switch (currentNightMode) {
             case Configuration.UI_MODE_NIGHT_YES:
-                switchButton.setChecked(true);
+                switchButtonTheme.setChecked(true);
                 break;
             case Configuration.UI_MODE_NIGHT_NO:
-                switchButton.setChecked(false);
+                switchButtonTheme.setChecked(false);
                 break;
         }
 
-        switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        switchButtonTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 sharedPreferencesUtil.writeStringData(SHARED_PREFERENCES_FILE_NAME,
@@ -228,39 +223,34 @@ public class ProfileFragment extends Fragment{
             }
         });
 
-        MenuItem spinnerItem = fragmentProfileBinding.navView.getMenu().findItem(R.id.nav_spinner);
-        Spinner spinner = (Spinner) spinnerItem.getActionView();
-        if (spinner != null) {
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.visibility, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
-            String visibility = loggedUser.getVisibility();
-            if(visibility.equals(USER_VISIBILITY_PRIVATE)){
-                spinner.setSelection(1);
-            } else {
-                spinner.setSelection(0);
+        SwitchCompat switchButtonVisibility = Objects.requireNonNull(fragmentProfileBinding.navView.getMenu()
+                .findItem(R.id.nav_switch_visibility).getActionView()).findViewById(R.id.switch_compat);
+
+        if(loggedUser!= null){
+            String currentVisibility = loggedUser.getVisibility();
+
+            switch (currentVisibility) {
+                case USER_VISIBILITY_PUBLIC:
+                    switchButtonVisibility.setChecked(false);
+                    break;
+                case USER_VISIBILITY_PRIVATE:
+                    switchButtonVisibility.setChecked(true);
+                    break;
             }
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(!firstLoadSpinner){
-                        String selectedVisibility;
-                        if (position == 0) {
-                            selectedVisibility = USER_VISIBILITY_PUBLIC;
-                        } else {
-                            selectedVisibility = USER_VISIBILITY_PRIVATE;
-                        }
-                        loggedUser.setVisibility(selectedVisibility);
-                        userViewModel.setUserVisibility(loggedUser);
-                    } else {
-                        firstLoadSpinner = false;
-                    }
+
+            switchButtonVisibility.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                String selectedVisibility;
+                if (isChecked) {
+                    selectedVisibility = USER_VISIBILITY_PRIVATE;
+                } else {
+                    selectedVisibility = USER_VISIBILITY_PUBLIC;
                 }
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    //Not needed
-                }
+                loggedUser.setVisibility(selectedVisibility);
+                userViewModel.setUserVisibility(loggedUser);
             });
+
+        } else {
+            Log.e(TAG, "logged user is null, error during load visibility section");
         }
 
         //Set up the toolbar and remove all icons

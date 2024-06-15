@@ -91,7 +91,8 @@
     <string name="textview_select_avatar">Seleziona l\'immagine profilo</string>
     <string name="content_description_button_edit_profile">Conferma le modifiche al profilo</string>
     <string name="textview_already_registered">Hai già un account?</string>
-
+    <string name="content_description_public_profile">Profilo pubblico</string>
+    <string name="content_description_private_profile">Profilo privato</string>
 
 
 

@@ -87,6 +87,9 @@
     <string name="content_description_shared_profiles_notification">Shared profiles notification icon</string>
     <string name="content_description_system_notification">System notification icon</string>
     <string name="content_description_statistics_notification">Statistics notification icon</string>
+    <string name="content_description_public_profile">Public profile</string>
+    <string name="content_description_private_profile">Private profile</string>
+
 
 
     <string name="placeholder_error_message">An error occurred. Please, retry.</string>

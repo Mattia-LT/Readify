@@ -11,16 +11,16 @@
     </group>
 
     <item
-        android:id="@+id/nav_switch"
+        android:id="@+id/nav_switch_theme"
         android:title="@string/theme"
         app:actionLayout="@layout/custom_theme_switch"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/nav_spinner"
+        android:id="@+id/nav_switch_visibility"
         android:title="@string/change_collection_visibility_action"
-        app:actionViewClass="android.widget.Spinner"
-        app:showAsAction="always"/>
+        app:actionLayout="@layout/custom_visibility_switch"
+        app:showAsAction="ifRoom"/>
 
     <group>
         <item

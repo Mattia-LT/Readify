@@ -234,7 +234,6 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean isPasswordOk(String password) {
-        //todo it is incomplete
         if (password.isEmpty()) {
             fragmentLoginBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
             return false;

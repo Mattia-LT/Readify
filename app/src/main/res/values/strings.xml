@@ -246,6 +246,7 @@
     <string name="email_invalid_input">Email error: invalid input</string>
     <string name="field_not_filled_in">Fill in the field</string>
     <string name="fields_not_filled_in">Fill in at least one field</string>
+    <string name="fields_required">Fill in all fields</string>
     <string name="error_password_length">Password length must be 6 characters or higher</string>
     <string name="error_confirm_password_equal">Confirm Password must be equal to Password field</string>
     <string name="error_gender">Select a valid gender</string>

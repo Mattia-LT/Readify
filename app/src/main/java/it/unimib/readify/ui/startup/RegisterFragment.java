@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -66,8 +69,12 @@ public class RegisterFragment extends Fragment{
                     .getEditText()).getText().toString().trim();
             String passwordConfirm = Objects.requireNonNull(fragmentRegisterBinding.textInputLayoutPasswordConfirm
                     .getEditText()).getText().toString().trim();
+            fragmentRegisterBinding.textInputLayoutPassword.setError(null);
+            fragmentRegisterBinding.textInputLayoutPasswordConfirm.setError(null);
 
-            if (isEmailOk(email) && isPasswordOk(password) && isPasswordConfirmOk(passwordConfirm)) {
+            if(email.isEmpty() && password.isEmpty() && passwordConfirm.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.fields_required, Toast.LENGTH_SHORT).show();
+            } else if (isEmailOk(email) && isPasswordsOkay(password, passwordConfirm)) {
                 userViewModel.setUserMutableLiveData(email, password, false);
                 //Registration
                 loggedUserObserver = result -> {
@@ -80,6 +87,7 @@ public class RegisterFragment extends Fragment{
                             } else {
                                 String errorMessage = ((Result.Error) result).getMessage();
                                 Log.e(TAG, "Error: Logged user fetch wasn't successful -> " + errorMessage);
+                                fragmentRegisterBinding.textInputLayoutEmail.setError(getString(R.string.email_already_taken));
                             }
                         }
                     }
@@ -100,37 +108,46 @@ public class RegisterFragment extends Fragment{
     }
 
     private boolean isEmailOk(String email) {
-        if (!EmailValidator.getInstance().isValid((email))) {
-            fragmentRegisterBinding.textInputLayoutEmail.setError(getString(R.string.error_email));
-            return false;
-        } else {
-            fragmentRegisterBinding.textInputLayoutEmail.setError(null);
-            return true;
+        if(email != null) {
+            TextInputLayout errorEmail = fragmentRegisterBinding.textInputLayoutEmail;
+            if(!email.isEmpty()) {
+                if (!EmailValidator.getInstance().isValid((email))) {
+                    errorEmail.setError(getString(R.string.error_email));
+                    return false;
+                } else {
+                    errorEmail.setError(null);
+                    return true;
+                }
+            } else {
+                errorEmail.setError(getString(R.string.field_not_filled_in));
+                return false;
+            }
         }
+        return false;
     }
 
-    private boolean isPasswordOk(String password) {
-        //todo it is incomplete
-        if (password.isEmpty()) {
-            fragmentRegisterBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
+    private boolean isPasswordsOkay(String password, String passwordConfirm) {
+        TextInputLayout errorPassword = fragmentRegisterBinding.textInputLayoutPassword;
+        TextInputLayout errorConfirmPassword = fragmentRegisterBinding.textInputLayoutPasswordConfirm;
+        if(password.isEmpty() && !passwordConfirm.isEmpty()) {
+            errorPassword.setError(getString(R.string.field_not_filled_in));
             return false;
-        } else if(password.length() < 6){
-            fragmentRegisterBinding.textInputLayoutPassword.setError(getString(R.string.error_password));
+        } else if(!password.isEmpty() && passwordConfirm.isEmpty()) {
+            errorConfirmPassword.setError(getString(R.string.field_not_filled_in));
             return false;
-        } else {
-            fragmentRegisterBinding.textInputLayoutPassword.setError(null);
+        } else if(!password.isEmpty()) {
+            if(password.length() < 6) {
+                errorPassword.setError(getString(R.string.error_password_length));
+                return false;
+            } else if(!passwordConfirm.equals(password)) {
+                errorConfirmPassword.setError(getString(R.string.error_confirm_password_equal));
+                return false;
+            }
             return true;
-        }
-    }
-
-    private boolean isPasswordConfirmOk(String passwordConfirm) {
-        //todo it is incomplete
-        if (passwordConfirm.isEmpty()) {
-            fragmentRegisterBinding.textInputLayoutPasswordConfirm.setError(getString(R.string.error_password));
-            return false;
         } else {
-            fragmentRegisterBinding.textInputLayoutPasswordConfirm.setError(null);
-            return true;
+            errorPassword.setError(getString(R.string.field_not_filled_in));
+            errorConfirmPassword.setError(getString(R.string.field_not_filled_in));
+            return false;
         }
     }
 

@@ -61,7 +61,7 @@
         android:layout_marginEnd="24dp"
         android:clickable="true"
         android:focusable="true"
-        android:text="@string/unfollow_button_string"
+        android:text="@string/unfollow_short_button_string"
         app:layout_constrainedWidth="true"
         app:icon="@drawable/person_remove_black_24dp"
         app:iconPadding="5dp"

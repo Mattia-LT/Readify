@@ -101,6 +101,7 @@
     <string name="textview_following">Following</string>
     <string name="follow_button_string">Follow</string>
     <string name="unfollow_button_string">Unfollow</string>
+    <string name="unfollow_short_button_string">Unfollow</string>
     <string name="content_description_background_book">A background containing a blurred version of the book\'s cover.</string>
     <string name="content_description_add_to_collection">Add a book into a collection.</string>
     <string name="snackbar_empty_comment">You cannot enter an empty comment.</string>

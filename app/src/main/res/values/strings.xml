@@ -3,42 +3,31 @@
     <string name="app_name" translatable="false">Readify</string>
     <string name="button_add_comment">Add comment</string>
     <string name="button_getting_started">Get started</string>
-    <string name="check_login_data_message">Check the data you inserted</string>
     <string name="email" translatable="false">E-mail</string>
     <string name="error_email">The email is invalid</string>
     <string name="error_password">The password is invalid</string>
-    <string name="error_username">The username is invalid</string>
-    <string name="forgot_password">Forgot password?</string>
     <string name="google_login">Login with Google</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_comment">Write your comment here</string>
     <string name="login" translatable="false">Login</string>
     <string name="logo">App logo</string>
     <string name="navigation_bar_item_home" translatable="false">Home</string>
     <string name="navigation_bar_item_profile">Profile</string>
-    <string name="navigation_bar_item_saved">Saved</string>
     <string name="navigation_bar_item_search">Search</string>
     <string name="navigation_bar_label_image_selector">Select the avatar</string>
     <string name="navigation_bar_label_notifications">Notifications</string>
 
     <string name="new_account">No account yet?</string>
 
-    <!-- pa sta per personal area -->
+    <!-- pa = personal area -->
     <string name="pa_collections">Collections</string>
-    <string name="pa_description_arrow" translatable="false">arrow right</string>
     <string name="pa_description_photo" translatable="false">personal area photo</string>
-    <string name="pa_notes">Notes</string>
-    <!-- c'è un'altra stringa con lo stesso valore -->
     <string name="pa_edit_profile">Edit profile</string>
-    <string name="pa_stats">Statistics</string>
-    <string name="pa_title">My Personal Area</string>
 
     <string name="password" translatable="false">Password</string>
     <string name="password_confirm">Confirm Password</string>
 
     <string name="placeholder_book_author">Book author</string>
     <string name="placeholder_book_description">Book description</string>
-    <string name="placeholder_book_rating" translatable="false">5.0</string>
     <string name="placeholder_book_title">Book title</string>
     <string name="placeholder_comment">Body of the comment</string>
     <string name="placeholder_comment_name">Name</string>
@@ -46,8 +35,6 @@
 
     <string name="register">Register</string>
     <string name="name">Name</string>
-    <string name="surname">Surname</string>
-    <!-- c'è un'altra stringa con lo stesso valore -->
     <string name="username" translatable="false">Username</string>
 
     <string-array name="gender">
@@ -64,12 +51,9 @@
 
     <string name="textview_comments_title">Comments</string>
     <string name="textview_description_title">Description</string>
-    <string name="textview_icon_already_read">Already read?</string>
     <string name="textview_icon_add_to_collection">Add to …</string>
     <string name="textview_slogan">Your library at your fingertips.</string>
     <string name="hint_search_book">Enter book title</string>
-    <string name="button_search">Search</string>
-    <string name="hint_search_author">Enter author name</string>
     <string name="textview_search_filters_title">Sort and Search Filters</string>
     <string name="textview_sort_by_label">Sort by</string>
     <string name="textview_title_order_label">Title</string>
@@ -91,24 +75,15 @@
     <string name="content_description_private_profile">Private profile</string>
 
 
-
-    <string name="placeholder_error_message">An error occurred. Please, retry.</string>
-    <string name="button_retry">Retry</string>
     <string name="content_description_filter_button">Filter Search</string>
     <string name="placeholder_home_welcome">Hi,</string>
-    <string name="textview_home_continue_label">Let\'s continue where we left off</string>
     <string name="textview_trending_books">Trending books</string>
-    <string name="book_search_error">An error occurred during the search, please retry.</string>
     <string name="description_not_available">This book does not provide a description. Feel free to explore its content through reviews or comments for more information</string>
     <string name="empty_search_snackbar">The searchbar is empty</string>
     <string name="textview_home_recommended">Recommended for you</string>
     <string name="textview_new_books">New Books</string>
-    <string name="textview_loading">Loading…</string>
     <string name="rating_not_available">Rating not available</string>
     <string name="unexpected_error">An unexpected error occurred, please retry.</string>
-    <string name="error_login_user_message">An error occurred during login, please retry</string>
-    <string name="error_login_password_message">An error occurred during login, check your password again</string>
-    <string name="error_no_google_account_found_message">Error: no google account associated to this email</string>
     <string name="empty_collection">There are no books in this collection</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="undo_changes">Undo Changes</string>
@@ -121,13 +96,12 @@
     <string name="error_author_not_found">Author not found</string>
     <string name="notifications_button">Notifications</string>
     <string name="settings_button_profile">Menu</string>
-    <string name="user_details">User details</string>
     <string name="collection_settings_button">Collection\'s settings</string>
     <string name="textview_followers">Followers</string>
     <string name="textview_following">Following</string>
     <string name="follow_button_string">Follow</string>
     <string name="unfollow_button_string">Unfollow</string>
-    <string name="content_description_background_book">A background containning a blurred version of the book\'s cover.</string>
+    <string name="content_description_background_book">A background containing a blurred version of the book\'s cover.</string>
     <string name="content_description_add_to_collection">Add a book into a collection.</string>
     <string name="snackbar_empty_comment">You cannot enter an empty comment.</string>
     <string name="delete_comment_button">Delete this comment</string>
@@ -243,7 +217,6 @@
     <string name="error_username_length">Username length must be 20 characters or lower</string>
     <string name="error_username_illegal_symbols">Username must not contains these symbols: /@</string>
     <string name="email_already_taken">Email already taken</string>
-    <string name="email_invalid_input">Email error: invalid input</string>
     <string name="field_not_filled_in">Fill in the field</string>
     <string name="fields_not_filled_in">Fill in at least one field</string>
     <string name="fields_required">Fill in all fields</string>

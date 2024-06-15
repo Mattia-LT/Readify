@@ -74,7 +74,7 @@ public class ServiceLocator {
                 if(repositoryInstance == null) {
                     //creating UserRepository instance
                     if(repositoryClass == IUserRepository.class) {
-                        repositoryInstance = UserRepository.getInstance(application);
+                        repositoryInstance = UserRepository.getInstance();
                         repositories.put(repositoryClass, repositoryInstance);
                     }
                     //creating BookRepository instance

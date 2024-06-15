@@ -5,7 +5,6 @@ import static it.unimib.readify.util.Constants.FIREBASE_REALTIME_DATABASE;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_AVATAR_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_BIOGRAPHY_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_COLLECTION;
-import static it.unimib.readify.util.Constants.FIREBASE_USERS_EMAILS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWERS_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_FOLLOWING_FIELD;
 import static it.unimib.readify.util.Constants.FIREBASE_USERS_GENDER_FIELD;
@@ -21,8 +20,6 @@ import static it.unimib.readify.util.Constants.UNFOLLOW_ACTION;
 import static it.unimib.readify.util.Constants.USERNAME_AVAILABLE;
 import static it.unimib.readify.util.Constants.USERNAME_ERROR;
 import static it.unimib.readify.util.Constants.USERNAME_NOT_AVAILABLE;
-
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -47,19 +44,16 @@ import it.unimib.readify.model.FollowGroup;
 import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     private final String TAG = UserDataRemoteDataSource.class.getSimpleName();
 
     private final DatabaseReference databaseReference;
-    private final SharedPreferencesUtil sharedPreferencesUtil;
 
-    public UserDataRemoteDataSource(SharedPreferencesUtil sharedPreferencesUtil) {
+    public UserDataRemoteDataSource() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_REALTIME_DATABASE);
         databaseReference = firebaseDatabase.getReference();
-        this.sharedPreferencesUtil = sharedPreferencesUtil;
     }
 
     @Override
@@ -101,34 +95,6 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
                 .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
         
-    }
-
-    //TODO sistemare refactor dopo modifiche di ema
-    //todo modify
-    @Override
-    public void setEmail(User user) {
-        databaseReference.child(FIREBASE_USERS_COLLECTION)
-                .orderByChild(FIREBASE_USERS_EMAILS_FIELD).equalTo(user.getEmail())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    //userResponseCallback.onEmailAvailable("notAvailable");
-                } else {
-                    databaseReference.child(FIREBASE_USERS_COLLECTION).child(user.getIdToken())
-                            .child(FIREBASE_USERS_EMAILS_FIELD).setValue(user.getEmail())
-                            .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessFromRemoteDatabase(user))
-                            .addOnFailureListener(e -> userResponseCallback.onFailureFromRemoteDatabaseUser(e.getLocalizedMessage()));
-                    //userResponseCallback.onEmailAvailable("available");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("verifyEmail Firebase error", databaseError.getMessage());
-                //userResponseCallback.onEmailAvailable("error");
-            }
-        });
     }
 
     @Override
@@ -229,9 +195,11 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
     @Override
     public void fetchNotifications(String idToken) {
-        Log.d(TAG, "fetchNotifications");
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken)
-                .addValueEventListener (new ValueEventListener() {
+        DatabaseReference notificationsReference = databaseReference
+                .child(FIREBASE_NOTIFICATIONS_COLLECTION)
+                .child(idToken);
+
+        notificationsReference.addValueEventListener (new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         HashMap<String, ArrayList<Notification>> notifications = new HashMap<>();
@@ -267,7 +235,7 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                     notificationTypeExecutor.shutdown();
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
-                                    userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
+                                    userResponseCallback.onFailureFetchNotifications(TAG + " - Error: " + e.getLocalizedMessage());
                                 }
                             });
                         }
@@ -279,22 +247,26 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                                 notificationTotalTypeExecutor.shutdown();
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
-                                userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
+                                userResponseCallback.onFailureFetchNotifications(TAG + " - Error: " + e.getLocalizedMessage());
                             }
                         });
 
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFetchNotifications("fetchNotifications error");
+                        userResponseCallback.onFailureFetchNotifications(TAG + " - Error: " + error.getMessage());
                     }
                 });
     }
 
     @Override
     public void readNotifications(String idToken, String notificationType) {
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(idToken).child(notificationType)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference notificationTypeReference = databaseReference
+                .child(FIREBASE_NOTIFICATIONS_COLLECTION)
+                .child(idToken)
+                .child(notificationType);
+
+        notificationTypeReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()) {
@@ -315,17 +287,17 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        //todo manage errors
+                        userResponseCallback.onFailureReadNotification(error.getMessage());
                     }
                 });
     }
 
     @Override
     public void fetchComments(String bookId){
-        Log.d(TAG, "Start fetching comments for book with id: " + bookId);
         if (bookId.startsWith("/works/")) {
             bookId = bookId.substring("/works/".length());
         }
+
         DatabaseReference commentsReference = databaseReference
                 .child(FIREBASE_WORKS_COLLECTION)
                 .child(bookId)
@@ -740,24 +712,24 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
                 .child(otherUserIdToken);
 
         otherUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            User otherUser = snapshot.getValue(User.class);
-                            if(otherUser != null){
-                                userResponseCallback.onSuccessFetchOtherUser(otherUser);
-                            } else {
-                                userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this user was null");
-                            }
-                        } else {
-                            userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this snapshot doesn't exist");
-                        }
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User otherUser = snapshot.getValue(User.class);
+                    if(otherUser != null){
+                        userResponseCallback.onSuccessFetchOtherUser(otherUser);
+                    } else {
+                        userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this user was null");
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : " + error.getMessage());
-                    }
-                });
+                } else {
+                    userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : this snapshot doesn't exist");
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureFetchOtherUser(TAG + ": error in fetchOtherUser : " + error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -788,13 +760,14 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-
-    //TODO sistema notifiche
     @Override
     public void addNotification(String receivingIdToken, String content, String loggedUserIdToken) {
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(receivingIdToken)
-                .child(content)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference givenTypeNotificationsReference = databaseReference
+                .child(FIREBASE_NOTIFICATIONS_COLLECTION)
+                .child(receivingIdToken)
+                .child(content);
+
+        givenTypeNotificationsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ArrayList<Notification> notificationsList = new ArrayList<>();
@@ -816,68 +789,67 @@ public class UserDataRemoteDataSource extends BaseUserDataRemoteDataSource{
         });
     }
 
-    /*
-        1. remove only newFollowers notifications
-        2. remove every notification with loggedUserIdToken as idToken
-     */
     @Override
     public void removeNotification(String targetIdToken, String content, String loggedUserIdToken) {
-        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION)
+        DatabaseReference givenTypeNotificationsReference = databaseReference
+                .child(FIREBASE_NOTIFICATIONS_COLLECTION)
                 .child(targetIdToken)
-                .child(content)
-            .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()) {
-                        ArrayList<Notification> newFollowersNotifications = new ArrayList<>();
-                        for (DataSnapshot datasnapshot: snapshot.getChildren()) {
-                            Notification notification = datasnapshot.getValue(Notification.class);
-                            if(notification != null && !notification.getIdToken().equals(loggedUserIdToken)) {
-                                newFollowersNotifications.add(notification);
-                            }
-                        }
-                        databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken)
-                                .child(content).setValue(newFollowersNotifications)
-                                .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessRemoveNotification())
-                                .addOnFailureListener(e -> userResponseCallback.onFailureRemoveNotification(e.getLocalizedMessage()));
-                    } else {
-                        userResponseCallback.onFailureRemoveNotification("no newFollowers notifications detected");
-                    }
-                }
+                .child(content);
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    userResponseCallback.onFailureRemoveNotification(error.getMessage());
+        givenTypeNotificationsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    ArrayList<Notification> newFollowersNotifications = new ArrayList<>();
+                    for (DataSnapshot datasnapshot: snapshot.getChildren()) {
+                        Notification notification = datasnapshot.getValue(Notification.class);
+                        if(notification != null && !notification.getIdToken().equals(loggedUserIdToken)) {
+                            newFollowersNotifications.add(notification);
+                        }
+                    }
+                    databaseReference.child(FIREBASE_NOTIFICATIONS_COLLECTION).child(targetIdToken)
+                            .child(content).setValue(newFollowersNotifications)
+                            .addOnSuccessListener(aVoid -> userResponseCallback.onSuccessRemoveNotification())
+                            .addOnFailureListener(e -> userResponseCallback.onFailureRemoveNotification(e.getLocalizedMessage()));
+                } else {
+                    userResponseCallback.onFailureRemoveNotification(TAG + " - no newFollowers notifications detected");
                 }
-            });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                userResponseCallback.onFailureRemoveNotification(error.getMessage());
+            }
+        });
     }
 
     @Override
     public void isUsernameAvailable(String username) {
         DatabaseReference usersReference = databaseReference
                 .child(FIREBASE_USERS_COLLECTION);
-        usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        boolean isUsernameAvailable = true;
-                        for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
-                            String existingUsername = userSnapshot.child(FIREBASE_USERS_USERNAME_FIELD).getValue(String.class);
-                            if(username.equalsIgnoreCase(existingUsername)){
-                                isUsernameAvailable = false;
-                                break;
-                            }
-                        }
-                        if (!isUsernameAvailable) {
-                            userResponseCallback.onUsernameAvailable(USERNAME_NOT_AVAILABLE);
-                        } else {
-                            userResponseCallback.onUsernameAvailable(USERNAME_AVAILABLE);
-                        }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        userResponseCallback.onUsernameAvailable(USERNAME_ERROR);
+        usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean isUsernameAvailable = true;
+                for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+                    String existingUsername = userSnapshot.child(FIREBASE_USERS_USERNAME_FIELD).getValue(String.class);
+                    if(username.equalsIgnoreCase(existingUsername)){
+                        isUsernameAvailable = false;
+                        break;
                     }
+                }
+                if (!isUsernameAvailable) {
+                    userResponseCallback.onUsernameAvailable(USERNAME_NOT_AVAILABLE);
+                } else {
+                    userResponseCallback.onUsernameAvailable(USERNAME_AVAILABLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                userResponseCallback.onUsernameAvailable(USERNAME_ERROR);
+            }
         });
     }
 

@@ -3,18 +3,13 @@
 
     <string name="button_add_comment">Aggiungi il commento</string>
     <string name="button_getting_started">Inizia</string>
-    <string name="check_login_data_message">Controllare i dati inseriti</string>
     <string name="error_email">La mail non è valida</string>
     <string name="error_password">La password non è valida</string>
-    <string name="error_username">Il nome utente non è valido</string>
-    <string name="forgot_password">Password dimenticata?</string>
     <string name="password_confirm">Confirma Password</string>
     <string name="google_login">Login con Google</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_comment">Scrivi qui il tuo commento</string>
     <string name="logo">Logo applicazione</string>
     <string name="name">Nome</string>
-    <string name="surname">Cognome</string>
 
     <string-array name="gender">
         <item>Genere</item>
@@ -30,7 +25,6 @@
 
 
     <string name="navigation_bar_item_profile">Profilo</string>
-    <string name="navigation_bar_item_saved">Salvati</string>
     <string name="navigation_bar_item_search">Cerca</string>
     <string name="navigation_bar_label_image_selector">Seleziona l\'avatar</string>
     <string name="navigation_bar_label_notifications">Notifiche</string>
@@ -38,10 +32,7 @@
     <string name="new_account">Non hai ancora un account?</string>
 
     <string name="pa_collections">Raccolte</string>
-    <string name="pa_notes">Note</string>
     <string name="pa_edit_profile">Modifica profilo</string>
-    <string name="pa_stats">Statistiche</string>
-    <string name="pa_title">La Mia Area Personale</string>
 
     <string name="placeholder_book_author">Autore del libro</string>
     <string name="placeholder_book_description">Descrizione del libro</string>
@@ -53,12 +44,9 @@
 
     <string name="textview_comments_title">Commenti</string>
     <string name="textview_description_title">Descrizione</string>
-    <string name="textview_icon_already_read">Già letto?</string>
     <string name="textview_icon_add_to_collection">Aggiungi a …</string>
     <string name="textview_slogan">La tua libreria a portata di mano.</string>
     <string name="hint_search_book">Inserisci il titolo del libro</string>
-    <string name="button_search">Cerca</string>
-    <string name="hint_search_author">Inserisci il nome dell\'autore</string>
     <string name="textview_search_filters_title">Filtri di ricerca e Ordinamento</string>
     <string name="textview_sort_by_label">Ordina per</string>
     <string name="textview_title_order_label">Titolo</string>
@@ -96,26 +84,18 @@
 
 
 
-    <string name="placeholder_error_message">Si è verificato un errore. Riprova.</string>
-    <string name="button_retry">Riprova</string>
     <string name="content_description_filter_button">Filtri della ricerca</string>
     <string name="placeholder_home_welcome">Ciao,</string>
-    <string name="textview_home_continue_label">Continuiamo da dove eravamo rimasti</string>
     <string name="textview_trending_books">Libri in tendenza</string>
-    <string name="book_search_error">Si è verificato un errore durante la ricerca, riprova.</string>
     <string name="description_not_available">Questo libro non fornisce una descrizione. Sentiti libero di esplorarne il contenuto attraverso recensioni o commenti per ulteriori informazioni.</string>
     <string name="empty_search_snackbar">La barra di ricerca é vuota</string>
     <string name="textview_home_recommended">Suggeriti per te</string>
     <string name="textview_new_books">Nuovi libri</string>
-    <string name="textview_loading">Caricamento…</string>
     <string name="rating_not_available">Valutazione non disponibile</string>
     <string name="empty_collection">Nessun libro in questa raccolta</string>
     <string name="users_section">Utenti</string>
     <string name="books_section">Libri</string>
     <string name="unexpected_error">Si è verificato un errore inaspettato, perfavore riprova.</string>
-    <string name="error_login_user_message">Si è verificato un errore durante il login, perfavore riprova</string>
-    <string name="error_login_password_message">Si è verificato un errore durante il login, ricontrolla la tua password.</string>
-    <string name="error_no_google_account_found_message">Errore: nessun account google associato a questa mail</string>
     <string name="hint_search_users">Cerca un utente</string>
     <string name="textview_books_read">"Libri letti: "</string>
     <string name="book_details">Dettagli</string>
@@ -124,7 +104,6 @@
     <string name="undo_changes">Annulla Modifiche</string>
     <string name="notifications_button">Notifiche</string>
     <string name="settings_button_profile">Menù</string>
-    <string name="user_details">Profilo utente</string>
     <string name="collection_settings_button">Impostazioni della collezione</string>
     <string name="textview_followers">Seguaci</string>
     <string name="textview_following">Seguiti</string>
@@ -209,7 +188,6 @@
     <string name="error_username_length">La lunghezza del nome utente deve essere di 20 caratteri o inferiore</string>
     <string name="error_username_illegal_symbols">Il nome utente non deve contenere questi simboli: /@</string>
     <string name="email_already_taken">Email già in uso</string>
-    <string name="email_invalid_input">Errore email: input non valido</string>
     <string name="field_not_filled_in">Compila il campo</string>
     <string name="fields_not_filled_in">Compila almeno un campo</string>
     <string name="fields_required">Compila tutti i campi</string>

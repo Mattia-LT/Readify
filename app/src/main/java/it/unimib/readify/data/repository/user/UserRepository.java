@@ -1,10 +1,7 @@
 package it.unimib.readify.data.repository.user;
 
-import static java.text.DateFormat.getTimeInstance;
-
 import static it.unimib.readify.util.Constants.NOTIFICATION_NEW_FOLLOWER;
 
-import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -23,7 +20,6 @@ import it.unimib.readify.model.FollowUser;
 import it.unimib.readify.model.Notification;
 import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
-import it.unimib.readify.util.SharedPreferencesUtil;
 
 public class UserRepository implements IUserRepository, UserResponseCallback {
 
@@ -45,9 +41,9 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     private final MutableLiveData<HashMap<String, ArrayList<Notification>>> fetchedNotifications;
     private final MutableLiveData<Long> lastAuthenticationTimestamp;
 
-    public static IUserRepository getInstance(Application application) {
+    public static IUserRepository getInstance() {
         return new UserRepository(new UserAuthenticationRemoteDataSource(),
-                new UserDataRemoteDataSource(new SharedPreferencesUtil(application)));
+                new UserDataRemoteDataSource());
     }
 
     private UserRepository(BaseUserAuthenticationRemoteDataSource userAuthRemoteDataSource,
@@ -243,6 +239,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     @Override
     public void onSuccessFromAuthentication(User user) {
         if (user != null) {
+            Log.d(TAG, "Authentication success.");
             userDataRemoteDataSource.saveUserData(user);
             logoutResult.postValue(null);
             lastAuthenticationTimestamp.postValue(System.currentTimeMillis());
@@ -251,12 +248,14 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFromAuthentication(String message) {
+        Log.e(TAG, message);
         Result.Error result = new Result.Error(message);
         userMutableLiveData.postValue(result);
     }
 
     @Override
     public void onSuccessFromRemoteDatabase(User user) {
+        Log.d(TAG, "User data updated successfully.");
         Result.UserSuccess result = new Result.UserSuccess(user);
         userMutableLiveData.postValue(result);
     }
@@ -278,6 +277,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onFailureFromRemoteDatabaseUser(String message) {
+        Log.e(TAG, message);
         Result.Error result = new Result.Error(message);
         userMutableLiveData.postValue(result);
     }
@@ -299,6 +299,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchFollowersFromRemoteDatabase(List<FollowUser> followerList) {
+        Log.d(TAG, "Followers fetched successfully");
         List<Result> followersResultList = new ArrayList<>();
         for(FollowUser follower : followerList){
             followersResultList.add(new Result.FollowUserSuccess(follower));
@@ -313,6 +314,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchFollowingFromRemoteDatabase(List<FollowUser> followingList) {
+        Log.d(TAG, "Followings fetched successfully");
         List<Result> followingResultList = new ArrayList<>();
         for(FollowUser following : followingList){
             followingResultList.add(new Result.FollowUserSuccess(following));
@@ -327,7 +329,6 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessAddComment(String bookId, Comment comment) {
-        //TODO vogliamo far vedere qualcos'altro? forse non serve comment? forse possiamo aggiungere direttamente il commento?? vale anche per successo di delete
         Log.d(TAG,"Comment added successfully");
         fetchComments(bookId);
     }
@@ -436,19 +437,21 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessFetchOtherUser(User otherUser) {
+        Log.d(TAG, "Other user data fetched successfully");
         Result otherUserResult = new Result.UserSuccess(otherUser);
         otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
     public void onFailureFetchOtherUser(String message) {
+        Log.e(TAG, message);
         Result otherUserResult = new Result.Error(message);
         otherUserLiveData.postValue(otherUserResult);
     }
 
     @Override
     public void onSuccessFollowUser(String loggedUserIdToken, String followedUserIdToken) {
-        Log.d("onSuccessFollowUser", "success");
+        Log.d(TAG, "User " + loggedUserIdToken + " started following " +  followedUserIdToken + " successfully");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(followedUserIdToken);
         addNotification(followedUserIdToken, NOTIFICATION_NEW_FOLLOWER, loggedUserIdToken);
@@ -461,7 +464,7 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessUnfollowUser(String loggedUserIdToken, String unfollowedUserIdToken) {
-        Log.d("onSuccessUnfollowUser", "success");
+        Log.d(TAG, "User " + loggedUserIdToken + " unfollowed" +  unfollowedUserIdToken + " successfully");
         userDataRemoteDataSource.refreshLoggedUserData(loggedUserIdToken);
         userDataRemoteDataSource.fetchOtherUser(unfollowedUserIdToken);
         removeNotification(unfollowedUserIdToken, NOTIFICATION_NEW_FOLLOWER, loggedUserIdToken);
@@ -494,11 +497,13 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessLogout() {
+        Log.d(TAG, "logout succeeded");
         logoutResult.postValue(true);
     }
 
     @Override
     public void onFailureLogout() {
+        Log.d(TAG, "logout failed");
         logoutResult.postValue(false);
     }
 
@@ -511,37 +516,39 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
     public void onPasswordChanged(Boolean result) {
         sourcePasswordError.postValue(result);
         if(result) {
-            Log.d("onPasswordChanged", "true");
+            Log.d(TAG, "Password changed");
         } else {
-            Log.d("onPasswordChanged", "false");
+            Log.w(TAG, "Password didn't change");
         }
-
     }
 
     @Override
     public void onSuccessFetchNotifications(HashMap<String, ArrayList<Notification>> notifications) {
-        Log.d(TAG, "onSuccessFetchNotifications");
+        Log.d(TAG, "Notifications fetched successfully");
         this.fetchedNotifications.postValue(notifications);
     }
 
     @Override
     public void onFailureFetchNotifications(String message) {
-        Log.d("onFailureFetchNotifications", message);
+        Log.d(TAG, message);
     }
 
     @Override
     public void onSuccessReAuthentication() {
+        Log.d(TAG, "Re-authentication succeeded");
         userAuthenticationResult.postValue(true);
         lastAuthenticationTimestamp.postValue(System.currentTimeMillis());
     }
 
     @Override
     public void onFailureReAuthentication() {
+        Log.w(TAG, "Re-authentication failed");
         userAuthenticationResult.postValue(false);
     }
 
     @Override
     public void onSuccessReadNotification(String loggedUserIdToken) {
+        Log.d(TAG, "Notifications read succeeded");
         fetchNotifications(loggedUserIdToken);
     }
 
@@ -552,21 +559,21 @@ public class UserRepository implements IUserRepository, UserResponseCallback {
 
     @Override
     public void onSuccessAddNotification() {
-        Log.d("onSuccessAddNotification", "success");
+        Log.d(TAG, "Notification added successfully");
     }
 
     @Override
     public void onFailureAddNotification(String message) {
-        Log.d("onFailureAddNotification", message);
+        Log.e(TAG, message);
     }
 
     @Override
     public void onSuccessRemoveNotification() {
-        Log.d("onSuccessRemoveNotification", "success");
+        Log.d(TAG, "Notification removed successfully");
     }
 
     @Override
     public void onFailureRemoveNotification(String message) {
-        Log.d("onFailureRemoveNotification", message);
+        Log.e(TAG, message);
     }
 }

@@ -1,8 +1,6 @@
 package it.unimib.readify.viewmodel;
 
-import static java.text.DateFormat.getTimeInstance;
-
-import android.util.Log;
+import static it.unimib.readify.util.Constants.USER_SEARCH_LIMIT;
 
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -19,39 +17,11 @@ import it.unimib.readify.model.Result;
 import it.unimib.readify.model.User;
 
 public class UserViewModel extends ViewModel {
-    private final IUserRepository testDatabaseRepository;
-    private final int USER_SEARCH_LIMIT = 10;
-    /*
-        With this configuration
-         (having two LiveData variables that memorizes data, repositoryData and copiedData),
-         ViewModel can have a different version of the data in the Repository, and so in the Database.
-        Even if it isn't yet known the purpose of this choice, it is the most flexible one
-         for future changes and implementations.
 
-        How to implement the copy of Database data:
-        1)  Using MutableLiveData
-        2)  Using MediatorLiveData
-            This class can observe one or more other LiveData objects
-             and propagate their changes to its set of observers.
-            It can be used to create complex data update logic in the ViewModel,
-             for example combining data from multiple sources or applying transformations
-             to the data before exposing it to the user interface.
-            This is (again) the most flexible choice for future changes and implementations;
-             in addition, it is an opportunity to use a different JetPack element.
-     */
-    private final MutableLiveData<Result> repositoryData;
-    private final MediatorLiveData<Result> copiedData = new MediatorLiveData<>();
-    /*
-        It can happen that the user inserts incorrect credentials
-         (generating userCollisionError, invalidCredentials exceptions).
-        With this implementation, WITHOUT @isUIRunning, IF the user inserts incorrect credentials
-         in the Login AND AFTER moves from Login to Registration, the Registration is going
-         to print the previous error made in the Login; that's because the Observer catches the update
-         (@copiedData has changed to a new Result.Error instance).
-        It is the same with roles reversed (Login printing a Registration error).
-        @isUIRunning prevents the problem, allowing Login / Registration actions only after
-         having set the data using setUserMutableLiveData(), each time a container is created.
-     */
+    private final IUserRepository userRepository;
+
+    private final MediatorLiveData<Result> userData = new MediatorLiveData<>();
+
     private MutableLiveData<List<Result>> userSearchResultsLiveData;
     private MutableLiveData<List<Result>> commentListLiveData;
     private MutableLiveData<List<Result>> followersListLiveData;
@@ -67,79 +37,37 @@ public class UserViewModel extends ViewModel {
     private boolean firstLoading = true;
     private boolean continueRegistrationFirstLoading = true;
     private final MutableLiveData<Long> lastAuthenticationTimestamp;
-    public UserViewModel(IUserRepository testDatabaseRepository) {
-        this.testDatabaseRepository = testDatabaseRepository;
-        /*
-            With the coming MutableLiveData initialization, repositoryData(1) (ViewModel)
-             is pointing to the instance of userMutableLiveData(2) (Repository).
-            This means that each of them will overwrite the value of the other with method postValue().
-            Class MutableLiveData seems to have the same behavior as a POINTER, even though
-             pointers don't exist in Java: this is an example of OBJECT REFERENCING.
-            In this case, object referencing is useful: it allows the programmer to not implement
-             any method that would communicate the change of data from ViewModel to Repository
-             (for example)
-         */
-        repositoryData = testDatabaseRepository.getUserMutableLiveData();
 
-        /*
-            To allow ViewModel having a different version of the data memorized in Repository,
-             it can be used another LiveData instance(3)
-             which gets (only) the value from the original one (1 or 2) using postValue().
-            Using (a) postValue() isn't the same as (b) initialising a LiveData with another instance:
-                (a) Changes only the value of an already created instance (instance of LiveData).
-                    es. copiedData.postValue(result);
-                (b) Changes the reference of the current instance (object referencing)
-                    es. repositoryData = testDatabaseRepository.getUserMutableLiveData();
-            Using (a) is the best practice when an INDEPENDENT LiveData instance is needed.
-            Nevertheless, (b) can be useful in some cases.
-         */
-        copiedData.addSource(repositoryData, newData -> {
-            Log.d("viewModel", "data changed");
+    public UserViewModel(IUserRepository userRepository) {
+        this.userRepository = userRepository;
+
+        MutableLiveData<Result> repositoryData = userRepository.getUserMutableLiveData();
+        userData.addSource(repositoryData, newData -> {
             Result result;
             if(newData.isSuccess()) {
-                /*
-                    Setting the value of Mutable / MediatorLiveData
-                    Object referencing is a practice
-                     which assets depending on the situation it is used on.
-                    Regarding the assignment of the value of LiveData instances,
-                     object referencing the value is:
-                        1) suboptimal because some memory is going to be allocated
-                            without necessity (not completely unnecessary in this case);
-                        2) definitely useful because, IN THIS CASE, having the reference of the data
-                            contained in the Repository, even for a brief moment, CAN be
-                            a lack of security;
-
-                    In this case, newData and result, despite being of the same class and
-                     memorizing the very same data, they are two DIFFERENT instances.
-                    The instance of LiveData is UNCHANGED because postValue() is used.
-                 */
                 result = new Result.UserSuccess(((Result.UserSuccess)newData).getData());
             } else {
                 result = new Result.Error(((Result.Error)newData).getMessage());
             }
-            copiedData.postValue(result);
+            userData.postValue(result);
         });
-        usernameAvailableResult = testDatabaseRepository.getUsernameAvailableResult();
-        sourcePasswordError = testDatabaseRepository.getSourcePasswordError();
-        notifications = testDatabaseRepository.getFetchedNotifications();
-        userAuthenticationResult = testDatabaseRepository.getUserAuthenticationResult();
-        lastAuthenticationTimestamp = testDatabaseRepository.getLastAuthenticationTimestamp();
+
+        usernameAvailableResult = userRepository.getUsernameAvailableResult();
+        sourcePasswordError = userRepository.getSourcePasswordError();
+        notifications = userRepository.getFetchedNotifications();
+        userAuthenticationResult = userRepository.getUserAuthenticationResult();
+        lastAuthenticationTimestamp = userRepository.getLastAuthenticationTimestamp();
     }
 
-    //new logic
     public void setUserMutableLiveData(String email, String password, boolean isRegistered) {
-        testDatabaseRepository.getUser(email, password, isRegistered);
+        userRepository.getUser(email, password, isRegistered);
         if(!isUIRunning) {
             setUIRunning(true);
         }
     }
 
     public MediatorLiveData<Result> getUserMediatorLiveData() {
-        return copiedData;
-    }
-
-    public void setUserMediatorLiveData(Result newData) {
-        copiedData.postValue(newData);
+        return userData;
     }
 
     public boolean isUIRunning() {
@@ -150,54 +78,20 @@ public class UserViewModel extends ViewModel {
         isUIRunning = UIRunning;
     }
 
-    /*
-        Why professor use boolean authenticationError (USELESS EXPLANATION)
-        (Having only this function)
-            public MutableLiveData<Result> getLoggedUser(String email, String password, boolean isRegistered) {
-            if(userMutableLiveData.getValue() == null) {
-                userMutableLiveData = testDatabaseRepository.getUser(email, password, isRegistered);
-            }
-            return userMutableLiveData;
-        In case the user insert incorrect credentials
-        in the login / registration fragment, which are going to cause database error "invalid credentials",
-        (such as insert an email that is not memorized in the Authentication Database yet), these
-        (incorrect) credentials will set the value of userMutableLiveData to a Result.Error and,
-        after correcting the inputs (email / password) in the login section, the getLoggedUser() method
-        is not going to invoke the Repository call because the value of userMutableLiveData is not null,
-        causing the system to not be able to update the userMutableLiveData variable
-        in the viewModel and Repository.
-        This would cause the impossibility to log into the HomeActivity
-
-        Solutions:
-        1) adding boolean authenticationError, getter / setter methods and other system logic
-            --> this will update the userMutableLiveData only in the Repository and solve the problem????
-        2) implementing a mechanism which will set the value of userMutableLiveData to null / new variable
-            in case its value is going to be a Result.Error
-            --> this will work for the system logic, but each time the system will set the decided
-                base value, another observer will be created because we return
-                a new instance of userMutableLiveData; that's obviously a problem
-
-         UPDATE:
-         Implementing the new logic, the problem can't happen.
-     */
-
     public void searchUsers(String query){
-        testDatabaseRepository.searchUsers(query, USER_SEARCH_LIMIT);
+        userRepository.searchUsers(query, USER_SEARCH_LIMIT);
     }
 
     public MutableLiveData<List<Result>> getUserSearchResultsLiveData(){
         if(userSearchResultsLiveData == null){
-            userSearchResultsLiveData = testDatabaseRepository.getUserSearchResultsLiveData();
+            userSearchResultsLiveData = userRepository.getUserSearchResultsLiveData();
         }
         return userSearchResultsLiveData;
     }
 
     public MutableLiveData<List<Result>> getCommentList(){
         if(commentListLiveData == null){
-            Log.d("ViewModel", "getCommentList : case NULL");
-            commentListLiveData = testDatabaseRepository.getCommentListLiveData();
-        } else {
-            Log.d("ViewModel", "getCommentList : case OK");
+            commentListLiveData = userRepository.getCommentListLiveData();
         }
         return commentListLiveData;
     }
@@ -207,75 +101,79 @@ public class UserViewModel extends ViewModel {
     }
 
     public void fetchComments(String bookId){
-        Log.d("ViewModel", "fetchComments start");
-        testDatabaseRepository.fetchComments(bookId);
+        userRepository.fetchComments(bookId);
     }
 
     public void addComment(String commentContent, String bookId, String idToken){
-        testDatabaseRepository.addComment(commentContent,bookId,idToken);
+        userRepository.addComment(commentContent,bookId,idToken);
     }
 
     public void deleteComment(String bookId, Comment deletedComment){
-        testDatabaseRepository.deleteComment(bookId, deletedComment);
+        userRepository.deleteComment(bookId, deletedComment);
     }
 
-    public void changeUserPassword(String newPassword) {testDatabaseRepository.changeUserPassword(newPassword);}
+    public void changeUserPassword(String newPassword) {
+        userRepository.changeUserPassword(newPassword);}
 
     public void setUserUsername(User user) {
-        testDatabaseRepository.setUserUsername(user);
+        userRepository.setUserUsername(user);
     }
 
     public void setUserGender(User user) {
-        testDatabaseRepository.setUserGender(user);
+        userRepository.setUserGender(user);
     }
 
     public void setUserVisibility(User user) {
-        testDatabaseRepository.setUserVisibility(user);
+        userRepository.setUserVisibility(user);
     }
 
     public void setUserRecommended(User user) {
-        testDatabaseRepository.setUserRecommended(user);
+        userRepository.setUserRecommended(user);
     }
 
     public void setUserBiography(User user) {
-        testDatabaseRepository.setUserBiography(user);
+        userRepository.setUserBiography(user);
     }
 
     public void setUserAvatar(User user) {
-        testDatabaseRepository.setUserAvatar(user);
+        userRepository.setUserAvatar(user);
     }
 
-    public void setUserFollowing(User user) {testDatabaseRepository.setUserFollowing(user);}
+    public void setUserFollowing(User user) {
+        userRepository.setUserFollowing(user);}
 
-    public void setUserFollowers(User user) {testDatabaseRepository.setUserFollowers(user);}
-    public void setUserTotalNumberOfBooks(User user) {testDatabaseRepository.setUserTotalNumberOfBooks(user);}
+    public void setUserFollowers(User user) {
+        userRepository.setUserFollowers(user);}
+
+    public void setUserTotalNumberOfBooks(User user) {
+        userRepository.setUserTotalNumberOfBooks(user);}
 
     public void fetchNotifications(String idToken) {
-        testDatabaseRepository.fetchNotifications(idToken);
+        userRepository.fetchNotifications(idToken);
     }
 
     public void readNotifications(String idToken, String notificationType) {
-        testDatabaseRepository.readNotifications(idToken, notificationType);
+        userRepository.readNotifications(idToken, notificationType);
     }
 
     public void fetchFollowers(String idToken){
-        testDatabaseRepository.fetchFollowers(idToken);
+        userRepository.fetchFollowers(idToken);
     }
 
     public void fetchFollowing(String idToken){
-        testDatabaseRepository.fetchFollowing(idToken);
+        userRepository.fetchFollowing(idToken);
     }
 
     public MutableLiveData<List<Result>> getFollowersListLiveData() {
         if(followersListLiveData == null){
-            followersListLiveData = testDatabaseRepository.getFollowersListLiveData();
+            followersListLiveData = userRepository.getFollowersListLiveData();
         }
         return followersListLiveData;
     }
 
     public MutableLiveData<List<Result>> getFollowingListLiveData() {
         if(followingListLiveData == null){
-            followingListLiveData = testDatabaseRepository.getFollowingListLiveData();
+            followingListLiveData = userRepository.getFollowingListLiveData();
         }
         return followingListLiveData;
     }
@@ -297,27 +195,26 @@ public class UserViewModel extends ViewModel {
     }
 
     public void followUser(String idTokenLoggedUser, String idTokenFollowedUser){
-        testDatabaseRepository.followUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("ViewModel", "followButtonClick premuto con idtoken: " + idTokenLoggedUser);
+        userRepository.followUser(idTokenLoggedUser, idTokenFollowedUser);
     }
+
     public void unfollowUser(String idTokenLoggedUser, String idTokenFollowedUser){
-        testDatabaseRepository.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
-        Log.d("ViewModel", "unfollowButtonClick premuto con idtoken: " + idTokenLoggedUser);
+        userRepository.unfollowUser(idTokenLoggedUser, idTokenFollowedUser);
     }
 
     public MutableLiveData<Result> getOtherUserLiveData(){
         if(otherUserLiveData == null){
-            otherUserLiveData = testDatabaseRepository.getOtherUserLiveData();
+            otherUserLiveData = userRepository.getOtherUserLiveData();
         }
         return otherUserLiveData;
     }
 
     public void fetchOtherUser(String otherUserIdToken){
-        testDatabaseRepository.fetchOtherUser(otherUserIdToken);
+        userRepository.fetchOtherUser(otherUserIdToken);
     }
 
     public void signInWithGoogle(String idToken){
-        testDatabaseRepository.signInWithGoogle(idToken);
+        userRepository.signInWithGoogle(idToken);
         if(!isUIRunning) {
             setUIRunning(true);
         }
@@ -333,13 +230,13 @@ public class UserViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> getLogoutResult() {
         if(logoutResult == null){
-            logoutResult = testDatabaseRepository.getLogoutResult();
+            logoutResult = userRepository.getLogoutResult();
         }
         return logoutResult;
     }
 
     public void logout(){
-        testDatabaseRepository.logout();
+        userRepository.logout();
     }
 
     public boolean isContinueRegistrationFirstLoading() {
@@ -351,22 +248,22 @@ public class UserViewModel extends ViewModel {
     }
 
     public void resetAuthenticationResult() {
-        testDatabaseRepository.resetAuthenticationResult();
+        userRepository.resetAuthenticationResult();
     }
 
     public void isUsernameAvailable(String username){
-        testDatabaseRepository.isUsernameAvailable(username);
+        userRepository.isUsernameAvailable(username);
     }
 
     public void userAuthentication(String email, String password){
-        testDatabaseRepository.userAuthentication(email, password);
+        userRepository.userAuthentication(email, password);
     }
 
     public void deleteUserInfo(){
-        testDatabaseRepository.deleteUserInfo();
+        userRepository.deleteUserInfo();
     }
 
     public void resetPasswordErrorResult() {
-        testDatabaseRepository.resetPasswordErrorResult();
+        userRepository.resetPasswordErrorResult();
     }
 }

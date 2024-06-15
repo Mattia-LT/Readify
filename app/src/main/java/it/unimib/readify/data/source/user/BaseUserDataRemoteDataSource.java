@@ -14,7 +14,6 @@ public abstract class BaseUserDataRemoteDataSource {
 
     public abstract void saveUserData(User user);
     public abstract void setUsername(User user);
-    public abstract void setEmail(User user);
     public abstract void setGender(User user);
     public abstract void setVisibility(User user);
     public abstract void setRecommended(User user);

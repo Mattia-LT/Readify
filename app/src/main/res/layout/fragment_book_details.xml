@@ -248,7 +248,7 @@
                 app:layout_constraintTop_toBottomOf="@id/book_description_title" />
 
 
-            <!-- separatore -->
+            <!-- separator -->
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider_book_details_3"
                 android:layout_width="match_parent"

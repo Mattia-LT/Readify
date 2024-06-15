@@ -58,7 +58,6 @@ public class Constants {
     public static final String RECOMMENDED = "recommended";
     public static final String RECENT = "recent";
     public static final String SEARCH = "search";
-    public static final String COLLECTION = "collection";
 
 
     // Constants or error messages
@@ -140,4 +139,6 @@ public class Constants {
     public static final String NOTIFICATION_STATISTICS = "statistics";
 
     public static final String GOOGLE_SESSION_EXPIRED = "invalidCredentials";
+
+    public static final int USER_SEARCH_LIMIT = 10;
 }

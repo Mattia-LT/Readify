@@ -53,8 +53,6 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.palette:palette:1.0.0")
 
-
-
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.android.gms:play-services-base:18.5.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
@@ -72,18 +70,15 @@ dependencies {
     // Module for rounded image views
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-
     // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     // Analytics
     implementation("com.google.firebase:firebase-analytics")
     // Authentication
     implementation("com.google.firebase:firebase-auth")
-    // TODO - don't update. delete this comment before final commit
     implementation("com.google.android.gms:play-services-auth:21.1.0")
     // Realtime Database library
     implementation("com.google.firebase:firebase-database")
-
 
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
 

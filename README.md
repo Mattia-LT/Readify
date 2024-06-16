@@ -10,6 +10,6 @@
 * Mattia Ingrassia 879204 <m.ingrassia3@campus.unimib.it>
 * Michele Panzeri 887579 <m.panzeri57@campus.unimib.it>
 
-TODO link alla documentazione
-
 E' possibile visualizzare gli screenshots delle schermate dell'applicazione nella apposita cartella [screenshots](https://github.com/Mattia-LT/Readify/tree/master/screenshots).
+
+E' inoltre possibile visualizzare la [documentazione](https://github.com/Mattia-LT/Readify/blob/master/Documentazione%20Readify.pdf).
